@@ -1,11 +1,14 @@
-FROM python:3.12-slim AS base
+FROM python:3.12-slim
 
 WORKDIR /app
 
 RUN pip install --no-cache-dir uv
 
 COPY pyproject.toml uv.lock ./
-RUN uv sync --no-dev --frozen
+
+RUN uv export --no-dev --frozen --no-hashes -o requirements.txt \
+    && pip install --no-cache-dir -r requirements.txt \
+    && rm requirements.txt
 
 COPY pokedex/ pokedex/
 COPY tracker/ tracker/
@@ -19,4 +22,4 @@ ENV TRACKER_PORT=8765
 
 EXPOSE 8765
 
-CMD ["uv", "run", "python", "-m", "tracker"]
+CMD ["python", "-m", "tracker"]

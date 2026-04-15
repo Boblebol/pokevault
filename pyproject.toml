@@ -18,10 +18,6 @@ classifiers = [
     "Topic :: Games/Entertainment",
 ]
 
-[project.urls]
-Homepage = "https://pokevault.alexandre-enouf.fr"
-Repository = "https://github.com/Boblebol/pokevault"
-Issues = "https://github.com/Boblebol/pokevault/issues"
 dependencies = [
     "typer>=0.9.0",
     "pydantic>=2.0.0",
@@ -35,6 +31,11 @@ dependencies = [
     "tqdm>=4.66.0",
     "pyyaml>=6.0.0",
 ]
+
+[project.urls]
+Homepage = "https://pokevault.alexandre-enouf.fr"
+Repository = "https://github.com/Boblebol/pokevault"
+Issues = "https://github.com/Boblebol/pokevault/issues"
 
 [project.scripts]
 pokedex = "main:app"
