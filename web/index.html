@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Pokédex Tracker</title>
+    <title>pokevault — Laboratory Archive</title>
     <link
       rel="stylesheet"
       href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@300;400;500;600;700&display=swap"
@@ -12,7 +12,7 @@
       rel="stylesheet"
       href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL,GRAD,opsz@100..700,0..1,-50..200,20..48"
     />
-    <link rel="stylesheet" href="/styles.css?v=20260414c" />
+    <link rel="stylesheet" href="/styles.css?v=20260415" />
   </head>
   <body>
     <header class="stitch-topbar">
@@ -54,7 +54,7 @@
             </div>
 
             <div class="progress-row">
-              <div class="progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100">
+              <div class="progress-bar" role="progressbar" aria-label="Collection progress" aria-valuemin="0" aria-valuemax="100">
                 <div class="progress-bar-fill" id="progressFill"></div>
               </div>
               <span class="counter" id="counter">0 / 0</span>
@@ -67,19 +67,20 @@
                 id="search"
                 class="search-input"
                 placeholder="Search by name or archive index..."
+                aria-label="Search by name or archive index"
                 autocomplete="off"
                 spellcheck="false"
               />
             </label>
 
-            <div class="filters" role="tablist" aria-label="Filtrer par statut">
-              <button type="button" class="filter-btn is-active" data-filter="all" role="tab" aria-selected="true">
+            <div class="filters" role="group" aria-label="Filter by status">
+              <button type="button" class="filter-btn is-active" data-filter="all" aria-pressed="true">
                 All
               </button>
-              <button type="button" class="filter-btn" data-filter="caught" role="tab" aria-selected="false">
+              <button type="button" class="filter-btn" data-filter="caught" aria-pressed="false">
                 Caught
               </button>
-              <button type="button" class="filter-btn" data-filter="missing" role="tab" aria-selected="false">
+              <button type="button" class="filter-btn" data-filter="missing" aria-pressed="false">
                 Missing
               </button>
             </div>
@@ -122,7 +123,7 @@
 
           <main class="grid" id="grid" aria-live="polite"></main>
           <nav class="list-pagination" id="listPagination" aria-label="Pagination liste">
-            <button type="button" class="list-page-btn" id="listPagePrev" aria-label="Page precedente">◀</button>
+            <button type="button" class="list-page-btn" id="listPagePrev" aria-label="Page précédente">◀</button>
             <div class="list-page-numbers" id="listPageNumbers" aria-label="Pages"></div>
             <span class="list-page-info" id="listPageInfo">Page 1 / 1</span>
             <button type="button" class="list-page-btn" id="listPageNext" aria-label="Page suivante">▶</button>
@@ -136,7 +137,7 @@
           <h1 class="title">Collection Statistics</h1>
           <p class="collection-subtitle">Global completion, regions, and archive gaps.</p>
         </header>
-        <main class="stats-main" id="statsBody"></main>
+        <section class="stats-main" id="statsBody"></section>
       </div>
 
       <div id="viewClasseur" class="app-view" hidden>
@@ -150,14 +151,14 @@
           <div id="binderAdvancedPanel" class="stitch-hidden" hidden>
             <label class="region-filter-wrap binder-v2-region-wrap">
               <span class="region-filter-label">Région (aperçu ordre)</span>
-              <select id="binderRegionFilter" class="region-filter" disabled aria-label="Filtrer l’aperçu ordre par région">
+              <select id="binderRegionFilter" class="region-filter" disabled aria-label="Filtrer l'aperçu ordre par région">
                 <option value="all">Toutes</option>
               </select>
             </label>
           </div>
         </header>
 
-        <main class="binder-main binder-main--v2">
+        <section class="binder-main binder-main--v2">
           <div id="binderContentWrap">
             <div id="binderCollectionShell" class="binder-collection-shell" hidden>
               <div class="binder-shell-layout">
@@ -216,7 +217,7 @@
               </details>
             </div>
           </div>
-        </main>
+        </section>
       </div>
 
       <div id="viewSettings" class="app-view" hidden>
@@ -224,29 +225,29 @@
           <h1 class="title">System Settings</h1>
           <p class="collection-subtitle">Réglages interface et préférences locales.</p>
         </header>
-        <main class="stats-main">
-          <section class="stats-kpi-card">
+        <section class="stats-main">
+          <div class="stats-kpi-card">
             <h2 class="stats-kpi-label">Display</h2>
             <p class="stats-kpi-sub">Le contraste des cartes est partagé entre liste et classeur.</p>
-            <label class="region-filter-wrap" style="margin-top: 8px">
+            <label class="region-filter-wrap settings-dim-label">
               <span class="region-filter-label">Contraste global</span>
               <select id="settingsDimSelect" class="region-filter" aria-label="Contraste global">
                 <option value="caught">Attrapés atténués</option>
                 <option value="missing">Manquants atténués</option>
               </select>
             </label>
-          </section>
-          <section class="stats-kpi-card">
+          </div>
+          <div class="stats-kpi-card">
             <h2 class="stats-kpi-label">Data</h2>
-            <p class="stats-kpi-sub">Les préférences d’interface sont stockées en localStorage.</p>
-          </section>
-        </main>
+            <p class="stats-kpi-sub">Les préférences d'interface sont stockées en localStorage.</p>
+          </div>
+        </section>
       </div>
     </div>
 
-    <script src="/binder-v2.js?v=20260414c" defer></script>
-    <script src="/app.js?v=20260414c" defer></script>
-    <script src="/binder-collection-view.js?v=20260414c" defer></script>
-    <script src="/stats-view.js?v=20260414c" defer></script>
+    <script src="/binder-v2.js?v=20260415" defer></script>
+    <script src="/app.js?v=20260415" defer></script>
+    <script src="/binder-collection-view.js?v=20260415" defer></script>
+    <script src="/stats-view.js?v=20260415" defer></script>
   </body>
 </html>

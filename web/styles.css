@@ -1864,6 +1864,10 @@ body {
   color: #c4a29d;
 }
 
+.settings-dim-label {
+  margin-top: 8px;
+}
+
 .stats-kpi-value {
   margin: 0;
   font-family: "Space Grotesk", "Inter", system-ui, sans-serif;

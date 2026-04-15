@@ -707,7 +707,7 @@ function setupFilters() {
       document.querySelectorAll(".filter-btn").forEach((b) => {
         const on = b === btn;
         b.classList.toggle("is-active", on);
-        b.setAttribute("aria-selected", on ? "true" : "false");
+        b.setAttribute("aria-pressed", on ? "true" : "false");
       });
       render();
     });
