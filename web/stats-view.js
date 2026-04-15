@@ -27,16 +27,6 @@ function filteredPoolForStats() {
   return PC?.allPokemon || [];
 }
 
-function appendRow(tbody, cells) {
-  const tr = document.createElement("tr");
-  for (const c of cells) {
-    const td = document.createElement("td");
-    td.textContent = c;
-    tr.append(td);
-  }
-  tbody.append(tr);
-}
-
 function topMissingTypes(pool, caught, limit = 3) {
   const map = new Map();
   for (const p of pool) {
@@ -103,8 +93,7 @@ function renderStats() {
   }
 
   const globalPct = gTotal ? Math.round((gCaught / gTotal) * 100) : 0;
-  const hasToggle = Boolean(document.getElementById("statsAdvancedToggle"));
-  const showAdvanced = hasToggle ? window.__statsAdvancedOpen === true : true;
+  const showAdvanced = true;
   const hero = document.createElement("section");
   hero.className = "stats-hero";
   const heroLeft = document.createElement("div");

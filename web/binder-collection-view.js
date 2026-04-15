@@ -3,14 +3,13 @@
  * choix du classeur, navigation feuillet recto/verso.
  */
 
-/** @type {{ cfg: object | null; binderId: string; sheet: number; face: number; ordered: unknown[]; viewMode: "region" }} */
+/** @type {{ cfg: object | null; binderId: string; sheet: number; face: number; ordered: unknown[] }} */
 const shellState = {
   cfg: null,
   binderId: "",
   sheet: 0,
   face: 0,
   ordered: [],
-  viewMode: "region",
 };
 
 let shellInited = false;
@@ -404,7 +403,6 @@ function syncFromConfig(cfg) {
     return;
   }
   fillBinderSelect(cfg);
-  shellState.viewMode = "region";
   const binder = getActiveBinder(cfg);
   if (binder && !shellState.binderId) shellState.binderId = binder.id;
   shellState.sheet = 0;

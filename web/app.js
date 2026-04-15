@@ -483,47 +483,6 @@ function setupListPagination() {
   }
 }
 
-function setupAdvancedFiltersToggle() {
-  const btn = document.getElementById("advancedFiltersToggle");
-  const panel = document.getElementById("advancedFiltersPanel");
-  if (!btn || !panel || btn.dataset.wired) return;
-  btn.dataset.wired = "1";
-  btn.addEventListener("click", () => {
-    const willOpen = panel.hidden;
-    panel.hidden = !willOpen;
-    btn.setAttribute("aria-expanded", willOpen ? "true" : "false");
-    btn.classList.toggle("is-active", willOpen);
-  });
-}
-
-function setupStatsAdvancedToggle() {
-  const btn = document.getElementById("statsAdvancedToggle");
-  if (!btn || btn.dataset.wired) return;
-  btn.dataset.wired = "1";
-  btn.addEventListener("click", () => {
-    const current = window.__statsAdvancedOpen === true;
-    window.__statsAdvancedOpen = !current;
-    btn.setAttribute("aria-expanded", !current ? "true" : "false");
-    btn.classList.toggle("is-active", !current);
-    if (window.PokedexStats?.render) window.PokedexStats.render();
-  });
-}
-
-function setupBinderAdvancedToggle() {
-  const btn = document.getElementById("binderAdvancedToggle");
-  const panel = document.getElementById("binderAdvancedPanel");
-  const extras = document.getElementById("binderExtrasWrap");
-  if (!btn || !panel || !extras || btn.dataset.wired) return;
-  btn.dataset.wired = "1";
-  btn.addEventListener("click", () => {
-    const open = panel.hidden;
-    panel.hidden = !open;
-    extras.hidden = !open;
-    btn.setAttribute("aria-expanded", open ? "true" : "false");
-    btn.classList.toggle("is-active", open);
-  });
-}
-
 function setupSettingsView() {
   const sel = document.getElementById("settingsDimSelect");
   if (!sel || sel.dataset.wired) return;
@@ -786,7 +745,7 @@ function readStoredTypeFilter() {
   }
 }
 
-async function startTrackerV1() {
+async function startTracker() {
   formFilterMode = readStoredFormFilterMode();
   typeFilter = readStoredTypeFilter();
   setupFilters();
@@ -795,9 +754,6 @@ async function startTrackerV1() {
   setupTypeFilter();
   setupFormFilter();
   setupListPagination();
-  setupAdvancedFiltersToggle();
-  setupStatsAdvancedToggle();
-  setupBinderAdvancedToggle();
   setupSettingsView();
   const formSel = document.getElementById("formFilter");
   if (formSel) formSel.value = formFilterMode;
@@ -865,7 +821,7 @@ function applyAppRoute() {
           : "Collection — Classeurs";
   if (view === "liste" && !listViewStarted) {
     listViewStarted = true;
-    void startTrackerV1();
+    void startTracker();
   }
   if (view === "classeur" && typeof window.startBinderV2IfNeeded === "function") {
     window.startBinderV2IfNeeded();
