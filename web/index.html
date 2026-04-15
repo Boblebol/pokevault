@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Pokédex Tracker</title>
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@300;400;500;600;700&display=swap"
+    />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL,GRAD,opsz@100..700,0..1,-50..200,20..48"
+    />
+    <link rel="stylesheet" href="/styles.css?v=20260414c" />
+  </head>
+  <body>
+    <header class="stitch-topbar">
+      <div class="stitch-topbar-inner">
+        <div class="stitch-brand">Laboratory Archive</div>
+        <nav class="stitch-topnav">
+          <a href="#/liste" class="app-switch-link is-active" data-view="liste" aria-current="page">List</a>
+          <a href="#/classeur" class="app-switch-link" data-view="classeur">Binders</a>
+          <a href="#/stats" class="app-switch-link" data-view="stats">Stats</a>
+          <a href="#/settings" class="app-switch-link" data-view="settings">Settings</a>
+        </nav>
+      </div>
+    </header>
+
+    <aside class="stitch-sidebar">
+      <div class="stitch-side-title">Archive</div>
+      <a href="#/liste" class="app-switch-link is-active" data-view="liste">Specimens</a>
+      <a href="#/classeur" class="app-switch-link" data-view="classeur">Vaults</a>
+      <a href="#/stats" class="app-switch-link" data-view="stats">Analytics</a>
+      <a href="#/settings" class="app-switch-link" data-view="settings">System</a>
+    </aside>
+
+    <div class="stitch-canvas">
+      <div id="viewListe" class="app-view">
+        <div id="trackerMainBlock">
+          <header class="header app-collection-header">
+            <div class="list-hero">
+              <div class="list-hero-left">
+                <p class="list-kicker">Collection Status</p>
+                <h1 class="title">Archive Completion</h1>
+                <p class="collection-subtitle">
+                  Progression partagée avec les classeurs, synchronisée via les APIs locales.
+                </p>
+              </div>
+              <div class="list-hero-right">
+                <span id="listHeroPct" class="list-hero-pct">0%</span>
+                <p id="listHeroCount" class="list-hero-count">0 / 0 discovered</p>
+              </div>
+            </div>
+
+            <div class="progress-row">
+              <div class="progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100">
+                <div class="progress-bar-fill" id="progressFill"></div>
+              </div>
+              <span class="counter" id="counter">0 / 0</span>
+            </div>
+
+            <label class="search-wrap">
+              <span class="search-icon" aria-hidden="true">⌕</span>
+              <input
+                type="search"
+                id="search"
+                class="search-input"
+                placeholder="Search by name or archive index..."
+                autocomplete="off"
+                spellcheck="false"
+              />
+            </label>
+
+            <div class="filters" role="tablist" aria-label="Filtrer par statut">
+              <button type="button" class="filter-btn is-active" data-filter="all" role="tab" aria-selected="true">
+                All
+              </button>
+              <button type="button" class="filter-btn" data-filter="caught" role="tab" aria-selected="false">
+                Caught
+              </button>
+              <button type="button" class="filter-btn" data-filter="missing" role="tab" aria-selected="false">
+                Missing
+              </button>
+            </div>
+
+            <div class="advanced-filters stitch-hidden" id="advancedFiltersPanel" hidden>
+              <label class="region-filter-wrap">
+                <span class="region-filter-label">Région</span>
+                <select id="regionFilter" class="region-filter" aria-label="Filtrer par région du Pokédex">
+                  <option value="all">Toutes les régions</option>
+                </select>
+              </label>
+              <label class="region-filter-wrap">
+                <span class="region-filter-label">Formes</span>
+                <select id="formFilter" class="region-filter" aria-label="Filtrer les formes dans la liste uniquement">
+                  <option value="all">Tout le dex</option>
+                  <option value="base_only">Base uniquement</option>
+                  <option value="base_regional">Base + régional</option>
+                </select>
+              </label>
+              <label class="region-filter-wrap">
+                <span class="region-filter-label">Type</span>
+                <select id="typeFilter" class="region-filter" aria-label="Filtrer par type Pokémon">
+                  <option value="all">Tous les types</option>
+                </select>
+              </label>
+              <label class="region-filter-wrap collection-dim-wrap">
+                <span class="region-filter-label">Contraste</span>
+                <select
+                  id="collectionDimSelect"
+                  class="region-filter"
+                  aria-label="Assombrir les attrapés ou les manquants dans la grille"
+                >
+                  <option value="caught">Attrapés atténués</option>
+                  <option value="missing">Manquants atténués</option>
+                </select>
+              </label>
+            </div>
+            <p class="sync-hint" id="syncHint" hidden></p>
+          </header>
+
+          <main class="grid" id="grid" aria-live="polite"></main>
+          <nav class="list-pagination" id="listPagination" aria-label="Pagination liste">
+            <button type="button" class="list-page-btn" id="listPagePrev" aria-label="Page precedente">◀</button>
+            <div class="list-page-numbers" id="listPageNumbers" aria-label="Pages"></div>
+            <span class="list-page-info" id="listPageInfo">Page 1 / 1</span>
+            <button type="button" class="list-page-btn" id="listPageNext" aria-label="Page suivante">▶</button>
+          </nav>
+          <footer class="list-footer" id="listFooterMeta" aria-live="polite"></footer>
+        </div>
+      </div>
+
+      <div id="viewStats" class="app-view" hidden>
+        <header class="header app-collection-header stats-header">
+          <h1 class="title">Collection Statistics</h1>
+          <p class="collection-subtitle">Global completion, regions, and archive gaps.</p>
+        </header>
+        <main class="stats-main" id="statsBody"></main>
+      </div>
+
+      <div id="viewClasseur" class="app-view" hidden>
+        <header class="header binder-header app-collection-header">
+          <h1 class="title title-binder">Vault Explorer</h1>
+          <p class="collection-subtitle">Gestion des classeurs, pages, placements et synchronisation.</p>
+          <div class="binder-header-actions">
+            <button type="button" class="binder-refresh" id="binderV2Refresh">Rafraîchir</button>
+          </div>
+          <p class="sync-hint" id="binderV2Hint" hidden></p>
+          <div id="binderAdvancedPanel" class="stitch-hidden" hidden>
+            <label class="region-filter-wrap binder-v2-region-wrap">
+              <span class="region-filter-label">Région (aperçu ordre)</span>
+              <select id="binderRegionFilter" class="region-filter" disabled aria-label="Filtrer l’aperçu ordre par région">
+                <option value="all">Toutes</option>
+              </select>
+            </label>
+          </div>
+        </header>
+
+        <main class="binder-main binder-main--v2">
+          <div id="binderContentWrap">
+            <div id="binderCollectionShell" class="binder-collection-shell" hidden>
+              <div class="binder-shell-layout">
+                <aside class="binder-vaults-nav">
+                  <h2 class="binder-vaults-title">Your Vaults</h2>
+                  <div id="binderVaultsNav" class="binder-vaults-list" aria-label="Liste des classeurs"></div>
+                </aside>
+                <section class="binder-shell-main">
+                  <div class="binder-shell-toolbar">
+                    <label class="binder-shell-select-wrap">
+                      <span class="binder-shell-select-label">Classeur</span>
+                      <select id="binderIdSelect" class="region-filter binder-shell-select" aria-label="Classeur actif"></select>
+                    </label>
+                    <label class="binder-shell-select-wrap binder-dim-wrap">
+                      <span class="binder-shell-select-label">Contraste</span>
+                      <select id="binderDimSelect" class="region-filter binder-shell-select" aria-label="Assombrir les attrapés ou les manquants sur les pages">
+                        <option value="caught">Attrapés atténués</option>
+                        <option value="missing">Manquants atténués</option>
+                      </select>
+                    </label>
+                    <div class="binder-pager" role="navigation" aria-label="Pages du classeur">
+                      <button type="button" class="binder-pager-btn" id="binderFacePrev" aria-label="Pages précédentes">◀</button>
+                      <span class="binder-pager-label" id="binderFaceLabel"></span>
+                      <button type="button" class="binder-pager-btn" id="binderFaceNext" aria-label="Pages suivantes">▶</button>
+                    </div>
+                  </div>
+                  <div id="binderPagesHost" class="binder-pages-host" aria-label="Pages du classeur"></div>
+                  <section class="binder-metrics" id="binderMetrics" aria-label="Indicateurs du classeur"></section>
+                  <p class="binder-shell-hint" id="binderShellHint"></p>
+                </section>
+              </div>
+            </div>
+
+            <div id="binderEmptyPlaceholder" class="binder-empty-placeholder" hidden>
+              <p class="binder-empty-placeholder__text">Initialisation des classeurs 3×3 par région…</p>
+            </div>
+
+            <div id="binderExtrasWrap" class="binder-extras-wrap stitch-hidden" hidden>
+              <section id="binderRegionPreviewWrap" class="binder-panel binder-panel--full" hidden>
+                <h2 class="binder-panel-title">Aperçu ordre « par région »</h2>
+                <p class="binder-region-preview-hint" id="binderRegionPreviewHint"></p>
+                <ol class="binder-region-preview-list" id="binderRegionPreviewList"></ol>
+              </section>
+              <details class="binder-json-details">
+                <summary class="binder-json-details-summary">Données JSON (debug)</summary>
+                <div class="binder-panels-wrap binder-panels-wrap--json">
+                  <section class="binder-panel" aria-labelledby="lbl-config">
+                    <h2 id="lbl-config" class="binder-panel-title">Config classeurs (agrégée via REST)</h2>
+                    <pre class="binder-pre" id="binderConfigPreview"></pre>
+                  </section>
+                  <section class="binder-panel" aria-labelledby="lbl-pl">
+                    <h2 id="lbl-pl" class="binder-panel-title">Placements (agrégés via REST)</h2>
+                    <pre class="binder-pre" id="binderPlacementsPreview"></pre>
+                  </section>
+                </div>
+              </details>
+            </div>
+          </div>
+        </main>
+      </div>
+
+      <div id="viewSettings" class="app-view" hidden>
+        <header class="header app-collection-header">
+          <h1 class="title">System Settings</h1>
+          <p class="collection-subtitle">Réglages interface et préférences locales.</p>
+        </header>
+        <main class="stats-main">
+          <section class="stats-kpi-card">
+            <h2 class="stats-kpi-label">Display</h2>
+            <p class="stats-kpi-sub">Le contraste des cartes est partagé entre liste et classeur.</p>
+            <label class="region-filter-wrap" style="margin-top: 8px">
+              <span class="region-filter-label">Contraste global</span>
+              <select id="settingsDimSelect" class="region-filter" aria-label="Contraste global">
+                <option value="caught">Attrapés atténués</option>
+                <option value="missing">Manquants atténués</option>
+              </select>
+            </label>
+          </section>
+          <section class="stats-kpi-card">
+            <h2 class="stats-kpi-label">Data</h2>
+            <p class="stats-kpi-sub">Les préférences d’interface sont stockées en localStorage.</p>
+          </section>
+        </main>
+      </div>
+    </div>
+
+    <script src="/binder-v2.js?v=20260414c" defer></script>
+    <script src="/app.js?v=20260414c" defer></script>
+    <script src="/binder-collection-view.js?v=20260414c" defer></script>
+    <script src="/stats-view.js?v=20260414c" defer></script>
+  </body>
+</html>
