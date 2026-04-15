@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>pokevault — Laboratory Archive</title>
+    <title>pokevault</title>
     <link
       rel="stylesheet"
       href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@300;400;500;600;700&display=swap"
@@ -17,7 +17,7 @@
   <body>
     <header class="stitch-topbar">
       <div class="stitch-topbar-inner">
-        <div class="stitch-brand">Laboratory Archive</div>
+        <div class="stitch-brand">pokevault</div>
         <nav class="stitch-topnav">
           <a href="#/liste" class="app-switch-link is-active" data-view="liste" aria-current="page">List</a>
           <a href="#/classeur" class="app-switch-link" data-view="classeur">Binders</a>
@@ -28,7 +28,7 @@
     </header>
 
     <aside class="stitch-sidebar">
-      <div class="stitch-side-title">Archive</div>
+      <div class="stitch-side-title">pokevault</div>
       <a href="#/liste" class="app-switch-link is-active" data-view="liste">Specimens</a>
       <a href="#/classeur" class="app-switch-link" data-view="classeur">Vaults</a>
       <a href="#/stats" class="app-switch-link" data-view="stats">Analytics</a>
@@ -107,14 +107,14 @@
                 </select>
               </label>
               <label class="region-filter-wrap collection-dim-wrap">
-                <span class="region-filter-label">Contraste</span>
+                <span class="region-filter-label">Emphasis</span>
                 <select
                   id="collectionDimSelect"
                   class="region-filter"
-                  aria-label="Assombrir les attrapés ou les manquants dans la grille"
+                  aria-label="Choose which cards to fade in the grid"
                 >
-                  <option value="caught">Attrapés atténués</option>
-                  <option value="missing">Manquants atténués</option>
+                  <option value="caught">Fade caught</option>
+                  <option value="missing">Fade missing</option>
                 </select>
               </label>
             </div>
@@ -173,10 +173,10 @@
                       <select id="binderIdSelect" class="region-filter binder-shell-select" aria-label="Classeur actif"></select>
                     </label>
                     <label class="binder-shell-select-wrap binder-dim-wrap">
-                      <span class="binder-shell-select-label">Contraste</span>
-                      <select id="binderDimSelect" class="region-filter binder-shell-select" aria-label="Assombrir les attrapés ou les manquants sur les pages">
-                        <option value="caught">Attrapés atténués</option>
-                        <option value="missing">Manquants atténués</option>
+                      <span class="binder-shell-select-label">Emphasis</span>
+                      <select id="binderDimSelect" class="region-filter binder-shell-select" aria-label="Choose which cards to fade on binder pages">
+                        <option value="caught">Fade caught</option>
+                        <option value="missing">Fade missing</option>
                       </select>
                     </label>
                     <div class="binder-pager" role="navigation" aria-label="Pages du classeur">
@@ -230,10 +230,10 @@
             <h2 class="stats-kpi-label">Display</h2>
             <p class="stats-kpi-sub">Le contraste des cartes est partagé entre liste et classeur.</p>
             <label class="region-filter-wrap settings-dim-label">
-              <span class="region-filter-label">Contraste global</span>
-              <select id="settingsDimSelect" class="region-filter" aria-label="Contraste global">
-                <option value="caught">Attrapés atténués</option>
-                <option value="missing">Manquants atténués</option>
+              <span class="region-filter-label">Emphasis</span>
+              <select id="settingsDimSelect" class="region-filter" aria-label="Global emphasis mode">
+                <option value="caught">Fade caught</option>
+                <option value="missing">Fade missing</option>
               </select>
             </label>
           </div>
