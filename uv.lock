@@ -238,7 +238,7 @@ wheels = [
 ]
 
 [[package]]
-name = "pokedex-scraper"
+name = "pokevault"
 version = "0.1.0"
 source = { virtual = "." }
 
