@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Binder View | Laboratory Archive</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "tertiary": "#00daf3",
+                        "surface-container-low": "#1c1b1b",
+                        "on-primary": "#690002",
+                        "on-tertiary-fixed-variant": "#004f58",
+                        "on-secondary-fixed": "#0e1d25",
+                        "on-surface-variant": "#e9bcb6",
+                        "surface-tint": "#ffb4a9",
+                        "on-secondary": "#23323a",
+                        "error-container": "#93000a",
+                        "inverse-on-surface": "#313030",
+                        "secondary-container": "#3c4b53",
+                        "on-surface": "#e5e2e1",
+                        "secondary": "#b9c9d3",
+                        "surface-container-high": "#2a2a2a",
+                        "on-primary-fixed-variant": "#930004",
+                        "primary-fixed-dim": "#ffb4a9",
+                        "on-error": "#690005",
+                        "secondary-fixed-dim": "#b9c9d3",
+                        "primary-fixed": "#ffdad5",
+                        "surface-container-highest": "#353534",
+                        "surface-container-lowest": "#0e0e0e",
+                        "on-error-container": "#ffdad6",
+                        "tertiary-container": "#009fb2",
+                        "on-primary-container": "#5c0001",
+                        "on-background": "#e5e2e1",
+                        "outline": "#af8782",
+                        "error": "#ffb4ab",
+                        "primary-container": "#ff5544",
+                        "surface": "#131313",
+                        "inverse-primary": "#c00008",
+                        "surface-container": "#201f1f",
+                        "tertiary-fixed": "#9cf0ff",
+                        "on-tertiary-fixed": "#001f24",
+                        "tertiary-fixed-dim": "#00daf3",
+                        "surface-bright": "#393939",
+                        "on-tertiary-container": "#002f35",
+                        "on-secondary-fixed-variant": "#3a4951",
+                        "primary": "#ffb4a9",
+                        "outline-variant": "#5e3f3a",
+                        "on-primary-fixed": "#410001",
+                        "secondary-fixed": "#d5e5ef",
+                        "background": "#131313",
+                        "inverse-surface": "#e5e2e1",
+                        "on-secondary-container": "#abbbc5",
+                        "surface-dim": "#131313",
+                        "on-tertiary": "#00363d",
+                        "surface-variant": "#353534"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "fontFamily": {
+                        "headline": ["Space Grotesk"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        body {
+            background-color: #131313;
+            color: #e5e2e1;
+            font-family: 'Inter', sans-serif;
+        }
+        .glass-panel {
+            background: rgba(53, 53, 52, 0.4);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+        .tabular-nums {
+            font-variant-numeric: tabular-nums;
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface antialiased overflow-x-hidden">
+<!-- TopNavBar -->
+<header class="fixed top-0 w-full z-50 bg-[#131313] dark:bg-[#131313] border-b border-white/10 shadow-2xl shadow-black/50">
+<div class="flex justify-between items-center px-8 h-16 w-full max-w-[1920px] mx-auto">
+<div class="flex items-center gap-8">
+<span class="text-xl font-bold tracking-tighter text-[#EE1515] uppercase font-['Space_Grotesk']">Laboratory Archive</span>
+<nav class="hidden md:flex items-center gap-6 font-['Space_Grotesk'] tracking-tight">
+<a class="text-slate-400 hover:text-white transition-colors" href="#">List</a>
+<a class="text-[#00daf3] border-b-2 border-[#00daf3] pb-1" href="#">Binders</a>
+<a class="text-slate-400 hover:text-white transition-colors" href="#">Stats</a>
+<a class="text-slate-400 hover:text-white transition-colors" href="#">Settings</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<div class="relative hidden lg:block">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-sm">search</span>
+<input class="bg-surface-container-lowest border-none rounded-md pl-10 pr-4 py-1.5 text-sm w-64 focus:ring-1 focus:ring-tertiary" placeholder="Archive search..." type="text"/>
+</div>
+<button class="text-slate-400 hover:text-white transition-all duration-200 active:scale-95">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="text-slate-400 hover:text-white transition-all duration-200 active:scale-95">
+<span class="material-symbols-outlined">account_circle</span>
+</button>
+</div>
+</div>
+</header>
+<!-- SideNavBar -->
+<aside class="fixed left-0 top-0 h-full w-64 z-40 bg-[#1c1b1b] dark:bg-[#1c1b1b] flex flex-col pt-20 pb-8 px-4 font-['Inter'] text-sm font-medium tabular-nums bg-gradient-to-r from-white/5 to-transparent">
+<div class="flex items-center gap-3 px-2 mb-8">
+<div class="w-10 h-10 rounded-lg bg-surface-container-high flex items-center justify-center overflow-hidden border border-white/10">
+<img alt="Collector Profile" class="w-full h-full object-cover" data-alt="Close-up portrait of a serious researcher in a high-tech dark laboratory setting with blue ambient light" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAVUv5C1huSymTPqA34RK5QDTPkZerOTayVXYGHNO82xDBOcFoV6otfHWrulML3U0wNv3T_PYN2AF5iRjeHNMYdLv4jMX94gxaAwaBVIwlmDBwKvb6n6BBivmKrpypcT-5Lss30G76xr2s_770JbfzBOHNu8ihNdAUZ79eJSizuj1BcadeJBi3zesjJdNd29lQXjckipLhD-xnsRZu7rgddGIkzQhjdlBKVBPbsHblYB4iotLNsO6Xmo36x1LMFiTZStLHo5aSzj-o"/>
+</div>
+<div>
+<p class="text-on-surface font-bold leading-none">Lead Researcher</p>
+<p class="text-slate-500 text-xs mt-1 uppercase tracking-widest">Rank: Master</p>
+</div>
+</div>
+<nav class="flex-1 flex flex-col gap-1">
+<div class="group cursor-pointer transition-all duration-300 flex items-center gap-3 px-3 py-2.5 text-slate-500 hover:text-slate-200 hover:bg-white/5 rounded-lg">
+<span class="material-symbols-outlined">database</span>
+<span>Archive</span>
+</div>
+<div class="group cursor-pointer transition-all duration-300 flex items-center gap-3 px-3 py-2.5 bg-[#00daf3]/10 text-[#00daf3] border-r-4 border-[#00daf3] rounded-lg">
+<span class="material-symbols-outlined">folder_special</span>
+<span>Vaults</span>
+</div>
+<div class="group cursor-pointer transition-all duration-300 flex items-center gap-3 px-3 py-2.5 text-slate-500 hover:text-slate-200 hover:bg-white/5 rounded-lg">
+<span class="material-symbols-outlined">query_stats</span>
+<span>Analytics</span>
+</div>
+<div class="group cursor-pointer transition-all duration-300 flex items-center gap-3 px-3 py-2.5 text-slate-500 hover:text-slate-200 hover:bg-white/5 rounded-lg">
+<span class="material-symbols-outlined">settings</span>
+<span>System</span>
+</div>
+</nav>
+<div class="mt-auto space-y-4">
+<button class="w-full py-2 bg-primary text-on-primary font-bold rounded-lg flex items-center justify-center gap-2 transition-transform active:scale-95">
+<span class="material-symbols-outlined text-sm">sync</span>
+                Sync Database
+            </button>
+<div class="flex flex-col gap-1 pt-4 border-t border-white/5">
+<div class="group cursor-pointer transition-all duration-300 flex items-center gap-3 px-3 py-2 text-slate-500 hover:text-slate-200">
+<span class="material-symbols-outlined text-lg">help_outline</span>
+<span>Support</span>
+</div>
+<div class="group cursor-pointer transition-all duration-300 flex items-center gap-3 px-3 py-2 text-slate-500 hover:text-slate-200">
+<span class="material-symbols-outlined text-lg">terminal</span>
+<span>Logs</span>
+</div>
+</div>
+</div>
+</aside>
+<!-- Main Content -->
+<main class="ml-64 pt-16 min-h-screen">
+<div class="max-w-7xl mx-auto p-8">
+<!-- Header Section -->
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
+<div>
+<h1 class="text-5xl font-['Space_Grotesk'] font-bold tracking-tight text-white mb-2">Vault Explorer</h1>
+<p class="text-slate-400 font-['Inter'] flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-tertiary"></span>
+                        Current Active Binder: <span class="text-white font-medium">Kanto Base Set (1st Ed.)</span>
+</p>
+</div>
+<div class="flex gap-3">
+<button class="px-5 py-2.5 bg-surface-container-high text-on-surface font-medium rounded-md flex items-center gap-2 hover:bg-surface-container-highest transition-colors">
+<span class="material-symbols-outlined text-lg">edit</span>
+                        Edit Binder
+                    </button>
+<button class="px-5 py-2.5 bg-tertiary/10 text-tertiary border-b border-tertiary font-medium rounded-md flex items-center gap-2 hover:bg-tertiary/20 transition-all">
+<span class="material-symbols-outlined text-lg">add_box</span>
+                        Add Binder
+                    </button>
+</div>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+<!-- Binder Sidebar (Left) -->
+<div class="lg:col-span-3 space-y-4">
+<h3 class="text-xs font-bold text-slate-500 uppercase tracking-[0.2em] mb-4">Your Vaults</h3>
+<div class="space-y-2">
+<!-- Active Binder Item -->
+<div class="p-4 bg-surface-container-high rounded-lg border-l-2 border-tertiary group cursor-pointer">
+<div class="flex justify-between items-start mb-2">
+<span class="text-white font-bold font-['Space_Grotesk']">Kanto Base Set</span>
+<span class="text-[10px] bg-tertiary/20 text-tertiary px-1.5 py-0.5 rounded font-mono">ACTIVE</span>
+</div>
+<div class="w-full h-1 bg-surface-variant rounded-full overflow-hidden mb-1">
+<div class="h-full bg-gradient-to-r from-tertiary to-tertiary-container w-[72%]"></div>
+</div>
+<p class="text-[10px] text-slate-500 flex justify-between">
+<span>72% COMPLETE</span>
+<span class="tabular-nums">73 / 102</span>
+</p>
+</div>
+<!-- Other Binders -->
+<div class="p-4 bg-surface-container-low hover:bg-surface-container-high rounded-lg transition-colors group cursor-pointer border-l-2 border-transparent">
+<div class="flex justify-between items-start mb-2">
+<span class="text-slate-300 font-medium font-['Space_Grotesk']">Paldea Evolved</span>
+</div>
+<div class="w-full h-1 bg-surface-variant rounded-full overflow-hidden mb-1">
+<div class="h-full bg-slate-500 w-[12%]"></div>
+</div>
+<p class="text-[10px] text-slate-500 flex justify-between uppercase">
+<span>12% SYNCED</span>
+<span class="tabular-nums">24 / 193</span>
+</p>
+</div>
+<div class="p-4 bg-surface-container-low hover:bg-surface-container-high rounded-lg transition-colors group cursor-pointer border-l-2 border-transparent">
+<div class="flex justify-between items-start mb-2">
+<span class="text-slate-300 font-medium font-['Space_Grotesk']">Team Rocket</span>
+</div>
+<div class="w-full h-1 bg-surface-variant rounded-full overflow-hidden mb-1">
+<div class="h-full bg-slate-500 w-[95%]"></div>
+</div>
+<p class="text-[10px] text-slate-500 flex justify-between uppercase">
+<span>95% SYNCED</span>
+<span class="tabular-nums">78 / 82</span>
+</p>
+</div>
+</div>
+</div>
+<!-- Binder Main Display (Center/Right) -->
+<div class="lg:col-span-9 space-y-8">
+<!-- Binder Controls -->
+<div class="glass-panel p-4 rounded-xl flex items-center justify-between border border-white/5">
+<div class="flex items-center gap-6">
+<div class="flex items-center gap-2">
+<button class="p-1 hover:bg-white/10 rounded"><span class="material-symbols-outlined">chevron_left</span></button>
+<span class="text-sm font-['Space_Grotesk'] font-medium">PAGE 01 / 12</span>
+<button class="p-1 hover:bg-white/10 rounded"><span class="material-symbols-outlined">chevron_right</span></button>
+</div>
+<div class="h-6 w-[1px] bg-white/10"></div>
+<div class="text-xs uppercase tracking-widest text-slate-500">
+                                Total Value: <span class="text-tertiary font-bold tabular-nums">$4,821.50</span>
+</div>
+</div>
+<div class="flex gap-4">
+<button class="text-xs font-bold uppercase tracking-widest text-slate-400 hover:text-white transition-colors">Sort: Index</button>
+<button class="text-xs font-bold uppercase tracking-widest text-slate-400 hover:text-white transition-colors">Filters</button>
+</div>
+</div>
+<!-- 3x3 Card Grid -->
+<div class="grid grid-cols-2 md:grid-cols-3 gap-6 p-8 bg-surface-container-lowest rounded-2xl border border-white/5 shadow-inner relative overflow-hidden">
+<!-- Decorative background element -->
+<div class="absolute -top-24 -right-24 w-96 h-96 bg-tertiary/5 blur-[100px] rounded-full pointer-events-none"></div>
+<!-- Card Slot 1 (Occupied) -->
+<div class="group relative aspect-[3/4] bg-surface-container-low rounded-lg p-2 transition-all hover:scale-[1.02] hover:bg-surface-container-high cursor-pointer overflow-hidden">
+<img alt="Alakazam Holo" class="w-full h-full object-cover rounded-md opacity-90 group-hover:opacity-100 transition-opacity" data-alt="High quality holographic trading card featuring a powerful psychic monster with golden spoons, vibrant colors and metallic shine" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBXITH4HuLFneFNBXFpHQy06HDMwB2ag3yDUxsgmN-nJoL5lC2PJKp9CsYZIiJclsyioe0HqOjFO2lyYnr8N800uReyy3FMHMX4owcQkufFbN5ahLAhDbGh3FkQPfOtDr302m7yoHEgfbV_RpM8BO-51HKqKuIimREeUk37pReIZZhOgvDs-iDM59q5DSlpSDCDsOBLXRjZy-7thm6k6Q7bhEhN5OFAJdeW1GBMLbsVw1BT_-Q46SMgMCm-ba-OfVVubO44YWLtlEk"/>
+<div class="absolute bottom-4 left-4 right-4 translate-y-2 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300">
+<div class="bg-black/80 backdrop-blur-md p-2 rounded border border-white/10">
+<p class="text-[10px] font-bold text-tertiary uppercase leading-tight">Alakazam #1</p>
+<p class="text-[10px] text-slate-400 tabular-nums">PSA 9 | $340.00</p>
+</div>
+</div>
+</div>
+<!-- Card Slot 2 (Occupied) -->
+<div class="group relative aspect-[3/4] bg-surface-container-low rounded-lg p-2 transition-all hover:scale-[1.02] hover:bg-surface-container-high cursor-pointer overflow-hidden">
+<img alt="Blastoise Holo" class="w-full h-full object-cover rounded-md opacity-90 group-hover:opacity-100 transition-opacity" data-alt="Close-up of a blue tortoise-like monster card with water cannons, holographic background reflecting rainbow light" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBHc7w5XZYTiB8MbYcb5Ni-qoFTRRzXkJnmqpNAT2i1rdorZiM2V8YxKHpW0IyMoPNie4OvTNQEaHPyx68w5JELlU0wvPBD0CYqPWl5e2PJTEuMHTwlGfpJ8CTkC3p2a_o4hmXwAL3DvoL_u3MBgP7lxeYAIWVpDwHQ3u2z0Dd3AU6WumdeF1XjKMCc-hDKHdksUfLQxRhbDlQaEpd0CYa5S_pmOKWibt9YUyq1nw57BpQuJfVYMdRcEmqOf3D7UnrV53qdO3Jj2qI"/>
+<div class="absolute bottom-4 left-4 right-4 translate-y-2 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300">
+<div class="bg-black/80 backdrop-blur-md p-2 rounded border border-white/10">
+<p class="text-[10px] font-bold text-tertiary uppercase leading-tight">Blastoise #2</p>
+<p class="text-[10px] text-slate-400 tabular-nums">LP+ | $210.00</p>
+</div>
+</div>
+</div>
+<!-- Card Slot 3 (Empty/Ghost) -->
+<div class="group relative aspect-[3/4] bg-surface-container-low border-2 border-dashed border-white/5 rounded-lg flex flex-col items-center justify-center transition-all hover:border-tertiary/30 hover:bg-surface-container-high cursor-pointer">
+<span class="material-symbols-outlined text-slate-700 group-hover:text-tertiary text-4xl mb-2 transition-colors">add_circle</span>
+<span class="text-[10px] font-bold text-slate-600 group-hover:text-slate-400 uppercase tracking-widest">Assign Slot #3</span>
+</div>
+<!-- Card Slot 4 (Occupied) -->
+<div class="group relative aspect-[3/4] bg-surface-container-low rounded-lg p-2 transition-all hover:scale-[1.02] hover:bg-surface-container-high cursor-pointer overflow-hidden">
+<img alt="Charizard Holo" class="w-full h-full object-cover rounded-md opacity-90 group-hover:opacity-100 transition-opacity" data-alt="Iconic fire dragon monster card, vibrant orange and red holographic finish with dynamic flame illustrations" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDUJi9tWKGScVid-_BusDVqq37vSlAktH5xiYB7lZww-9e4jedLwlH4UUj1MmfA-kgvDRlIQ2Kn9kxkmF_eyH-lBPAf6rllCFRZRcluQTATFGqvm_f9vOVCtIEivmZt4N7JYVSqtlY2Xbpn3jALGIwDYVq-1jatzSIcs2Qejy52jFviO7Rv8rgtJl_99x-tfe-yrF-FS2QldwYKeg6d9LbSBLnRwmuXEdjJlfpuTCXPVP1bhm_3Ppj022WujZIltUUXvKWY-DAPF8I"/>
+<div class="absolute bottom-4 left-4 right-4 translate-y-2 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300">
+<div class="bg-black/80 backdrop-blur-md p-2 rounded border border-white/10">
+<p class="text-[10px] font-bold text-tertiary uppercase leading-tight">Charizard #4</p>
+<p class="text-[10px] text-slate-400 tabular-nums">PSA 10 | $2,450.00</p>
+</div>
+</div>
+</div>
+<!-- Card Slot 5 (Empty/Ghost) -->
+<div class="group relative aspect-[3/4] bg-surface-container-low border-2 border-dashed border-white/5 rounded-lg flex flex-col items-center justify-center transition-all hover:border-tertiary/30 hover:bg-surface-container-high cursor-pointer">
+<span class="material-symbols-outlined text-slate-700 group-hover:text-tertiary text-4xl mb-2 transition-colors">add_circle</span>
+<span class="text-[10px] font-bold text-slate-600 group-hover:text-slate-400 uppercase tracking-widest">Assign Slot #5</span>
+</div>
+<!-- Card Slot 6 (Empty/Ghost) -->
+<div class="group relative aspect-[3/4] bg-surface-container-low border-2 border-dashed border-white/5 rounded-lg flex flex-col items-center justify-center transition-all hover:border-tertiary/30 hover:bg-surface-container-high cursor-pointer">
+<span class="material-symbols-outlined text-slate-700 group-hover:text-tertiary text-4xl mb-2 transition-colors">add_circle</span>
+<span class="text-[10px] font-bold text-slate-600 group-hover:text-slate-400 uppercase tracking-widest">Assign Slot #6</span>
+</div>
+<!-- Card Slot 7 (Occupied) -->
+<div class="group relative aspect-[3/4] bg-surface-container-low rounded-lg p-2 transition-all hover:scale-[1.02] hover:bg-surface-container-high cursor-pointer overflow-hidden">
+<img alt="Hitmonchan" class="w-full h-full object-cover rounded-md opacity-90 group-hover:opacity-100 transition-opacity" data-alt="Punching fighting monster card, classic artwork with retro grid background and brown leather tones" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBfh6RuQ_7Z0uME8LYm7sTSqpJ9SpiNv8f0a7dWOMS8zA6PJTLQnfPd4ttDv8QpZwKedxFW8h3VASGYa6a9ZInFCaKzPSWI_rAkpstRq3azYzSh-AhrIJagzihlQe6k0UuQfoE9FOM-Oqe-kvDCD0siZlhrsnL-iLDIXBUfiZBNx62sSayJooZ7fcueYrvO-5A11HUKYGpPh7bPYQtvkTTlyn5MRsgeOTVoP_6Q6nyLe3GKcmXQizx_8zad9P9Y5phmsr-NbB2d7-A"/>
+<div class="absolute bottom-4 left-4 right-4 translate-y-2 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300">
+<div class="bg-black/80 backdrop-blur-md p-2 rounded border border-white/10">
+<p class="text-[10px] font-bold text-tertiary uppercase leading-tight">Hitmonchan #7</p>
+<p class="text-[10px] text-slate-400 tabular-nums">NM | $45.00</p>
+</div>
+</div>
+</div>
+<!-- Card Slot 8 (Empty/Ghost) -->
+<div class="group relative aspect-[3/4] bg-surface-container-low border-2 border-dashed border-white/5 rounded-lg flex flex-col items-center justify-center transition-all hover:border-tertiary/30 hover:bg-surface-container-high cursor-pointer">
+<span class="material-symbols-outlined text-slate-700 group-hover:text-tertiary text-4xl mb-2 transition-colors">add_circle</span>
+<span class="text-[10px] font-bold text-slate-600 group-hover:text-slate-400 uppercase tracking-widest">Assign Slot #8</span>
+</div>
+<!-- Card Slot 9 (Occupied) -->
+<div class="group relative aspect-[3/4] bg-surface-container-low rounded-lg p-2 transition-all hover:scale-[1.02] hover:bg-surface-container-high cursor-pointer overflow-hidden">
+<img alt="Magneton" class="w-full h-full object-cover rounded-md opacity-90 group-hover:opacity-100 transition-opacity" data-alt="Electric magnetic monster card with sparking static effects, silver and blue color palette, holographic rare finish" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDNj6YqOUil4-VjTUPufPXovcxEZHnN12-PFhQmtyGRmBvjYnrRfL13W1R0axaKchrJxn-2EYI9FA75sh5U6SScWmNCsS4L5BTuf3pMazkXPEfBpGq0aAN_eccQIpY4wFyLJzyoKdK06R7Zz1NXdfLvBGHpch4mghfU-xRTlX0qg8rJRAB2cXd4rI9dVmV35nurWvQOdP8moxJEITr6IuNaHhgDJp67Nr_jMCh3A3eOCVP3qDSN-QyoKUU5Wvnnz8HKtt7PfEoSvgo"/>
+<div class="absolute bottom-4 left-4 right-4 translate-y-2 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300">
+<div class="bg-black/80 backdrop-blur-md p-2 rounded border border-white/10">
+<p class="text-[10px] font-bold text-tertiary uppercase leading-tight">Magneton #9</p>
+<p class="text-[10px] text-slate-400 tabular-nums">EX | $38.00</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Quick Stats Bento -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+<div class="bg-surface-container-low p-6 rounded-xl border-l border-white/5">
+<p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Holo Rares</p>
+<p class="text-3xl font-['Space_Grotesk'] font-bold text-white tabular-nums">12 / 16</p>
+<p class="text-xs text-tertiary mt-2">+1 this week</p>
+</div>
+<div class="bg-surface-container-low p-6 rounded-xl border-l border-white/5">
+<p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Condition Average</p>
+<p class="text-3xl font-['Space_Grotesk'] font-bold text-white tabular-nums">PSA 8.4</p>
+<p class="text-xs text-slate-500 mt-2">Verified Archive Status</p>
+</div>
+<div class="bg-surface-container-low p-6 rounded-xl border-l border-white/5">
+<p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2">Market Stability</p>
+<p class="text-3xl font-['Space_Grotesk'] font-bold text-white tabular-nums">+4.2%</p>
+<div class="flex gap-1 mt-3">
+<div class="h-1 flex-1 bg-tertiary/20"></div>
+<div class="h-1 flex-1 bg-tertiary/40"></div>
+<div class="h-1 flex-1 bg-tertiary/60"></div>
+<div class="h-1 flex-1 bg-tertiary"></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- FAB Action (Mobile) -->
+<div class="md:hidden fixed bottom-6 right-6 z-50">
+<button class="w-14 h-14 bg-primary text-on-primary rounded-full shadow-lg flex items-center justify-center active:scale-95 transition-transform">
+<span class="material-symbols-outlined text-2xl">add</span>
+</button>
+</div>
+</body></html>

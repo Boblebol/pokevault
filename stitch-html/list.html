@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Laboratory Archive | Pokedex List</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "tertiary": "#00daf3",
+                    "surface-container-low": "#1c1b1b",
+                    "on-primary": "#690002",
+                    "on-tertiary-fixed-variant": "#004f58",
+                    "on-secondary-fixed": "#0e1d25",
+                    "on-surface-variant": "#e9bcb6",
+                    "surface-tint": "#ffb4a9",
+                    "on-secondary": "#23323a",
+                    "error-container": "#93000a",
+                    "inverse-on-surface": "#313030",
+                    "secondary-container": "#3c4b53",
+                    "on-surface": "#e5e2e1",
+                    "secondary": "#b9c9d3",
+                    "surface-container-high": "#2a2a2a",
+                    "on-primary-fixed-variant": "#930004",
+                    "primary-fixed-dim": "#ffb4a9",
+                    "on-error": "#690005",
+                    "secondary-fixed-dim": "#b9c9d3",
+                    "primary-fixed": "#ffdad5",
+                    "surface-container-highest": "#353534",
+                    "surface-container-lowest": "#0e0e0e",
+                    "on-error-container": "#ffdad6",
+                    "tertiary-container": "#009fb2",
+                    "on-primary-container": "#5c0001",
+                    "on-background": "#e5e2e1",
+                    "outline": "#af8782",
+                    "error": "#ffb4ab",
+                    "primary-container": "#ff5544",
+                    "surface": "#131313",
+                    "inverse-primary": "#c00008",
+                    "surface-container": "#201f1f",
+                    "tertiary-fixed": "#9cf0ff",
+                    "on-tertiary-fixed": "#001f24",
+                    "tertiary-fixed-dim": "#00daf3",
+                    "surface-bright": "#393939",
+                    "on-tertiary-container": "#002f35",
+                    "on-secondary-fixed-variant": "#3a4951",
+                    "primary": "#ffb4a9",
+                    "outline-variant": "#5e3f3a",
+                    "on-primary-fixed": "#410001",
+                    "secondary-fixed": "#d5e5ef",
+                    "background": "#131313",
+                    "inverse-surface": "#e5e2e1",
+                    "on-secondary-container": "#abbbc5",
+                    "surface-dim": "#131313",
+                    "on-tertiary": "#00363d",
+                    "surface-variant": "#353534"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "fontFamily": {
+                    "headline": ["Space Grotesk"],
+                    "body": ["Inter"],
+                    "label": ["Inter"]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body { font-family: 'Inter', sans-serif; }
+        h1, h2, h3, .font-headline { font-family: 'Space Grotesk', sans-serif; }
+        .glass-panel {
+            background: rgba(53, 53, 52, 0.4);
+            backdrop-filter: blur(20px);
+        }
+        .tabular-nums { font-variant-numeric: tabular-nums; }
+    </style>
+</head>
+<body class="bg-surface text-on-surface selection:bg-tertiary selection:text-on-tertiary">
+<!-- TopNavBar -->
+<nav class="fixed top-0 w-full z-50 bg-[#131313] dark:bg-[#131313] border-b border-white/10 shadow-2xl shadow-black/50">
+<div class="flex justify-between items-center px-8 h-16 w-full max-w-[1920px] mx-auto font-['Space_Grotesk'] tracking-tight">
+<div class="text-xl font-bold tracking-tighter text-[#EE1515] uppercase">Laboratory Archive</div>
+<div class="hidden md:flex items-center gap-8">
+<a class="text-[#00daf3] border-b-2 border-[#00daf3] pb-1 active:scale-95 transition-all" href="#">List</a>
+<a class="text-slate-400 hover:text-white transition-colors active:scale-95 transition-all" href="#">Binders</a>
+<a class="text-slate-400 hover:text-white transition-colors active:scale-95 transition-all" href="#">Stats</a>
+<a class="text-slate-400 hover:text-white transition-colors active:scale-95 transition-all" href="#">Settings</a>
+</div>
+<div class="flex items-center gap-4">
+<button class="material-symbols-outlined text-slate-400 hover:bg-white/5 p-2 rounded-full transition-all" data-icon="notifications">notifications</button>
+<button class="material-symbols-outlined text-slate-400 hover:bg-white/5 p-2 rounded-full transition-all" data-icon="account_circle">account_circle</button>
+</div>
+</div>
+</nav>
+<!-- SideNavBar (Desktop) -->
+<aside class="hidden md:flex fixed left-0 top-0 h-full w-64 z-40 bg-[#1c1b1b] dark:bg-[#1c1b1b] flex-col pt-20 pb-8 px-4 font-['Inter'] text-sm font-medium tabular-nums">
+<div class="flex items-center gap-3 px-4 mb-10">
+<div class="w-10 h-10 rounded-lg bg-surface-container-highest overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="high-tech laboratory researcher avatar with digital HUD interface overlays and cinematic blue lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD8JJmoHFK8dpOYKziDeum5ln77p0oy_B5KcM6G_VDr-SL5GNBch48665mdta3xNYlar0EvyHBR-_JsaM0e8QGxKEPnaF62QDq_SoygQ7SO0S2r4HCXrke9yiHJtwfzIDD5_567BNPKTehfDZAaAjZ7NbmW5JVJpeuPEtyyMMXydMR_7LtlOVKCtYUhUeUD-89EZ0FNYT5T2JQlwd_n_FiFFho5HCxsJqLKRADwgNyL9OV2ylDQ5JXBDDjIl1uMKIxWSQCHfoEUiyk"/>
+</div>
+<div>
+<p class="text-on-surface font-bold">Lead Researcher</p>
+<p class="text-slate-500 text-xs uppercase tracking-wider">Rank: Master</p>
+</div>
+</div>
+<div class="space-y-1 flex-grow">
+<a class="flex items-center gap-3 px-4 py-3 bg-[#00daf3]/10 text-[#00daf3] border-r-4 border-[#00daf3] cursor-pointer transition-all duration-300" href="#">
+<span class="material-symbols-outlined" data-icon="database">database</span>
+<span>Archive</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-500 hover:text-slate-200 hover:bg-white/5 cursor-pointer transition-all duration-300" href="#">
+<span class="material-symbols-outlined" data-icon="folder_special">folder_special</span>
+<span>Vaults</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-500 hover:text-slate-200 hover:bg-white/5 cursor-pointer transition-all duration-300" href="#">
+<span class="material-symbols-outlined" data-icon="query_stats">query_stats</span>
+<span>Analytics</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-500 hover:text-slate-200 hover:bg-white/5 cursor-pointer transition-all duration-300" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span>System</span>
+</a>
+</div>
+<div class="mt-auto space-y-1 pt-6 border-t border-white/5">
+<a class="flex items-center gap-3 px-4 py-3 text-slate-500 hover:text-slate-200 hover:bg-white/5 cursor-pointer transition-all duration-300" href="#">
+<span class="material-symbols-outlined" data-icon="help_outline">help_outline</span>
+<span>Support</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-500 hover:text-slate-200 hover:bg-white/5 cursor-pointer transition-all duration-300" href="#">
+<span class="material-symbols-outlined" data-icon="terminal">terminal</span>
+<span>Logs</span>
+</a>
+<button class="w-full mt-4 bg-tertiary-container text-on-tertiary-container py-3 rounded-lg font-bold active:scale-95 transition-all">
+                Sync Database
+            </button>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="md:ml-64 pt-24 pb-12 px-8 max-w-[1400px] mx-auto min-h-screen">
+<!-- Global Progress Header -->
+<section class="mb-12">
+<div class="flex justify-between items-end mb-4">
+<div>
+<span class="text-xs font-bold tracking-widest text-slate-500 uppercase font-label mb-1 block">Collection Status</span>
+<h1 class="text-4xl md:text-6xl font-bold tracking-tighter font-headline text-on-surface">Archive Completion</h1>
+</div>
+<div class="text-right">
+<span class="text-5xl font-bold font-headline text-tertiary tabular-nums">74.2%</span>
+<p class="text-slate-500 text-sm font-label tracking-wide">758 / 1021 DISCOVERED</p>
+</div>
+</div>
+<div class="h-2 w-full bg-surface-container rounded-full overflow-hidden">
+<div class="h-full bg-gradient-to-r from-tertiary/60 to-tertiary w-[74.2%] shadow-[0_0_15px_rgba(0,218,243,0.3)]"></div>
+</div>
+</section>
+<!-- Filter & Search Bar -->
+<section class="mb-10 grid grid-cols-1 lg:grid-cols-12 gap-4">
+<div class="lg:col-span-7 relative group">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-tertiary transition-colors" data-icon="search">search</span>
+<input class="w-full bg-surface-container-low border-none focus:ring-1 focus:ring-tertiary rounded-lg pl-12 pr-4 py-4 text-on-surface placeholder-slate-600 transition-all" placeholder="Search by name or archive index..." type="text"/>
+</div>
+<div class="lg:col-span-5 flex gap-2">
+<button class="flex-1 bg-tertiary text-on-tertiary font-bold py-4 rounded-lg active:scale-95 transition-all">All</button>
+<button class="flex-1 bg-surface-container-high text-on-surface font-medium py-4 rounded-lg hover:bg-surface-variant active:scale-95 transition-all">Caught</button>
+<button class="flex-1 bg-surface-container-high text-on-surface font-medium py-4 rounded-lg hover:bg-surface-variant active:scale-95 transition-all">Missing</button>
+<button class="material-symbols-outlined bg-surface-container-high p-4 rounded-lg text-slate-400 hover:text-white" data-icon="filter_list">filter_list</button>
+</div>
+</section>
+<!-- Specimen Grid -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+<!-- Card 1 (Caught) -->
+<div class="bg-surface-container-lowest rounded-xl p-6 transition-all hover:scale-[1.02] hover:bg-surface-container-highest group relative overflow-hidden ring-1 ring-tertiary/30">
+<div class="flex justify-between items-start mb-4">
+<span class="text-xs font-bold font-label text-tertiary tracking-widest tabular-nums">#0003</span>
+<div class="bg-tertiary/10 text-tertiary p-1 rounded">
+<span class="material-symbols-outlined text-sm" data-icon="check_circle" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+</div>
+<div class="aspect-square mb-6 relative">
+<div class="absolute inset-0 bg-tertiary/5 blur-3xl rounded-full"></div>
+<img class="w-full h-full object-contain relative z-10" data-alt="professional 3d render of a grass type dinosaur pokemon with vibrant green colors and high-tech lab specimen lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBLd6W-CAKkihCiAjyQY-YKqvBDbQXFpDe2Grgdr7FYOQwxHMjM08dVWKaBdOhmV5is7MdxmJyjnD20GCRojMexXfdw1PBP5MZnHeNv87FTDwk56fC982Pu40SOHEoZ-Rip5jlYoK8TzmCzir7siacGb7miHZCrRG3bvoMfSlBkf_vfxrSl357YmjVdQ-XbBEGmp1U4KLf9VlOMSJW_epZQd4Wb7KnGKZ09cAQPOgmOl3PfAREdFltPwq9w6Skj3BHZxuTuQThF8R4"/>
+</div>
+<h3 class="text-xl font-bold font-headline mb-1 uppercase tracking-tight">Venusaur</h3>
+<div class="flex gap-2 mb-6">
+<span class="text-[10px] px-2 py-0.5 rounded bg-green-900/30 text-green-400 font-bold border border-green-900/50 uppercase tracking-tighter">Grass</span>
+<span class="text-[10px] px-2 py-0.5 rounded bg-purple-900/30 text-purple-400 font-bold border border-purple-900/50 uppercase tracking-tighter">Poison</span>
+</div>
+<button class="w-full py-2.5 rounded bg-tertiary/20 text-tertiary text-xs font-bold uppercase tracking-widest border border-tertiary/20 hover:bg-tertiary hover:text-on-tertiary transition-all">
+                    Release Specimen
+                </button>
+</div>
+<!-- Card 2 (Missing) -->
+<div class="bg-surface-container-lowest rounded-xl p-6 transition-all hover:scale-[1.02] hover:bg-surface-container-highest group relative overflow-hidden">
+<div class="flex justify-between items-start mb-4">
+<span class="text-xs font-bold font-label text-slate-500 tracking-widest tabular-nums">#0006</span>
+<div class="bg-surface-container-high text-slate-600 p-1 rounded">
+<span class="material-symbols-outlined text-sm" data-icon="radio_button_unchecked">radio_button_unchecked</span>
+</div>
+</div>
+<div class="aspect-square mb-6 relative grayscale opacity-40 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-500">
+<img class="w-full h-full object-contain relative z-10" data-alt="dynamic 3d render of a fire breathing dragon pokemon with glowing orange embers and dramatic tech-noir shadows" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB2kAHLX-trU4WOKvzI1YXa0hqB0vZV7uQx1wU-hk6bAkXAZn-YkgxqAY751g2xIKRJm6qS7X2-306gE8J1zr_OOOKmKEKRuO80FusIwqpgCYLE3QoAewqWM2NFYdhxh-w1humVaxH4lc-ajVcCyCFV_rXVOwm_-iYHBqrA9sNmzzJLb1z_5m9H8Hq9hq5Qii22Z45kIzfgBWDUnvXvUpuOTBHGwEDdbqIoGfeC_bUqZBzpSdTaFCpQaKl4FZhafvpG6n-dMP6xYwM"/>
+</div>
+<h3 class="text-xl font-bold font-headline mb-1 uppercase tracking-tight">Charizard</h3>
+<div class="flex gap-2 mb-6">
+<span class="text-[10px] px-2 py-0.5 rounded bg-red-900/30 text-red-400 font-bold border border-red-900/50 uppercase tracking-tighter">Fire</span>
+<span class="text-[10px] px-2 py-0.5 rounded bg-blue-900/30 text-blue-400 font-bold border border-blue-900/50 uppercase tracking-tighter">Flying</span>
+</div>
+<button class="w-full py-2.5 rounded bg-surface-container-high text-on-surface text-xs font-bold uppercase tracking-widest hover:bg-tertiary hover:text-on-tertiary transition-all">
+                    Register Catch
+                </button>
+</div>
+<!-- Card 3 (Caught) -->
+<div class="bg-surface-container-lowest rounded-xl p-6 transition-all hover:scale-[1.02] hover:bg-surface-container-highest group relative overflow-hidden ring-1 ring-tertiary/30">
+<div class="flex justify-between items-start mb-4">
+<span class="text-xs font-bold font-label text-tertiary tracking-widest tabular-nums">#0025</span>
+<div class="bg-tertiary/10 text-tertiary p-1 rounded">
+<span class="material-symbols-outlined text-sm" data-icon="check_circle" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+</div>
+<div class="aspect-square mb-6 relative">
+<div class="absolute inset-0 bg-yellow-500/5 blur-3xl rounded-full"></div>
+<img class="w-full h-full object-contain relative z-10" data-alt="vibrant 3d render of an electric mouse pokemon with yellow glowing cheeks and electrical spark effects in a sterile laboratory setting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAsVI7D3a9UNxRS2H4WCo4MGDhoZ1VksZrr8xU-U8YjbTsR4t58dyhQWxbF3W5k4X47dUKGT1EUw5gub3AC1brZRGfqEn3epXZ2bou-sV0SPPG6Tm-Ayk8iBPRGZ-rrivawDwqnM07n1LlSppP7C0NAxierECzAtFW9WmLC9xhbgcsIClKuTWXS2d6wUoxKHGUn7g1IquZRX9ihA-ohrcM-U8guqYvpfZrWnQ_CQRTSl3NF4ncr0PxmaXVwH14waY4aF6oiluHWI7o"/>
+</div>
+<h3 class="text-xl font-bold font-headline mb-1 uppercase tracking-tight">Pikachu</h3>
+<div class="flex gap-2 mb-6">
+<span class="text-[10px] px-2 py-0.5 rounded bg-yellow-900/30 text-yellow-400 font-bold border border-yellow-900/50 uppercase tracking-tighter">Electric</span>
+</div>
+<button class="w-full py-2.5 rounded bg-tertiary/20 text-tertiary text-xs font-bold uppercase tracking-widest border border-tertiary/20 hover:bg-tertiary hover:text-on-tertiary transition-all">
+                    Release Specimen
+                </button>
+</div>
+<!-- Card 4 (Missing) -->
+<div class="bg-surface-container-lowest rounded-xl p-6 transition-all hover:scale-[1.02] hover:bg-surface-container-highest group relative overflow-hidden">
+<div class="flex justify-between items-start mb-4">
+<span class="text-xs font-bold font-label text-slate-500 tracking-widest tabular-nums">#0150</span>
+<div class="bg-surface-container-high text-slate-600 p-1 rounded">
+<span class="material-symbols-outlined text-sm" data-icon="radio_button_unchecked">radio_button_unchecked</span>
+</div>
+</div>
+<div class="aspect-square mb-6 relative grayscale opacity-40 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-500">
+<img class="w-full h-full object-contain relative z-10" data-alt="mystical psychic pokemon creature floating in a stasis pod within a dark futuristic scientific laboratory" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDP4MKuKnY8x1SvJD5MRK2dA5f7iJzglJ2ISdTRffKeiEpLdFguKXy0H7soTtO8IGDmbw81_9_CoOkmw8cqKipWQCL4OC60cIvWh2fzUeQSv_sMNE-mks90Y_bKC97w4kpbEbQG_k3GOFNI0_KlEZrn9ZvQ6uyD-7KgRIIEVc-_Id2XjGHxkmOUBn7hAxCJTNIvJAEGmfbhRhYk9rTjmwbYt6GbIWUHLRYfLd84278TCNGZYg0q6CnQ-maGBAN04AMDLwAMyvPVWQM"/>
+</div>
+<h3 class="text-xl font-bold font-headline mb-1 uppercase tracking-tight">Mewtwo</h3>
+<div class="flex gap-2 mb-6">
+<span class="text-[10px] px-2 py-0.5 rounded bg-pink-900/30 text-pink-400 font-bold border border-pink-900/50 uppercase tracking-tighter">Psychic</span>
+</div>
+<button class="w-full py-2.5 rounded bg-surface-container-high text-on-surface text-xs font-bold uppercase tracking-widest hover:bg-tertiary hover:text-on-tertiary transition-all">
+                    Register Catch
+                </button>
+</div>
+<!-- Card 5 (Caught) -->
+<div class="bg-surface-container-lowest rounded-xl p-6 transition-all hover:scale-[1.02] hover:bg-surface-container-highest group relative overflow-hidden ring-1 ring-tertiary/30">
+<div class="flex justify-between items-start mb-4">
+<span class="text-xs font-bold font-label text-tertiary tracking-widest tabular-nums">#0130</span>
+<div class="bg-tertiary/10 text-tertiary p-1 rounded">
+<span class="material-symbols-outlined text-sm" data-icon="check_circle" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+</div>
+<div class="aspect-square mb-6 relative">
+<div class="absolute inset-0 bg-blue-500/5 blur-3xl rounded-full"></div>
+<img class="w-full h-full object-contain relative z-10" data-alt="aggressive water dragon pokemon emerging from dark digital ocean waves with cinematic lighting and spray effects" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC-KOkwr4CVnbq9gNEKR3WuVhy8tXZMWYT-drioRuI7xsYBsed81okDzmKRhtJ1zcsLnOKEzD4nnLRjUMS-Aqk1gcYjHVLpOnASZgNIIiJHjTYfACVnevq4cmkhDdydYRmgj8VbXutTmfMtUTfZSgqHbLKn2_cUMjItDvdIJ1gZwV_uFKBW11H0srITOs75mLNsP-E4G-yBLf7z4ahjV33O9Hi44FtRtAXBruTzU6ciDHQvZtkD9jG-NOrcpfGyS_BoPBKSGBtvzjc"/>
+</div>
+<h3 class="text-xl font-bold font-headline mb-1 uppercase tracking-tight">Gyarados</h3>
+<div class="flex gap-2 mb-6">
+<span class="text-[10px] px-2 py-0.5 rounded bg-blue-900/30 text-blue-400 font-bold border border-blue-900/50 uppercase tracking-tighter">Water</span>
+<span class="text-[10px] px-2 py-0.5 rounded bg-blue-900/30 text-blue-400 font-bold border border-blue-900/50 uppercase tracking-tighter">Flying</span>
+</div>
+<button class="w-full py-2.5 rounded bg-tertiary/20 text-tertiary text-xs font-bold uppercase tracking-widest border border-tertiary/20 hover:bg-tertiary hover:text-on-tertiary transition-all">
+                    Release Specimen
+                </button>
+</div>
+<!-- Card 6 (Missing) -->
+<div class="bg-surface-container-lowest rounded-xl p-6 transition-all hover:scale-[1.02] hover:bg-surface-container-highest group relative overflow-hidden">
+<div class="flex justify-between items-start mb-4">
+<span class="text-xs font-bold font-label text-slate-500 tracking-widest tabular-nums">#0094</span>
+<div class="bg-surface-container-high text-slate-600 p-1 rounded">
+<span class="material-symbols-outlined text-sm" data-icon="radio_button_unchecked">radio_button_unchecked</span>
+</div>
+</div>
+<div class="aspect-square mb-6 relative grayscale opacity-40 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-500">
+<img class="w-full h-full object-contain relative z-10" data-alt="menacing purple ghost pokemon with glowing red eyes appearing from a dark laboratory corner with volumetric smoke" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCvtAeowsN801C2x1wUnySX6zF1CZ_cvkRSqj2qI77v-QxMUjnet2qCmPCevPrAFj3RnzZmHpJf_ARzpa8XO8Sd_rPkUdHXs5tPPzV41gCiR-ifRpmogGc1uPswVnRLjVv10JYo-oHi7qE7WKeoSjH-nHFGz-B7CKh5WbywtVIz3vQEMx5Bo0rymvoybNLNwrE9u4_Yz2sgjCs0ALRhuBQiu5bq_i9aDx6LKCcLdJ7iSZFIEO13iKT9r07_O18wgQzbV1f6uwiW_0M"/>
+</div>
+<h3 class="text-xl font-bold font-headline mb-1 uppercase tracking-tight">Gengar</h3>
+<div class="flex gap-2 mb-6">
+<span class="text-[10px] px-2 py-0.5 rounded bg-purple-900/30 text-purple-400 font-bold border border-purple-900/50 uppercase tracking-tighter">Ghost</span>
+<span class="text-[10px] px-2 py-0.5 rounded bg-purple-900/30 text-purple-400 font-bold border border-purple-900/50 uppercase tracking-tighter">Poison</span>
+</div>
+<button class="w-full py-2.5 rounded bg-surface-container-high text-on-surface text-xs font-bold uppercase tracking-widest hover:bg-tertiary hover:text-on-tertiary transition-all">
+                    Register Catch
+                </button>
+</div>
+<!-- Card 7 (Caught) -->
+<div class="bg-surface-container-lowest rounded-xl p-6 transition-all hover:scale-[1.02] hover:bg-surface-container-highest group relative overflow-hidden ring-1 ring-tertiary/30">
+<div class="flex justify-between items-start mb-4">
+<span class="text-xs font-bold font-label text-tertiary tracking-widest tabular-nums">#0143</span>
+<div class="bg-tertiary/10 text-tertiary p-1 rounded">
+<span class="material-symbols-outlined text-sm" data-icon="check_circle" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+</div>
+<div class="aspect-square mb-6 relative">
+<div class="absolute inset-0 bg-slate-500/5 blur-3xl rounded-full"></div>
+<img class="w-full h-full object-contain relative z-10" data-alt="sleeping giant normal type pokemon resting in a large laboratory observation room with scientific equipment background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAUX5Pce01JgQzvseujKXvCE1GjC8hnE5TC7lo3NQsuQCwP8cs2rtsgtMDlCu8tSuEg1psGWKGudQVwMj9QIAUNAu0Qu_lUUGkXwAXU3sW0zCzdRIO7Sk5vBzzmYfIidgy5KH5rO9YYtgyu6Yn9erFvBSB45wNUj2H_vvIa5Xp4LxHGmEF0E0ZnTi4xQh9GJr3MZkEQG7fuH84Bk2V74Bes2ByyQlERazn6gHpNrbdA4elU4t-IduhvpW7BuA-5WaPIftYvcW_kgfk"/>
+</div>
+<h3 class="text-xl font-bold font-headline mb-1 uppercase tracking-tight">Snorlax</h3>
+<div class="flex gap-2 mb-6">
+<span class="text-[10px] px-2 py-0.5 rounded bg-slate-900/30 text-slate-400 font-bold border border-slate-900/50 uppercase tracking-tighter">Normal</span>
+</div>
+<button class="w-full py-2.5 rounded bg-tertiary/20 text-tertiary text-xs font-bold uppercase tracking-widest border border-tertiary/20 hover:bg-tertiary hover:text-on-tertiary transition-all">
+                    Release Specimen
+                </button>
+</div>
+<!-- Card 8 (Missing) -->
+<div class="bg-surface-container-lowest rounded-xl p-6 transition-all hover:scale-[1.02] hover:bg-surface-container-highest group relative overflow-hidden">
+<div class="flex justify-between items-start mb-4">
+<span class="text-xs font-bold font-label text-slate-500 tracking-widest tabular-nums">#0149</span>
+<div class="bg-surface-container-high text-slate-600 p-1 rounded">
+<span class="material-symbols-outlined text-sm" data-icon="radio_button_unchecked">radio_button_unchecked</span>
+</div>
+</div>
+<div class="aspect-square mb-6 relative grayscale opacity-40 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-500">
+<img class="w-full h-full object-contain relative z-10" data-alt="majestic orange dragon pokemon flying through a digital storm with electric blue lightning effects and sharp detail" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCfGBoXoUMyvHF7Tr754G-WziW14bxBFjPBUdhUPsugovtHLOTZtYQCgP983UBiDzruZSeCPbVd2Nyb0HPdezqVHZW0knhsvYP5gfN3oV3XrmihKZIOexxEf8odAFySPqFH3aGk1ndIHjIPEPIDZ2Ilhuev2qlLEZfCthYepsGLaTCLYLqeQup8SJ0pST3ahVvSBbhpDPP14WIARZ00jaaxWQmBLQPKEtB4h11uliRer1bHWznDpXRDhUYkIWybhln1K1wixoT7NKA"/>
+</div>
+<h3 class="text-xl font-bold font-headline mb-1 uppercase tracking-tight">Dragonite</h3>
+<div class="flex gap-2 mb-6">
+<span class="text-[10px] px-2 py-0.5 rounded bg-orange-900/30 text-orange-400 font-bold border border-orange-900/50 uppercase tracking-tighter">Dragon</span>
+<span class="text-[10px] px-2 py-0.5 rounded bg-blue-900/30 text-blue-400 font-bold border border-blue-900/50 uppercase tracking-tighter">Flying</span>
+</div>
+<button class="w-full py-2.5 rounded bg-surface-container-high text-on-surface text-xs font-bold uppercase tracking-widest hover:bg-tertiary hover:text-on-tertiary transition-all">
+                    Register Catch
+                </button>
+</div>
+</div>
+<!-- Pagination / Footer -->
+<div class="mt-16 flex justify-between items-center text-slate-500 font-label">
+<span class="text-xs tracking-widest uppercase">Showing 1-48 of 1021</span>
+<div class="flex gap-2">
+<button class="w-10 h-10 flex items-center justify-center rounded-lg bg-surface-container-high hover:bg-tertiary hover:text-on-tertiary transition-all">
+<span class="material-symbols-outlined" data-icon="chevron_left">chevron_left</span>
+</button>
+<button class="w-10 h-10 flex items-center justify-center rounded-lg bg-tertiary text-on-tertiary font-bold tabular-nums">1</button>
+<button class="w-10 h-10 flex items-center justify-center rounded-lg bg-surface-container-high hover:bg-tertiary hover:text-on-tertiary transition-all tabular-nums">2</button>
+<button class="w-10 h-10 flex items-center justify-center rounded-lg bg-surface-container-high hover:bg-tertiary hover:text-on-tertiary transition-all tabular-nums">3</button>
+<span class="w-10 h-10 flex items-center justify-center">...</span>
+<button class="w-10 h-10 flex items-center justify-center rounded-lg bg-surface-container-high hover:bg-tertiary hover:text-on-tertiary transition-all">
+<span class="material-symbols-outlined" data-icon="chevron_right">chevron_right</span>
+</button>
+</div>
+</div>
+</main>
+<!-- BottomNavBar (Mobile) -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full bg-surface-container-low border-t border-white/5 z-50">
+<div class="flex justify-around items-center h-16">
+<button class="flex flex-col items-center gap-1 text-tertiary">
+<span class="material-symbols-outlined" data-icon="database">database</span>
+<span class="text-[10px] font-bold uppercase tracking-tighter">Archive</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-slate-500">
+<span class="material-symbols-outlined" data-icon="folder_special">folder_special</span>
+<span class="text-[10px] font-bold uppercase tracking-tighter">Vaults</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-slate-500">
+<span class="material-symbols-outlined" data-icon="query_stats">query_stats</span>
+<span class="text-[10px] font-bold uppercase tracking-tighter">Stats</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-slate-500">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="text-[10px] font-bold uppercase tracking-tighter">System</span>
+</button>
+</div>
+</nav>
+</body></html>
