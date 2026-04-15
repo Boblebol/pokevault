@@ -836,8 +836,5 @@ window.addEventListener("hashchange", applyAppRoute);
 window.applyPokedexAppRoute = applyAppRoute;
 
 void (async () => {
-  if (typeof window.PokedexOnboarding?.bootstrapOnboarding === "function") {
-    await window.PokedexOnboarding.bootstrapOnboarding();
-  }
   applyAppRoute();
 })();

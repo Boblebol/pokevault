@@ -7,7 +7,6 @@ const API_BINDER_ROOT = "/api/binder";
 const API_BINDER_CONFIG = "/api/binder/config";
 const API_BINDER_PLACEMENTS = "/api/binder/placements";
 
-const LS_ONBOARDING_DONE = "pokedexOnboardingCompleted";
 const LS_WIZARD_DISMISSED = "pokedexBinderWizardDismissed";
 
 let binderV2Started = false;
@@ -40,10 +39,9 @@ let lastConfigJson = null;
 /** @type {object | null} */
 let lastPlacementsPayload = null;
 
-/** @type {{ file_exists: boolean; onboarding_completed: boolean; binder_wizard_dismissed: boolean }} */
+/** @type {{ file_exists: boolean; binder_wizard_dismissed: boolean }} */
 let trackerUiCache = {
   file_exists: false,
-  onboarding_completed: false,
   binder_wizard_dismissed: false,
 };
 readTrackerUiFromStorage();
@@ -69,7 +67,6 @@ function wizardSkipped() {
 
 function readTrackerUiFromStorage() {
   try {
-    trackerUiCache.onboarding_completed = localStorage.getItem(LS_ONBOARDING_DONE) === "1";
     trackerUiCache.binder_wizard_dismissed = localStorage.getItem(LS_WIZARD_DISMISSED) === "1";
   } catch {
     /* ignore */
@@ -243,9 +240,7 @@ function wireRegionPresetOnce() {
 }
 
 function onboardingCoversBinderWizard() {
-  return typeof window.PokedexOnboarding === "object" && window.PokedexOnboarding !== null
-    ? window.PokedexOnboarding.isBlockingBinderWizard()
-    : false;
+  return false;
 }
 
 function toggleBinderViews(showWizard) {

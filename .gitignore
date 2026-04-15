@@ -1,15 +1,34 @@
+# Python
 .venv/
 __pycache__/
 *.pyc
+*.pyo
+*.egg-info/
+dist/
+build/
+
+# Testing / Quality
 .pytest_cache/
 .ruff_cache/
 .coverage
 htmlcov/
-*.swp
-.DS_Store
+
+# Data (generated at runtime)
 data/
+
+# Legacy
 outputs/
 
-# IDE / AI tooling
+# OS
+*.swp
+.DS_Store
+Thumbs.db
+
+# IDE / AI tooling (may contain API keys)
 .cursor/mcp.json
 .claude/
+.idea/
+.vscode/
+
+# Docker
+docker-compose.override.yml
