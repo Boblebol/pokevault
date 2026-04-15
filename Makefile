@@ -7,48 +7,67 @@ TRACKER_HOST ?= 127.0.0.1
 TRACKER_PORT ?= 8765
 FRONT_URL ?= http://$(TRACKER_HOST):$(TRACKER_PORT)/
 
+DOCKER_IMAGE ?= pokevault
+DOCKER_TAG ?= latest
+
 .DEFAULT_GOAL := help
 
-.PHONY: help install dev backend web back front fetch run fetch-test test test-all test-cov lint fmt check clean
+.PHONY: help install dev fetch fetch-test test test-cov lint fmt check clean \
+        docker-build docker-up docker-down docker-logs
 
-help: ## Affiche les commandes disponibles
-	@awk 'BEGIN {FS = ":.*##"} /^[a-zA-Z0-9_.-]+:.*##/ {printf "  %-14s %s\n", $$1, $$2}' $(MAKEFILE_LIST)
+# ── General ──────────────────────────────────────────────────────────────────
 
-install: ## Installe les deps de dev (uv)
+help: ## Show available commands
+	@awk 'BEGIN {FS = ":.*##"} /^[a-zA-Z0-9_.-]+:.*##/ {printf "  %-18s %s\n", $$1, $$2}' $(MAKEFILE_LIST)
+
+install: ## Install dev dependencies (uv sync)
 	$(UV) sync --dev
 
-dev: ## Lance l'app web locale (alias backend/web/back)
-	TRACKER_HOST=$(TRACKER_HOST) TRACKER_PORT=$(TRACKER_PORT) $(UV) run $(PYTHON) -m tracker
-backend: dev ## Alias de dev
-web: dev ## Alias de dev
-back: dev ## Alias de dev
+# ── Development ──────────────────────────────────────────────────────────────
 
-front: ## Ouvre l'app dans le navigateur
+dev: ## Start the local tracker server (FastAPI + static UI)
+	TRACKER_HOST=$(TRACKER_HOST) TRACKER_PORT=$(TRACKER_PORT) $(UV) run $(PYTHON) -m tracker
+
+open: ## Open the web UI in the default browser
 	$(UV) run $(PYTHON) -c "import webbrowser; webbrowser.open('$(FRONT_URL)')"
 
-fetch: ## Scrape complet et génère data/pokedex.json
+fetch: ## Scrape Pokepedia and generate data/pokedex.json
 	$(UV) run $(PYTHON) main.py fetch
-run: fetch ## Alias de fetch
 
-fetch-test: ## Scrape rapide (10 entrées, sans images)
+fetch-test: ## Quick scrape (10 entries, no images)
 	$(UV) run $(PYTHON) main.py fetch --no-images --limit 10
 
-test: ## Lance toute la suite pytest
-	$(UV) run pytest tests/
-test-all: test ## Alias de test
+# ── Quality ──────────────────────────────────────────────────────────────────
 
-test-cov: ## Lance les tests avec couverture tracker (100%)
+test: ## Run the full test suite
+	$(UV) run pytest tests/
+
+test-cov: ## Run tests with coverage (100% on tracker)
 	$(UV) run pytest tests/ --cov=tracker --cov-report=term-missing --cov-fail-under=100
 
-lint: ## Vérifie le style avec ruff
+lint: ## Check code style (ruff)
 	$(UV) run ruff check pokedex/ tracker/ main.py tests/
 
-fmt: ## Formate le code avec ruff
+fmt: ## Auto-format code (ruff)
 	$(UV) run ruff format pokedex/ tracker/ main.py tests/
 
-check: ## lint + test-cov
-	$(MAKE) lint
-	$(MAKE) test-cov
+check: lint test-cov ## Run lint + tests with coverage
 
-clean: ## Nettoie les artefacts locaux courants
+# ── Docker ───────────────────────────────────────────────────────────────────
+
+docker-build: ## Build the Docker image
+	docker build -t $(DOCKER_IMAGE):$(DOCKER_TAG) .
+
+docker-up: ## Start the tracker via docker compose
+	docker compose up -d
+
+docker-down: ## Stop docker compose services
+	docker compose down
+
+docker-logs: ## Tail docker compose logs
+	docker compose logs -f
+
+# ── Cleanup ──────────────────────────────────────────────────────────────────
+
+clean: ## Remove local build artifacts
 	rm -rf .pytest_cache .ruff_cache .coverage htmlcov

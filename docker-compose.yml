@@ -1,0 +1,11 @@
+services:
+  tracker:
+    build: .
+    ports:
+      - "8765:8765"
+    volumes:
+      - ./data:/app/data
+    environment:
+      - TRACKER_HOST=0.0.0.0
+      - TRACKER_PORT=8765
+    restart: unless-stopped
