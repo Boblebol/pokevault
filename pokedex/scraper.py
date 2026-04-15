@@ -15,14 +15,11 @@ from bs4 import BeautifulSoup
 from tqdm import tqdm
 
 from .form_labels import resolve_stored_form_label
-from .models import Pokedex, Pokemon, PokemonNames
+from .models import SOURCE_URL, Pokedex, Pokemon, PokemonNames
 from .regions import attach_region_fields
 
 BASE_URL = "https://www.pokepedia.fr"
-PAGE_URL = (
-    "https://www.pokepedia.fr/"
-    "Liste_des_Pok%C3%A9mon_dans_l%27ordre_du_Pok%C3%A9dex_National"
-)
+PAGE_URL = SOURCE_URL
 HEADERS = {
     "User-Agent": (
         "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
@@ -206,7 +203,7 @@ def _cell_name_text(cell) -> str:
     return cell.get_text(" ", strip=True)
 
 
-def _parse_row_variant_form(cells: list, session: requests.Session) -> dict | None:
+def _parse_row_variant_form(cells: list) -> dict | None:
     """
     Ligne « forme alternative » (Méga, etc.) : 7 cellules, sans colonne # (rowspan).
     Image | FR | EN | DE | JA (ruby) | romaji | types
@@ -248,10 +245,10 @@ def _parse_row_variant_form(cells: list, session: requests.Session) -> dict | No
     }
 
 
-def parse_row(cells, col_map: dict, session: requests.Session) -> dict | None:
+def parse_row(cells, col_map: dict) -> dict | None:
     types_col = col_map.get("types")
     if len(cells) == 7 and types_col is not None and types_col >= len(cells):
-        return _parse_row_variant_form(cells, session)
+        return _parse_row_variant_form(cells)
 
     def cell(role):
         idx = col_map.get(role)
@@ -411,7 +408,7 @@ def scrape(
             cells = row.find_all(["td", "th"])
             if not cells:
                 continue
-            entry = parse_row(cells, col_map, session)
+            entry = parse_row(cells, col_map)
             if not entry:
                 continue
             # Déduplication slug

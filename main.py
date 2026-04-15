@@ -13,7 +13,7 @@ import typer
 from rich.console import Console
 
 app = typer.Typer(
-    name="pokedex",
+    name="pokevault",
     help="🎮 Pokédex Scraper — Pokepedia → JSON / CSV / YAML / XML",
     add_completion=False,
     rich_markup_mode="rich",
@@ -35,7 +35,7 @@ class OutputFormat(str, Enum):  # noqa: UP042
 
 @app.command()
 def fetch(
-    format: OutputFormat = typer.Option(
+    output_format: OutputFormat = typer.Option(
         OutputFormat.json, "--format", "-f",
         help="Format de sortie : json | csv | yaml | xml",
     ),
@@ -84,12 +84,11 @@ def fetch(
         console.print(f"[red]❌ Erreur lors du scraping : {e}[/red]")
         raise typer.Exit(1)  # noqa: B904
 
-    # Chemin de sortie
     if output is None:
-        ext = EXTENSIONS[format.value]
+        ext = EXTENSIONS[output_format.value]
         output = Path("data") / f"pokedex{ext}"
 
-    export(pokedex, output, format.value)
+    export(pokedex, output, output_format.value)
     console.print(f"\n[green]💾 {pokedex.total} Pokémon → {output}[/green]")
     if not no_images:
         console.print(f"[green]🖼  Images → {images_dir}/[/green]")
@@ -99,7 +98,7 @@ def fetch(
 
 @app.command()
 def view(
-    input: Path = typer.Option(
+    input_path: Path = typer.Option(
         DEFAULT_DATA, "--input", "-i",
         help="Fichier JSON source (généré par fetch)",
     ),
@@ -143,16 +142,15 @@ def view(
     from pokedex.regions import filter_pokemon_by_region
     from pokedex.viewer import view_detail, view_list
 
-    if not input.exists():
+    if not input_path.exists():
         console.print(
-            f"[red]Fichier introuvable : {input}[/red]\n"
+            f"[red]Fichier introuvable : {input_path}[/red]\n"
             "[dim]Lance d'abord : python main.py fetch[/dim]"
         )
         raise typer.Exit(1)  # noqa: B904
 
-    pokedex = load_pokedex(input)
+    pokedex = load_pokedex(input_path)
 
-    # Fiche détaillée
     if number:
         results = pokedex.by_number(number)
         if not results:
@@ -207,7 +205,7 @@ def edit(
         None, "--value",
         help="Nouvelle valeur (nécessite --field)",
     ),
-    input: Path = typer.Option(
+    input_path: Path = typer.Option(
         DEFAULT_DATA, "--input", "-i",
         help="Fichier JSON source",
     ),
@@ -226,14 +224,14 @@ def edit(
     from pokedex.exporters import load_pokedex
     from pokedex.viewer import edit_direct, edit_interactive, view_list
 
-    if not input.exists():
+    if not input_path.exists():
         console.print(
-            f"[red]Fichier introuvable : {input}[/red]\n"
+            f"[red]Fichier introuvable : {input_path}[/red]\n"
             "[dim]Lance d'abord : python main.py fetch[/dim]"
         )
         raise typer.Exit(1)  # noqa: B904
 
-    pokedex = load_pokedex(input)
+    pokedex = load_pokedex(input_path)
 
     # Résolution du slug via --number
     if not slug and number:
@@ -253,9 +251,9 @@ def edit(
         raise typer.Exit(1)  # noqa: B904
 
     if field and value is not None:
-        edit_direct(pokedex, slug, field, value, input)
+        edit_direct(pokedex, slug, field, value, input_path)
     else:
-        edit_interactive(pokedex, slug, input)
+        edit_interactive(pokedex, slug, input_path)
 
 
 # ── Entry point ────────────────────────────────────────────────────────────────

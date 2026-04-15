@@ -12,6 +12,7 @@ SOURCE_URL = (
     "https://www.pokepedia.fr/"
     "Liste_des_Pok%C3%A9mon_dans_l%27ordre_du_Pok%C3%A9dex_National"
 )
+"""Canonical source URL — also used as PAGE_URL in scraper."""
 
 
 class PokemonNames(BaseModel):
@@ -34,7 +35,10 @@ class Pokemon(BaseModel):
     types: list[str] = Field(default_factory=list, max_length=2)
     form: str | None = Field(
         None,
-        description="Variante (Méga X, d'Alola, Forme primale, Forme partenaire, Forme spéciale Pikachu, Zarbi lettre…)",
+        description=(
+            "Variante (Méga X, d'Alola, Forme primale, "
+            "Forme partenaire, Forme spéciale Pikachu, Zarbi lettre…)"
+        ),
     )
     image: str | None = Field(None, description="Chemin local vers l'image téléchargée")
     region: str = Field(

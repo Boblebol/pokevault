@@ -1,6 +1,6 @@
 """
-Libellés de formes : détection depuis le nom FR (scrape),
-puis raffinage (Primo / partenaire / Pikachu spéciaux / lettres Zarbi) pour persistance et affichage.
+Libellés de formes : détection depuis le nom FR (scrape), puis raffinage
+(Primo / partenaire / Pikachu spéciaux / lettres Zarbi) pour persistance et affichage.
 """
 
 from __future__ import annotations
@@ -79,17 +79,14 @@ def _zarbi_is_letter_variant(name_fr: str | None, name_en: str | None, slug_n: s
     Slug de base : ``0201-unown`` ou ``0201-zarbi`` (2 segments après le n°) ; suffixe → variante.
     """
     parts = slug_n.split("-")
-    if len(parts) >= 2 and parts[0] == _ZARBI_NUM and parts[1] in ("unown", "zarbi"):
-        if len(parts) > 2:
-            return True
+    if len(parts) > 2 and parts[0] == _ZARBI_NUM and parts[1] in ("unown", "zarbi"):
+        return True
 
     fr_n = _norm_blob(name_fr)
     if fr_n.startswith("zarbi") and fr_n[5:].strip():
         return True
     en_n = _norm_blob(name_en)
-    if en_n.startswith("unown") and en_n[5:].strip():
-        return True
-    return False
+    return en_n.startswith("unown") and bool(en_n[5:].strip())
 
 
 def refine_form_label(

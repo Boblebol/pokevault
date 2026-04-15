@@ -342,8 +342,7 @@ class TestParseRow:
             "<td>フシギダネ</td>"
             "<td><a>Plante</a><a>Poison</a></td>"
         )
-        session = MagicMock()
-        result = parse_row(cells, self._col_map(), session)
+        result = parse_row(cells, self._col_map())
 
         assert result is not None
         assert result["number"] == "0001"
@@ -362,8 +361,7 @@ class TestParseRow:
             "<td>リザードン</td>"
             "<td><a>Feu</a><a>Dragon</a></td>"
         )
-        session = MagicMock()
-        result = parse_row(cells, self._col_map(), session)
+        result = parse_row(cells, self._col_map())
 
         assert result is not None
         assert result["form"] is not None
@@ -379,23 +377,20 @@ class TestParseRow:
             "<td>ニャース</td>"
             "<td><a>Ténèbres</a></td>"
         )
-        session = MagicMock()
-        result = parse_row(cells, self._col_map(), session)
+        result = parse_row(cells, self._col_map())
         assert result is not None
         assert result["form"] is not None
 
     def test_parse_row_no_number_returns_none(self):
         cells = self._row_cells("<td>Type</td><td></td><td>Nom</td><td></td><td></td><td></td>")
-        session = MagicMock()
-        result = parse_row(cells, self._col_map(), session)
+        result = parse_row(cells, self._col_map())
         assert result is None
 
     def test_slug_is_built_from_en_name(self):
         cells = self._row_cells(
             "<td>#025</td><td></td><td>Pikachu</td><td>Pikachu</td><td>ピカチュウ</td><td><a>Électrik</a></td>"
         )
-        session = MagicMock()
-        result = parse_row(cells, self._col_map(), session)
+        result = parse_row(cells, self._col_map())
         assert result is not None
         assert result["slug"].startswith("0025-")
         assert "pikachu" in result["slug"]
@@ -429,8 +424,7 @@ class TestParseRow:
             "</td>"
         )
         cells = self._row_cells(row_html)
-        session = MagicMock()
-        result = parse_row(cells, col_map_live, session)
+        result = parse_row(cells, col_map_live)
         assert result is not None
         assert result["number"] == "0003"
         assert result["names"]["fr"] == "Méga-Florizarre"
@@ -462,8 +456,7 @@ class TestParseRow:
             '<img alt="Plante" src="/p.png"/></a></td>'
         )
         cells = self._row_cells(row_html)
-        session = MagicMock()
-        result = parse_row(cells, col_map_live, session)
+        result = parse_row(cells, col_map_live)
         assert result is not None
         assert result["names"]["fr"] == "Florizarre Gigamax"
         assert result["names"]["en"] == "Venusaur Gigantamax"

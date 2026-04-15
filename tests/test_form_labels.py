@@ -11,7 +11,8 @@ class TestPrimal:
         )
 
     def test_primo_groudon_slug(self) -> None:
-        assert refine_form_label("Groudon", "Groudon", "0383", "0383-groudon-primal", None) == "Forme primale"
+        result = refine_form_label("Groudon", "Groudon", "0383", "0383-groudon-primal", None)
+        assert result == "Forme primale"
 
 
 class TestPartner:
@@ -39,16 +40,16 @@ class TestPikachuSpecial:
         assert resolve_stored_form_label("Pikachu", "Pikachu", "0025", "0025-pikachu") is None
 
     def test_cosplay_style_name(self) -> None:
-        assert (
-            resolve_stored_form_label("Pikachu Lady", "Pikachu Pop Star", "0025", "0025-pikachu-pop-star")
-            == "Forme spéciale Pikachu"
+        result = resolve_stored_form_label(
+            "Pikachu Lady", "Pikachu Pop Star", "0025", "0025-pikachu-pop-star",
         )
+        assert result == "Forme spéciale Pikachu"
 
     def test_gigamax_kept(self) -> None:
-        assert (
-            resolve_stored_form_label("Pikachu Gigamax", "Gigantamax Pikachu", "0025", "0025-pikachu")
-            == "Gigamax"
+        result = resolve_stored_form_label(
+            "Pikachu Gigamax", "Gigantamax Pikachu", "0025", "0025-pikachu",
         )
+        assert result == "Gigamax"
 
 
 class TestZarbiLettre:
@@ -59,7 +60,8 @@ class TestZarbiLettre:
         )
 
     def test_name_fr_zarbi_plus_letter(self) -> None:
-        assert resolve_stored_form_label("Zarbi H", "Unown H", "0201", "0201-unown") == "Zarbi lettre"
+        result = resolve_stored_form_label("Zarbi H", "Unown H", "0201", "0201-unown")
+        assert result == "Zarbi lettre"
 
     def test_plain_zarbi_no_form(self) -> None:
         assert resolve_stored_form_label("Zarbi", "Unown", "0201", "0201-unown") is None
