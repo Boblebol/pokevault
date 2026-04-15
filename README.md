@@ -110,10 +110,20 @@ make fetch
 make dev
 
 # 3. Open in browser
-make front
+make open
 ```
 
 App available at [http://127.0.0.1:8765](http://127.0.0.1:8765/).
+
+### Docker
+
+```bash
+make docker-build
+make fetch              # scrape data locally first
+make docker-up          # start on localhost:8765
+make docker-logs        # tail logs
+make docker-down        # stop
+```
 
 ---
 
@@ -151,6 +161,7 @@ All common commands via `make`:
 make              # Show help
 make install      # Install dependencies (uv sync --dev)
 make dev          # Start local server
+make open         # Open web UI in browser
 make fetch        # Full scrape
 make fetch-test   # Quick scrape (10 entries, no images)
 make test         # Run tests
@@ -158,6 +169,10 @@ make test-cov     # Tests + coverage (100% tracker)
 make lint         # Check style (ruff)
 make fmt          # Format code (ruff)
 make check        # lint + test-cov
+make docker-build # Build Docker image
+make docker-up    # Start via docker compose
+make docker-down  # Stop docker compose
+make docker-logs  # Tail docker compose logs
 make clean        # Clean artifacts
 ```
 
@@ -209,10 +224,11 @@ pokevault/
 ├── tests/                   # Unit & integration tests
 ├── docs/
 │   └── screenshots/         #   App screenshots
+├── Dockerfile               # Production image
+├── docker-compose.yml       # One-command local deploy
 ├── Makefile                 # Common commands
 ├── pyproject.toml           # Project config & dependencies
-├── DESIGN.md                # Design system documentation
-└── requirements.txt         # Runtime dependencies (subset)
+└── DESIGN.md                # Design system documentation
 ```
 
 ### Data directory (`data/`, gitignored)
@@ -238,6 +254,7 @@ pokevault/
 | Front-end    | HTML / CSS / JavaScript vanilla                                |
 | Quality      | [ruff](https://docs.astral.sh/ruff/) (lint + format), [pytest](https://docs.pytest.org/) (100% tracker coverage) |
 | Dependencies | [uv](https://github.com/astral-sh/uv)                         |
+| Container    | [Docker](https://www.docker.com/) + docker compose             |
 
 ### Design System
 
