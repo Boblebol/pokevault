@@ -1,0 +1,15 @@
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+*.swp
+.DS_Store
+data/
+outputs/
+
+# IDE / AI tooling
+.cursor/mcp.json
+.claude/
