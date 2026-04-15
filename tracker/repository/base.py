@@ -1,15 +1,23 @@
-"""Contrat du stockage de progression."""
+"""Contrats de stockage (protocoles structurels)."""
 
 from __future__ import annotations
 
 from typing import Protocol
 
+from tracker.binder_models import BinderConfigPayload, BinderPlacementsPayload
 from tracker.models import CollectionProgress
 
 
 class ProgressRepository(Protocol):
-    def load(self) -> CollectionProgress:
-        """Charge l’état persisté (fichier absent → progression vide)."""
+    def load(self) -> CollectionProgress: ...
+    def save(self, data: CollectionProgress) -> None: ...
 
-    def save(self, data: CollectionProgress) -> None:
-        """Écrit l’état complet (remplace le fichier)."""
+
+class BinderConfigRepository(Protocol):
+    def load(self) -> BinderConfigPayload: ...
+    def save(self, data: BinderConfigPayload) -> None: ...
+
+
+class BinderPlacementsRepository(Protocol):
+    def load(self) -> BinderPlacementsPayload: ...
+    def save(self, data: BinderPlacementsPayload) -> None: ...

@@ -3,11 +3,11 @@
 from __future__ import annotations
 
 from tracker.binder_models import BinderConfigPayload
-from tracker.repository.json_binder_config_repository import JsonBinderConfigRepository
+from tracker.repository.base import BinderConfigRepository
 
 
 class BinderConfigService:
-    def __init__(self, repository: JsonBinderConfigRepository) -> None:
+    def __init__(self, repository: BinderConfigRepository) -> None:
         self._repository = repository
 
     def get_config(self) -> BinderConfigPayload:

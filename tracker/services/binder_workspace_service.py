@@ -5,15 +5,14 @@ from __future__ import annotations
 from typing import Any
 
 from tracker.binder_models import BinderConfigPayload, BinderPlacementsPayload
-from tracker.repository.json_binder_config_repository import JsonBinderConfigRepository
-from tracker.repository.json_binder_placements_repository import JsonBinderPlacementsRepository
+from tracker.repository.base import BinderConfigRepository, BinderPlacementsRepository
 
 
 class BinderWorkspaceService:
     def __init__(
         self,
-        config_repo: JsonBinderConfigRepository,
-        placements_repo: JsonBinderPlacementsRepository,
+        config_repo: BinderConfigRepository,
+        placements_repo: BinderPlacementsRepository,
     ) -> None:
         self._config_repo = config_repo
         self._placements_repo = placements_repo

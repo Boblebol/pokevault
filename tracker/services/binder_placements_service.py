@@ -3,11 +3,11 @@
 from __future__ import annotations
 
 from tracker.binder_models import BinderPlacementsPayload
-from tracker.repository.json_binder_placements_repository import JsonBinderPlacementsRepository
+from tracker.repository.base import BinderPlacementsRepository
 
 
 class BinderPlacementsService:
-    def __init__(self, repository: JsonBinderPlacementsRepository) -> None:
+    def __init__(self, repository: BinderPlacementsRepository) -> None:
         self._repository = repository
 
     def get_placements(self) -> BinderPlacementsPayload:
