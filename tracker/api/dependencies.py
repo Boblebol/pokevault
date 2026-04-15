@@ -7,7 +7,11 @@ from typing import Annotated
 from fastapi import Depends
 
 from tracker.config import TrackerSettings, get_settings
-from tracker.repository.base import BinderConfigRepository, BinderPlacementsRepository, ProgressRepository
+from tracker.repository.base import (
+    BinderConfigRepository,
+    BinderPlacementsRepository,
+    ProgressRepository,
+)
 from tracker.repository.json_binder_config_repository import JsonBinderConfigRepository
 from tracker.repository.json_binder_placements_repository import JsonBinderPlacementsRepository
 from tracker.repository.json_progress_repository import JsonProgressRepository

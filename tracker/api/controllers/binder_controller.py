@@ -19,6 +19,13 @@ from tracker.services.binder_workspace_service import BinderWorkspaceService
 
 router = APIRouter(prefix="/api/binder", tags=["binder"])
 
+_RESERVED_IDS = frozenset({"config", "placements"})
+
+
+def _reject_reserved(binder_id: str) -> None:
+    if binder_id in _RESERVED_IDS:
+        raise HTTPException(status_code=400, detail=f"'{binder_id}' is a reserved endpoint")
+
 
 @router.get("/config", response_model=BinderConfigPayload)
 def get_binder_config(
@@ -50,9 +57,6 @@ def put_binder_placements(
     return service.replace_placements(body)
 
 
-# ── REST par classeur (TICKET-04) — après les routes littérales /config et /placements ──
-
-
 @router.get("", response_model=list[dict[str, Any]])
 def list_binders(
     workspace: Annotated[BinderWorkspaceService, Depends(get_binder_workspace_service)],
@@ -65,8 +69,7 @@ def get_binder_detail(
     binder_id: str,
     workspace: Annotated[BinderWorkspaceService, Depends(get_binder_workspace_service)],
 ) -> dict[str, Any]:
-    if binder_id in ("config", "placements"):
-        raise HTTPException(status_code=404, detail="Not found")
+    _reject_reserved(binder_id)
     data = workspace.get_one(binder_id)
     if data is None:
         raise HTTPException(status_code=404, detail="Binder not found")
@@ -79,8 +82,7 @@ def put_binder_detail(
     body: BinderRestPutBody,
     workspace: Annotated[BinderWorkspaceService, Depends(get_binder_workspace_service)],
 ) -> dict[str, Any]:
-    if binder_id in ("config", "placements"):
-        raise HTTPException(status_code=400, detail="Invalid binder id")
+    _reject_reserved(binder_id)
     workspace.upsert_with_rules(binder_id, body.binder, body.form_rule, body.placements)
     data = workspace.get_one(binder_id)
     if data is None:
@@ -93,7 +95,6 @@ def delete_binder_detail(
     binder_id: str,
     workspace: Annotated[BinderWorkspaceService, Depends(get_binder_workspace_service)],
 ) -> None:
-    if binder_id in ("config", "placements"):
-        raise HTTPException(status_code=404, detail="Not found")
+    _reject_reserved(binder_id)
     if not workspace.delete_one(binder_id):
         raise HTTPException(status_code=404, detail="Binder not found")

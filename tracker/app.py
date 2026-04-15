@@ -13,9 +13,9 @@ from tracker.config import TrackerSettings, get_settings
 def create_app(settings: TrackerSettings | None = None) -> FastAPI:
     s = settings or get_settings()
     app = FastAPI(
-        title="Pokédex Tracker & Classeurs",
-        version="1.0.0",
-        description="API locale : v1 progression + v2 classeurs (deux fichiers JSON dédiés).",
+        title="pokevault",
+        version="0.1.0",
+        description="Local-first Pokémon collection tracker API.",
     )
 
     app.include_router(progress_router)

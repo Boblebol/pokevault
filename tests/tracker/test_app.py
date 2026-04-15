@@ -63,7 +63,9 @@ def test_create_app_serves_static_and_api(tmp_path: Path) -> None:
 
     application.dependency_overrides[get_binder_placements_service] = _binder_placements
     application.dependency_overrides[get_binder_workspace_service] = _binder_workspace
-    (tmp_path / "data" / "pokedex.json").write_text('{"meta":{"total":0},"pokemon":[]}', encoding="utf-8")
+    (tmp_path / "data" / "pokedex.json").write_text(
+        '{"meta":{"total":0},"pokemon":[]}', encoding="utf-8"
+    )
     client = TestClient(application)
     assert client.get("/api/progress").status_code == 200
     assert client.get("/api/progress").json() == {"version": 1, "caught": {}}
@@ -87,4 +89,4 @@ def test_create_app_web_dir_missing(tmp_path: Path) -> None:
 
 
 def test_default_app_module_loads() -> None:
-    assert default_app.title == "Pokédex Tracker & Classeurs"
+    assert default_app.title == "pokevault"

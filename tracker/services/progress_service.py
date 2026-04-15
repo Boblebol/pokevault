@@ -37,17 +37,15 @@ class ProgressService:
         return ProgressSaveResponse(ok=True, saved=len(to_store.caught))
 
 
+_TRUTHY = {True, "1", "true", "True"}
+
+
 def _normalize_caught(raw: dict[str, bool]) -> dict[str, bool]:
     out: dict[str, bool] = {}
     for k, v in raw.items():
         if not isinstance(k, str):
             continue
         key = k.strip()
-        if not key:
-            continue
-        if isinstance(v, bool):
-            if v:
-                out[key] = True
-        elif v in (1, "1", "true", "True"):
+        if key and v in _TRUTHY:
             out[key] = True
     return out
