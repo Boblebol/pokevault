@@ -2088,7 +2088,7 @@ body {
   padding: 0 24px;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  gap: 24px;
 }
 
 .stitch-brand {
@@ -2103,21 +2103,11 @@ body {
 .stitch-topnav {
   display: flex;
   gap: 18px;
+  margin-left: auto;
 }
 
 .stitch-sidebar {
-  position: fixed;
-  top: 64px;
-  left: 0;
-  bottom: 0;
-  width: 232px;
-  z-index: 50;
-  background: linear-gradient(90deg, #1c1b1b 0%, #191818 100%);
-  border-right: 1px solid rgba(255, 255, 255, 0.06);
-  padding: 18px 12px;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
+  display: none;
 }
 
 .stitch-side-title {
@@ -2129,24 +2119,17 @@ body {
 }
 
 .stitch-canvas {
-  margin-left: 232px;
+  margin-left: 0;
   padding-top: 74px;
   min-height: 100vh;
 }
 
-.stitch-sidebar .app-switch-link,
 .stitch-topnav .app-switch-link {
   border-bottom: none;
   margin: 0;
   border-radius: 8px;
   padding: 9px 10px;
   color: #a3918f;
-}
-
-.stitch-sidebar .app-switch-link.is-active {
-  color: #00daf3;
-  background: rgba(0, 218, 243, 0.1);
-  box-shadow: inset 2px 0 0 #00daf3;
 }
 
 .stitch-topnav .app-switch-link.is-active {
@@ -2168,10 +2151,6 @@ body {
 }
 
 @media (max-width: 980px) {
-  .stitch-sidebar {
-    display: none;
-  }
-
   .stitch-canvas {
     margin-left: 0;
   }
@@ -2810,6 +2789,7 @@ body {
   border-radius: 8px;
   background: rgba(255 255 255 / 0.06);
   color: var(--md-on-surface, #e3e3e3);
+  text-decoration: none;
   font: 500 0.85rem / 1.4 "Inter", sans-serif;
   cursor: pointer;
   transition: background 0.15s, border-color 0.15s;
@@ -2854,6 +2834,71 @@ body {
 .import-preview-actions {
   display: flex;
   gap: 10px;
+}
+
+.settings-dev-card {
+  background: color-mix(in oklab, var(--md-surface-container-low, #1c1b1b) 78%, transparent);
+}
+
+.settings-dev-meta {
+  margin: 12px 0 0;
+  display: grid;
+  gap: 8px;
+}
+
+.settings-dev-row {
+  display: grid;
+  grid-template-columns: 88px 1fr;
+  gap: 10px;
+  align-items: baseline;
+  font: 400 0.85rem / 1.45 "Inter", sans-serif;
+}
+
+.settings-dev-row dt {
+  color: rgba(255 255 255 / 0.5);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-size: 0.72rem;
+}
+
+.settings-dev-row dd {
+  margin: 0;
+  color: var(--md-on-surface, #e3e3e3);
+}
+
+.settings-dev-row a {
+  color: #00daf3;
+  text-decoration: none;
+}
+
+.settings-dev-row a:hover {
+  text-decoration: underline;
+}
+
+.settings-dev-actions {
+  margin-top: 12px;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.settings-dev-pill {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 6px 12px;
+  font: 500 0.75rem / 1.2 "Inter", sans-serif;
+  color: rgba(255 255 255 / 0.86);
+  text-decoration: none;
+  background: color-mix(in oklab, var(--md-surface-container-high, #2a2a2a) 80%, transparent);
+  border: 1px solid rgba(255 255 255 / 0.12);
+  transition: border-color 0.15s, background 0.15s, color 0.15s;
+}
+
+.settings-dev-pill:hover {
+  color: #00daf3;
+  border-color: rgba(0 218 243 / 0.4);
+  background: rgba(0 218 243 / 0.14);
 }
 
 /* ── Print view ── */

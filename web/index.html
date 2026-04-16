@@ -12,7 +12,7 @@
       rel="stylesheet"
       href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL,GRAD,opsz@100..700,0..1,-50..200,20..48"
     />
-    <link rel="stylesheet" href="/styles.css?v=20260415" />
+    <link rel="stylesheet" href="/styles.css?v=20260416" />
   </head>
   <body>
     <header class="stitch-topbar">
@@ -26,14 +26,6 @@
         </nav>
       </div>
     </header>
-
-    <aside class="stitch-sidebar">
-      <div class="stitch-side-title">pokevault</div>
-      <a href="#/liste" class="app-switch-link is-active" data-view="liste">Specimens</a>
-      <a href="#/classeur" class="app-switch-link" data-view="classeur">Vaults</a>
-      <a href="#/stats" class="app-switch-link" data-view="stats">Analytics</a>
-      <a href="#/settings" class="app-switch-link" data-view="settings">System</a>
-    </aside>
 
     <div class="stitch-canvas">
       <div id="viewListe" class="app-view">
@@ -142,7 +134,7 @@
 
       <div id="viewClasseur" class="app-view" hidden>
         <header class="header binder-header app-collection-header">
-          <h1 class="title title-binder">Vault Explorer</h1>
+          <h1 class="title title-binder">Binders</h1>
           <p class="collection-subtitle">Gestion des classeurs, pages, placements et synchronisation.</p>
           <div class="binder-header-actions">
             <button type="button" class="binder-refresh" id="binderV2Refresh">Rafraîchir</button>
@@ -164,7 +156,7 @@
             <div id="binderCollectionShell" class="binder-collection-shell" hidden>
               <div class="binder-shell-layout">
                 <aside class="binder-vaults-nav">
-                  <h2 class="binder-vaults-title">Your Vaults</h2>
+                  <h2 class="binder-vaults-title">Your Binders</h2>
                   <div id="binderVaultsNav" class="binder-vaults-list" aria-label="Liste des classeurs"></div>
                 </aside>
                 <section class="binder-shell-main">
@@ -282,6 +274,10 @@
                 <span class="material-symbols-outlined" aria-hidden="true">upload</span>
                 Import JSON
               </button>
+              <a href="#/print" class="settings-action-btn" id="printFromSettingsBtn">
+                <span class="material-symbols-outlined" aria-hidden="true">print</span>
+                Print checklist
+              </a>
               <input type="file" id="importFileInput" accept=".json" hidden />
             </div>
             <div id="importPreview" class="import-preview" hidden>
@@ -297,14 +293,59 @@
             </div>
             <p id="exportImportHint" class="sync-hint" hidden></p>
           </div>
+          <div class="stats-kpi-card settings-dev-card">
+            <h2 class="stats-kpi-label">Archive Author</h2>
+            <p class="stats-kpi-sub">Primary architect and maintainer of the pokevault ecosystem.</p>
+            <dl class="settings-dev-meta">
+              <div class="settings-dev-row">
+                <dt>Name</dt>
+                <dd>Alexandre Enouf</dd>
+              </div>
+              <div class="settings-dev-row">
+                <dt>Website</dt>
+                <dd>
+                  <a href="https://alexandre-enouf.fr" target="_blank" rel="noopener noreferrer">
+                    alexandre-enouf.fr
+                  </a>
+                </dd>
+              </div>
+              <div class="settings-dev-row">
+                <dt>GitHub</dt>
+                <dd>
+                  <a href="https://github.com/Boblebol/pokevault" target="_blank" rel="noopener noreferrer">
+                    github.com/Boblebol/pokevault
+                  </a>
+                </dd>
+              </div>
+              <div class="settings-dev-row">
+                <dt>LinkedIn</dt>
+                <dd>
+                  <a href="https://fr.linkedin.com/in/alexandre-enouf-47834990" target="_blank" rel="noopener noreferrer">
+                    fr.linkedin.com/in/alexandre-enouf-47834990
+                  </a>
+                </dd>
+              </div>
+            </dl>
+            <div class="settings-dev-actions">
+              <a href="https://alexandre-enouf.fr" target="_blank" rel="noopener noreferrer" class="settings-dev-pill">
+                View Portfolio
+              </a>
+              <a href="https://github.com/Boblebol/pokevault/issues" target="_blank" rel="noopener noreferrer" class="settings-dev-pill">
+                Report Issue
+              </a>
+              <a href="https://github.com/sponsors" target="_blank" rel="noopener noreferrer" class="settings-dev-pill">
+                Donate
+              </a>
+            </div>
+          </div>
         </section>
       </div>
     </div>
 
-    <script src="/binder-v2.js?v=20260415" defer></script>
-    <script src="/app.js?v=20260415" defer></script>
-    <script src="/binder-collection-view.js?v=20260415" defer></script>
-    <script src="/stats-view.js?v=20260415" defer></script>
-    <script src="/print-view.js?v=20260415" defer></script>
+    <script src="/binder-v2.js?v=20260416" defer></script>
+    <script src="/app.js?v=20260416" defer></script>
+    <script src="/binder-collection-view.js?v=20260416" defer></script>
+    <script src="/stats-view.js?v=20260416" defer></script>
+    <script src="/print-view.js?v=20260416" defer></script>
   </body>
 </html>

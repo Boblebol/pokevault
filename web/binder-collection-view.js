@@ -201,7 +201,7 @@ function renderVaultsNav(cfg, activeBinderId, ordered) {
     top.className = "binder-vault-item-top";
     const nm = document.createElement("span");
     nm.className = "binder-vault-item-name";
-    nm.textContent = String(b.name || "Vault");
+    nm.textContent = String(b.name || "Binder");
     top.append(nm);
     if (String(b.id) === String(activeBinderId)) {
       const pill = document.createElement("span");

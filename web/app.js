@@ -917,7 +917,7 @@ function applyAppRoute() {
     stats: "Collection — Stats",
     settings: "Collection — Settings",
     print: "Collection — Print",
-    classeur: "Collection — Classeurs",
+    classeur: "Collection — Binders",
   };
   document.title = titles[view] || "pokevault";
   if (view === "liste" && !listViewStarted) {
