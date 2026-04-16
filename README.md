@@ -72,6 +72,19 @@
 - Global and regional progress.
 - Detailed collection metrics.
 
+### Web UI — Print View (`#/print`)
+
+- Text-first printable checklist (no images): number, name, binder location.
+- Filters before printing: **all**, **caught only**, **missing only**.
+- Grouping modes: **by binder** or **by region**.
+- A4 print stylesheet with page breaks between sections.
+
+### Collection Backup / Restore
+
+- Export full local state to a single versioned JSON backup.
+- Import backup JSON to fully restore caught progress and binder workspace.
+- Import preview in Settings before confirmation.
+
 ### Local REST API
 
 | Endpoint                          | Method          | Description                    |
@@ -81,6 +94,8 @@
 | `/api/binder/{id}`                | GET / PUT / DELETE | Manage a binder             |
 | `/api/binder/config`              | GET / PUT       | Binder configuration           |
 | `/api/binder/placements`          | GET / PUT       | Binder placements              |
+| `/api/export`                     | GET             | Full backup export (JSON)      |
+| `/api/import`                     | POST            | Full backup restore (JSON)     |
 | `/data/pokedex.json`              | GET             | Pokédex data                   |
 
 ---
@@ -176,6 +191,18 @@ make docker-logs  # Tail docker compose logs
 make clean        # Clean artifacts
 ```
 
+### Export / Import / Print
+
+From **Settings**:
+
+- `Export JSON` downloads a full backup (`pokevault-backup-YYYY-MM-DD.json`).
+- `Import JSON` loads a backup with a summary preview before applying.
+
+From **Binders**:
+
+- `Print checklist` opens `#/print`.
+- Choose binder scope, filter mode, and grouping mode, then print.
+
 ### Configuration
 
 Environment variables (`TRACKER_` prefix):
@@ -210,7 +237,7 @@ pokevault/
 │   ├── models.py            #   API models
 │   ├── binder_models.py     #   Binder models
 │   ├── api/
-│   │   ├── controllers/     #   Routes (progress, binder)
+│   │   ├── controllers/     #   Routes (progress, binder, export/import)
 │   │   └── dependencies.py  #   Dependency injection
 │   ├── services/            #   Business logic
 │   └── repository/          #   JSON persistence
@@ -220,6 +247,7 @@ pokevault/
 │   ├── binder-v2.js         #   Binder logic
 │   ├── binder-collection-view.js  # Binder rendering
 │   ├── stats-view.js        #   Statistics view
+│   ├── print-view.js        #   Printable checklist view
 │   └── styles.css           #   Styles
 ├── tests/                   # Unit & integration tests
 ├── docs/

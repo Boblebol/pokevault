@@ -74,11 +74,14 @@ Préfixes recommandés :
 - Les tests sont dans `tests/` et utilisent [pytest](https://docs.pytest.org/).
 - Le module `tracker/` doit maintenir **100% de couverture** (lignes).
 - Les tests d'intégration API utilisent `httpx` avec le `TestClient` FastAPI.
+- Les endpoints `GET /api/export` et `POST /api/import` doivent rester couverts.
 
 ### Front-end
 
 - Le front est en **HTML/CSS/JS vanilla** (pas de framework, pas de build).
 - Les fichiers sont dans `web/` et servis directement par FastAPI.
+- La vue `#/print` doit rester légère et orientée impression (pas d'images).
+- Toute évolution export/import doit mettre à jour `README.md` et `CHANGELOG.md`.
 
 ## Structure des contributions
 
