@@ -88,3 +88,19 @@ def test_reserved_paths_not_binder_ids(tmp_path: Path) -> None:
     client = _app(tmp_path)
     assert client.get("/api/binder/config").status_code == 200
     assert client.get("/api/binder/config-not-real").status_code == 404
+
+
+def test_reserved_ids_rejected_on_delete(tmp_path: Path) -> None:
+    client = _app(tmp_path)
+    assert client.delete("/api/binder/config").status_code == 400
+    assert client.delete("/api/binder/placements").status_code == 400
+
+
+def test_delete_nonexistent_binder_returns_404(tmp_path: Path) -> None:
+    client = _app(tmp_path)
+    assert client.delete("/api/binder/does-not-exist").status_code == 404
+
+
+def test_get_nonexistent_binder_returns_404(tmp_path: Path) -> None:
+    client = _app(tmp_path)
+    assert client.get("/api/binder/nope").status_code == 404

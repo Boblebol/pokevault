@@ -35,3 +35,32 @@ def test_binder_placements_service_get_and_replace() -> None:
     assert svc.get_placements() is payload
     assert svc.replace_placements(payload) is payload
     repo.save.assert_called_once_with(payload)
+
+
+def test_workspace_list_summaries_skips_entries_without_id() -> None:
+    from tracker.services.binder_workspace_service import BinderWorkspaceService
+
+    cfg_repo = MagicMock()
+    pl_repo = MagicMock()
+    cfg_repo.load.return_value = BinderConfigPayload(
+        binders=[
+            {"name": "no-id"},
+            {"id": "", "name": "empty-id"},
+            {"id": "ok", "name": "Good"},
+        ],
+    )
+    ws = BinderWorkspaceService(cfg_repo, pl_repo)
+    result = ws.list_summaries()
+    assert len(result) == 1
+    assert result[0]["id"] == "ok"
+
+
+def test_workspace_delete_nonexistent_returns_false() -> None:
+    from tracker.services.binder_workspace_service import BinderWorkspaceService
+
+    cfg_repo = MagicMock()
+    pl_repo = MagicMock()
+    cfg_repo.load.return_value = BinderConfigPayload(binders=[])
+    pl_repo.load.return_value = BinderPlacementsPayload()
+    ws = BinderWorkspaceService(cfg_repo, pl_repo)
+    assert ws.delete_one("ghost") is False

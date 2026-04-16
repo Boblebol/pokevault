@@ -10,6 +10,7 @@ from tracker.api.dependencies import (
     get_binder_placements_repository,
     get_binder_placements_service,
     get_binder_workspace_service,
+    get_export_service,
     get_progress_repository,
     get_progress_service,
 )
@@ -20,6 +21,7 @@ from tracker.repository.json_progress_repository import JsonProgressRepository
 from tracker.services.binder_config_service import BinderConfigService
 from tracker.services.binder_placements_service import BinderPlacementsService
 from tracker.services.binder_workspace_service import BinderWorkspaceService
+from tracker.services.export_service import ExportService
 from tracker.services.progress_service import ProgressService
 
 
@@ -49,3 +51,16 @@ def test_get_binder_workspace_service(tmp_path: Path) -> None:
     pl_repo = get_binder_placements_repository(settings=settings)
     ws = get_binder_workspace_service(cfg_repo=cfg_repo, pl_repo=pl_repo)
     assert isinstance(ws, BinderWorkspaceService)
+
+
+def test_get_export_service(tmp_path: Path) -> None:
+    settings = TrackerSettings(repo_root=tmp_path)
+    progress_repo = get_progress_repository(settings=settings)
+    cfg_repo = get_binder_config_repository(settings=settings)
+    pl_repo = get_binder_placements_repository(settings=settings)
+    svc = get_export_service(
+        progress_repo=progress_repo,
+        config_repo=cfg_repo,
+        placements_repo=pl_repo,
+    )
+    assert isinstance(svc, ExportService)

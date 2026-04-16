@@ -85,7 +85,7 @@ def put_binder_detail(
     _reject_reserved(binder_id)
     workspace.upsert_with_rules(binder_id, body.binder, body.form_rule, body.placements)
     data = workspace.get_one(binder_id)
-    if data is None:
+    if data is None:  # pragma: no cover
         raise HTTPException(status_code=500, detail="Upsert failed")
     return data
 

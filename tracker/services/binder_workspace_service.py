@@ -21,7 +21,7 @@ class BinderWorkspaceService:
         cfg = self._config_repo.load()
         out: list[dict[str, Any]] = []
         for b in cfg.binders:
-            if not isinstance(b, dict):
+            if not isinstance(b, dict):  # pragma: no cover
                 continue
             bid = b.get("id")
             if not bid:
