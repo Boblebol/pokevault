@@ -1670,7 +1670,7 @@ body {
   font-size: 13px;
 }
 
-.stats-main::before {
+#viewStats .stats-main::before {
   content: "Global Completion Status";
   display: block;
   margin-bottom: 8px;
