@@ -1496,4 +1496,7 @@ window.PokedexBinder = {
   selectBinderPokemonPool,
   getFormRuleForBinder,
   getEffectiveFormRuleForCollection,
+  get cachedConfig() {
+    return lastConfigJson;
+  },
 };

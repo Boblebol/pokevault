@@ -492,6 +492,104 @@ function setupSettingsView() {
   subscribeDimMode((mode) => {
     sel.value = mode;
   });
+  setupExportImport();
+}
+
+let pendingImportPayload = null;
+
+function setupExportImport() {
+  const exportBtn = document.getElementById("exportBtn");
+  const importBtn = document.getElementById("importBtn");
+  const fileInput = document.getElementById("importFileInput");
+  const preview = document.getElementById("importPreview");
+  const previewText = document.getElementById("importPreviewText");
+  const confirmBtn = document.getElementById("importConfirmBtn");
+  const cancelBtn = document.getElementById("importCancelBtn");
+  const hint = document.getElementById("exportImportHint");
+  if (!exportBtn || exportBtn.dataset.wired) return;
+  exportBtn.dataset.wired = "1";
+
+  function showHint(msg, isError) {
+    if (!hint) return;
+    hint.textContent = msg;
+    hint.hidden = false;
+    hint.style.color = isError ? "var(--md-error, #f44)" : "";
+    if (!isError) setTimeout(() => { hint.hidden = true; }, 4000);
+  }
+
+  exportBtn.addEventListener("click", async () => {
+    try {
+      const res = await fetch("/api/export");
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      const date = new Date().toISOString().slice(0, 10);
+      a.href = url;
+      a.download = `pokevault-backup-${date}.json`;
+      document.body.append(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+      showHint(`Exported ${Object.keys(data.progress?.caught || {}).length} caught, ${(data.binder_config?.binders || []).length} binders.`, false);
+    } catch (err) {
+      showHint(`Export failed: ${err.message}`, true);
+    }
+  });
+
+  importBtn.addEventListener("click", () => fileInput.click());
+
+  fileInput.addEventListener("change", () => {
+    const file = fileInput.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      try {
+        const data = JSON.parse(reader.result);
+        if (data.schema_version !== 1) throw new Error("Unsupported schema version");
+        if (!data.progress || !data.binder_config || !data.binder_placements) {
+          throw new Error("Missing required fields");
+        }
+        pendingImportPayload = data;
+        const caught = Object.keys(data.progress?.caught || {}).length;
+        const binders = (data.binder_config?.binders || []).length;
+        const date = data.exported_at ? new Date(data.exported_at).toLocaleDateString() : "unknown";
+        previewText.textContent = `${caught} caught, ${binders} binders — exported ${date}. This will replace your current data.`;
+        preview.hidden = false;
+      } catch (err) {
+        showHint(`Invalid file: ${err.message}`, true);
+        pendingImportPayload = null;
+        preview.hidden = true;
+      }
+      fileInput.value = "";
+    };
+    reader.readAsText(file);
+  });
+
+  confirmBtn.addEventListener("click", async () => {
+    if (!pendingImportPayload) return;
+    try {
+      const res = await fetch("/api/import", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(pendingImportPayload),
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const body = await res.json();
+      showHint(`Imported ${body.caught_count} caught, ${body.binder_count} binders. Reloading…`, false);
+      pendingImportPayload = null;
+      preview.hidden = true;
+      setTimeout(() => location.reload(), 1200);
+    } catch (err) {
+      showHint(`Import failed: ${err.message}`, true);
+    }
+  });
+
+  cancelBtn.addEventListener("click", () => {
+    pendingImportPayload = null;
+    preview.hidden = true;
+  });
 }
 
 function renderPageNumbers(current, totalPages) {
@@ -784,6 +882,7 @@ function currentViewFromHash() {
   if (raw === "stats") return "stats";
   if (raw === "classeur") return "classeur";
   if (raw === "settings") return "settings";
+  if (raw === "print") return "print";
   if (raw === "liste" || raw === "") return "liste";
   return "liste";
 }
@@ -806,19 +905,21 @@ function applyAppRoute() {
   const elClasseur = document.getElementById("viewClasseur");
   const elStats = document.getElementById("viewStats");
   const elSettings = document.getElementById("viewSettings");
+  const elPrint = document.getElementById("viewPrint");
   if (elListe) elListe.hidden = view !== "liste";
   if (elClasseur) elClasseur.hidden = view !== "classeur";
   if (elStats) elStats.hidden = view !== "stats";
   if (elSettings) elSettings.hidden = view !== "settings";
+  if (elPrint) elPrint.hidden = view !== "print";
   updateAppSwitchNav(view);
-  document.title =
-    view === "liste"
-      ? "Collection — Liste"
-      : view === "stats"
-        ? "Collection — Stats"
-        : view === "settings"
-          ? "Collection — Settings"
-          : "Collection — Classeurs";
+  const titles = {
+    liste: "Collection — Liste",
+    stats: "Collection — Stats",
+    settings: "Collection — Settings",
+    print: "Collection — Print",
+    classeur: "Collection — Classeurs",
+  };
+  document.title = titles[view] || "pokevault";
   if (view === "liste" && !listViewStarted) {
     listViewStarted = true;
     void startTracker();
@@ -828,6 +929,9 @@ function applyAppRoute() {
   }
   if (view === "stats" && typeof window.PokedexStats?.start === "function") {
     window.PokedexStats.start();
+  }
+  if (view === "print" && typeof window.PokedexPrint?.start === "function") {
+    window.PokedexPrint.start();
   }
 }
 

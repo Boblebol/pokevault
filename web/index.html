@@ -146,6 +146,7 @@
           <p class="collection-subtitle">Gestion des classeurs, pages, placements et synchronisation.</p>
           <div class="binder-header-actions">
             <button type="button" class="binder-refresh" id="binderV2Refresh">Rafraîchir</button>
+            <a href="#/print" class="binder-refresh">Print checklist</a>
           </div>
           <p class="sync-hint" id="binderV2Hint" hidden></p>
           <div id="binderAdvancedPanel" class="stitch-hidden" hidden>
@@ -220,6 +221,38 @@
         </section>
       </div>
 
+      <div id="viewPrint" class="app-view" hidden>
+        <div class="print-controls">
+          <div class="print-control-group">
+            <label for="printBinderSelect">Binder</label>
+            <select id="printBinderSelect">
+              <option value="all">All binders</option>
+            </select>
+          </div>
+          <div class="print-control-group">
+            <label for="printFilterSelect">Filter</label>
+            <select id="printFilterSelect">
+              <option value="all">All</option>
+              <option value="caught">Caught only</option>
+              <option value="missing">Missing only</option>
+            </select>
+          </div>
+          <div class="print-control-group">
+            <label for="printGroupSelect">Group by</label>
+            <select id="printGroupSelect">
+              <option value="binder">Binder pages</option>
+              <option value="region">Region</option>
+            </select>
+          </div>
+          <span class="print-summary" id="printSummary"></span>
+          <button type="button" class="print-action-btn" id="printBtn">
+            <span class="material-symbols-outlined" aria-hidden="true">print</span>
+            Print
+          </button>
+        </div>
+        <div id="printOutput"></div>
+      </div>
+
       <div id="viewSettings" class="app-view" hidden>
         <header class="header app-collection-header">
           <h1 class="title">System Settings</h1>
@@ -239,7 +272,30 @@
           </div>
           <div class="stats-kpi-card">
             <h2 class="stats-kpi-label">Data</h2>
-            <p class="stats-kpi-sub">Les préférences d'interface sont stockées en localStorage.</p>
+            <p class="stats-kpi-sub">Export or import your full collection (caught + binders).</p>
+            <div class="settings-data-actions">
+              <button type="button" class="settings-action-btn" id="exportBtn">
+                <span class="material-symbols-outlined" aria-hidden="true">download</span>
+                Export JSON
+              </button>
+              <button type="button" class="settings-action-btn" id="importBtn">
+                <span class="material-symbols-outlined" aria-hidden="true">upload</span>
+                Import JSON
+              </button>
+              <input type="file" id="importFileInput" accept=".json" hidden />
+            </div>
+            <div id="importPreview" class="import-preview" hidden>
+              <p id="importPreviewText"></p>
+              <div class="import-preview-actions">
+                <button type="button" class="settings-action-btn settings-action-btn--confirm" id="importConfirmBtn">
+                  Confirm import
+                </button>
+                <button type="button" class="settings-action-btn settings-action-btn--cancel" id="importCancelBtn">
+                  Cancel
+                </button>
+              </div>
+            </div>
+            <p id="exportImportHint" class="sync-hint" hidden></p>
           </div>
         </section>
       </div>
@@ -249,5 +305,6 @@
     <script src="/app.js?v=20260415" defer></script>
     <script src="/binder-collection-view.js?v=20260415" defer></script>
     <script src="/stats-view.js?v=20260415" defer></script>
+    <script src="/print-view.js?v=20260415" defer></script>
   </body>
 </html>
