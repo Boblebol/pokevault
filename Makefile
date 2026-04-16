@@ -56,10 +56,15 @@ check: lint test-cov ## Run lint + tests with coverage
 # ── Docker ───────────────────────────────────────────────────────────────────
 
 docker-build: ## Build the Docker image
-	docker build -t $(DOCKER_IMAGE):$(DOCKER_TAG) .
+	DOCKER_IMAGE=$(DOCKER_IMAGE) DOCKER_TAG=$(DOCKER_TAG) docker compose build --no-cache tracker
+	@echo ""
+	@echo "Pour servir cette image: recréer le conteneur (ex. make docker-up ou"
+	@echo "  docker compose up -d --force-recreate tracker)"
+	@echo "Sinon l’ancien conteneur peut encore tourner avec l’image précédente."
 
 docker-up: ## Start the tracker via docker compose
-	docker compose up -d
+	DOCKER_IMAGE=$(DOCKER_IMAGE) DOCKER_TAG=$(DOCKER_TAG) docker compose build --no-cache tracker
+	DOCKER_IMAGE=$(DOCKER_IMAGE) DOCKER_TAG=$(DOCKER_TAG) docker compose up -d --force-recreate tracker
 
 docker-down: ## Stop docker compose services
 	docker compose down
