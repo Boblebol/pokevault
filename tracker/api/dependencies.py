@@ -18,6 +18,7 @@ from tracker.repository.json_progress_repository import JsonProgressRepository
 from tracker.services.binder_config_service import BinderConfigService
 from tracker.services.binder_placements_service import BinderPlacementsService
 from tracker.services.binder_workspace_service import BinderWorkspaceService
+from tracker.services.export_service import ExportService
 from tracker.services.progress_service import ProgressService
 
 
@@ -65,3 +66,14 @@ def get_binder_workspace_service(
     pl_repo: Annotated[BinderPlacementsRepository, Depends(get_binder_placements_repository)],
 ) -> BinderWorkspaceService:
     return BinderWorkspaceService(cfg_repo, pl_repo)
+
+
+def get_export_service(
+    progress_repo: Annotated[ProgressRepository, Depends(get_progress_repository)],
+    config_repo: Annotated[BinderConfigRepository, Depends(get_binder_config_repository)],
+    placements_repo: Annotated[
+        BinderPlacementsRepository,
+        Depends(get_binder_placements_repository),
+    ],
+) -> ExportService:
+    return ExportService(progress_repo, config_repo, placements_repo)
