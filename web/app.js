@@ -708,7 +708,7 @@ function createPokemonCard(p, opts) {
   if (!typeList.length) {
     const unknown = document.createElement("span");
     unknown.className = "card-type-badge";
-    unknown.textContent = "Unknown";
+    unknown.textContent = "Inconnu";
     types.append(unknown);
   } else {
     for (const t of typeList) {
@@ -729,7 +729,7 @@ function createPokemonCard(p, opts) {
 
   const action = document.createElement("div");
   action.className = "card-action";
-  action.textContent = caught ? "Release Specimen" : "Register Catch";
+  action.textContent = caught ? "Retirer de la collection" : "Marquer comme attrape";
   card.append(action);
 
   card.addEventListener("click", () => {
@@ -758,7 +758,7 @@ function render() {
   const heroPct = document.getElementById("listHeroPct");
   const heroCount = document.getElementById("listHeroCount");
   if (heroPct) heroPct.textContent = `${pct}%`;
-  if (heroCount) heroCount.textContent = `${caughtCount} / ${barTotal} discovered`;
+  if (heroCount) heroCount.textContent = `${caughtCount} / ${barTotal} decouverts`;
   const fill = document.getElementById("progressFill");
   fill.style.width = `${pct}%`;
   fill.parentElement.setAttribute("aria-valuenow", String(pct));
@@ -913,11 +913,11 @@ function applyAppRoute() {
   if (elPrint) elPrint.hidden = view !== "print";
   updateAppSwitchNav(view);
   const titles = {
-    liste: "Collection — Liste",
-    stats: "Collection — Stats",
-    settings: "Collection — Settings",
-    print: "Collection — Print",
-    classeur: "Collection — Binders",
+    liste: "pokevault — Collection",
+    stats: "pokevault — Statistiques",
+    settings: "pokevault — Reglages",
+    print: "pokevault — Impression",
+    classeur: "pokevault — Classeurs",
   };
   document.title = titles[view] || "pokevault";
   if (view === "liste" && !listViewStarted) {

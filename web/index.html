@@ -19,10 +19,10 @@
       <div class="stitch-topbar-inner">
         <div class="stitch-brand">pokevault</div>
         <nav class="stitch-topnav">
-          <a href="#/liste" class="app-switch-link is-active" data-view="liste" aria-current="page">List</a>
-          <a href="#/classeur" class="app-switch-link" data-view="classeur">Binders</a>
-          <a href="#/stats" class="app-switch-link" data-view="stats">Stats</a>
-          <a href="#/settings" class="app-switch-link" data-view="settings">Settings</a>
+          <a href="#/liste" class="app-switch-link is-active" data-view="liste" aria-current="page">Collection</a>
+          <a href="#/classeur" class="app-switch-link" data-view="classeur">Classeurs</a>
+          <a href="#/stats" class="app-switch-link" data-view="stats">Statistiques</a>
+          <a href="#/settings" class="app-switch-link" data-view="settings">Reglages</a>
         </nav>
       </div>
     </header>
@@ -31,17 +31,28 @@
       <div id="viewListe" class="app-view">
         <div id="trackerMainBlock">
           <header class="header app-collection-header">
-            <div class="list-hero">
-              <div class="list-hero-left">
-                <p class="list-kicker">Collection Status</p>
-                <h1 class="title">Archive Completion</h1>
+            <div class="page-header-top">
+              <div>
+                <h1 class="title">Collection</h1>
                 <p class="collection-subtitle">
                   Progression partagée avec les classeurs, synchronisée via les APIs locales.
                 </p>
               </div>
+              <nav class="binder-pager list-pager" role="navigation" aria-label="Pagination liste">
+                <button type="button" class="binder-pager-btn" id="listPagePrev" aria-label="Page précédente">◀</button>
+                <div class="list-page-numbers" id="listPageNumbers" aria-label="Pages"></div>
+                <span class="binder-pager-label" id="listPageInfo">Page 1 / 1</span>
+                <button type="button" class="binder-pager-btn" id="listPageNext" aria-label="Page suivante">▶</button>
+              </nav>
+            </div>
+
+            <div class="list-hero">
+              <div class="list-hero-left">
+                <p class="list-kicker">Etat de collection</p>
+              </div>
               <div class="list-hero-right">
                 <span id="listHeroPct" class="list-hero-pct">0%</span>
-                <p id="listHeroCount" class="list-hero-count">0 / 0 discovered</p>
+                <p id="listHeroCount" class="list-hero-count">0 / 0 decouverts</p>
               </div>
             </div>
 
@@ -58,22 +69,22 @@
                 type="search"
                 id="search"
                 class="search-input"
-                placeholder="Search by name or archive index..."
-                aria-label="Search by name or archive index"
+                placeholder="Rechercher par nom ou numero..."
+                aria-label="Rechercher par nom ou numero"
                 autocomplete="off"
                 spellcheck="false"
               />
             </label>
 
-            <div class="filters" role="group" aria-label="Filter by status">
+            <div class="filters" role="group" aria-label="Filtrer par statut">
               <button type="button" class="filter-btn is-active" data-filter="all" aria-pressed="true">
-                All
+                Tous
               </button>
               <button type="button" class="filter-btn" data-filter="caught" aria-pressed="false">
-                Caught
+                Attrapes
               </button>
               <button type="button" class="filter-btn" data-filter="missing" aria-pressed="false">
-                Missing
+                Manquants
               </button>
             </div>
 
@@ -114,19 +125,14 @@
           </header>
 
           <main class="grid" id="grid" aria-live="polite"></main>
-          <nav class="list-pagination" id="listPagination" aria-label="Pagination liste">
-            <button type="button" class="list-page-btn" id="listPagePrev" aria-label="Page précédente">◀</button>
-            <div class="list-page-numbers" id="listPageNumbers" aria-label="Pages"></div>
-            <span class="list-page-info" id="listPageInfo">Page 1 / 1</span>
-            <button type="button" class="list-page-btn" id="listPageNext" aria-label="Page suivante">▶</button>
-          </nav>
+          
           <footer class="list-footer" id="listFooterMeta" aria-live="polite"></footer>
         </div>
       </div>
 
       <div id="viewStats" class="app-view" hidden>
         <header class="header app-collection-header stats-header">
-          <h1 class="title">Collection Statistics</h1>
+          <h1 class="title">Statistiques</h1>
           <p class="collection-subtitle">Global completion, regions, and archive gaps.</p>
         </header>
         <section class="stats-main" id="statsBody"></section>
@@ -138,7 +144,7 @@
           <p class="collection-subtitle">Gestion des classeurs, pages, placements et synchronisation.</p>
           <div class="binder-header-actions">
             <button type="button" class="binder-refresh" id="binderV2Refresh">Rafraîchir</button>
-            <a href="#/print" class="binder-refresh">Print checklist</a>
+            <a href="#/print" class="binder-refresh">Checklist impression</a>
           </div>
           <p class="sync-hint" id="binderV2Hint" hidden></p>
           <div id="binderAdvancedPanel" class="stitch-hidden" hidden>
@@ -156,7 +162,7 @@
             <div id="binderCollectionShell" class="binder-collection-shell" hidden>
               <div class="binder-shell-layout">
                 <aside class="binder-vaults-nav">
-                  <h2 class="binder-vaults-title">Your Binders</h2>
+                  <h2 class="binder-vaults-title">Tes classeurs</h2>
                   <div id="binderVaultsNav" class="binder-vaults-list" aria-label="Liste des classeurs"></div>
                 </aside>
                 <section class="binder-shell-main">
@@ -166,10 +172,10 @@
                       <select id="binderIdSelect" class="region-filter binder-shell-select" aria-label="Classeur actif"></select>
                     </label>
                     <label class="binder-shell-select-wrap binder-dim-wrap">
-                      <span class="binder-shell-select-label">Emphasis</span>
-                      <select id="binderDimSelect" class="region-filter binder-shell-select" aria-label="Choose which cards to fade on binder pages">
-                        <option value="caught">Fade caught</option>
-                        <option value="missing">Fade missing</option>
+                      <span class="binder-shell-select-label">Mise en avant</span>
+                      <select id="binderDimSelect" class="region-filter binder-shell-select" aria-label="Choisir quelles cartes attenuer dans le classeur">
+                        <option value="caught">Attenuer attrapes</option>
+                        <option value="missing">Attenuer manquants</option>
                       </select>
                     </label>
                     <div class="binder-pager" role="navigation" aria-label="Pages du classeur">
@@ -214,32 +220,36 @@
       </div>
 
       <div id="viewPrint" class="app-view" hidden>
+        <header class="header app-collection-header">
+          <h1 class="title">Impression</h1>
+          <p class="collection-subtitle">Checklist d'impression basée sur les mêmes données que les classeurs.</p>
+        </header>
         <div class="print-controls">
           <div class="print-control-group">
-            <label for="printBinderSelect">Binder</label>
+            <label for="printBinderSelect">Classeur</label>
             <select id="printBinderSelect">
-              <option value="all">All binders</option>
+              <option value="all">Tous les classeurs</option>
             </select>
           </div>
           <div class="print-control-group">
-            <label for="printFilterSelect">Filter</label>
+            <label for="printFilterSelect">Filtre</label>
             <select id="printFilterSelect">
-              <option value="all">All</option>
-              <option value="caught">Caught only</option>
-              <option value="missing">Missing only</option>
+              <option value="all">Tous</option>
+              <option value="caught">Attrapés seulement</option>
+              <option value="missing">Manquants seulement</option>
             </select>
           </div>
           <div class="print-control-group">
-            <label for="printGroupSelect">Group by</label>
+            <label for="printGroupSelect">Regrouper par</label>
             <select id="printGroupSelect">
-              <option value="binder">Binder pages</option>
-              <option value="region">Region</option>
+              <option value="binder">Pages de classeur</option>
+              <option value="region">Région</option>
             </select>
           </div>
           <span class="print-summary" id="printSummary"></span>
           <button type="button" class="print-action-btn" id="printBtn">
             <span class="material-symbols-outlined" aria-hidden="true">print</span>
-            Print
+            Imprimer
           </button>
         </div>
         <div id="printOutput"></div>
@@ -247,36 +257,36 @@
 
       <div id="viewSettings" class="app-view" hidden>
         <header class="header app-collection-header">
-          <h1 class="title">System Settings</h1>
+          <h1 class="title">Reglages</h1>
           <p class="collection-subtitle">Réglages interface et préférences locales.</p>
         </header>
         <section class="stats-main">
           <div class="stats-kpi-card">
-            <h2 class="stats-kpi-label">Display</h2>
+            <h2 class="stats-kpi-label">Affichage</h2>
             <p class="stats-kpi-sub">Le contraste des cartes est partagé entre liste et classeur.</p>
             <label class="region-filter-wrap settings-dim-label">
-              <span class="region-filter-label">Emphasis</span>
-              <select id="settingsDimSelect" class="region-filter" aria-label="Global emphasis mode">
-                <option value="caught">Fade caught</option>
-                <option value="missing">Fade missing</option>
+              <span class="region-filter-label">Mise en avant</span>
+              <select id="settingsDimSelect" class="region-filter" aria-label="Mode global de mise en avant">
+                <option value="caught">Attenuer attrapes</option>
+                <option value="missing">Attenuer manquants</option>
               </select>
             </label>
           </div>
           <div class="stats-kpi-card">
-            <h2 class="stats-kpi-label">Data</h2>
-            <p class="stats-kpi-sub">Export or import your full collection (caught + binders).</p>
+            <h2 class="stats-kpi-label">Donnees</h2>
+            <p class="stats-kpi-sub">Exporter ou importer toute la collection (attrapes + classeurs).</p>
             <div class="settings-data-actions">
               <button type="button" class="settings-action-btn" id="exportBtn">
                 <span class="material-symbols-outlined" aria-hidden="true">download</span>
-                Export JSON
+                Exporter JSON
               </button>
               <button type="button" class="settings-action-btn" id="importBtn">
                 <span class="material-symbols-outlined" aria-hidden="true">upload</span>
-                Import JSON
+                Importer JSON
               </button>
               <a href="#/print" class="settings-action-btn" id="printFromSettingsBtn">
                 <span class="material-symbols-outlined" aria-hidden="true">print</span>
-                Print checklist
+                Checklist impression
               </a>
               <input type="file" id="importFileInput" accept=".json" hidden />
             </div>
@@ -284,59 +294,14 @@
               <p id="importPreviewText"></p>
               <div class="import-preview-actions">
                 <button type="button" class="settings-action-btn settings-action-btn--confirm" id="importConfirmBtn">
-                  Confirm import
+                  Confirmer import
                 </button>
                 <button type="button" class="settings-action-btn settings-action-btn--cancel" id="importCancelBtn">
-                  Cancel
+                  Annuler
                 </button>
               </div>
             </div>
             <p id="exportImportHint" class="sync-hint" hidden></p>
-          </div>
-          <div class="stats-kpi-card settings-dev-card">
-            <h2 class="stats-kpi-label">Archive Author</h2>
-            <p class="stats-kpi-sub">Primary architect and maintainer of the pokevault ecosystem.</p>
-            <dl class="settings-dev-meta">
-              <div class="settings-dev-row">
-                <dt>Name</dt>
-                <dd>Alexandre Enouf</dd>
-              </div>
-              <div class="settings-dev-row">
-                <dt>Website</dt>
-                <dd>
-                  <a href="https://alexandre-enouf.fr" target="_blank" rel="noopener noreferrer">
-                    alexandre-enouf.fr
-                  </a>
-                </dd>
-              </div>
-              <div class="settings-dev-row">
-                <dt>GitHub</dt>
-                <dd>
-                  <a href="https://github.com/Boblebol/pokevault" target="_blank" rel="noopener noreferrer">
-                    github.com/Boblebol/pokevault
-                  </a>
-                </dd>
-              </div>
-              <div class="settings-dev-row">
-                <dt>LinkedIn</dt>
-                <dd>
-                  <a href="https://fr.linkedin.com/in/alexandre-enouf-47834990" target="_blank" rel="noopener noreferrer">
-                    fr.linkedin.com/in/alexandre-enouf-47834990
-                  </a>
-                </dd>
-              </div>
-            </dl>
-            <div class="settings-dev-actions">
-              <a href="https://alexandre-enouf.fr" target="_blank" rel="noopener noreferrer" class="settings-dev-pill">
-                View Portfolio
-              </a>
-              <a href="https://github.com/Boblebol/pokevault/issues" target="_blank" rel="noopener noreferrer" class="settings-dev-pill">
-                Report Issue
-              </a>
-              <a href="https://github.com/sponsors" target="_blank" rel="noopener noreferrer" class="settings-dev-pill">
-                Donate
-              </a>
-            </div>
           </div>
         </section>
       </div>

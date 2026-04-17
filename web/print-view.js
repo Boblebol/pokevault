@@ -30,7 +30,7 @@ function fillPrintBinderSelect() {
 
   const allOpt = document.createElement("option");
   allOpt.value = "all";
-  allOpt.textContent = "All binders";
+  allOpt.textContent = "Tous les classeurs";
   sel.append(allOpt);
 
   const cfg = getBinderConfig();
@@ -129,7 +129,7 @@ function renderPrintView() {
   }
 
   if (summary) {
-    summary.textContent = `${totalEntries} entries`;
+    summary.textContent = `${totalEntries} entrées`;
   }
 }
 
@@ -174,7 +174,7 @@ function buildBinderSection(binder, allPokemon, caughtMap, defs, cfg, filterMode
 
   return {
     title: String(binder.name || binder.id),
-    subtitle: `${caughtCount}/${total} caught (${total ? Math.round((caughtCount / total) * 100) : 0}%)`,
+    subtitle: `${caughtCount}/${total} attrapés (${total ? Math.round((caughtCount / total) * 100) : 0}%)`,
     rows,
     showBinderCol: false,
   };
@@ -217,7 +217,7 @@ function buildRegionSections(allPokemon, binders, caughtMap, defs, cfg, filterMo
     const caughtCount = rows.filter((r) => r.caught).length;
     sections.push({
       title: `${region.label_fr} (${region.low}–${region.high})`,
-      subtitle: `${caughtCount}/${rows.length} caught (${rows.length ? Math.round((caughtCount / rows.length) * 100) : 0}%)`,
+    subtitle: `${caughtCount}/${rows.length} attrapés (${rows.length ? Math.round((caughtCount / rows.length) * 100) : 0}%)`,
       rows,
       showBinderCol: true,
     });
@@ -281,9 +281,9 @@ function buildSectionElement(section, date, showBinderCol, pageBreakBefore) {
 
   const thead = document.createElement("thead");
   const headRow = document.createElement("tr");
-  const cols = ["#", "Name"];
-  if (section.showBinderCol) cols.push("Binder");
-  cols.push("Page", "Slot", "✓");
+  const cols = ["#", "Nom"];
+  if (section.showBinderCol) cols.push("Classeur");
+  cols.push("Page", "Case", "✓");
   for (const col of cols) {
     const th = document.createElement("th");
     th.textContent = col;
@@ -332,7 +332,7 @@ function buildSectionElement(section, date, showBinderCol, pageBreakBefore) {
 
   const footer = document.createElement("div");
   footer.className = "print-footer";
-  footer.textContent = `pokevault · ${date} · ☑ = caught · ☐ = missing`;
+  footer.textContent = `pokevault · ${date} · ☑ = attrapé · ☐ = manquant`;
   wrapper.append(footer);
 
   frag.append(wrapper);
