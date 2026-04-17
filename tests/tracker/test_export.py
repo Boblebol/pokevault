@@ -22,11 +22,16 @@ from tracker.services.export_service import ExportService
 from tracker.services.progress_service import ProgressService
 
 
-def _setup(tmp_path: Path) -> TestClient:
+def _setup(tmp_path: Path, pokedex_rows: list[dict] | None = None) -> TestClient:
     prog = tmp_path / "data" / "collection-progress.json"
     cfg = tmp_path / "data" / "binder-config.json"
     pl = tmp_path / "data" / "binder-placements.json"
+    pokedex = tmp_path / "data" / "pokedex.json"
     prog.parent.mkdir(parents=True, exist_ok=True)
+    if pokedex_rows is not None:
+        import json
+
+        pokedex.write_text(json.dumps(pokedex_rows), encoding="utf-8")
 
     progress_repo = JsonProgressRepository(prog)
     config_repo = JsonBinderConfigRepository(cfg)
@@ -36,7 +41,7 @@ def _setup(tmp_path: Path) -> TestClient:
         return ProgressService(progress_repo)
 
     def export_override() -> ExportService:
-        return ExportService(progress_repo, config_repo, placements_repo)
+        return ExportService(progress_repo, config_repo, placements_repo, pokedex)
 
     app = FastAPI()
     app.include_router(progress_router)
@@ -159,3 +164,46 @@ def test_roundtrip_export_import(tmp_path: Path) -> None:
 
     restored = client.get("/api/export").json()
     assert restored["progress"]["caught"] == {"pikachu": True, "eevee": True}
+
+
+def test_export_import_filters_out_of_scope_forms(tmp_path: Path) -> None:
+    client = _setup(
+        tmp_path,
+        pokedex_rows=[
+            {"slug": "0001-bulbizarre", "number": "0001", "form": ""},
+            {"slug": "0001-bulbizarre-mega", "number": "0001", "form": "Mega"},
+        ],
+    )
+
+    payload = {
+        "schema_version": 1,
+        "progress": {
+            "version": 1,
+            "caught": {"0001-bulbizarre": True, "0001-bulbizarre-mega": True},
+        },
+        "binder_config": {
+            "version": 1,
+            "convention": "sheet_recto_verso",
+            "binders": [{"id": "kanto", "name": "Kanto", "rows": 3, "cols": 3}],
+            "form_rules": [],
+        },
+        "binder_placements": {
+            "version": 1,
+            "by_binder": {
+                "kanto": {
+                    "0001-bulbizarre": {"page": 0, "slot": 1},
+                    "0001-bulbizarre-mega": {"page": 0, "slot": 2},
+                }
+            },
+        },
+    }
+    r = client.post("/api/import", json=payload)
+    assert r.status_code == 200
+
+    exported = client.get("/api/export")
+    assert exported.status_code == 200
+    data = exported.json()
+    assert data["progress"]["caught"] == {"0001-bulbizarre": True}
+    assert data["binder_placements"]["by_binder"]["kanto"] == {
+        "0001-bulbizarre": {"page": 0, "slot": 1}
+    }

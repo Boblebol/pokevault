@@ -19,6 +19,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   - `Import JSON` button with preview and confirmation before restore.
 - Test coverage for new export/import flows, keeping tracker coverage at 100%.
 
+### Changed
+
+- UI harmonization pass to align non-binder pages with binder visual headers and navigation patterns.
+- Makefile quality-of-life updates:
+  - richer grouped `help` output,
+  - new `build` alias for Docker image build,
+  - `docker-up` now opens the web UI automatically.
+- Web static asset caching disabled in local tracker responses to always serve the latest frontend files.
+- Print view now uses the same collection scope as list/binders (excluding out-of-scope special forms).
+- Export/import payload sanitization now keeps only in-scope collection slugs (progress and binder placements), including backend-side enforcement.
+
 ## [0.1.0] — 2025
 
 ### Added

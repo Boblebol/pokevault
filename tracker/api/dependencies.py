@@ -69,6 +69,7 @@ def get_binder_workspace_service(
 
 
 def get_export_service(
+    settings: Annotated[TrackerSettings, Depends(get_settings)],
     progress_repo: Annotated[ProgressRepository, Depends(get_progress_repository)],
     config_repo: Annotated[BinderConfigRepository, Depends(get_binder_config_repository)],
     placements_repo: Annotated[
@@ -76,4 +77,4 @@ def get_export_service(
         Depends(get_binder_placements_repository),
     ],
 ) -> ExportService:
-    return ExportService(progress_repo, config_repo, placements_repo)
+    return ExportService(progress_repo, config_repo, placements_repo, settings.pokedex_path)

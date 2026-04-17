@@ -497,6 +497,50 @@ function setupSettingsView() {
 
 let pendingImportPayload = null;
 
+function getCollectionScopeSlugSet() {
+  const pool = window.PokedexCollection?.poolForCollectionScope
+    ? window.PokedexCollection.poolForCollectionScope()
+    : window.PokedexCollection?.allPokemon || [];
+  const keep = new Set();
+  for (const p of pool) {
+    const slug = String(p?.slug || "");
+    if (slug) keep.add(slug);
+  }
+  return keep;
+}
+
+function sanitizeBackupPayloadToCollectionScope(payload) {
+  if (!payload || typeof payload !== "object") return payload;
+  const keep = getCollectionScopeSlugSet();
+  const clean = JSON.parse(JSON.stringify(payload));
+
+  const caught = clean?.progress?.caught && typeof clean.progress.caught === "object"
+    ? clean.progress.caught
+    : {};
+  const filteredCaught = Object.create(null);
+  for (const [slug, v] of Object.entries(caught)) {
+    if (keep.has(String(slug))) filteredCaught[slug] = Boolean(v);
+  }
+  if (clean?.progress) clean.progress.caught = filteredCaught;
+
+  const byBinder =
+    clean?.binder_placements?.by_binder && typeof clean.binder_placements.by_binder === "object"
+      ? clean.binder_placements.by_binder
+      : {};
+  const filteredByBinder = Object.create(null);
+  for (const [binderId, placements] of Object.entries(byBinder)) {
+    if (!placements || typeof placements !== "object") continue;
+    const keptPlacements = Object.create(null);
+    for (const [slug, slot] of Object.entries(placements)) {
+      if (keep.has(String(slug))) keptPlacements[slug] = slot;
+    }
+    filteredByBinder[binderId] = keptPlacements;
+  }
+  if (clean?.binder_placements) clean.binder_placements.by_binder = filteredByBinder;
+
+  return clean;
+}
+
 function setupExportImport() {
   const exportBtn = document.getElementById("exportBtn");
   const importBtn = document.getElementById("importBtn");
@@ -521,7 +565,8 @@ function setupExportImport() {
     try {
       const res = await fetch("/api/export");
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const data = await res.json();
+      const dataRaw = await res.json();
+      const data = sanitizeBackupPayloadToCollectionScope(dataRaw);
       const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
@@ -551,9 +596,9 @@ function setupExportImport() {
         if (!data.progress || !data.binder_config || !data.binder_placements) {
           throw new Error("Missing required fields");
         }
-        pendingImportPayload = data;
-        const caught = Object.keys(data.progress?.caught || {}).length;
-        const binders = (data.binder_config?.binders || []).length;
+        pendingImportPayload = sanitizeBackupPayloadToCollectionScope(data);
+        const caught = Object.keys(pendingImportPayload.progress?.caught || {}).length;
+        const binders = (pendingImportPayload.binder_config?.binders || []).length;
         const date = data.exported_at ? new Date(data.exported_at).toLocaleDateString() : "unknown";
         previewText.textContent = `${caught} caught, ${binders} binders — exported ${date}. This will replace your current data.`;
         preview.hidden = false;

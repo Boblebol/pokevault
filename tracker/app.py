@@ -40,6 +40,18 @@ def create_app(settings: TrackerSettings | None = None) -> FastAPI:
             headers={"Cache-Control": "max-age=86400, immutable"},
         )
 
+    @app.middleware("http")
+    async def disable_web_cache(request, call_next):
+        """Toujours servir la derniere version des assets web en local."""
+        response = await call_next(request)
+        path = request.url.path
+        if path.startswith("/api/") or path.startswith("/data/"):
+            return response
+        response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
+        response.headers["Pragma"] = "no-cache"
+        response.headers["Expires"] = "0"
+        return response
+
     app.mount(
         "/data",
         StaticFiles(directory=str(data_dir), check_dir=True),

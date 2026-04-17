@@ -95,8 +95,9 @@ function renderPrintView() {
   output.replaceChildren();
 
   const PC = window.PokedexCollection;
-  const B = window.PokedexBinder;
   const allPokemon = PC?.allPokemon || [];
+  // Aligne Print sur la meme base que la liste (pas de formes specifiques non souhaitees).
+  const listScopedPokemon = PC?.poolForCollectionScope ? PC.poolForCollectionScope() : allPokemon;
   const caughtMap = PC?.caughtMap || {};
   const defs = PC?.regionDefinitions || [];
   const cfg = getBinderConfig();
@@ -111,7 +112,15 @@ function renderPrintView() {
   let sectionIdx = 0;
 
   if (groupMode === "region") {
-    const sections = buildRegionSections(allPokemon, binders, caughtMap, defs, cfg, filterMode, selectedBinder);
+    const sections = buildRegionSections(
+      listScopedPokemon,
+      binders,
+      caughtMap,
+      defs,
+      cfg,
+      filterMode,
+      selectedBinder,
+    );
     for (const section of sections) {
       totalEntries += section.rows.length;
       output.append(buildSectionElement(section, date, true, sectionIdx++ > 0));
@@ -122,7 +131,7 @@ function renderPrintView() {
       : binders.filter((b) => String(b.id) === selectedBinder);
 
     for (const binder of targetBinders) {
-      const section = buildBinderSection(binder, allPokemon, caughtMap, defs, cfg, filterMode);
+      const section = buildBinderSection(binder, listScopedPokemon, caughtMap, defs, cfg, filterMode);
       totalEntries += section.rows.length;
       output.append(buildSectionElement(section, date, false, sectionIdx++ > 0));
     }

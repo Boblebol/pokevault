@@ -12,7 +12,7 @@
       rel="stylesheet"
       href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL,GRAD,opsz@100..700,0..1,-50..200,20..48"
     />
-    <link rel="stylesheet" href="/styles.css?v=20260416" />
+    <link rel="stylesheet" href="/styles.css" />
   </head>
   <body>
     <header class="stitch-topbar">
@@ -30,7 +30,7 @@
     <div class="stitch-canvas">
       <div id="viewListe" class="app-view">
         <div id="trackerMainBlock">
-          <header class="header app-collection-header">
+          <header class="header app-collection-header binder-header">
             <div class="page-header-top">
               <div>
                 <h1 class="title">Collection</h1>
@@ -116,8 +116,8 @@
                   class="region-filter"
                   aria-label="Choose which cards to fade in the grid"
                 >
-                  <option value="caught">Fade caught</option>
-                  <option value="missing">Fade missing</option>
+                      <option value="caught">Attenuer attrapes</option>
+                      <option value="missing">Attenuer manquants</option>
                 </select>
               </label>
             </div>
@@ -131,16 +131,16 @@
       </div>
 
       <div id="viewStats" class="app-view" hidden>
-        <header class="header app-collection-header stats-header">
+        <header class="header app-collection-header binder-header stats-header">
           <h1 class="title">Statistiques</h1>
-          <p class="collection-subtitle">Global completion, regions, and archive gaps.</p>
+          <p class="collection-subtitle">Progression globale, regions et manques de la collection.</p>
         </header>
         <section class="stats-main" id="statsBody"></section>
       </div>
 
       <div id="viewClasseur" class="app-view" hidden>
         <header class="header binder-header app-collection-header">
-          <h1 class="title title-binder">Binders</h1>
+          <h1 class="title title-binder">Classeurs</h1>
           <p class="collection-subtitle">Gestion des classeurs, pages, placements et synchronisation.</p>
           <div class="binder-header-actions">
             <button type="button" class="binder-refresh" id="binderV2Refresh">Rafraîchir</button>
@@ -220,7 +220,7 @@
       </div>
 
       <div id="viewPrint" class="app-view" hidden>
-        <header class="header app-collection-header">
+        <header class="header app-collection-header binder-header">
           <h1 class="title">Impression</h1>
           <p class="collection-subtitle">Checklist d'impression basée sur les mêmes données que les classeurs.</p>
         </header>
@@ -256,7 +256,7 @@
       </div>
 
       <div id="viewSettings" class="app-view" hidden>
-        <header class="header app-collection-header">
+        <header class="header app-collection-header binder-header">
           <h1 class="title">Reglages</h1>
           <p class="collection-subtitle">Réglages interface et préférences locales.</p>
         </header>
@@ -307,10 +307,10 @@
       </div>
     </div>
 
-    <script src="/binder-v2.js?v=20260416" defer></script>
-    <script src="/app.js?v=20260416" defer></script>
-    <script src="/binder-collection-view.js?v=20260416" defer></script>
-    <script src="/stats-view.js?v=20260416" defer></script>
-    <script src="/print-view.js?v=20260416" defer></script>
+    <script src="/binder-v2.js" defer></script>
+    <script src="/app.js" defer></script>
+    <script src="/binder-collection-view.js" defer></script>
+    <script src="/stats-view.js" defer></script>
+    <script src="/print-view.js" defer></script>
   </body>
 </html>

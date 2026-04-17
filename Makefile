@@ -15,7 +15,7 @@ AWK ?= awk
 .DEFAULT_GOAL := help
 
 .PHONY: help vars install dev open fetch fetch-test test test-cov lint fmt check clean \
-	docker-build docker-up docker-down docker-logs
+	build docker-build docker-up docker-down docker-logs
 
 ##@ General
 
@@ -83,6 +83,8 @@ check: lint test-cov ## Executer lint + tests couverture
 
 ##@ Docker
 
+build: docker-build ## Alias: builder l'image Docker
+
 docker-build: ## Builder l'image Docker
 	DOCKER_IMAGE=$(DOCKER_IMAGE) DOCKER_TAG=$(DOCKER_TAG) docker compose build --no-cache tracker
 	@echo ""
@@ -93,6 +95,7 @@ docker-build: ## Builder l'image Docker
 docker-up: ## Demarrer le tracker via docker compose
 	DOCKER_IMAGE=$(DOCKER_IMAGE) DOCKER_TAG=$(DOCKER_TAG) docker compose build --no-cache tracker
 	DOCKER_IMAGE=$(DOCKER_IMAGE) DOCKER_TAG=$(DOCKER_TAG) docker compose up -d --force-recreate tracker
+	@$(MAKE) --no-print-directory open
 
 docker-down: ## Arreter les services docker compose
 	docker compose down
