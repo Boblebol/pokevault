@@ -351,6 +351,16 @@
             <p id="exportImportHint" class="sync-hint" hidden></p>
           </div>
           <div class="stats-kpi-card">
+            <h2 class="stats-kpi-label">Profil</h2>
+            <p class="stats-kpi-sub" id="settingsProfileLabel">Profil : —</p>
+            <div class="settings-data-actions">
+              <button type="button" class="settings-action-btn" id="replayOnboardingBtn">
+                <span class="material-symbols-outlined" aria-hidden="true">play_circle</span>
+                Rejouer l'onboarding
+              </button>
+            </div>
+          </div>
+          <div class="stats-kpi-card">
             <h2 class="stats-kpi-label">Version</h2>
             <p class="stats-kpi-sub" id="settingsVersionLabel">UI -- · API --</p>
             <p class="stats-kpi-sub" id="settingsHealthLabel">État API : vérification...</p>
@@ -411,6 +421,105 @@
       </div>
     </footer>
 
+    <dialog id="onboardingWizard" class="onboarding" aria-labelledby="onboardingTitle">
+      <form method="dialog" class="onboarding__form" id="onboardingForm">
+        <header class="onboarding__header">
+          <h2 id="onboardingTitle" class="onboarding__title">Bienvenue sur Pokevault</h2>
+          <button
+            type="button"
+            class="onboarding__close"
+            id="onboardingSkip"
+            aria-label="Passer l'onboarding"
+          >
+            <span class="material-symbols-outlined" aria-hidden="true">close</span>
+          </button>
+        </header>
+
+        <ol class="onboarding__dots" aria-hidden="true">
+          <li class="onboarding__dot is-active" data-step-dot="1"></li>
+          <li class="onboarding__dot" data-step-dot="2"></li>
+          <li class="onboarding__dot" data-step-dot="3"></li>
+        </ol>
+
+        <section class="onboarding__step is-active" data-step="1">
+          <p class="onboarding__kicker">Étape 1 · La promesse</p>
+          <h3 class="onboarding__step-title">Un Pokédex d'abord, tes cartes ensuite.</h3>
+          <p class="onboarding__lede">
+            Pokevault est un Pokédex local, 100 % sous ton contrôle. Tu
+            suis ta progression, tu filtres par région, type ou catégorie
+            narrative, et tu ajoutes tes cartes physiques en option —
+            jamais imposées.
+          </p>
+          <ul class="onboarding__bullets">
+            <li>1025 Pokémon couverts, du Gen 1 au Gen 9.</li>
+            <li>États <em>aperçu</em>, <em>attrapé</em> et <em>shiny</em>.</li>
+            <li>Tes données restent dans <code>data/</code>, exportables à tout moment.</li>
+          </ul>
+        </section>
+
+        <section class="onboarding__step" data-step="2" hidden>
+          <p class="onboarding__kicker">Étape 2 · Ton profil</p>
+          <h3 class="onboarding__step-title">Comment collectionnes-tu ?</h3>
+          <p class="onboarding__lede">
+            Ce choix oriente les réglages par défaut. Tu pourras toujours
+            les changer depuis les Réglages.
+          </p>
+          <div class="onboarding__choices" role="radiogroup" aria-label="Profil de collectionneur">
+            <label class="onboarding__choice">
+              <input type="radio" name="onboardingProfile" value="dex" checked />
+              <span class="onboarding__choice-title">Pokédex pur</span>
+              <span class="onboarding__choice-sub">Je veux compléter le dex, peu ou pas de cartes physiques.</span>
+            </label>
+            <label class="onboarding__choice">
+              <input type="radio" name="onboardingProfile" value="hybrid" />
+              <span class="onboarding__choice-title">Hybride</span>
+              <span class="onboarding__choice-sub">Je complète le dex <em>et</em> je garde un œil sur mes cartes.</span>
+            </label>
+            <label class="onboarding__choice">
+              <input type="radio" name="onboardingProfile" value="card" />
+              <span class="onboarding__choice-title">TCG physique</span>
+              <span class="onboarding__choice-sub">Ce sont mes cartes qui m'intéressent avant tout.</span>
+            </label>
+          </div>
+        </section>
+
+        <section class="onboarding__step" data-step="3" hidden>
+          <p class="onboarding__kicker">Étape 3 · Tes préférences</p>
+          <h3 class="onboarding__step-title">Réglages de démarrage</h3>
+          <p class="onboarding__lede">
+            Trois choix rapides pour que la liste ressemble tout de suite
+            à ce que tu attends.
+          </p>
+          <div class="onboarding__grid">
+            <label class="onboarding__field">
+              <span class="onboarding__field-label">Formes à afficher</span>
+              <select name="onboardingForms" id="onboardingForms">
+                <option value="all">Tout le dex (recommandé)</option>
+                <option value="base_regional">Base + formes régionales</option>
+                <option value="base_only">Uniquement les formes de base</option>
+              </select>
+            </label>
+            <label class="onboarding__field">
+              <span class="onboarding__field-label">Mise en avant des cartes</span>
+              <select name="onboardingDim" id="onboardingDim">
+                <option value="caught">Atténuer les attrapés</option>
+                <option value="missing">Atténuer les manquants</option>
+              </select>
+            </label>
+          </div>
+        </section>
+
+        <footer class="onboarding__footer">
+          <button type="button" class="onboarding__btn onboarding__btn--ghost" id="onboardingBack">
+            Retour
+          </button>
+          <button type="button" class="onboarding__btn onboarding__btn--primary" id="onboardingNext">
+            Continuer
+          </button>
+        </footer>
+      </form>
+    </dialog>
+
     <dialog id="shortcutsHelp" class="kb-help" aria-labelledby="shortcutsHelpTitle">
       <form method="dialog" class="kb-help__form">
         <header class="kb-help__header">
@@ -437,6 +546,7 @@
 
     <script src="/empty-states.js" defer></script>
     <script src="/keyboard.js" defer></script>
+    <script src="/onboarding.js" defer></script>
     <script src="/binder-v2.js" defer></script>
     <script src="/app.js" defer></script>
     <script src="/binder-collection-view.js" defer></script>
