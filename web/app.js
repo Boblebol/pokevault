@@ -26,6 +26,14 @@ let totalCount = 0;
 /** @type {"all" | "base_only" | "base_regional"} */
 let formFilterMode = "all";
 let typeFilter = "all";
+/** Multi-select narrative filter (F05) — set of tag ids. */
+let narrativeTagFilter = new Set();
+/** @type {Record<string, string[]>} */
+let narrativeTagsByNumber = Object.create(null);
+/** @type {Record<string, string>} */
+let narrativeTagLabels = Object.create(null);
+/** @type {string[]} */
+let narrativeTagOrder = [];
 const LIST_PAGE_SIZE = 48;
 let displayedCount = LIST_PAGE_SIZE;
 /** @type {IntersectionObserver | null} */
@@ -115,6 +123,7 @@ async function getCollectionBootstrap() {
     allPokemon = Array.isArray(dex) ? dex : dex.pokemon || [];
     totalCount = dex.meta?.total ?? allPokemon.length;
     regionDefinitions = Array.isArray(dex.meta?.regions) ? dex.meta.regions : [];
+    await loadNarrativeTags();
     fillRegionSelect();
     fillTypeSelect();
     const pending = loadProgressQueue();
@@ -517,6 +526,51 @@ function matchesFilter(p) {
   return true;
 }
 
+async function loadNarrativeTags() {
+  try {
+    const res = await fetch("/data/narrative-tags.json");
+    if (!res.ok) return;
+    const data = await res.json();
+    if (!data || typeof data !== "object") return;
+    const rawLabels = data.labels && typeof data.labels === "object" ? data.labels : {};
+    narrativeTagLabels = Object.create(null);
+    narrativeTagOrder = [];
+    for (const [id, label] of Object.entries(rawLabels)) {
+      if (typeof id !== "string" || typeof label !== "string") continue;
+      narrativeTagLabels[id] = label;
+      narrativeTagOrder.push(id);
+    }
+    const raw = data.tags_by_number && typeof data.tags_by_number === "object"
+      ? data.tags_by_number
+      : {};
+    narrativeTagsByNumber = Object.create(null);
+    for (const [num, tags] of Object.entries(raw)) {
+      if (!Array.isArray(tags)) continue;
+      const clean = tags.filter((t) => typeof t === "string" && narrativeTagLabels[t]);
+      if (clean.length) narrativeTagsByNumber[num] = clean;
+    }
+  } catch {
+    narrativeTagsByNumber = Object.create(null);
+    narrativeTagLabels = Object.create(null);
+    narrativeTagOrder = [];
+  }
+}
+
+function narrativeTagsFor(p) {
+  const n = nationalNum(p);
+  return narrativeTagsByNumber[String(n)] || [];
+}
+
+function matchesNarrativeTags(p) {
+  if (!narrativeTagFilter.size) return true;
+  const tags = narrativeTagsFor(p);
+  if (!tags.length) return false;
+  for (const active of narrativeTagFilter) {
+    if (tags.includes(active)) return true;
+  }
+  return false;
+}
+
 function matchesRegion(p) {
   if (regionFilter === "all") return true;
   return effectiveRegion(p) === regionFilter;
@@ -567,7 +621,8 @@ function visibleList() {
       matchesTypeFilter(p) &&
       matchesSearch(p, searchQuery) &&
       matchesFilter(p) &&
-      matchesRegion(p),
+      matchesRegion(p) &&
+      matchesNarrativeTags(p),
   );
 }
 
@@ -696,6 +751,95 @@ function readRegionFromHash() {
   const v = params.get("region");
   if (!v || v === "all") return null;
   return v;
+}
+
+function renderNarrativeChips() {
+  const host = document.getElementById("narrativeChips");
+  if (!host) return;
+  if (!narrativeTagOrder.length) {
+    host.hidden = true;
+    host.replaceChildren();
+    return;
+  }
+  host.hidden = false;
+  host.replaceChildren();
+  for (const id of narrativeTagOrder) {
+    const label = narrativeTagLabels[id];
+    if (!label) continue;
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "narrative-chip";
+    btn.dataset.tag = id;
+    const active = narrativeTagFilter.has(id);
+    btn.setAttribute("aria-pressed", active ? "true" : "false");
+    if (active) btn.classList.add("is-active");
+    btn.textContent = label;
+    btn.addEventListener("click", () => toggleNarrativeTag(id));
+    host.append(btn);
+  }
+  if (narrativeTagFilter.size > 0) {
+    const clear = document.createElement("button");
+    clear.type = "button";
+    clear.className = "narrative-chip narrative-chip--clear";
+    clear.textContent = "Tout réinitialiser";
+    clear.addEventListener("click", () => clearNarrativeTags());
+    host.append(clear);
+  }
+}
+
+function syncNarrativeChipsActive() {
+  const host = document.getElementById("narrativeChips");
+  if (!host) return;
+  for (const btn of host.querySelectorAll(".narrative-chip")) {
+    const id = btn.dataset.tag;
+    if (!id) continue;
+    const on = narrativeTagFilter.has(id);
+    btn.classList.toggle("is-active", on);
+    btn.setAttribute("aria-pressed", on ? "true" : "false");
+  }
+}
+
+function toggleNarrativeTag(id) {
+  if (!narrativeTagLabels[id]) return;
+  if (narrativeTagFilter.has(id)) narrativeTagFilter.delete(id);
+  else narrativeTagFilter.add(id);
+  writeTagsToHash();
+  resetDisplayedCount();
+  renderNarrativeChips();
+  render();
+}
+
+function clearNarrativeTags() {
+  if (!narrativeTagFilter.size) return;
+  narrativeTagFilter = new Set();
+  writeTagsToHash();
+  resetDisplayedCount();
+  renderNarrativeChips();
+  render();
+}
+
+function writeTagsToHash() {
+  const { view, params } = parseHashQuery();
+  const ordered = narrativeTagOrder.filter((t) => narrativeTagFilter.has(t));
+  if (ordered.length) params.set("tags", ordered.join(","));
+  else params.delete("tags");
+  const qs = params.toString();
+  const next = `#/${view}${qs ? `?${qs}` : ""}`;
+  if (location.hash !== next) {
+    history.replaceState(null, "", next);
+  }
+}
+
+function readTagsFromHash() {
+  const { params } = parseHashQuery();
+  const raw = params.get("tags");
+  if (!raw) return new Set();
+  const out = new Set();
+  for (const part of raw.split(",")) {
+    const t = part.trim();
+    if (t && narrativeTagLabels[t]) out.add(t);
+  }
+  return out;
 }
 
 function setupRegionFilter() {
@@ -1144,7 +1288,8 @@ function hasActiveFilterExceptMissing() {
     searchQuery.trim() !== "" ||
     regionFilter !== "all" ||
     typeFilter !== "all" ||
-    formFilterMode !== "all"
+    formFilterMode !== "all" ||
+    narrativeTagFilter.size > 0
   );
 }
 
@@ -1179,7 +1324,8 @@ function render() {
       filterMode !== "all" ||
       regionFilter !== "all" ||
       typeFilter !== "all" ||
-      formFilterMode !== "all";
+      formFilterMode !== "all" ||
+      narrativeTagFilter.size > 0;
     let variant = "listNoMatch";
     if (filterMode === "missing" && !hasActiveFilterExceptMissing()) {
       variant = "listAllCaught";
@@ -1287,7 +1433,9 @@ async function startTracker() {
     const sel = document.getElementById("regionFilter");
     if (sel) sel.value = hashRegion;
   }
+  narrativeTagFilter = readTagsFromHash();
   renderRegionChips();
+  renderNarrativeChips();
   if (!listCaughtSubscribed) {
     listCaughtSubscribed = true;
     window.PokedexCollection.subscribeCaught(() => render());

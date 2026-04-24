@@ -10,6 +10,7 @@ htmlcov/
 .claude/
 data/
 !data/pokedex.json
+!data/narrative-tags.json
 outputs/
 stitch-html/
 docs/

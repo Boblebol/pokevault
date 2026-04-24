@@ -15,8 +15,9 @@ htmlcov/
 
 # Data (generated at runtime or user state)
 data/*
-# Ship the reference Pokédex so the app runs out of the box.
+# Ship the reference Pokédex + narrative tags so the app runs out of the box.
 !data/pokedex.json
+!data/narrative-tags.json
 
 # Legacy
 outputs/
