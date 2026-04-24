@@ -210,6 +210,42 @@ function toggleCaughtBySlug(slug) {
   }
 }
 
+/**
+ * Contract-first card stats (F01 ↔ F08).
+ *
+ * Returns the aggregate number of catalogued cards and the count of distinct
+ * sets those cards belong to. Until F08 ships the real Card model, we return
+ * zeroes — but downstream views already render the secondary progression
+ * line so the UI contract is frozen.
+ *
+ * @returns {{ cards: number; sets: number }}
+ */
+function computeCardStats() {
+  const src = window.PokevaultCards;
+  if (src && typeof src.summary === "function") {
+    try {
+      const s = src.summary();
+      if (s && typeof s === "object") {
+        const cards = Number(s.cards);
+        const sets = Number(s.sets);
+        return {
+          cards: Number.isFinite(cards) ? cards : 0,
+          sets: Number.isFinite(sets) ? sets : 0,
+        };
+      }
+    } catch {
+      /* tolerate incomplete provider */
+    }
+  }
+  return { cards: 0, sets: 0 };
+}
+
+function formatCardSummary({ cards, sets }) {
+  const c = cards === 1 ? "1 carte" : `${cards} cartes`;
+  const s = sets === 1 ? "1 set" : `${sets} sets`;
+  return `${c} dans ${s}`;
+}
+
 window.PokedexCollection = {
   ensureLoaded: () => getCollectionBootstrap(),
   get caughtMap() {
@@ -907,6 +943,8 @@ function createPokemonCard(p, opts) {
 
 window.PokedexCollection.createPokemonCard = createPokemonCard;
 window.PokedexCollection.poolForCollectionScope = poolForCollectionScope;
+window.PokedexCollection.computeCardStats = computeCardStats;
+window.PokedexCollection.formatCardSummary = formatCardSummary;
 
 function hasActiveFilterExceptMissing() {
   return (
@@ -927,8 +965,14 @@ function render() {
   const pct = barTotal ? Math.round((caughtCount / barTotal) * 100) : 0;
   const heroPct = document.getElementById("listHeroPct");
   const heroCount = document.getElementById("listHeroCount");
+  const heroCards = document.getElementById("listHeroCards");
   if (heroPct) heroPct.textContent = `${pct}%`;
   if (heroCount) heroCount.textContent = `${caughtCount} / ${barTotal} découverts`;
+  if (heroCards) {
+    const stats = computeCardStats();
+    heroCards.textContent = formatCardSummary(stats);
+    heroCards.classList.toggle("is-dormant", stats.cards === 0);
+  }
   const fill = document.getElementById("progressFill");
   fill.style.width = `${pct}%`;
   fill.parentElement.setAttribute("aria-valuenow", String(pct));

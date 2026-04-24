@@ -90,9 +90,10 @@ function nextPriorityRows(pool, caught, defs, limit = 6) {
   return { targetRegion, rows: sorted.slice(0, limit) };
 }
 
-function renderKpiCard(label, value, sub) {
+function renderKpiCard(label, value, sub, modifier) {
   const item = document.createElement("article");
   item.className = "stats-kpi-card";
+  if (modifier) item.classList.add(modifier);
   const l = document.createElement("h3");
   l.className = "stats-kpi-label";
   l.textContent = label;
@@ -184,10 +185,21 @@ function renderStats() {
 
   const kpiGrid = document.createElement("section");
   kpiGrid.className = "stats-kpi-grid";
+  const cardStats = PC?.computeCardStats ? PC.computeCardStats() : { cards: 0, sets: 0 };
+  const cardSub =
+    cardStats.cards === 0
+      ? "Disponible avec le module cartes (roadmap F08)"
+      : `${cardStats.sets} set(s) catalogué(s)`;
   kpiGrid.append(
     renderKpiCard("Total spécimens", String(gTotal), "Entrées suivies dans le Pokédex local"),
     renderKpiCard("Attrapés", String(gCaught), `${globalPct}% de complétion globale`),
     renderKpiCard("Manquants", String(Math.max(0, gTotal - gCaught)), "Priorité collection"),
+    renderKpiCard(
+      "Cartes catalogu\u00e9es",
+      String(cardStats.cards),
+      cardSub,
+      cardStats.cards === 0 ? "is-dormant" : "",
+    ),
   );
   host.append(kpiGrid);
 
