@@ -9,6 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- Public product roadmap in [docs/ROADMAP.md](docs/ROADMAP.md): 16 RICE-scored
+  features organised in 4 delivery waves (Polish J1, Activation, Card Layer,
+  Delights), each with user story, acceptance criteria and tech notes.
 - Full collection backup API:
   - `GET /api/export` exports progress + binder config + binder placements.
   - `POST /api/import` restores the same payload in one operation.

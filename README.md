@@ -308,6 +308,18 @@ Linting and formatting use [ruff](https://docs.astral.sh/ruff/) with a strict ru
 
 ---
 
+## Roadmap
+
+The product direction is public and RICE-scored. See [docs/ROADMAP.md](docs/ROADMAP.md)
+for the full 16-feature plan organised in 4 delivery waves (V1 Polish,
+V2 Activation, V3 Card Layer, V4 Delights). Each entry ships with a
+user story, acceptance criteria, tech notes and dependencies.
+
+Current focus: **Wave 1 — Polish immédiat** (empty states, regional chips,
+multi-level progression, keyboard shortcuts & fuzzy search).
+
+---
+
 ## Contributing
 
 Contributions are welcome! See [CONTRIBUTING.md](CONTRIBUTING.md) for details.

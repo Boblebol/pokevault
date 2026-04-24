@@ -28,6 +28,13 @@ make fetch              # scrape + images (~1500 fichiers)
 make fetch-test         # 10 entrées, sans images
 ```
 
+## Roadmap produit
+
+Avant de proposer une nouvelle feature, jette un œil à [docs/ROADMAP.md](docs/ROADMAP.md)
+pour voir où elle s'inscrit (priorisation RICE, vagues de livraison, dépendances
+techniques). Les PR qui ciblent une feature déjà priorisée sont particulièrement
+bienvenues.
+
 ## Workflow de développement
 
 1. **Crée une branche** depuis `main` :
