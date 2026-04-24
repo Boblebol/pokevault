@@ -329,14 +329,76 @@ async function fetchProgressFile() {
   return data.caught && typeof data.caught === "object" ? data.caught : {};
 }
 
+function normalizeSearchToken(s) {
+  return String(s || "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .trim();
+}
+
+/**
+ * Levenshtein distance with an early-exit upper bound. Returns `maxDist + 1`
+ * as soon as the minimum possible distance exceeds `maxDist`.
+ */
+function levenshtein(a, b, maxDist) {
+  const m = a.length;
+  const n = b.length;
+  if (!m) return n;
+  if (!n) return m;
+  if (Math.abs(m - n) > maxDist) return maxDist + 1;
+  const prev = new Array(n + 1);
+  const curr = new Array(n + 1);
+  for (let j = 0; j <= n; j++) prev[j] = j;
+  for (let i = 1; i <= m; i++) {
+    curr[0] = i;
+    let rowMin = curr[0];
+    for (let j = 1; j <= n; j++) {
+      const cost = a.charCodeAt(i - 1) === b.charCodeAt(j - 1) ? 0 : 1;
+      curr[j] = Math.min(prev[j] + 1, curr[j - 1] + 1, prev[j - 1] + cost);
+      if (curr[j] < rowMin) rowMin = curr[j];
+    }
+    if (rowMin > maxDist) return maxDist + 1;
+    for (let j = 0; j <= n; j++) prev[j] = curr[j];
+  }
+  return prev[n];
+}
+
+/**
+ * Diacritic-insensitive + fuzzy (Levenshtein ≤ 2) per-word match.
+ * Also matches on the national number and on type names (kept as-is for
+ * queries like "feu" or "psy").
+ */
 function matchesSearch(p, q) {
-  if (!q) return true;
-  const qq = q.toLowerCase().trim();
-  const num = String(p.number || "").toLowerCase();
-  const form = (p.form || "").toLowerCase();
+  const qn = normalizeSearchToken(q);
+  if (!qn) return true;
+  const num = String(p.number || "").replace(/^#/, "").replace(/^0+/, "");
+  const form = p.form || "";
   const names = p.names || {};
-  const blob = [num, form, names.fr, names.en, names.ja, p.slug].filter(Boolean).join(" ").toLowerCase();
-  return blob.includes(qq);
+  const types = Array.isArray(p.types) ? p.types : [];
+  const fieldsRaw = [
+    String(p.number || ""),
+    num,
+    form,
+    names.fr,
+    names.en,
+    names.ja,
+    p.slug,
+    ...types,
+  ].filter(Boolean);
+  const blob = normalizeSearchToken(fieldsRaw.join(" "));
+  if (blob.includes(qn)) return true;
+  if (qn.length < 3) return false;
+  const words = blob.split(/[^a-z0-9]+/).filter(Boolean);
+  const maxDist = qn.length <= 4 ? 1 : 2;
+  for (const w of words) {
+    if (w.length < 3) continue;
+    if (levenshtein(w, qn, maxDist) <= maxDist) return true;
+    if (w.length > qn.length && levenshtein(w.slice(0, qn.length), qn, maxDist) <= maxDist) {
+      return true;
+    }
+  }
+  return false;
 }
 
 function matchesFilter(p) {
@@ -630,6 +692,7 @@ function appendVisibleItems(fullList) {
   }
   if (frag.childNodes.length) grid.append(frag);
   updateListDisplayInfo({ full, end: target, total: full.length });
+  window.PokevaultKeyboard?.repaint?.();
 }
 
 function setupSettingsView() {
@@ -1011,6 +1074,7 @@ function render() {
   grid.append(frag);
 
   updateListDisplayInfo({ full: sliced.full, end: sliced.end, total: sliced.total });
+  window.PokevaultKeyboard?.repaint?.();
 }
 
 function setupFilters() {
@@ -1034,6 +1098,15 @@ function setupSearch() {
     searchQuery = input.value;
     resetDisplayedCount();
     render();
+  });
+}
+
+function setupKeyboardHelpTrigger() {
+  const btn = document.getElementById("kbHelpTrigger");
+  if (!btn || btn.dataset.wired) return;
+  btn.dataset.wired = "1";
+  btn.addEventListener("click", () => {
+    window.PokevaultKeyboard?.openHelp?.();
   });
 }
 
@@ -1064,6 +1137,7 @@ async function startTracker() {
   typeFilter = readStoredTypeFilter();
   setupFilters();
   setupSearch();
+  setupKeyboardHelpTrigger();
   setupRegionFilter();
   setupTypeFilter();
   setupFormFilter();

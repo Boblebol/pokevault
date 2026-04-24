@@ -65,6 +65,13 @@
                 <div class="progress-bar-fill" id="progressFill"></div>
               </div>
               <span class="counter" id="counter">0 / 0</span>
+              <button
+                type="button"
+                class="kb-hint-btn"
+                id="kbHelpTrigger"
+                aria-label="Afficher les raccourcis clavier"
+                title="Raccourcis clavier (touche ?)"
+              >?</button>
             </div>
 
             <label class="search-wrap">
@@ -396,7 +403,30 @@
       </div>
     </footer>
 
+    <dialog id="shortcutsHelp" class="kb-help" aria-labelledby="shortcutsHelpTitle">
+      <form method="dialog" class="kb-help__form">
+        <header class="kb-help__header">
+          <h2 id="shortcutsHelpTitle" class="kb-help__title">Raccourcis clavier</h2>
+          <button type="button" class="kb-help__close" data-kb-close aria-label="Fermer l'aide">
+            <span class="material-symbols-outlined" aria-hidden="true">close</span>
+          </button>
+        </header>
+        <ul class="kb-help__list">
+          <li><kbd>/</kbd><span>Focus la barre de recherche</span></li>
+          <li><kbd>Esc</kbd><span>Vide / quitte la recherche ou la sélection</span></li>
+          <li><kbd>j</kbd> / <kbd>k</kbd><span>Pokémon suivant / précédent</span></li>
+          <li><kbd>c</kbd><span>Attrape / relâche le Pokémon surligné</span></li>
+          <li><kbd>?</kbd><span>Ouvre cette aide</span></li>
+        </ul>
+        <p class="kb-help__hint">
+          Astuce : la recherche tolère les accents et les coquilles (ex. « dracau » trouve Dracaufeu).
+        </p>
+        <button type="submit" class="kb-help__submit">Compris</button>
+      </form>
+    </dialog>
+
     <script src="/empty-states.js" defer></script>
+    <script src="/keyboard.js" defer></script>
     <script src="/binder-v2.js" defer></script>
     <script src="/app.js" defer></script>
     <script src="/binder-collection-view.js" defer></script>
