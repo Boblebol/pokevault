@@ -4623,3 +4623,37 @@ body.drawer-open {
     font-size: 0.82rem;
   }
 }
+
+/* ── F13 · Thèmes de région ────────────────────────────────────── */
+
+html[data-theme="kanto"] {
+  --bg: #fff8ed;
+  --card: #fff2d4;
+  --accent: #d7263d;
+  --text: #1f1a17;
+  --muted: #6a5950;
+}
+
+html[data-theme="hoenn"] {
+  --bg: #071a2b;
+  --card: #0e2b44;
+  --accent: #33c2d9;
+  --text: #e8f3fb;
+  --muted: #7ea5bf;
+}
+
+html[data-theme="paldea"] {
+  --bg: #2a1a10;
+  --card: #3d281a;
+  --accent: #d9843a;
+  --text: #f6ead8;
+  --muted: #a88d74;
+}
+
+/* Default skin = no attribute, so :root variables apply as-is. */
+
+.theme-choice-row {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}

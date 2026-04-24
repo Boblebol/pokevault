@@ -947,6 +947,25 @@ function appendVisibleItems(fullList) {
   window.PokevaultKeyboard?.repaint?.();
 }
 
+function setupThemeSelect() {
+  const sel = document.getElementById("settingsThemeSelect");
+  const T = window.PokevaultThemes;
+  if (!sel || !T || sel.dataset.wired) return;
+  sel.dataset.wired = "1";
+  sel.replaceChildren();
+  for (const t of T.list) {
+    const opt = document.createElement("option");
+    opt.value = t.id;
+    opt.textContent = t.label;
+    sel.append(opt);
+  }
+  sel.value = T.current;
+  sel.addEventListener("change", () => T.set(sel.value));
+  T.subscribe((id) => {
+    if (sel.value !== id) sel.value = id;
+  });
+}
+
 function setupSettingsView() {
   const sel = document.getElementById("settingsDimSelect");
   if (!sel || sel.dataset.wired) return;
@@ -956,6 +975,7 @@ function setupSettingsView() {
   subscribeDimMode((mode) => {
     sel.value = mode;
   });
+  setupThemeSelect();
   paintVersionLabels();
   const versionEl = document.getElementById("settingsVersionLabel");
   const healthEl = document.getElementById("settingsHealthLabel");
