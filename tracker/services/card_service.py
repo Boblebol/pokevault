@@ -66,6 +66,7 @@ class CardService:
             qty=payload.qty,
             acquired_at=(payload.acquired_at or None),
             note=payload.note.strip(),
+            image_url=payload.image_url.strip(),
             created_at=now,
             updated_at=now,
         )
@@ -92,6 +93,7 @@ class CardService:
                 qty=payload.qty,
                 acquired_at=(payload.acquired_at or None),
                 note=payload.note.strip(),
+                image_url=payload.image_url.strip(),
                 created_at=card.created_at,
                 updated_at=_now_iso(),
             )

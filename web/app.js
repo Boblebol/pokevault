@@ -966,6 +966,26 @@ function setupThemeSelect() {
   });
 }
 
+function setupArtworkSelect() {
+  const sel = document.getElementById("settingsArtworkSelect");
+  const A = window.PokevaultArtwork;
+  if (!sel || !A || sel.dataset.wired) return;
+  sel.dataset.wired = "1";
+  sel.replaceChildren();
+  for (const m of A.modes) {
+    const opt = document.createElement("option");
+    opt.value = m.id;
+    opt.textContent = m.label;
+    sel.append(opt);
+  }
+  sel.value = A.mode;
+  sel.addEventListener("change", () => A.setMode(sel.value));
+  A.subscribe((id) => {
+    if (sel.value !== id) sel.value = id;
+    if (typeof render === "function") render();
+  });
+}
+
 function setupSettingsView() {
   const sel = document.getElementById("settingsDimSelect");
   if (!sel || sel.dataset.wired) return;
@@ -976,6 +996,7 @@ function setupSettingsView() {
     sel.value = mode;
   });
   setupThemeSelect();
+  setupArtworkSelect();
   paintVersionLabels();
   const versionEl = document.getElementById("settingsVersionLabel");
   const healthEl = document.getElementById("settingsHealthLabel");
@@ -1230,19 +1251,27 @@ function createPokemonCard(p, opts) {
   const glow = document.createElement("div");
   glow.className = "card-glow";
   imgWrap.append(glow);
-  const src = normalizePath(p.image);
+  const A = window.PokevaultArtwork;
+  const resolved = A?.resolve ? A.resolve(p) : { src: normalizePath(p.image), fallbacks: [] };
+  const src = resolved.src;
   if (src) {
     const img = document.createElement("img");
     img.className = "card-img";
-    img.src = src;
     img.alt = "";
     img.loading = "lazy";
+    const remainingFallbacks = (resolved.fallbacks || []).slice();
     img.addEventListener("error", () => {
+      const next = remainingFallbacks.shift();
+      if (next && img.src !== next) {
+        img.src = next;
+        return;
+      }
       img.remove();
       const ph = document.createElement("div");
       ph.className = "card-img-placeholder";
       imgWrap.append(ph);
     });
+    img.src = src;
     imgWrap.append(img);
   } else {
     const ph = document.createElement("div");

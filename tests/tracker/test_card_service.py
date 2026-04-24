@@ -203,3 +203,28 @@ def test_ensure_caught_upgrades_seen_to_caught(tmp_path: Path) -> None:
     assert progress.ensure_caught("0001-bulbasaur") is True
     state = progress.get_progress().statuses["0001-bulbasaur"]
     assert state.state == "caught"
+
+
+def test_create_trims_image_url(tmp_path: Path) -> None:
+    svc = _make(tmp_path)
+    card = svc.create(_payload(image_url="  https://img.example/a.png  "))
+    assert card.image_url == "https://img.example/a.png"
+
+
+def test_update_replaces_image_url(tmp_path: Path) -> None:
+    svc = _make(tmp_path)
+    created = svc.create(_payload(image_url="https://a.png"))
+    new = svc.update(
+        created.id,
+        CardUpdate(
+            pokemon_slug=created.pokemon_slug,
+            set_id=created.set_id,
+            num=created.num,
+            variant=created.variant,
+            lang=created.lang,
+            condition=created.condition,
+            qty=created.qty,
+            image_url="  https://b.png  ",
+        ),
+    )
+    assert new.image_url == "https://b.png"

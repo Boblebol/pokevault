@@ -113,6 +113,10 @@ class Card(BaseModel):
     qty: int = Field(default=1, ge=1)
     acquired_at: str | None = Field(default=None)
     note: str = ""
+    image_url: str = Field(
+        default="",
+        description="F11 — optional scan/preview URL used by the artwork switcher.",
+    )
     created_at: str
     updated_at: str
 
@@ -131,6 +135,7 @@ class CardCreate(BaseModel):
     qty: int = Field(default=1, ge=1)
     acquired_at: str | None = Field(default=None)
     note: str = ""
+    image_url: str = ""
 
 
 class CardUpdate(BaseModel):
@@ -147,6 +152,7 @@ class CardUpdate(BaseModel):
     qty: int = Field(default=1, ge=1)
     acquired_at: str | None = Field(default=None)
     note: str = ""
+    image_url: str = ""
 
 
 class CardList(BaseModel):
