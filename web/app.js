@@ -380,6 +380,12 @@ function slicedVisibleList() {
 
 function showDexError(grid) {
   grid.replaceChildren();
+  const ES = window.PokevaultEmptyStates;
+  if (ES?.render) {
+    const node = ES.render(grid, "dexError");
+    if (node) grid.append(node);
+    return;
+  }
   const p = document.createElement("p");
   p.className = "empty-state";
   p.textContent =
@@ -690,7 +696,7 @@ function updateListDisplayInfo({ full, end, total }) {
   const endBanner = document.getElementById("listScrollEnd");
   if (info) {
     if (!total) {
-      info.textContent = "Aucune entrée à afficher.";
+      info.textContent = "Le Pokédex reste silencieux sur ce périmètre.";
     } else {
       const caughtVisible = (full || []).filter((p) => Boolean(caughtMap[pokemonKey(p)])).length;
       const pctVisible = total ? Math.round((caughtVisible / total) * 100) : 0;
@@ -825,6 +831,15 @@ function createPokemonCard(p, opts) {
 window.PokedexCollection.createPokemonCard = createPokemonCard;
 window.PokedexCollection.poolForCollectionScope = poolForCollectionScope;
 
+function hasActiveFilterExceptMissing() {
+  return (
+    searchQuery.trim() !== "" ||
+    regionFilter !== "all" ||
+    typeFilter !== "all" ||
+    formFilterMode !== "all"
+  );
+}
+
 function render() {
   const grid = document.getElementById("grid");
   const sliced = slicedVisibleList();
@@ -843,10 +858,29 @@ function render() {
 
   grid.replaceChildren();
   if (!sliced.total) {
-    const empty = document.createElement("p");
-    empty.className = "empty-state";
-    empty.textContent = "Aucun Pokémon ne correspond à ce filtre.";
-    grid.append(empty);
+    const ES = window.PokevaultEmptyStates;
+    const collectionEmpty = Object.keys(caughtMap).length === 0;
+    const hasActiveFilter =
+      searchQuery.trim() !== "" ||
+      filterMode !== "all" ||
+      regionFilter !== "all" ||
+      typeFilter !== "all" ||
+      formFilterMode !== "all";
+    let variant = "listNoMatch";
+    if (filterMode === "missing" && !hasActiveFilterExceptMissing()) {
+      variant = "listAllCaught";
+    } else if (collectionEmpty && !hasActiveFilter) {
+      variant = "listCollectionEmpty";
+    }
+    const node = ES?.render
+      ? ES.render(grid, variant)
+      : (() => {
+          const p = document.createElement("p");
+          p.className = "empty-state";
+          p.textContent = "Aucun Pokémon ne correspond à ce filtre.";
+          return p;
+        })();
+    if (node) grid.append(node);
     updateListDisplayInfo({ full: sliced.full, end: 0, total: 0 });
     return;
   }

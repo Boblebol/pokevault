@@ -247,6 +247,14 @@ function renderPrintView() {
   if (summary) {
     summary.textContent = `${totalEntries} entrées`;
   }
+
+  if (totalEntries === 0) {
+    const ES = window.PokevaultEmptyStates;
+    if (ES?.render) {
+      const node = ES.render(output, "printEmpty");
+      if (node) output.append(node);
+    }
+  }
 }
 
 function buildBinderSection(binder, allPokemon, caughtMap, defs, cfg, filterMode) {

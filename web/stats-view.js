@@ -116,6 +116,16 @@ function renderStats() {
   const defs = PC?.regionDefinitions || [];
   const caught = PC?.caughtMap || {};
 
+  const nothingCaught = Object.keys(caught).length === 0;
+  if (nothingCaught || pool.length === 0) {
+    const ES = window.PokevaultEmptyStates;
+    if (ES?.render) {
+      const node = ES.render(host, "statsEmpty");
+      if (node) host.append(node);
+      return;
+    }
+  }
+
   /** @type {Record<string, { label: string; caught: number; total: number }>} */
   const byR = Object.create(null);
   for (const d of defs) {

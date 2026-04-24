@@ -313,6 +313,14 @@ body {
   margin-bottom: 16px;
 }
 
+.binder-empty-placeholder__title {
+  margin: 0 0 4px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--fg, #f5f5f5);
+  letter-spacing: 0.01em;
+}
+
 .binder-empty-placeholder__text {
   margin: 0;
   font-size: 0.875rem;
@@ -1077,6 +1085,39 @@ body {
   padding: 32px 16px;
   color: var(--muted);
   font-size: 0.875rem;
+}
+
+.empty-state--narrative {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: center;
+  padding: 48px 24px;
+  max-width: 640px;
+  margin: 0 auto;
+  line-height: 1.5;
+}
+
+.empty-state__title {
+  margin: 0;
+  color: var(--fg, #f5f5f5);
+  font-size: 1.05rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+.empty-state__body {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.empty-state__hint {
+  margin: 6px 0 0;
+  color: var(--muted);
+  font-size: 0.78rem;
+  opacity: 0.75;
+  font-style: italic;
 }
 
 /* ── Assistant plein écran (premier lancement) ───────────────────────────── */
