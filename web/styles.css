@@ -1331,6 +1331,21 @@ body {
   gap: 10px;
 }
 
+.onboarding__hint {
+  margin: 14px 0 0;
+  padding: 10px 12px;
+  font-size: 0.82rem;
+  line-height: 1.5;
+  color: color-mix(in oklab, var(--text, #f5f5f5) 78%, transparent);
+  background: color-mix(in oklab, var(--accent, #66f) 10%, transparent);
+  border: 1px solid color-mix(in oklab, var(--accent, #66f) 28%, transparent);
+  border-radius: 10px;
+}
+
+.onboarding__hint strong {
+  color: var(--text, #f5f5f5);
+}
+
 @media (min-width: 520px) {
   .onboarding__grid {
     grid-template-columns: 1fr 1fr;

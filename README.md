@@ -131,9 +131,12 @@
 - **Affichage** — global "atténuer attrapés / manquants" toggle, four
   regional themes (`Vault` default, `Kanto`, `Hoenn`, `Paldea`) applied
   via `data-theme` on `<html>` (F13), and an artwork switcher (Sugimori
-  default, Shiny `data/images_shiny/<slug>.png`, First card scan) with
-  `<img onerror>` fallback chain (F11). Both choices persist in
-  `localStorage`.
+  default, Shiny, First card scan) with a tri-level fallback chain
+  (F11). For shiny, the chain is: local `data/images_shiny/<slug>.png`
+  → PokéAPI CDN → default Sugimori. You can populate the local folder
+  offline with `make fetch-shiny` (downloads the 1025 artworks from
+  PokéAPI, respects `--limit` / `--force`). Both the theme and artwork
+  choices persist in `localStorage`.
 - **Données** — export / import the full backup (schema v2 carrying
   cards), launch the printable checklist.
 - **Profil** — replay the onboarding wizard (F00).
@@ -269,6 +272,7 @@ make dev          # Start local server
 make open         # Open web UI in browser
 make fetch        # Full scrape
 make fetch-test   # Quick scrape (10 entries, no images)
+make fetch-shiny  # Download shiny artworks into data/images_shiny/ (F11)
 make test         # Run tests
 make test-cov     # Tests + coverage (100% tracker)
 make lint         # Check style (ruff)

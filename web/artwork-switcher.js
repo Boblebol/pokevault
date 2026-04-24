@@ -5,8 +5,10 @@
  * tile + fallback chain. Three v1 modes:
  *
  *   - ``default`` — Sugimori/official artwork from ``data/images/``.
- *   - ``shiny``   — ``data/images_shiny/<slug>.png`` (falls back to
- *     default if the scrape hasn't produced the file yet).
+ *   - ``shiny``   — local ``data/images_shiny/<slug>.png`` first, then
+ *     the PokéAPI CDN shiny artwork (no scrape required), finally the
+ *     default sprite if both fail. To download shinies locally, run
+ *     ``make fetch-shiny`` (uses the same PokéAPI source).
  *   - ``card``    — first user-owned card thumbnail from
  *     ``/api/cards`` (indexed by ``pokemon_slug``); falls back to
  *     default when no card is owned.
@@ -71,6 +73,15 @@
     return `/data/images_shiny/${encodeURIComponent(slug)}.png`;
   }
 
+  function shinyCdnPath(p) {
+    const slug = String(p?.slug || "");
+    const m = slug.match(/^(\d{1,4})/);
+    if (!m) return "";
+    const natId = parseInt(m[1], 10);
+    if (!Number.isFinite(natId) || natId <= 0) return "";
+    return `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/shiny/${natId}.png`;
+  }
+
   function cardArt(p) {
     const slug = String(p?.slug || "");
     if (!slug) return "";
@@ -80,8 +91,12 @@
   function resolve(p) {
     const def = normalizeDefault(p);
     if (currentMode === "shiny") {
-      const shiny = shinyPath(p);
-      return { src: shiny || def, fallbacks: shiny && def !== shiny ? [def] : [] };
+      const local = shinyPath(p);
+      const cdn = shinyCdnPath(p);
+      const chain = [local, cdn, def].filter(
+        (url, idx, arr) => url && arr.indexOf(url) === idx,
+      );
+      return { src: chain[0] || def, fallbacks: chain.slice(1) };
     }
     if (currentMode === "card") {
       const ca = cardArt(p);
@@ -144,14 +159,15 @@
     const queue = Array.isArray(resolved.fallbacks)
       ? resolved.fallbacks.slice()
       : [];
-    img.addEventListener(
-      "error",
-      () => {
-        const next = queue.shift();
-        if (next && img.src !== next) img.src = next;
-      },
-      { passive: true },
-    );
+    const onError = () => {
+      const next = queue.shift();
+      if (!next) {
+        img.removeEventListener("error", onError);
+        return;
+      }
+      if (img.src !== next) img.src = next;
+    };
+    img.addEventListener("error", onError, { passive: true });
     img.src = resolved.src;
   }
 

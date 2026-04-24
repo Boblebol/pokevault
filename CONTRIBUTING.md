@@ -71,16 +71,23 @@ bienvenues.
 
 ### Messages de commit
 
-Préfixes recommandés :
+Préfixes recommandés — on accepte les deux styles (legacy + Conventional
+Commits). À partir de la roadmap Wave 1, on privilégie la forme
+Conventional Commits pour coller aux actions d'auto-release.
 
-| Préfixe    | Usage                          |
-|------------|--------------------------------|
-| `Add:`     | Nouvelle fonctionnalité        |
-| `Fix:`     | Correction de bug              |
-| `Update:`  | Amélioration d'une feature     |
-| `Refactor:`| Refactoring sans changement fonctionnel |
-| `Docs:`    | Documentation uniquement       |
-| `Test:`    | Ajout ou modification de tests |
+| Préfixe       | Usage                                                |
+|---------------|------------------------------------------------------|
+| `feat(fxx):`  | Nouvelle feature (référencer l'ID roadmap : `feat(f10): …`) |
+| `fix:`        | Correction de bug                                    |
+| `refactor:`   | Refactoring sans changement fonctionnel              |
+| `docs:`       | Documentation uniquement                             |
+| `test:`       | Ajout ou modification de tests                       |
+| `ci:`         | Workflows GitHub Actions, hooks, tooling CI          |
+| `chore:`      | Tâches transverses (build, deps Docker…)             |
+| `deps:`       | Mise à jour de dépendances                           |
+
+Les anciens préfixes `Add:` / `Update:` / `Fix:` restent acceptés dans
+l'historique mais ne sont plus recommandés pour les nouvelles PR.
 
 ### Style de code
 
@@ -95,6 +102,17 @@ Préfixes recommandés :
 - Le module `tracker/` doit maintenir **100% de couverture** (lignes).
 - Les tests d'intégration API utilisent `httpx` avec le `TestClient` FastAPI.
 - Les endpoints `GET /api/export`, `POST /api/import` et `GET /api/health` doivent rester couverts.
+
+### Intégration continue
+
+- Chaque PR déclenche [`.github/workflows/ci.yml`](.github/workflows/ci.yml) :
+  `ruff check`, `pytest --cov=tracker --cov-fail-under=100` sur Python
+  **3.11 et 3.12**, puis un smoke-test `docker build` pour garantir que
+  l'image reste publiable.
+- Un tag `vX.Y.Z` déclenche [`.github/workflows/release.yml`](.github/workflows/release.yml) :
+  création automatique de la Release GitHub (notes extraites du
+  CHANGELOG) + push de l'image `ghcr.io/<owner>/pokevault:<semver>`.
+- Dependabot met à jour pip / docker / github-actions une fois par mois.
 
 ### Données Pokédex
 
