@@ -198,9 +198,22 @@
       if (rowEl && rowEl.parentElement) rowEl.parentElement.removeChild(rowEl);
       notify("Carte retirée.", "info");
       await renderCardList();
+      emitCardsChanged();
     } catch (err) {
       console.error("drawer: delete failed", err);
       notify("Suppression impossible.", "error");
+    }
+  }
+
+  function emitCardsChanged() {
+    try {
+      document.dispatchEvent(
+        new CustomEvent("pokevault:cards-changed", {
+          detail: { slug: currentSlug || null },
+        }),
+      );
+    } catch {
+      /* CustomEvent unsupported — best effort only */
     }
   }
 
@@ -337,6 +350,7 @@
       if (typeof window.PokedexCollection?.setStatus === "function") {
         window.PokedexCollection.setStatus(currentSlug, "caught");
       }
+      emitCardsChanged();
     } catch (err) {
       console.error("drawer: create failed", err);
       notify("Ajout impossible.", "error");

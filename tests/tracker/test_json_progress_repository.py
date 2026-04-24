@@ -187,3 +187,70 @@ def test_save_keeps_legacy_caught_when_statuses_empty(tmp_path: Path) -> None:
     repo.save(data)
     raw = json.loads(path.read_text(encoding="utf-8"))
     assert raw["caught"] == {"only_legacy": True}
+
+
+def test_load_badges_unlocked_list(tmp_path: Path) -> None:
+    p = tmp_path / "prog.json"
+    p.write_text(
+        json.dumps({"caught": {}, "badges_unlocked": ["first_catch", "century"]}),
+        encoding="utf-8",
+    )
+    out = JsonProgressRepository(p).load()
+    assert out.badges_unlocked == ["first_catch", "century"]
+
+
+def test_load_badges_unlocked_skips_non_strings_and_dedupes(tmp_path: Path) -> None:
+    p = tmp_path / "prog.json"
+    p.write_text(
+        json.dumps(
+            {
+                "caught": {},
+                "badges_unlocked": ["x", "x", 42, "", "  ", "y"],
+            }
+        ),
+        encoding="utf-8",
+    )
+    out = JsonProgressRepository(p).load()
+    assert out.badges_unlocked == ["x", "y"]
+
+
+def test_load_badges_unlocked_bad_root_type(tmp_path: Path) -> None:
+    p = tmp_path / "prog.json"
+    p.write_text(
+        json.dumps({"caught": {}, "badges_unlocked": "nope"}),
+        encoding="utf-8",
+    )
+    out = JsonProgressRepository(p).load()
+    assert out.badges_unlocked == []
+
+
+def test_save_preserves_badges_unlocked_when_caller_omits_them(tmp_path: Path) -> None:
+    p = tmp_path / "prog.json"
+    p.write_text(
+        json.dumps({"caught": {}, "badges_unlocked": ["first_catch"]}),
+        encoding="utf-8",
+    )
+    repo = JsonProgressRepository(p)
+    repo.save(CollectionProgress(statuses={}))
+    out = repo.load()
+    assert out.badges_unlocked == ["first_catch"]
+
+
+def test_save_preserves_badges_when_file_unreadable(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    """Defensive branch — OSError during re-load falls back to empty badges."""
+    path = tmp_path / "prog.json"
+    repo = JsonProgressRepository(path)
+
+    calls = {"count": 0}
+    real_load = repo.load
+
+    def flaky_load() -> CollectionProgress:
+        calls["count"] += 1
+        if calls["count"] == 1:
+            raise OSError("temporary glitch")
+        return real_load()
+
+    monkeypatch.setattr(repo, "load", flaky_load)
+    repo.save(CollectionProgress(statuses={}))
+    raw = json.loads(path.read_text(encoding="utf-8"))
+    assert raw["badges_unlocked"] == []

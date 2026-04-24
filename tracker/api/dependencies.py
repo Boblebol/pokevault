@@ -17,6 +17,7 @@ from tracker.repository.json_binder_config_repository import JsonBinderConfigRep
 from tracker.repository.json_binder_placements_repository import JsonBinderPlacementsRepository
 from tracker.repository.json_card_repository import JsonCardRepository
 from tracker.repository.json_progress_repository import JsonProgressRepository
+from tracker.services.badge_service import BadgeService
 from tracker.services.binder_config_service import BinderConfigService
 from tracker.services.binder_placements_service import BinderPlacementsService
 from tracker.services.binder_workspace_service import BinderWorkspaceService
@@ -82,6 +83,13 @@ def get_card_service(
     progress_service: Annotated[ProgressService, Depends(get_progress_service)],
 ) -> CardService:
     return CardService(repository, progress_service)
+
+
+def get_badge_service(
+    progress_repo: Annotated[ProgressRepository, Depends(get_progress_repository)],
+    card_repo: Annotated[CardRepository, Depends(get_card_repository)],
+) -> BadgeService:
+    return BadgeService(progress_repo, card_repo)
 
 
 def get_export_service(

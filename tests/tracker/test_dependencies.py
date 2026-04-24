@@ -5,6 +5,7 @@ from __future__ import annotations
 from pathlib import Path
 
 from tracker.api.dependencies import (
+    get_badge_service,
     get_binder_config_repository,
     get_binder_config_service,
     get_binder_placements_repository,
@@ -21,6 +22,7 @@ from tracker.repository.json_binder_config_repository import JsonBinderConfigRep
 from tracker.repository.json_binder_placements_repository import JsonBinderPlacementsRepository
 from tracker.repository.json_card_repository import JsonCardRepository
 from tracker.repository.json_progress_repository import JsonProgressRepository
+from tracker.services.badge_service import BadgeService
 from tracker.services.binder_config_service import BinderConfigService
 from tracker.services.binder_placements_service import BinderPlacementsService
 from tracker.services.binder_workspace_service import BinderWorkspaceService
@@ -82,3 +84,11 @@ def test_get_card_repository_and_service(tmp_path: Path) -> None:
     )
     svc = get_card_service(repository=repo, progress_service=progress_svc)
     assert isinstance(svc, CardService)
+
+
+def test_get_badge_service(tmp_path: Path) -> None:
+    settings = TrackerSettings(repo_root=tmp_path)
+    progress_repo = get_progress_repository(settings=settings)
+    card_repo = get_card_repository(settings=settings)
+    svc = get_badge_service(progress_repo=progress_repo, card_repo=card_repo)
+    assert isinstance(svc, BadgeService)

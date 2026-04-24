@@ -37,6 +37,10 @@ class CollectionProgress(BaseModel):
     version: Literal[1] = 1
     caught: dict[str, bool] = Field(default_factory=dict)
     statuses: dict[str, PokemonStatusEntry] = Field(default_factory=dict)
+    badges_unlocked: list[str] = Field(
+        default_factory=list,
+        description="Roadmap F12 — monotonically growing list of unlocked badge ids.",
+    )
 
 
 class ProgressPutBody(BaseModel):
@@ -196,3 +200,23 @@ class ImportResponse(BaseModel):
     caught_count: int = Field(ge=0)
     binder_count: int = Field(ge=0)
     card_count: int = Field(default=0, ge=0)
+
+
+class BadgeDefinition(BaseModel):
+    """Roadmap F12 — static badge definition exposed to the UI."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    id: str
+    title: str
+    description: str
+    unlocked: bool = False
+
+
+class BadgeState(BaseModel):
+    """Roadmap F12 — ``GET /api/badges`` response."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    catalog: list[BadgeDefinition] = Field(default_factory=list)
+    unlocked: list[str] = Field(default_factory=list)

@@ -329,6 +329,14 @@ function renderStats() {
 
 let statsStarted = false;
 
+function renderBadgesBlock() {
+  const host = document.getElementById("statsBadges");
+  if (!host) return;
+  const B = window.PokevaultBadges;
+  if (!B) return;
+  B.renderInto(host);
+}
+
 function startStatsIfNeeded() {
   void (async () => {
     try {
@@ -339,8 +347,10 @@ function startStatsIfNeeded() {
     if (!statsStarted) {
       statsStarted = true;
       window.PokedexCollection?.subscribeCaught?.(() => renderStats());
+      window.PokevaultBadges?.subscribe?.(() => renderBadgesBlock());
     }
     renderStats();
+    window.PokevaultBadges?.poll?.().then(() => renderBadgesBlock());
   })();
 }
 

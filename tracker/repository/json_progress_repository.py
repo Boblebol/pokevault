@@ -36,6 +36,7 @@ class JsonProgressRepository:
 
         statuses = _load_statuses(raw.get("statuses"))
         caught = _load_caught(raw.get("caught"))
+        badges = _load_badges(raw.get("badges_unlocked"))
 
         if not statuses and caught:
             statuses = {
@@ -45,13 +46,25 @@ class JsonProgressRepository:
             }
 
         derived_caught = _derive_caught(statuses)
-        return CollectionProgress(caught=derived_caught, statuses=statuses)
+        return CollectionProgress(
+            caught=derived_caught,
+            statuses=statuses,
+            badges_unlocked=badges,
+        )
 
     def save(self, data: CollectionProgress) -> None:
         self._path.parent.mkdir(parents=True, exist_ok=True)
+        badges = data.badges_unlocked
+        if not badges:
+            try:
+                current = self.load()
+                badges = current.badges_unlocked
+            except OSError:
+                badges = []
         reconciled = CollectionProgress(
             caught=_derive_caught(data.statuses) or data.caught,
             statuses=data.statuses,
+            badges_unlocked=list(badges),
         )
         payload = reconciled.model_dump(mode="json")
         self._path.write_text(
@@ -95,3 +108,17 @@ def _load_statuses(raw: object) -> dict[str, PokemonStatusEntry]:
 
 def _derive_caught(statuses: dict[str, PokemonStatusEntry]) -> dict[str, bool]:
     return {slug: True for slug, entry in statuses.items() if entry.state == "caught"}
+
+
+def _load_badges(raw: object) -> list[str]:
+    if not isinstance(raw, list):
+        return []
+    out: list[str] = []
+    seen: set[str] = set()
+    for v in raw:
+        if isinstance(v, str):
+            k = v.strip()
+            if k and k not in seen:
+                seen.add(k)
+                out.append(k)
+    return out
