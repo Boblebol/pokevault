@@ -12,6 +12,7 @@ from tracker.api.controllers import (
     card_router,
     export_router,
     health_router,
+    profile_router,
     progress_router,
 )
 from tracker.config import TrackerSettings, get_settings
@@ -29,6 +30,7 @@ def create_app(settings: TrackerSettings | None = None) -> FastAPI:
     app.include_router(binder_router)
     app.include_router(card_router)
     app.include_router(badge_router)
+    app.include_router(profile_router)
     app.include_router(export_router)
     app.include_router(health_router)
 

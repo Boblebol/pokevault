@@ -986,6 +986,90 @@ function setupArtworkSelect() {
   });
 }
 
+function setupProfileSwitcher() {
+  const sel = document.getElementById("settingsProfileSelect");
+  const nameInput = document.getElementById("settingsProfileNewName");
+  const createBtn = document.getElementById("settingsProfileCreateBtn");
+  const deleteBtn = document.getElementById("settingsProfileDeleteBtn");
+  const hint = document.getElementById("settingsProfileHint");
+  const label = document.getElementById("settingsProfileLabel");
+  const P = window.PokevaultProfiles;
+  if (!sel || !P || sel.dataset.wired) return;
+  sel.dataset.wired = "1";
+
+  function showHint(text, variant) {
+    if (!hint) return;
+    hint.textContent = text || "";
+    hint.classList.toggle("sync-hint--err", variant === "err");
+    hint.hidden = !text;
+  }
+
+  function paint(state) {
+    sel.replaceChildren();
+    const profiles = state?.profiles || [];
+    for (const p of profiles) {
+      const opt = document.createElement("option");
+      opt.value = p.id;
+      opt.textContent = p.id === "default" ? `${p.name} (défaut)` : p.name;
+      sel.append(opt);
+    }
+    sel.value = state?.active_id || "default";
+    if (deleteBtn) deleteBtn.disabled = sel.value === "default";
+    if (label) {
+      const active = profiles.find((p) => p.id === state?.active_id);
+      label.textContent = `Profil : ${active ? active.name : "—"}`;
+    }
+  }
+
+  P.subscribe(paint);
+
+  sel.addEventListener("change", async () => {
+    showHint("Bascule de profil…");
+    try {
+      await P.setActive(sel.value);
+      showHint("Profil actif. Rechargement…");
+      setTimeout(() => window.location.reload(), 350);
+    } catch (err) {
+      showHint(`Erreur : ${err && err.message ? err.message : err}`, "err");
+    }
+  });
+
+  if (createBtn && nameInput) {
+    createBtn.addEventListener("click", async () => {
+      const name = nameInput.value.trim();
+      if (!name) {
+        showHint("Donne un nom au nouveau profil.", "err");
+        return;
+      }
+      try {
+        const created = await P.create(name);
+        nameInput.value = "";
+        showHint(`Profil « ${created.name} » créé.`);
+      } catch (err) {
+        showHint(`Erreur création : ${err && err.message ? err.message : err}`, "err");
+      }
+    });
+  }
+
+  if (deleteBtn) {
+    deleteBtn.addEventListener("click", async () => {
+      const id = sel.value;
+      if (id === "default") return;
+      const confirmation = window.confirm(
+        `Supprimer le profil « ${id} » ? Les fichiers JSON associés resteront sur disque (data/profiles/${id}/), tu peux les effacer à la main si besoin.`,
+      );
+      if (!confirmation) return;
+      try {
+        await P.remove(id);
+        showHint(`Profil « ${id} » supprimé. Bascule sur défaut…`);
+        setTimeout(() => window.location.reload(), 350);
+      } catch (err) {
+        showHint(`Erreur suppression : ${err && err.message ? err.message : err}`, "err");
+      }
+    });
+  }
+}
+
 function setupSettingsView() {
   const sel = document.getElementById("settingsDimSelect");
   if (!sel || sel.dataset.wired) return;
@@ -997,6 +1081,7 @@ function setupSettingsView() {
   });
   setupThemeSelect();
   setupArtworkSelect();
+  setupProfileSwitcher();
   paintVersionLabels();
   const versionEl = document.getElementById("settingsVersionLabel");
   const healthEl = document.getElementById("settingsHealthLabel");

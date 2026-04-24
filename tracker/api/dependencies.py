@@ -23,13 +23,24 @@ from tracker.services.binder_placements_service import BinderPlacementsService
 from tracker.services.binder_workspace_service import BinderWorkspaceService
 from tracker.services.card_service import CardService
 from tracker.services.export_service import ExportService
+from tracker.services.profile_service import ProfileService
 from tracker.services.progress_service import ProgressService
+
+
+def get_profile_service(
+    settings: Annotated[TrackerSettings, Depends(get_settings)],
+) -> ProfileService:
+    return ProfileService(
+        data_root=settings.data_dir,
+        registry_path=settings.profiles_registry_path,
+    )
 
 
 def get_progress_repository(
     settings: Annotated[TrackerSettings, Depends(get_settings)],
+    profiles: Annotated[ProfileService, Depends(get_profile_service)],
 ) -> ProgressRepository:
-    return JsonProgressRepository(settings.progress_path)
+    return JsonProgressRepository(profiles.progress_path())
 
 
 def get_progress_service(
@@ -40,8 +51,9 @@ def get_progress_service(
 
 def get_binder_config_repository(
     settings: Annotated[TrackerSettings, Depends(get_settings)],
+    profiles: Annotated[ProfileService, Depends(get_profile_service)],
 ) -> BinderConfigRepository:
-    return JsonBinderConfigRepository(settings.binder_config_path)
+    return JsonBinderConfigRepository(profiles.binder_config_path())
 
 
 def get_binder_config_service(
@@ -52,8 +64,9 @@ def get_binder_config_service(
 
 def get_binder_placements_repository(
     settings: Annotated[TrackerSettings, Depends(get_settings)],
+    profiles: Annotated[ProfileService, Depends(get_profile_service)],
 ) -> BinderPlacementsRepository:
-    return JsonBinderPlacementsRepository(settings.binder_placements_path)
+    return JsonBinderPlacementsRepository(profiles.binder_placements_path())
 
 
 def get_binder_placements_service(
@@ -74,8 +87,9 @@ def get_binder_workspace_service(
 
 def get_card_repository(
     settings: Annotated[TrackerSettings, Depends(get_settings)],
+    profiles: Annotated[ProfileService, Depends(get_profile_service)],
 ) -> CardRepository:
-    return JsonCardRepository(settings.cards_path)
+    return JsonCardRepository(profiles.cards_path())
 
 
 def get_card_service(

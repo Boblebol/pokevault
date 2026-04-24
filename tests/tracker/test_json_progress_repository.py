@@ -236,7 +236,9 @@ def test_save_preserves_badges_unlocked_when_caller_omits_them(tmp_path: Path) -
     assert out.badges_unlocked == ["first_catch"]
 
 
-def test_save_preserves_badges_when_file_unreadable(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+def test_save_preserves_badges_when_file_unreadable(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     """Defensive branch — OSError during re-load falls back to empty badges."""
     path = tmp_path / "prog.json"
     repo = JsonProgressRepository(path)

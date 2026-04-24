@@ -11,8 +11,8 @@ Persisted as ``badges_unlocked: list[str]`` inside
 
 from __future__ import annotations
 
+from collections.abc import Callable
 from dataclasses import dataclass
-from typing import Callable
 
 from tracker.models import BadgeDefinition, BadgeState, Card, CollectionProgress
 from tracker.repository.base import CardRepository, ProgressRepository

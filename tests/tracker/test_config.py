@@ -24,6 +24,8 @@ def test_tracker_settings_paths(tmp_path: Path, monkeypatch: pytest.MonkeyPatch)
     assert s.binder_config_path == root / "data" / "binder-config.json"
     assert s.binder_placements_path == root / "data" / "binder-placements.json"
     assert s.pokedex_path == root / "data" / "pokedex.json"
+    assert s.cards_path == root / "data" / "collection-cards.json"
+    assert s.profiles_registry_path == root / "data" / "profiles.json"
 
 
 def test_tracker_settings_from_env(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:

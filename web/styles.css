@@ -4884,3 +4884,29 @@ html[data-theme="paldea"] {
   color: var(--muted);
   font-size: 0.85rem;
 }
+
+/* ── F15: Profil multi-Pokédex ── */
+
+.profiles-actions {
+  align-items: center;
+}
+
+.profiles-name-input {
+  flex: 1 1 220px;
+  min-width: 180px;
+  background: rgba(255 255 255 / 0.06);
+  border: 1px solid rgba(255 255 255 / 0.12);
+  color: inherit;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font: 500 0.85rem / 1.4 "Inter", sans-serif;
+}
+
+.profiles-name-input:focus {
+  outline: 2px solid var(--accent, #66f);
+  outline-offset: 2px;
+}
+
+.sync-hint--err {
+  color: #f87171;
+}

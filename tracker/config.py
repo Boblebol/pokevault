@@ -54,6 +54,11 @@ class TrackerSettings(BaseSettings):
         """F08 — carnet de cartes TCG physiques (user state)."""
         return self.data_dir / "collection-cards.json"
 
+    @property
+    def profiles_registry_path(self) -> Path:
+        """F15 — liste des profils Pokédex + profil actif."""
+        return self.data_dir / "profiles.json"
+
 
 @lru_cache
 def get_settings() -> TrackerSettings:

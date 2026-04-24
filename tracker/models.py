@@ -208,6 +208,61 @@ class ImportResponse(BaseModel):
     card_count: int = Field(default=0, ge=0)
 
 
+class Profile(BaseModel):
+    """Roadmap F15 — isolated Pokédex profile (progress + cards + binders)."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    id: str = Field(min_length=1, pattern=r"^[a-z0-9][a-z0-9_-]{0,31}$")
+    name: str = Field(min_length=1, max_length=64)
+    created_at: str
+
+
+class ProfileRegistry(BaseModel):
+    """Persisted shape of ``data/profiles.json``.
+
+    The ``default`` profile is synthesised if absent so upgrades from
+    single-profile installs stay seamless — it aliases the legacy
+    ``data/*.json`` locations.
+    """
+
+    model_config = ConfigDict(extra="forbid")
+
+    version: Literal[1] = 1
+    active_id: str = "default"
+    profiles: list[Profile] = Field(default_factory=list)
+
+
+class ProfileCreate(BaseModel):
+    """POST /api/profiles — free-text name, server derives id."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    name: str = Field(min_length=1, max_length=64)
+
+
+class ProfileSwitchBody(BaseModel):
+    """PUT /api/profiles/active — select which profile is live."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    id: str = Field(min_length=1)
+
+
+class ProfileListResponse(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    active_id: str
+    profiles: list[Profile] = Field(default_factory=list)
+
+
+class ProfileDeleteResponse(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    ok: bool = True
+    deleted: int = Field(ge=0)
+
+
 class BadgeDefinition(BaseModel):
     """Roadmap F12 — static badge definition exposed to the UI."""
 

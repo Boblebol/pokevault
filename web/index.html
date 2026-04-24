@@ -371,6 +371,36 @@
             </div>
           </div>
           <div class="stats-kpi-card">
+            <h2 class="stats-kpi-label">Pokédex multi-profils</h2>
+            <p class="stats-kpi-sub">
+              Chaque profil garde sa propre progression, ses cartes et ses
+              classeurs (par ex. « Hardcore », « Casual », « Shiny only »).
+            </p>
+            <label class="region-filter-wrap settings-dim-label theme-choice-row">
+              <span class="region-filter-label">Profil actif</span>
+              <select id="settingsProfileSelect" class="region-filter" aria-label="Profil Pokédex actif"></select>
+            </label>
+            <div class="settings-data-actions profiles-actions">
+              <input
+                type="text"
+                id="settingsProfileNewName"
+                class="search-input profiles-name-input"
+                placeholder="Nom du nouveau profil"
+                aria-label="Nom du nouveau profil Pokédex"
+                maxlength="64"
+              />
+              <button type="button" class="settings-action-btn" id="settingsProfileCreateBtn">
+                <span class="material-symbols-outlined" aria-hidden="true">person_add</span>
+                Créer
+              </button>
+              <button type="button" class="settings-action-btn settings-action-btn--cancel" id="settingsProfileDeleteBtn">
+                <span class="material-symbols-outlined" aria-hidden="true">delete</span>
+                Supprimer
+              </button>
+            </div>
+            <p id="settingsProfileHint" class="sync-hint" hidden></p>
+          </div>
+          <div class="stats-kpi-card">
             <h2 class="stats-kpi-label">Version</h2>
             <p class="stats-kpi-sub" id="settingsVersionLabel">UI -- · API --</p>
             <p class="stats-kpi-sub" id="settingsHealthLabel">État API : vérification...</p>
@@ -584,6 +614,7 @@
     </div>
 
     <script src="/themes.js"></script>
+    <script src="/profiles.js" defer></script>
     <script src="/empty-states.js" defer></script>
     <script src="/keyboard.js" defer></script>
     <script src="/toast.js" defer></script>
