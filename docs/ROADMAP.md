@@ -58,8 +58,8 @@ Sorted by RICE descending. Tone/wave column drives the delivery plan below.
 
 | Wave                | Duration | Scope                        | User-visible milestone                           |
 |---------------------|---------:|------------------------------|--------------------------------------------------|
-| **V1 · Polish J1**  | ~1 week  | F07 · F04 · F01 · F06        | App feels alive with zero structural change      |
-| **V2 · Activation** | ~2 weeks | F00 · F03 · F05              | First run is scripted, grid tells a story        |
+| **V1 · Polish J1** ✅ | ~1 week  | F07 · F04 · F01 · F06       | App feels alive with zero structural change      |
+| **V2 · Activation** ✅ | ~2 weeks | F00 · F03 · F05             | First run is scripted, grid tells a story        |
 | **V3 · Layer Cartes** | ~3 weeks | F08 · F09 · F02 · F10      | Drawer + full-screen page, cards as opt-in layer |
 | **V4 · Délices**    | ~3 weeks | F11 · F12 · F15 · F14 · F13  | Full Pokédex identity, multi-profile, polish     |
 

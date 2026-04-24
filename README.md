@@ -56,16 +56,24 @@
 ### Web UI — List View (`#/liste`)
 
 - Visual Pokédex grid.
-- Click to mark **caught / missing**.
+- **Three-state Pokédex status** (F03) — click cycles `not met → seen →
+  caught → not met`. `Shift+click` (or `Shift+C`) toggles the shiny
+  flag with a golden glow and a ★ marker.
 - Status filters, **regional dex chips** with deep-linking
   (`#/liste?region=johto`).
+- **Narrative filter chips** (F05) — Starter · Légendaire · Mythique ·
+  Pseudo-légendaire · Fossile · Bébé · Ultra-Chimère. Multi-select,
+  deep-linked via `?tags=starter,legendary`.
 - **Fuzzy search** (tolerates accents and typos) on name, number,
   slug and types.
 - Keyboard shortcuts: `/` focus search, `Esc` clears, `j`/`k` move,
-  `c` catch, `?` open help.
+  `c` cycle status, `Shift+C` toggle shiny, `?` open help.
 - Narrative empty states when filters match nothing.
 - Global counter, progress bar, and a secondary "cartes catalogu\u00e9es"
   line (lights up with roadmap F08).
+- **First-run onboarding wizard** (F00) — 3-step dialog capturing your
+  collector profile (dex / hybrid / card) and starting preferences;
+  re-launchable from Réglages → Profil.
 
 ### Web UI — Binder View (`#/classeur`)
 
@@ -96,7 +104,8 @@
 
 | Endpoint                          | Method          | Description                    |
 |-----------------------------------|-----------------|--------------------------------|
-| `/api/progress`                   | GET / PUT / PATCH | Collection progress          |
+| `/api/progress`                   | GET / PUT / PATCH | Collection progress (legacy bool + enriched statuses) |
+| `/api/progress/status`            | PATCH           | F03 — enriched status (state, shiny) |
 | `/api/binder`                     | GET             | List binders                   |
 | `/api/binder/{id}`                | GET / PUT / DELETE | Manage a binder             |
 | `/api/binder/config`              | GET / PUT       | Binder configuration           |
@@ -105,6 +114,7 @@
 | `/api/import`                     | POST            | Full backup restore (JSON)     |
 | `/api/health`                     | GET             | Liveness probe                 |
 | `/data/pokedex.json`              | GET             | Pokédex data                   |
+| `/data/narrative-tags.json`       | GET             | Narrative tags (Starter, Légendaire, …) |
 
 ---
 
@@ -322,10 +332,16 @@ for the full 16-feature plan organised in 4 delivery waves (V1 Polish,
 V2 Activation, V3 Card Layer, V4 Delights). Each entry ships with a
 user story, acceptance criteria, tech notes and dependencies.
 
-Current focus: **Wave 1 — Polish immédiat** — ✅ complete. See the
-[Unreleased](CHANGELOG.md) section for the full list of shipped items
-(F07 · F04 · F01 · F06). Next up: **Wave 2 — Activation** (onboarding
-wizard, enriched Pokédex states, narrative filters).
+Delivery status:
+
+- **Wave 1 — Polish immédiat** — ✅ complete (F07 · F04 · F01 · F06).
+- **Wave 2 — Activation & Pokédex identity** — ✅ complete (F00 · F03 · F05).
+- **Wave 3 — Card Layer** — next up (F08 card data model unblocks the
+  cards drawer, auto-derivation of caught from cards, full-screen
+  Pokédex page).
+
+See the [Unreleased](CHANGELOG.md) section for the complete list of
+shipped items in the latest wave.
 
 ---
 

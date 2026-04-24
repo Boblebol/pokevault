@@ -12,6 +12,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 - Public product roadmap in [docs/ROADMAP.md](docs/ROADMAP.md): 16 RICE-scored
   features organised in 4 delivery waves (Polish J1, Activation, Card Layer,
   Delights), each with user story, acceptance criteria and tech notes.
+- **Wave 2 · Activation & Pokédex identity** shipped:
+  - **F03** Enriched Pokédex status — the legacy `caught: bool` dict
+    keeps working as a derived mirror while the new source of truth is
+    `statuses: {slug: {state, shiny, seen_at}}` with `state ∈ {seen,
+    caught}` and an independent `shiny` flag. New `PATCH
+    /api/progress/status` endpoint; existing progress files migrate in
+    flight (tracker coverage stays at 100 %). List cards cycle
+    `not_met → seen → caught → not_met` on click, toggle shiny with
+    `Shift+click` or `Shift+C`. Keyboard help dialog reflects the new
+    shortcuts.
+  - **F05** Narrative filter chips — a curated
+    `data/narrative-tags.json` ships 238 tagged Pokémon across seven
+    narrative categories (Starter, Légendaire, Mythique,
+    Pseudo-légendaire, Fossile, Bébé, Ultra-Chimère). The chips
+    compose with region / type / caught filters and persist via the
+    `?tags=starter,legendary` hash parameter.
+  - **F00** Three-step onboarding wizard — first-run dialog that
+    positions Pokevault as a Pokédex-first tracker, captures the
+    collector profile (dex / hybrid / card) and sets starting form
+    scope + dim mode. Persisted under
+    `localStorage["pokevault.ui.profile"]`; re-launchable from
+    Réglages → Profil.
 - **Wave 1 · Polish J1** kickoff:
   - **F07** Narrative empty states across list, stats, print and binder
     views, centralised in `web/empty-states.js`.
@@ -38,6 +60,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   container probes and uptime checks.
 - Reference `data/pokedex.json` is now shipped with the repository so the UI
   runs out of the box without invoking the scraper on first boot.
+- Curated `data/narrative-tags.json` shipped alongside `pokedex.json` so the
+  narrative chip filter works out of the box (and inside the Docker image).
 - Test coverage for new export/import flows, form-filtering helpers, health
   endpoint and dependencies, keeping tracker coverage at 100%.
 
