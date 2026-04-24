@@ -1472,8 +1472,16 @@ function currentViewFromHash() {
   if (raw === "classeur") return "classeur";
   if (raw === "settings") return "settings";
   if (raw === "print") return "print";
+  if (raw.startsWith("pokemon/")) return "pokemon";
   if (raw === "liste" || raw === "") return "liste";
   return "liste";
+}
+
+function currentPokemonSlugFromHash() {
+  const raw = (location.hash || "").replace(/^#/, "").replace(/^\//, "");
+  const before = raw.split("?")[0];
+  if (!before.startsWith("pokemon/")) return null;
+  return before.slice("pokemon/".length) || null;
 }
 
 let listViewStarted = false;
@@ -1495,11 +1503,13 @@ function applyAppRoute() {
   const elStats = document.getElementById("viewStats");
   const elSettings = document.getElementById("viewSettings");
   const elPrint = document.getElementById("viewPrint");
+  const elPokemon = document.getElementById("viewPokemon");
   if (elListe) elListe.hidden = view !== "liste";
   if (elClasseur) elClasseur.hidden = view !== "classeur";
   if (elStats) elStats.hidden = view !== "stats";
   if (elSettings) elSettings.hidden = view !== "settings";
   if (elPrint) elPrint.hidden = view !== "print";
+  if (elPokemon) elPokemon.hidden = view !== "pokemon";
   updateAppSwitchNav(view);
   const titles = {
     liste: "pokevault — Collection",
@@ -1507,6 +1517,7 @@ function applyAppRoute() {
     settings: "pokevault — Réglages",
     print: "pokevault — Impression",
     classeur: "pokevault — Classeurs",
+    pokemon: "pokevault — Fiche Pokédex",
   };
   document.title = titles[view] || "pokevault";
   if (view === "liste" && !listViewStarted) {
@@ -1521,6 +1532,9 @@ function applyAppRoute() {
   }
   if (view === "print" && typeof window.PokedexPrint?.start === "function") {
     window.PokedexPrint.start();
+  }
+  if (view === "pokemon" && typeof window.PokevaultFullView?.render === "function") {
+    window.PokevaultFullView.render(currentPokemonSlugFromHash());
   }
 }
 

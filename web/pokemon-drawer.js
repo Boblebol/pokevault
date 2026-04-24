@@ -88,7 +88,20 @@
   }
 
   function displayName(p) {
-    return p?.name_fr || p?.name_en || p?.name || p?.slug || "Inconnu";
+    const n = p?.names || {};
+    return n.fr || n.en || p?.name_fr || p?.slug || "Inconnu";
+  }
+
+  function subtitleName(p) {
+    const n = p?.names || {};
+    return n.en || p?.name_en || "";
+  }
+
+  function normalizeImgPath(img) {
+    if (!img) return null;
+    const s = String(img).replace(/^\.\//, "");
+    if (s.startsWith("http")) return s;
+    return s.startsWith("/") ? s : `/${s}`;
   }
 
   function displayNumber(num) {
@@ -335,7 +348,7 @@
     header.className = "drawer-header";
     const imgWrap = document.createElement("div");
     imgWrap.className = "drawer-header__img";
-    const src = p?.image || "";
+    const src = normalizeImgPath(p?.image);
     if (src) {
       const img = document.createElement("img");
       img.src = src;
@@ -357,7 +370,8 @@
     const subtitle = document.createElement("div");
     subtitle.className = "drawer-header__subtitle";
     const subParts = [];
-    if (p?.name_en) subParts.push(p.name_en);
+    const en = subtitleName(p);
+    if (en) subParts.push(en);
     if (p?.form) subParts.push(p.form);
     subtitle.textContent = subParts.join(" · ");
     const types = document.createElement("div");
@@ -377,6 +391,12 @@
     if (subtitle.textContent) meta.append(subtitle);
     if (tList.length) meta.append(types);
     meta.append(region);
+    const link = document.createElement("a");
+    link.className = "drawer-header__full-link";
+    link.href = `#/pokemon/${encodeURIComponent(p?.slug || currentSlug || "")}`;
+    link.textContent = "Voir fiche complète →";
+    link.addEventListener("click", () => close());
+    meta.append(link);
     header.append(meta);
     return header;
   }
