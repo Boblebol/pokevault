@@ -1,6 +1,6 @@
 [project]
 name = "pokevault"
-version = "0.1.0"
+version = "1.0.0"
 description = "Local-first Pokémon collection tracker — scraper, binder manager, and web UI"
 readme = "README.md"
 license = "MIT"

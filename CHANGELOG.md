@@ -7,11 +7,35 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [1.0.0] — 2026-04-24
+
+Wave 1 → Wave 4 of the public roadmap (16 RICE-scored features) are
+live, backed by 411 passing tests at 100 % coverage on the `tracker/`
+module. GitHub Actions runs lint + coverage + Docker smoke-build on
+every PR, tagged releases auto-publish a GitHub Release and the Docker
+image to `ghcr.io/<owner>/pokevault`.
+
 ### Added
 
 - Public product roadmap in [docs/ROADMAP.md](docs/ROADMAP.md): 16 RICE-scored
   features organised in 4 delivery waves (Polish J1, Activation, Card Layer,
   Delights), each with user story, acceptance criteria and tech notes.
+- GitHub Actions CI (`.github/workflows/ci.yml`): `ruff check` +
+  `pytest --cov=tracker --cov-fail-under=100` on Python 3.11 & 3.12,
+  plus a Docker build smoke-test, triggered on every push/PR to `main`.
+  Dependabot bumps pip / Docker / github-actions once a month.
+- Release pipeline (`.github/workflows/release.yml`): tag-triggered
+  (`v*.*.*`), drafts a GitHub Release from the matching CHANGELOG
+  section and pushes the image to `ghcr.io/<owner>/pokevault` with
+  full semver tags (`1.0.0`, `1.0`, `1`, `latest`).
+- Issue & PR templates under `.github/` mirror the Pokédex-first RICE
+  roadmap and enforce the `make check` checklist before review.
+- `make fetch-shiny` / `python main.py fetch-shiny` CLI: downloads the
+  1025 official-artwork shinies from the PokéAPI CDN into
+  `data/images_shiny/<slug>.png`, with `--limit` / `--force` /
+  `--output-dir` flags.
+- Onboarding wizard step 3 now surfaces the **Réglages → Pokédex
+  multi-profils** switcher for F15 discoverability.
 - **Wave 4 · Délices** shipped:
   - **F13** Thèmes de région — a lightweight `web/themes.js` module persists
     the user's choice in `localStorage` and applies a `data-theme` attribute
@@ -54,6 +78,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
     `DELETE /api/profiles/{id}`. Réglages exposes a switcher with create /
     delete buttons and a full reload after switch so every cached collection
     refreshes against the new dataset.
+
+### Changed
+
+- F11 shiny mode now resolves through a 3-step fallback chain:
+  `data/images_shiny/<slug>.png` → PokéAPI CDN
+  (`raw.githubusercontent.com/PokeAPI/sprites`) → Sugimori default.
+  Users no longer need to scrape to enjoy the switcher.
+- `web/artwork-switcher.js::attach()` tears the `onerror` listener down
+  once the fallback chain is exhausted to stop `<img>` error storms.
+
+### Tooling
+
+- 411 passing tests on `tracker/` at 100 % coverage (pytest + ruff
+  clean on 3.11 / 3.12).
   - Backend coverage stays at 100% (411 passing tests on the `tracker/`
     module) including new modules `test_badge_service`, `test_badge_api`,
     `test_profile_service`, `test_profile_api`, plus updates to

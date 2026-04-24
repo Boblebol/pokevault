@@ -5,7 +5,7 @@
 
 const API_PROGRESS = "/api/progress";
 const API_HEALTH = "/api/health";
-const APP_UI_VERSION = "2026.04.17-p2";
+const APP_UI_VERSION = "1.0.0";
 const PROGRESS_QUEUE_KEY = "pokedex_progress_queue";
 const FORM_FILTER_STORAGE_KEY = "pokedexFormFilter";
 const TYPE_FILTER_STORAGE_KEY = "pokedexTypeFilter";
