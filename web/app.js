@@ -413,14 +413,91 @@ function fillRegionSelect() {
   regionFilter = sel.value;
 }
 
+function renderRegionChips() {
+  const host = document.getElementById("regionChips");
+  if (!host) return;
+  host.replaceChildren();
+  const makeChip = (id, label) => {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "region-chip";
+    btn.dataset.region = id;
+    btn.setAttribute(
+      "aria-pressed",
+      regionFilter === id ? "true" : "false",
+    );
+    if (regionFilter === id) btn.classList.add("is-active");
+    btn.textContent = label;
+    btn.addEventListener("click", () => {
+      setRegionFilter(id);
+    });
+    return btn;
+  };
+  host.append(makeChip("all", "National"));
+  for (const r of regionDefinitions) {
+    host.append(makeChip(r.id, r.label_fr));
+  }
+}
+
+function setRegionFilter(id) {
+  const next = typeof id === "string" && id ? id : "all";
+  if (next !== "all" && !regionDefinitions.some((r) => r.id === next)) {
+    return;
+  }
+  if (regionFilter === next) return;
+  regionFilter = next;
+  const sel = document.getElementById("regionFilter");
+  if (sel) sel.value = next;
+  writeRegionToHash(next);
+  syncRegionChipsActive();
+  resetDisplayedCount();
+  render();
+}
+
+function syncRegionChipsActive() {
+  const host = document.getElementById("regionChips");
+  if (!host) return;
+  for (const btn of host.querySelectorAll(".region-chip")) {
+    const on = btn.dataset.region === regionFilter;
+    btn.classList.toggle("is-active", on);
+    btn.setAttribute("aria-pressed", on ? "true" : "false");
+  }
+}
+
+function parseHashQuery() {
+  const raw = (location.hash || "").replace(/^#\/?/, "");
+  const q = raw.indexOf("?");
+  if (q < 0) return { view: raw, params: new URLSearchParams() };
+  return {
+    view: raw.slice(0, q),
+    params: new URLSearchParams(raw.slice(q + 1)),
+  };
+}
+
+function writeRegionToHash(region) {
+  const { view, params } = parseHashQuery();
+  if (region && region !== "all") params.set("region", region);
+  else params.delete("region");
+  const qs = params.toString();
+  const next = `#/${view}${qs ? `?${qs}` : ""}`;
+  if (location.hash !== next) {
+    history.replaceState(null, "", next);
+  }
+}
+
+function readRegionFromHash() {
+  const { params } = parseHashQuery();
+  const v = params.get("region");
+  if (!v || v === "all") return null;
+  return v;
+}
+
 function setupRegionFilter() {
   const sel = document.getElementById("regionFilter");
   if (!sel || sel.dataset.wired) return;
   sel.dataset.wired = "1";
   sel.addEventListener("change", () => {
-    regionFilter = sel.value || "all";
-    resetDisplayedCount();
-    render();
+    setRegionFilter(sel.value || "all");
   });
 }
 
@@ -956,6 +1033,13 @@ async function startTracker() {
   } catch {
     return;
   }
+  const hashRegion = readRegionFromHash();
+  if (hashRegion) {
+    regionFilter = hashRegion;
+    const sel = document.getElementById("regionFilter");
+    if (sel) sel.value = hashRegion;
+  }
+  renderRegionChips();
   if (!listCaughtSubscribed) {
     listCaughtSubscribed = true;
     window.PokedexCollection.subscribeCaught(() => render());
@@ -973,7 +1057,8 @@ async function startTracker() {
 }
 
 function currentViewFromHash() {
-  const raw = (location.hash || "#/liste").replace(/^#/, "").replace(/^\//, "");
+  const rawFull = (location.hash || "#/liste").replace(/^#/, "").replace(/^\//, "");
+  const raw = rawFull.split("?")[0];
   if (raw === "stats") return "stats";
   if (raw === "classeur") return "classeur";
   if (raw === "settings") return "settings";
