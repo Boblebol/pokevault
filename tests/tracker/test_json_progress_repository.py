@@ -49,7 +49,11 @@ def test_load_normalizes_and_skips_bad_entries(tmp_path: Path) -> None:
     }
     p.write_text(json.dumps(raw), encoding="utf-8")
     out = JsonProgressRepository(p).load()
-    assert out.caught == {"ok": True, "no": False}
+    # After F03 migration, only `True` entries become statuses; `caught`
+    # is derived from statuses so `no: False` is dropped as intended.
+    assert out.caught == {"ok": True}
+    assert set(out.statuses.keys()) == {"ok"}
+    assert out.statuses["ok"].state == "caught"
 
 
 def test_load_skips_non_string_keys(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
@@ -74,3 +78,112 @@ def test_save_creates_parent_and_roundtrip(tmp_path: Path) -> None:
     repo.save(data)
     assert path.is_file()
     assert JsonProgressRepository(path).load().caught == {"a": True}
+
+
+# ── F03 — enriched statuses ─────────────────────────────────────────────
+
+
+def test_load_statuses_full(tmp_path: Path) -> None:
+    p = tmp_path / "prog.json"
+    raw = {
+        "version": 1,
+        "caught": {"pikachu": True},
+        "statuses": {
+            "pikachu": {"state": "caught", "shiny": True, "seen_at": "2026-01-01T00:00:00Z"},
+            "rattata": {"state": "seen", "shiny": False, "seen_at": None},
+        },
+    }
+    p.write_text(json.dumps(raw), encoding="utf-8")
+    out = JsonProgressRepository(p).load()
+    assert out.statuses["pikachu"].state == "caught"
+    assert out.statuses["pikachu"].shiny is True
+    assert out.statuses["pikachu"].seen_at == "2026-01-01T00:00:00Z"
+    assert out.statuses["rattata"].state == "seen"
+    assert out.caught == {"pikachu": True}
+
+
+def test_load_statuses_skips_invalid_entries(tmp_path: Path) -> None:
+    p = tmp_path / "prog.json"
+    raw = {
+        "caught": {},
+        "statuses": {
+            "": {"state": "seen"},
+            "   ": {"state": "seen"},
+            "no_state": {},
+            "bad_state": {"state": "unknown"},
+            "not_dict": "oops",
+            "seen_shiny_ignored": {"state": "seen", "shiny": True, "seen_at": 123},
+        },
+    }
+    p.write_text(json.dumps(raw), encoding="utf-8")
+    out = JsonProgressRepository(p).load()
+    assert list(out.statuses.keys()) == ["seen_shiny_ignored"]
+    entry = out.statuses["seen_shiny_ignored"]
+    assert entry.state == "seen"
+    assert entry.shiny is False
+    assert entry.seen_at is None
+
+
+def test_load_statuses_non_string_key(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    p = tmp_path / "prog.json"
+    p.write_text("{}", encoding="utf-8")
+
+    def fake_loads(_s: str) -> dict:
+        return {
+            "caught": {},
+            "statuses": {
+                42: {"state": "caught"},
+                "ok": {"state": "caught"},
+            },
+        }
+
+    monkeypatch.setattr(
+        "tracker.repository.json_progress_repository.json.loads",
+        fake_loads,
+    )
+    out = JsonProgressRepository(p).load()
+    assert list(out.statuses.keys()) == ["ok"]
+
+
+def test_load_statuses_bad_root_type(tmp_path: Path) -> None:
+    p = tmp_path / "prog.json"
+    p.write_text(json.dumps({"statuses": "nope"}), encoding="utf-8")
+    out = JsonProgressRepository(p).load()
+    assert out.statuses == {}
+
+
+def test_legacy_migration_populates_statuses(tmp_path: Path) -> None:
+    p = tmp_path / "prog.json"
+    p.write_text(json.dumps({"caught": {"a": True, "b": True}}), encoding="utf-8")
+    out = JsonProgressRepository(p).load()
+    assert set(out.statuses.keys()) == {"a", "b"}
+    assert all(e.state == "caught" for e in out.statuses.values())
+
+
+def test_save_derives_caught_from_statuses(tmp_path: Path) -> None:
+    from tracker.models import PokemonStatusEntry
+
+    path = tmp_path / "prog.json"
+    repo = JsonProgressRepository(path)
+    data = CollectionProgress(
+        caught={"legacy_only": True},
+        statuses={
+            "caught_one": PokemonStatusEntry(state="caught"),
+            "seen_one": PokemonStatusEntry(state="seen"),
+        },
+    )
+    repo.save(data)
+    raw = json.loads(path.read_text(encoding="utf-8"))
+    assert raw["caught"] == {"caught_one": True}
+    assert set(raw["statuses"].keys()) == {"caught_one", "seen_one"}
+
+
+def test_save_keeps_legacy_caught_when_statuses_empty(tmp_path: Path) -> None:
+    path = tmp_path / "prog.json"
+    repo = JsonProgressRepository(path)
+    data = CollectionProgress(caught={"only_legacy": True}, statuses={})
+    repo.save(data)
+    raw = json.loads(path.read_text(encoding="utf-8"))
+    assert raw["caught"] == {"only_legacy": True}

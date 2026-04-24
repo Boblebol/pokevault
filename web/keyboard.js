@@ -6,7 +6,8 @@
  *   Esc  blur input / clear search if focused, otherwise drop card focus
  *   j    move keyboard focus to next visible card
  *   k    move keyboard focus to previous visible card
- *   c    toggle caught on the currently focused card
+ *   c    cycle status (not_met → seen → caught → not_met) on focused card
+ *   C    toggle shiny (or jump to caught-shiny) on focused card
  *   ?    open the shortcuts help dialog
  *
  * Shortcuts are disabled whenever the user is typing in a text input,
@@ -82,11 +83,17 @@
     setFocusIndex(idx + delta);
   }
 
-  function toggleCaughtOnFocus() {
+  function cycleStatusOnFocus(shift) {
     if (!currentFocusSlug) return;
     const PC = window.PokedexCollection;
-    if (!PC || typeof PC.toggleCaughtBySlug !== "function") return;
-    PC.toggleCaughtBySlug(currentFocusSlug);
+    if (!PC) return;
+    if (typeof PC.cycleStatusBySlug === "function") {
+      PC.cycleStatusBySlug(currentFocusSlug, { shift: Boolean(shift) });
+      return;
+    }
+    if (typeof PC.toggleCaughtBySlug === "function") {
+      PC.toggleCaughtBySlug(currentFocusSlug);
+    }
   }
 
   function focusSearchInput() {
@@ -190,7 +197,11 @@
         return;
       case "c":
         e.preventDefault();
-        toggleCaughtOnFocus();
+        cycleStatusOnFocus(false);
+        return;
+      case "C":
+        e.preventDefault();
+        cycleStatusOnFocus(true);
         return;
       default:
         return;

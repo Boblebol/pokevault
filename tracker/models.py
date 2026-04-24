@@ -8,12 +8,35 @@ from pydantic import BaseModel, ConfigDict, Field
 
 from tracker.binder_models import BinderConfigPayload, BinderPlacementsPayload
 
+PokemonState = Literal["seen", "caught"]
+"""Two persisted states; absence of a slug means ``not_met``."""
+
+
+class PokemonStatusEntry(BaseModel):
+    """Enriched Pokédex status (roadmap F03).
+
+    Stored per-slug; a missing slug means the Pokémon has not been met yet.
+    ``caught`` stays the canonical catching bit — see
+    :class:`CollectionProgress` for how the legacy ``caught`` dict is
+    derived from ``state``.
+    """
+
+    model_config = ConfigDict(extra="forbid")
+
+    state: PokemonState
+    shiny: bool = False
+    seen_at: str | None = Field(
+        default=None,
+        description="ISO-8601 timestamp of the first seen/catch event (optional).",
+    )
+
 
 class CollectionProgress(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     version: Literal[1] = 1
     caught: dict[str, bool] = Field(default_factory=dict)
+    statuses: dict[str, PokemonStatusEntry] = Field(default_factory=dict)
 
 
 class ProgressPutBody(BaseModel):
@@ -29,6 +52,20 @@ class ProgressPatch(BaseModel):
 
     slug: str = Field(min_length=1)
     caught: bool
+
+
+class ProgressStatusPatch(BaseModel):
+    """Mise à jour enrichie du statut Pokédex (F03).
+
+    ``state`` accepte ``not_met`` qui supprime l'entrée côté serveur. Le
+    flag ``shiny`` n'est conservé que lorsque ``state == "caught"``.
+    """
+
+    model_config = ConfigDict(extra="forbid")
+
+    slug: str = Field(min_length=1)
+    state: Literal["not_met", "seen", "caught"]
+    shiny: bool = False
 
 
 class ProgressSaveResponse(BaseModel):

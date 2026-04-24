@@ -4,7 +4,14 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from tracker.models import CollectionProgress, ProgressPatch, ProgressPutBody, ProgressSaveResponse
+from tracker.models import (
+    CollectionProgress,
+    PokemonStatusEntry,
+    ProgressPatch,
+    ProgressPutBody,
+    ProgressSaveResponse,
+    ProgressStatusPatch,
+)
 from tracker.repository.json_progress_repository import JsonProgressRepository
 from tracker.services.progress_service import ProgressService, _normalize_caught
 
@@ -41,6 +48,80 @@ def test_patch_caught(tmp_path: Path) -> None:
     assert repo.load().caught == {"a": True, "b": True}
     svc.patch_caught(ProgressPatch(slug="a", caught=False))
     assert repo.load().caught == {"b": True}
+
+
+def test_replace_caught_seeds_statuses(tmp_path: Path) -> None:
+    repo = JsonProgressRepository(tmp_path / "p.json")
+    svc = ProgressService(repo)
+    svc.replace_caught(ProgressPutBody(caught={"pikachu": True}))
+    loaded = repo.load()
+    assert loaded.statuses["pikachu"].state == "caught"
+    assert loaded.statuses["pikachu"].shiny is False
+
+
+def test_patch_caught_preserves_shiny_flag(tmp_path: Path) -> None:
+    repo = JsonProgressRepository(tmp_path / "p.json")
+    svc = ProgressService(repo)
+    svc.patch_status(ProgressStatusPatch(slug="pikachu", state="caught", shiny=True))
+    svc.patch_caught(ProgressPatch(slug="pikachu", caught=True))
+    loaded = repo.load()
+    assert loaded.statuses["pikachu"].state == "caught"
+    assert loaded.statuses["pikachu"].shiny is True
+
+
+def test_patch_status_cycle(tmp_path: Path) -> None:
+    repo = JsonProgressRepository(tmp_path / "p.json")
+    svc = ProgressService(repo)
+    r = svc.patch_status(ProgressStatusPatch(slug="bulbi", state="seen"))
+    assert isinstance(r, ProgressSaveResponse)
+    assert r.saved == 0
+    assert repo.load().statuses["bulbi"].state == "seen"
+
+    svc.patch_status(ProgressStatusPatch(slug="bulbi", state="caught", shiny=True))
+    loaded = repo.load()
+    assert loaded.statuses["bulbi"].state == "caught"
+    assert loaded.statuses["bulbi"].shiny is True
+    assert loaded.caught == {"bulbi": True}
+
+    svc.patch_status(ProgressStatusPatch(slug="bulbi", state="not_met"))
+    final = repo.load()
+    assert "bulbi" not in final.statuses
+    assert final.caught == {}
+
+
+def test_patch_status_shiny_ignored_for_seen(tmp_path: Path) -> None:
+    repo = JsonProgressRepository(tmp_path / "p.json")
+    svc = ProgressService(repo)
+    svc.patch_status(ProgressStatusPatch(slug="x", state="seen", shiny=True))
+    entry = repo.load().statuses["x"]
+    assert entry.state == "seen"
+    assert entry.shiny is False
+
+
+def test_patch_status_preserves_seen_at(tmp_path: Path) -> None:
+    repo = JsonProgressRepository(tmp_path / "p.json")
+    repo.save(
+        CollectionProgress(
+            statuses={
+                "pika": PokemonStatusEntry(
+                    state="seen", seen_at="2026-01-01T00:00:00+00:00"
+                ),
+            }
+        )
+    )
+    svc = ProgressService(repo)
+    svc.patch_status(ProgressStatusPatch(slug="pika", state="caught"))
+    entry = repo.load().statuses["pika"]
+    assert entry.state == "caught"
+    assert entry.seen_at == "2026-01-01T00:00:00+00:00"
+
+
+def test_patch_caught_removes_entry(tmp_path: Path) -> None:
+    repo = JsonProgressRepository(tmp_path / "p.json")
+    svc = ProgressService(repo)
+    svc.patch_status(ProgressStatusPatch(slug="foo", state="caught"))
+    svc.patch_caught(ProgressPatch(slug="foo", caught=False))
+    assert "foo" not in repo.load().statuses
 
 
 def test_normalize_caught_types() -> None:

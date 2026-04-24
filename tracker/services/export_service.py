@@ -60,7 +60,10 @@ class ExportService:
             progress_in = self._sanitize_progress(progress_in, allowed)
             placements_in = self._sanitize_placements(placements_in, allowed)
 
-        progress = CollectionProgress(caught=progress_in.caught)
+        progress = CollectionProgress(
+            caught=progress_in.caught,
+            statuses=progress_in.statuses,
+        )
         self._progress.save(progress)
 
         config = BinderConfigPayload(
@@ -253,8 +256,15 @@ class ExportService:
 
     @staticmethod
     def _sanitize_progress(progress: CollectionProgress, allowed: set[str]) -> CollectionProgress:
-        filtered = {k: bool(v) for k, v in progress.caught.items() if str(k) in allowed}
-        return CollectionProgress(caught=filtered)
+        filtered_caught = {
+            k: bool(v) for k, v in progress.caught.items() if str(k) in allowed
+        }
+        filtered_statuses = {
+            slug: entry
+            for slug, entry in progress.statuses.items()
+            if str(slug) in allowed
+        }
+        return CollectionProgress(caught=filtered_caught, statuses=filtered_statuses)
 
     @staticmethod
     def _sanitize_placements(

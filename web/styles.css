@@ -2475,10 +2475,44 @@ body {
   color: #00daf3;
 }
 
+#viewListe .grid .card-status-icon.is-seen {
+  background: rgba(255, 193, 7, 0.14);
+  color: #ffc107;
+}
+
 #viewListe .grid .card.is-caught {
   box-shadow:
     inset 0 0 0 1px rgba(0, 218, 243, 0.28),
     0 0 0 1px rgba(0, 218, 243, 0.12);
+}
+
+#viewListe .grid .card.is-seen {
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 193, 7, 0.28),
+    0 0 0 1px rgba(255, 193, 7, 0.10);
+}
+
+#viewListe .grid .card.is-shiny {
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 215, 0, 0.55),
+    0 0 12px rgba(255, 215, 0, 0.25);
+}
+
+#viewListe .grid .card.is-shiny .card-status-icon {
+  background: rgba(255, 215, 0, 0.18);
+  color: #ffd700;
+  animation: pokevault-shiny-pulse 2.8s ease-in-out infinite;
+}
+
+#viewListe .grid .card.is-shiny .card-name::after {
+  content: " ★";
+  color: #ffd700;
+  text-shadow: 0 0 6px rgba(255, 215, 0, 0.55);
+}
+
+@keyframes pokevault-shiny-pulse {
+  0%, 100% { filter: drop-shadow(0 0 0 rgba(255, 215, 0, 0)); }
+  50% { filter: drop-shadow(0 0 6px rgba(255, 215, 0, 0.7)); }
 }
 
 #viewListe .grid .card-check {

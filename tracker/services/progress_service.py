@@ -1,12 +1,16 @@
-"""Logique métier — progression attrapé / non attrapé."""
+"""Logique métier — progression attrapé / non attrapé (+ états enrichis F03)."""
 
 from __future__ import annotations
 
+from datetime import datetime, timezone
+
 from tracker.models import (
     CollectionProgress,
+    PokemonStatusEntry,
     ProgressPatch,
     ProgressPutBody,
     ProgressSaveResponse,
+    ProgressStatusPatch,
 )
 from tracker.repository.base import ProgressRepository
 
@@ -20,21 +24,48 @@ class ProgressService:
 
     def replace_caught(self, body: ProgressPutBody) -> ProgressSaveResponse:
         cleaned = _normalize_caught(body.caught)
-        to_store = CollectionProgress(caught=cleaned)
+        statuses = {slug: PokemonStatusEntry(state="caught") for slug in cleaned}
+        to_store = CollectionProgress(caught=cleaned, statuses=statuses)
         self._repository.save(to_store)
-        return ProgressSaveResponse(ok=True, saved=len(to_store.caught))
+        return ProgressSaveResponse(ok=True, saved=len(cleaned))
 
     def patch_caught(self, body: ProgressPatch) -> ProgressSaveResponse:
         current = self._repository.load()
-        caught = dict(current.caught)
+        statuses = dict(current.statuses)
         key = body.slug.strip()
         if body.caught:
-            caught[key] = True
+            prev = statuses.get(key)
+            shiny = bool(prev.shiny) if prev else False
+            seen_at = prev.seen_at if prev else _now_iso()
+            statuses[key] = PokemonStatusEntry(
+                state="caught",
+                shiny=shiny,
+                seen_at=seen_at,
+            )
         else:
-            caught.pop(key, None)
-        to_store = CollectionProgress(caught=caught)
+            statuses.pop(key, None)
+        to_store = CollectionProgress(statuses=statuses)
         self._repository.save(to_store)
-        return ProgressSaveResponse(ok=True, saved=len(to_store.caught))
+        return ProgressSaveResponse(ok=True, saved=_count_caught(statuses))
+
+    def patch_status(self, body: ProgressStatusPatch) -> ProgressSaveResponse:
+        current = self._repository.load()
+        statuses = dict(current.statuses)
+        key = body.slug.strip()
+        if body.state == "not_met":
+            statuses.pop(key, None)
+        else:
+            prev = statuses.get(key)
+            seen_at = prev.seen_at if prev and prev.seen_at else _now_iso()
+            shiny = body.shiny if body.state == "caught" else False
+            statuses[key] = PokemonStatusEntry(
+                state=body.state,
+                shiny=shiny,
+                seen_at=seen_at,
+            )
+        to_store = CollectionProgress(statuses=statuses)
+        self._repository.save(to_store)
+        return ProgressSaveResponse(ok=True, saved=_count_caught(statuses))
 
 
 _TRUTHY = {True, "1", "true", "True"}
@@ -49,3 +80,11 @@ def _normalize_caught(raw: dict[str, bool]) -> dict[str, bool]:
         if key and v in _TRUTHY:
             out[key] = True
     return out
+
+
+def _count_caught(statuses: dict[str, PokemonStatusEntry]) -> int:
+    return sum(1 for e in statuses.values() if e.state == "caught")
+
+
+def _now_iso() -> str:
+    return datetime.now(timezone.utc).isoformat()

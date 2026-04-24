@@ -68,7 +68,11 @@ def test_create_app_serves_static_and_api(tmp_path: Path) -> None:
     )
     client = TestClient(application)
     assert client.get("/api/progress").status_code == 200
-    assert client.get("/api/progress").json() == {"version": 1, "caught": {}}
+    assert client.get("/api/progress").json() == {
+        "version": 1,
+        "caught": {},
+        "statuses": {},
+    }
     assert client.get("/api/binder/config").status_code == 200
     assert client.get("/api/binder/config").json()["version"] == 1
     assert client.get("/api/binder/placements").status_code == 200

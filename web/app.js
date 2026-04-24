@@ -11,6 +11,13 @@ const FORM_FILTER_STORAGE_KEY = "pokedexFormFilter";
 const TYPE_FILTER_STORAGE_KEY = "pokedexTypeFilter";
 
 let allPokemon = [];
+/**
+ * Source of truth for the enriched Pokédex status (F03).
+ * Keys are Pokémon slugs. Absence means `not_met`.
+ * @type {Record<string, { state: "seen" | "caught"; shiny: boolean; seen_at?: string | null }>}
+ */
+let statusMap = Object.create(null);
+/** Derived mirror kept in sync with `statusMap` for legacy consumers. */
 let caughtMap = Object.create(null);
 let filterMode = "all";
 let regionFilter = "all";
@@ -85,9 +92,9 @@ function wireDimModeSelectsOnce() {
 async function getCollectionBootstrap() {
   if (collectionBootstrapPromise) return collectionBootstrapPromise;
   collectionBootstrapPromise = (async () => {
-    let fileCaught = {};
+    let progress = { caught: {}, statuses: {} };
     try {
-      fileCaught = await fetchProgressFile();
+      progress = await fetchProgressFile();
     } catch {
       const hint = document.getElementById("syncHint");
       if (hint) {
@@ -96,11 +103,7 @@ async function getCollectionBootstrap() {
         hint.hidden = false;
       }
     }
-    const rawCaught = fileCaught && typeof fileCaught === "object" ? fileCaught : {};
-    caughtMap = Object.create(null);
-    for (const [k, v] of Object.entries(rawCaught)) {
-      if (v) caughtMap[k] = true;
-    }
+    hydrateProgressMaps(progress);
 
     const dexRes = await fetch("/data/pokedex.json");
     const grid = document.getElementById("grid");
@@ -154,10 +157,10 @@ async function flushOfflineProgressQueue() {
   while (rest.length > 0) {
     const item = rest[0];
     try {
-      const res = await fetch(API_PROGRESS, {
+      const res = await fetch(endpointForQueueItem(item), {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ slug: item.slug, caught: item.caught }),
+        body: JSON.stringify(bodyForQueueItem(item)),
       });
       if (!res.ok) throw new Error(String(res.status));
       rest = rest.slice(1);
@@ -173,20 +176,31 @@ async function flushOfflineProgressQueue() {
   if (hint) hint.hidden = true;
 }
 
-async function persistCaughtPatch(slug, caught) {
+function endpointForQueueItem(item) {
+  return item && item.kind === "status" ? `${API_PROGRESS}/status` : API_PROGRESS;
+}
+
+function bodyForQueueItem(item) {
+  if (item && item.kind === "status") {
+    return { slug: item.slug, state: item.state, shiny: Boolean(item.shiny) };
+  }
+  return { slug: item.slug, caught: Boolean(item.caught) };
+}
+
+async function persistStatusPatch(slug, state, shiny) {
   const hint = document.getElementById("syncHint");
   try {
-    const res = await fetch(API_PROGRESS, {
+    const res = await fetch(`${API_PROGRESS}/status`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ slug, caught }),
+      body: JSON.stringify({ slug, state, shiny: Boolean(shiny) }),
     });
     if (!res.ok) throw new Error(String(res.status));
     await flushOfflineProgressQueue();
     if (hint) hint.hidden = true;
   } catch {
     const q = loadProgressQueue();
-    q.push({ slug, caught, ts: Date.now() });
+    q.push({ kind: "status", slug, state, shiny: Boolean(shiny), ts: Date.now() });
     saveProgressQueue(q);
     if (hint) {
       hint.textContent = "Hors ligne ou serveur indisponible — synchro différée.";
@@ -195,18 +209,103 @@ async function persistCaughtPatch(slug, caught) {
   }
 }
 
-function toggleCaughtBySlug(slug) {
+/**
+ * @param {{ caught?: Record<string, unknown>; statuses?: Record<string, unknown> }} payload
+ */
+function hydrateProgressMaps(payload) {
+  statusMap = Object.create(null);
+  caughtMap = Object.create(null);
+  const statuses = payload && typeof payload.statuses === "object" ? payload.statuses : null;
+  if (statuses) {
+    for (const [slug, raw] of Object.entries(statuses)) {
+      if (!slug || !raw || typeof raw !== "object") continue;
+      const state = raw.state === "seen" || raw.state === "caught" ? raw.state : null;
+      if (!state) continue;
+      const shiny = state === "caught" && Boolean(raw.shiny);
+      const seenAt = typeof raw.seen_at === "string" ? raw.seen_at : null;
+      statusMap[slug] = { state, shiny, seen_at: seenAt };
+      if (state === "caught") caughtMap[slug] = true;
+    }
+    return;
+  }
+  const rawCaught = payload && typeof payload.caught === "object" ? payload.caught : {};
+  for (const [k, v] of Object.entries(rawCaught)) {
+    if (!v) continue;
+    statusMap[k] = { state: "caught", shiny: false, seen_at: null };
+    caughtMap[k] = true;
+  }
+}
+
+/** @returns {{ state: "not_met" | "seen" | "caught"; shiny: boolean }} */
+function getStatus(slug) {
+  const s = statusMap[slug];
+  if (!s) return { state: "not_met", shiny: false };
+  return { state: s.state, shiny: Boolean(s.shiny) };
+}
+
+/**
+ * Persists a status change for a slug and broadcasts to listeners.
+ * Passing `state: "not_met"` removes the entry.
+ *
+ * @param {string} slug
+ * @param {"not_met" | "seen" | "caught"} state
+ * @param {boolean} [shiny]
+ */
+function setStatus(slug, state, shiny = false) {
   if (!slug) return;
-  const willCatch = !caughtMap[slug];
-  if (willCatch) caughtMap[slug] = true;
-  else delete caughtMap[slug];
-  void persistCaughtPatch(slug, willCatch);
+  const effectiveShiny = state === "caught" ? Boolean(shiny) : false;
+  if (state === "not_met") {
+    delete statusMap[slug];
+    delete caughtMap[slug];
+  } else {
+    const prev = statusMap[slug];
+    const seenAt = prev?.seen_at || new Date().toISOString();
+    statusMap[slug] = { state, shiny: effectiveShiny, seen_at: seenAt };
+    if (state === "caught") caughtMap[slug] = true;
+    else delete caughtMap[slug];
+  }
+  void persistStatusPatch(slug, state, effectiveShiny);
   for (const cb of caughtUiListeners) {
     try {
       cb();
     } catch {
       /* ignore */
     }
+  }
+}
+
+/**
+ * F03 cycle : not_met → seen → caught → not_met.
+ * `shiftPressed` shortcuts to/toggles the shiny flag.
+ *
+ * @param {string} slug
+ * @param {{ shift?: boolean }} [opts]
+ */
+function cycleStatusBySlug(slug, opts) {
+  if (!slug) return;
+  const shift = Boolean(opts?.shift);
+  const current = getStatus(slug);
+  if (shift) {
+    if (current.state === "caught") {
+      setStatus(slug, "caught", !current.shiny);
+    } else {
+      setStatus(slug, "caught", true);
+    }
+    return;
+  }
+  if (current.state === "not_met") setStatus(slug, "seen");
+  else if (current.state === "seen") setStatus(slug, "caught");
+  else setStatus(slug, "not_met");
+}
+
+/** Legacy helper kept for binder/stats: toggles the `caught` bit only. */
+function toggleCaughtBySlug(slug) {
+  if (!slug) return;
+  const current = getStatus(slug);
+  if (current.state === "caught") {
+    setStatus(slug, "not_met");
+  } else {
+    setStatus(slug, "caught", current.shiny);
   }
 }
 
@@ -262,6 +361,12 @@ window.PokedexCollection = {
     return () => caughtUiListeners.delete(cb);
   },
   toggleCaughtBySlug,
+  getStatus,
+  setStatus,
+  cycleStatusBySlug,
+  get statusMap() {
+    return statusMap;
+  },
   getDimMode,
   setDimMode,
   subscribeDimMode,
@@ -326,7 +431,10 @@ async function fetchProgressFile() {
   const res = await fetch(API_PROGRESS);
   if (!res.ok) throw new Error(`progress ${res.status}`);
   const data = await res.json();
-  return data.caught && typeof data.caught === "object" ? data.caught : {};
+  return {
+    caught: data && typeof data.caught === "object" ? data.caught : {},
+    statuses: data && typeof data.statuses === "object" ? data.statuses : {},
+  };
 }
 
 function normalizeSearchToken(s) {
@@ -908,20 +1016,32 @@ function createPokemonCard(p, opts) {
   }
 
   const key = pokemonKey(p);
-  const caught = Boolean(caughtMap[key]);
+  const status = getStatus(key);
+  const caught = status.state === "caught";
+  const seen = status.state === "seen";
+  const shiny = caught && status.shiny;
   const dim = getDimMode();
 
   const card = document.createElement("button");
   card.type = "button";
-  card.className = `card${caught ? " is-caught" : ""}`;
+  const classParts = ["card"];
+  if (caught) classParts.push("is-caught");
+  if (seen) classParts.push("is-seen");
+  if (shiny) classParts.push("is-shiny");
+  card.className = classParts.join(" ");
   if ((dim === "caught" && caught) || (dim === "missing" && !caught)) {
     card.classList.add("is-dimmed");
   }
   card.dataset.slug = key;
+  card.dataset.status = status.state;
+  if (shiny) card.dataset.shiny = "1";
   card.setAttribute("aria-pressed", caught ? "true" : "false");
+  const stateLabel = caught
+    ? shiny ? ", attrapé shiny" : ", attrapé"
+    : seen ? ", aperçu" : ", non rencontré";
   card.setAttribute(
     "aria-label",
-    `${displayName(p)} ${displayNumber(p.number)}${caught ? ", attrapé" : ", manquant"}`,
+    `${displayName(p)} ${displayNumber(p.number)}${stateLabel}`,
   );
 
   const top = document.createElement("div");
@@ -929,11 +1049,16 @@ function createPokemonCard(p, opts) {
   const numEl = document.createElement("div");
   numEl.className = "card-num";
   numEl.textContent = displayNumber(p.number);
-  const status = document.createElement("span");
-  status.className = `card-status-icon ${caught ? "is-caught" : "is-missing"}`;
-  status.textContent = caught ? "check_circle" : "radio_button_unchecked";
-  status.setAttribute("aria-hidden", "true");
-  top.append(numEl, status);
+  const statusIcon = document.createElement("span");
+  const statusClass = caught ? "is-caught" : seen ? "is-seen" : "is-missing";
+  statusIcon.className = `card-status-icon ${statusClass}`;
+  statusIcon.textContent = caught
+    ? (shiny ? "auto_awesome" : "check_circle")
+    : seen
+      ? "visibility"
+      : "radio_button_unchecked";
+  statusIcon.setAttribute("aria-hidden", "true");
+  top.append(numEl, statusIcon);
   card.append(top);
 
   const imgWrap = document.createElement("div");
@@ -994,11 +1119,16 @@ function createPokemonCard(p, opts) {
 
   const action = document.createElement("div");
   action.className = "card-action";
-  action.textContent = caught ? "Retirer de la collection" : "Marquer comme attrapé";
+  const actionLabel = caught
+    ? shiny ? "Shiny — clic pour retirer" : "Attrapé — clic pour retirer"
+    : seen
+      ? "Aperçu — clic pour marquer attrapé"
+      : "Clic pour marquer aperçu";
+  action.textContent = actionLabel;
   card.append(action);
 
-  card.addEventListener("click", () => {
-    toggleCaughtBySlug(key);
+  card.addEventListener("click", (event) => {
+    cycleStatusBySlug(key, { shift: event.shiftKey });
   });
 
   return card;

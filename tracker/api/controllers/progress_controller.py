@@ -7,7 +7,13 @@ from typing import Annotated
 from fastapi import APIRouter, Depends
 
 from tracker.api.dependencies import get_progress_service
-from tracker.models import CollectionProgress, ProgressPatch, ProgressPutBody, ProgressSaveResponse
+from tracker.models import (
+    CollectionProgress,
+    ProgressPatch,
+    ProgressPutBody,
+    ProgressSaveResponse,
+    ProgressStatusPatch,
+)
 from tracker.services.progress_service import ProgressService
 
 router = APIRouter(prefix="/api", tags=["progress"])
@@ -34,3 +40,11 @@ def patch_progress(
     service: Annotated[ProgressService, Depends(get_progress_service)],
 ) -> ProgressSaveResponse:
     return service.patch_caught(body)
+
+
+@router.patch("/progress/status", response_model=ProgressSaveResponse)
+def patch_progress_status(
+    body: ProgressStatusPatch,
+    service: Annotated[ProgressService, Depends(get_progress_service)],
+) -> ProgressSaveResponse:
+    return service.patch_status(body)
