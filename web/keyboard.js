@@ -8,6 +8,7 @@
  *   k    move keyboard focus to previous visible card
  *   c    cycle status (not_met → seen → caught → not_met) on focused card
  *   C    toggle shiny (or jump to caught-shiny) on focused card
+ *   i    open the Pokémon drawer (F02) for the focused card
  *   ?    open the shortcuts help dialog
  *
  * Shortcuts are disabled whenever the user is typing in a text input,
@@ -202,6 +203,16 @@
       case "C":
         e.preventDefault();
         cycleStatusOnFocus(true);
+        return;
+      case "i":
+      case "I":
+        e.preventDefault();
+        if (currentFocusSlug && window.PokevaultDrawer?.open) {
+          const trigger = document
+            .getElementById("grid")
+            ?.querySelector(`.card[data-slug="${currentFocusSlug}"]`);
+          window.PokevaultDrawer.open(currentFocusSlug, trigger || null);
+        }
         return;
       default:
         return;

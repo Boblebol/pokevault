@@ -1271,6 +1271,19 @@ function createPokemonCard(p, opts) {
   action.textContent = actionLabel;
   card.append(action);
 
+  const details = document.createElement("span");
+  details.className = "card-details";
+  details.textContent = "Fiche & cartes";
+  details.setAttribute("role", "button");
+  details.setAttribute("tabindex", "-1");
+  details.setAttribute("aria-label", `Ouvrir la fiche de ${displayName(p)}`);
+  details.addEventListener("click", (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    window.PokevaultDrawer?.open(key, card);
+  });
+  card.append(details);
+
   card.addEventListener("click", (event) => {
     cycleStatusBySlug(key, { shift: event.shiftKey });
   });

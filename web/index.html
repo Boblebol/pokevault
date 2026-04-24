@@ -535,6 +535,7 @@
           <li><kbd>c</kbd><span>Cycle : non vu → aperçu → attrapé → non vu</span></li>
           <li><kbd>Shift</kbd>+<kbd>C</kbd><span>Active / désactive le shiny (attrape si besoin)</span></li>
           <li><kbd>Shift</kbd>+clic<span>Raccourci shiny à la souris</span></li>
+          <li><kbd>i</kbd><span>Ouvre la fiche complète (drawer « Mes cartes »)</span></li>
           <li><kbd>?</kbd><span>Ouvre cette aide</span></li>
         </ul>
         <p class="kb-help__hint">
@@ -544,9 +545,38 @@
       </form>
     </dialog>
 
+    <div
+      id="pokemonDrawer"
+      class="drawer"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="pokemonDrawerTitle"
+      hidden
+    >
+      <div class="drawer__scrim" aria-hidden="true"></div>
+      <aside class="drawer__panel" tabindex="-1">
+        <header class="drawer__topbar">
+          <span class="drawer__kicker">Fiche Pokédex</span>
+          <button
+            type="button"
+            class="drawer__close"
+            id="pokemonDrawerClose"
+            aria-label="Fermer la fiche"
+          >×</button>
+        </header>
+        <div class="drawer__content" id="pokemonDrawerContent"></div>
+        <p
+          class="drawer__status-message"
+          id="pokemonDrawerStatus"
+          aria-live="polite"
+        ></p>
+      </aside>
+    </div>
+
     <script src="/empty-states.js" defer></script>
     <script src="/keyboard.js" defer></script>
     <script src="/onboarding.js" defer></script>
+    <script src="/pokemon-drawer.js" defer></script>
     <script src="/binder-v2.js" defer></script>
     <script src="/app.js" defer></script>
     <script src="/binder-collection-view.js" defer></script>
