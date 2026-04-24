@@ -12,6 +12,41 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 - Public product roadmap in [docs/ROADMAP.md](docs/ROADMAP.md): 16 RICE-scored
   features organised in 4 delivery waves (Polish J1, Activation, Card Layer,
   Delights), each with user story, acceptance criteria and tech notes.
+- **Wave 3 · Layer Cartes** shipped:
+  - **F08** Card data model — a new versioned `data/collection-cards.json`
+    user-state file (gitignored) stores TCG cards per Pokémon with fields
+    `{id (uuid), pokemon_slug, set_id, num, variant, lang, condition, qty,
+    acquired_at, note}`. New `Card`, `CardCreate`, `CardUpdate`, `CardList`
+    Pydantic models; dedicated `JsonCardRepository`; REST endpoints
+    `GET/POST/PUT/DELETE /api/cards`, `GET /api/cards/by-pokemon/{slug}`,
+    `GET/PUT/DELETE /api/cards/{card_id}`. Export / Import payloads are now
+    `schema_version: 2` and carry the `cards` array; v1 backups keep
+    importing with an empty cards list (backward compatible).
+  - **F09** Auto-derivation `caught ← cards` — creating the first card for a
+    slug promotes its Pokédex status to `caught` without overwriting any
+    existing `shiny` flag. Deleting the last card never rewinds the status
+    (user intent wins). Wired through `ProgressService.ensure_caught()`
+    called from `CardService.create()` and `CardService.update()` when the
+    slug changes.
+  - **F02** Drawer « Mes cartes » — right-side `<dialog>` (420 px) slides
+    from the right on « Fiche & cartes » tile-hover button or `i` keyboard
+    shortcut. Shows sprite · number · FR/EN/JA names · types · region ·
+    status shortcuts, the live list of owned cards with inline delete, and
+    a mini-form `+ Ajouter une carte` (POST to `/api/cards`). Accessible
+    focus trap, `aria-labelledby`, `role=dialog`, closes on `Esc` or scrim
+    click. Deep-linked via `#/liste?slug=<slug>`.
+  - **F10** Fiche complète Pokédex (full screen) — new route
+    `#/pokemon/:slug` opens a dedicated page with hero (artwork, national
+    number, FR/EN/JA names, form, region, types), defensive type chart
+    (faiblesses · résistances · immunités computed from a static 18×18
+    matrix in `web/type-chart.js`), other forms sharing the same national
+    number (clickable tiles), and the list of cards for that slug. Status
+    shortcut and shiny toggle re-render in place. Reachable from the
+    drawer via a « Voir fiche complète → » CTA.
+  - Backend test suite now ships 367 passing tests at 100% coverage on the
+    `tracker/` module, including 3 new modules (`test_json_card_repository`,
+    `test_card_service`, `test_card_api`) plus updated export-service
+    fixtures for the v2 schema.
 - **Wave 2 · Activation & Pokédex identity** shipped:
   - **F03** Enriched Pokédex status — the legacy `caught: bool` dict
     keeps working as a derived mirror while the new source of truth is

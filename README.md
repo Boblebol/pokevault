@@ -67,13 +67,43 @@
 - **Fuzzy search** (tolerates accents and typos) on name, number,
   slug and types.
 - Keyboard shortcuts: `/` focus search, `Esc` clears, `j`/`k` move,
-  `c` cycle status, `Shift+C` toggle shiny, `?` open help.
+  `c` cycle status, `Shift+C` toggle shiny, `i` open the fiche drawer,
+  `?` open help.
 - Narrative empty states when filters match nothing.
-- Global counter, progress bar, and a secondary "cartes catalogu\u00e9es"
-  line (lights up with roadmap F08).
+- Global counter, progress bar, and a live « cartes catalogu\u00e9es »
+  line fed by F08 (`N cartes dans K sets`).
 - **First-run onboarding wizard** (F00) — 3-step dialog capturing your
   collector profile (dex / hybrid / card) and starting preferences;
   re-launchable from Réglages → Profil.
+
+### Web UI — Pokémon drawer (F02)
+
+- Right-side `<dialog>` (420 px) opened from any tile via the
+  « Fiche & cartes » button (visible on hover/focus) or the `i`
+  keyboard shortcut. Deep-linked through `#/liste?slug=<slug>`.
+- Shows the Pokédex identity (sprite, number, FR / EN / JA names,
+  form, types, region), the enriched status shortcut (cycle
+  not\_met → seen → caught + shiny toggle), and the live list of
+  owned cards with inline delete.
+- `+ Ajouter une carte` mini-form captures set / number / variant /
+  language / condition / quantity / optional note; the first card
+  auto-promotes the Pokédex status to `caught` (F09).
+- Accessible: focus trap, `role=dialog`, closes on `Esc` or scrim
+  click, and exposes a « Voir fiche complète → » CTA.
+
+### Web UI — Fiche complète Pokédex (F10)
+
+- Dedicated route `#/pokemon/:slug` rendered full screen.
+- Hero block with official artwork, national number, multilingual
+  names (FR / EN / JA), form label, region and type badges.
+- Defensive type chart computed from a static 18×18 matrix in
+  `web/type-chart.js`: Faiblesses · Résistances · Immunités with
+  exact multipliers (`¼×`, `½×`, `2×`, `4×`, `0×`).
+- « Autres formes » grid: clickable tiles for every entry sharing
+  the same national number.
+- « Mes cartes » table fed by `GET /api/cards/by-pokemon/{slug}`.
+- Status shortcuts re-render in place on click; browser back keeps
+  the grid scroll position.
 
 ### Web UI — Binder View (`#/classeur`)
 
@@ -106,12 +136,15 @@
 |-----------------------------------|-----------------|--------------------------------|
 | `/api/progress`                   | GET / PUT / PATCH | Collection progress (legacy bool + enriched statuses) |
 | `/api/progress/status`            | PATCH           | F03 — enriched status (state, shiny) |
+| `/api/cards`                      | GET / POST      | F08 — list / create TCG cards  |
+| `/api/cards/{id}`                 | GET / PUT / DELETE | F08 — manage a single card  |
+| `/api/cards/by-pokemon/{slug}`    | GET             | F08 — cards for a Pokédex slug |
 | `/api/binder`                     | GET             | List binders                   |
 | `/api/binder/{id}`                | GET / PUT / DELETE | Manage a binder             |
 | `/api/binder/config`              | GET / PUT       | Binder configuration           |
 | `/api/binder/placements`          | GET / PUT       | Binder placements              |
-| `/api/export`                     | GET             | Full backup export (JSON)      |
-| `/api/import`                     | POST            | Full backup restore (JSON)     |
+| `/api/export`                     | GET             | Full backup export (JSON, v2)  |
+| `/api/import`                     | POST            | Full backup restore (v1 or v2) |
 | `/api/health`                     | GET             | Liveness probe                 |
 | `/data/pokedex.json`              | GET             | Pokédex data                   |
 | `/data/narrative-tags.json`       | GET             | Narrative tags (Starter, Légendaire, …) |

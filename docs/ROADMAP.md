@@ -60,7 +60,7 @@ Sorted by RICE descending. Tone/wave column drives the delivery plan below.
 |---------------------|---------:|------------------------------|--------------------------------------------------|
 | **V1 · Polish J1** ✅ | ~1 week  | F07 · F04 · F01 · F06       | App feels alive with zero structural change      |
 | **V2 · Activation** ✅ | ~2 weeks | F00 · F03 · F05             | First run is scripted, grid tells a story        |
-| **V3 · Layer Cartes** | ~3 weeks | F08 · F09 · F02 · F10      | Drawer + full-screen page, cards as opt-in layer |
+| **V3 · Layer Cartes** ✅ | ~3 weeks | F08 · F09 · F02 · F10      | Drawer + full-screen page, cards as opt-in layer |
 | **V4 · Délices**    | ~3 weeks | F11 · F12 · F15 · F14 · F13  | Full Pokédex identity, multi-profile, polish     |
 
 Each wave can be tagged `v0.2`, `v0.3`, `v0.4`, `v1.0` on GitHub Releases.
@@ -256,10 +256,18 @@ Adds a `narrative_tags: list[str]` column on the Pokedex model.
 
 ---
 
-# Wave 3 — Layer Cartes (data foundation)
+# Wave 3 — Layer Cartes (data foundation) ✅
 
 **Goal.** 15 person-days. Card pivot without breaking the Pokédex. F08 is
 the anchor: keep the Card schema locked before writing anything downstream.
+
+**Status.** ✅ **Shipped.** F08 locked the `Card` schema and the
+`schema_version: 2` export payload (v1 backups keep importing). F09 hooks
+into `CardService.create/update` via `ProgressService.ensure_caught`. F02
+ships the right-side drawer with inline CRUD. F10 delivers the full-screen
+`#/pokemon/:slug` route with a static 18×18 type chart
+(`web/type-chart.js`), the « Autres formes » grid, and the owned-cards
+table. Tracker coverage: **100 % on 367 tests**.
 
 ## F08 — Modèle de données Carte
 
