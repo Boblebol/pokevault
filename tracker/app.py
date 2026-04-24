@@ -6,7 +6,13 @@ from fastapi import FastAPI, HTTPException
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
-from tracker.api.controllers import binder_router, export_router, health_router, progress_router
+from tracker.api.controllers import (
+    binder_router,
+    card_router,
+    export_router,
+    health_router,
+    progress_router,
+)
 from tracker.config import TrackerSettings, get_settings
 
 
@@ -20,6 +26,7 @@ def create_app(settings: TrackerSettings | None = None) -> FastAPI:
 
     app.include_router(progress_router)
     app.include_router(binder_router)
+    app.include_router(card_router)
     app.include_router(export_router)
     app.include_router(health_router)
 

@@ -17,6 +17,7 @@ from tracker.repository.json_binder_config_repository import JsonBinderConfigRep
 from tracker.repository.json_binder_placements_repository import (
     JsonBinderPlacementsRepository,
 )
+from tracker.repository.json_card_repository import JsonCardRepository
 from tracker.repository.json_progress_repository import JsonProgressRepository
 from tracker.services.export_service import ExportService
 from tracker.services.progress_service import ProgressService
@@ -138,29 +139,31 @@ def test_effective_rule_fallback_paths(tmp_path: Path) -> None:
 def test_load_pokedex_rows_variants(tmp_path: Path) -> None:
     import json as _json
 
-    missing = ExportService(None, None, None, tmp_path / "absent.json")  # type: ignore[arg-type]
-    assert missing._load_pokedex_rows() == []
+    def _svc(path: Path) -> ExportService:
+        return ExportService(
+            None,  # type: ignore[arg-type]
+            None,  # type: ignore[arg-type]
+            None,  # type: ignore[arg-type]
+            pokedex_path=path,
+        )
+
+    assert _svc(tmp_path / "absent.json")._load_pokedex_rows() == []
 
     broken = tmp_path / "broken.json"
     broken.write_text("{not json", encoding="utf-8")
-    svc_broken = ExportService(None, None, None, broken)  # type: ignore[arg-type]
-    assert svc_broken._load_pokedex_rows() == []
+    assert _svc(broken)._load_pokedex_rows() == []
 
     as_list = tmp_path / "list.json"
     as_list.write_text(_json.dumps([{"slug": "a"}, "bad"]), encoding="utf-8")
-    assert ExportService(None, None, None, as_list)._load_pokedex_rows() == [  # type: ignore[arg-type]
-        {"slug": "a"}
-    ]
+    assert _svc(as_list)._load_pokedex_rows() == [{"slug": "a"}]
 
     as_wrapped = tmp_path / "wrapped.json"
     as_wrapped.write_text(_json.dumps({"pokemon": [{"slug": "b"}]}), encoding="utf-8")
-    assert ExportService(None, None, None, as_wrapped)._load_pokedex_rows() == [  # type: ignore[arg-type]
-        {"slug": "b"}
-    ]
+    assert _svc(as_wrapped)._load_pokedex_rows() == [{"slug": "b"}]
 
     as_weird = tmp_path / "weird.json"
     as_weird.write_text(_json.dumps({"other": 1}), encoding="utf-8")
-    assert ExportService(None, None, None, as_weird)._load_pokedex_rows() == []  # type: ignore[arg-type]
+    assert _svc(as_weird)._load_pokedex_rows() == []
 
 
 def test_sanitize_placements_ignores_non_dict_slots() -> None:
@@ -191,12 +194,20 @@ def _setup(tmp_path: Path, pokedex_rows: list[dict] | None = None) -> TestClient
     progress_repo = JsonProgressRepository(prog)
     config_repo = JsonBinderConfigRepository(cfg)
     placements_repo = JsonBinderPlacementsRepository(pl)
+    cards_path = tmp_path / "data" / "collection-cards.json"
+    card_repo = JsonCardRepository(cards_path)
 
     def progress_override() -> ProgressService:
         return ProgressService(progress_repo)
 
     def export_override() -> ExportService:
-        return ExportService(progress_repo, config_repo, placements_repo, pokedex)
+        return ExportService(
+            progress_repo,
+            config_repo,
+            placements_repo,
+            card_repo,
+            pokedex_path=pokedex,
+        )
 
     app = FastAPI()
     app.include_router(progress_router)
@@ -211,12 +222,13 @@ def test_export_empty_collection(tmp_path: Path) -> None:
     r = client.get("/api/export")
     assert r.status_code == 200
     data = r.json()
-    assert data["schema_version"] == 1
+    assert data["schema_version"] == 2
     assert data["app"] == "pokevault"
     assert "exported_at" in data
     assert data["progress"]["caught"] == {}
     assert data["binder_config"]["binders"] == []
     assert data["binder_placements"]["by_binder"] == {}
+    assert data["cards"] == []
 
 
 def test_export_with_data(tmp_path: Path) -> None:
@@ -279,6 +291,27 @@ def test_import_overwrites_existing(tmp_path: Path) -> None:
     exported = client.get("/api/export").json()
     assert exported["progress"]["caught"] == {"new-pokemon": True}
     assert "old-pokemon" not in exported["progress"]["caught"]
+
+
+def test_import_accepts_v1_legacy_payload(tmp_path: Path) -> None:
+    """Schema v1 (pre-F08, no cards) remains importable for backward compat."""
+    client = _setup(tmp_path)
+    payload = {
+        "schema_version": 1,
+        "progress": {"version": 1, "caught": {"pichu": True}},
+        "binder_config": {
+            "version": 1,
+            "convention": "sheet_recto_verso",
+            "binders": [],
+            "form_rules": [],
+        },
+        "binder_placements": {"version": 1, "by_binder": {}},
+    }
+    r = client.post("/api/import", json=payload)
+    assert r.status_code == 200
+    body = r.json()
+    assert body["caught_count"] == 1
+    assert body["card_count"] == 0
 
 
 def test_import_rejects_bad_schema_version(tmp_path: Path) -> None:

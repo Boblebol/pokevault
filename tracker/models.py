@@ -85,30 +85,108 @@ class BinderRestPutBody(BaseModel):
     form_rule: dict[str, Any] | None = None
 
 
-class ExportPayload(BaseModel):
-    """Full collection export — wraps progress + binder config + placements."""
+CardCondition = Literal["mint", "near_mint", "excellent", "good", "played", "poor"]
+"""Known card conditions — UI uses this list to populate the dropdown."""
+
+
+class Card(BaseModel):
+    """Physical TCG card tied to a Pokédex slug (roadmap F08).
+
+    All fields except ``id`` and timestamps are free text; the service
+    layer is responsible for trimming and basic sanity checks. ``id``
+    is a server-generated UUID so clients can POST without one.
+    """
 
     model_config = ConfigDict(extra="forbid")
 
-    schema_version: Literal[1] = 1
+    id: str = Field(min_length=1)
+    pokemon_slug: str = Field(min_length=1)
+    set_id: str = ""
+    num: str = ""
+    variant: str = ""
+    lang: str = ""
+    condition: CardCondition = "near_mint"
+    qty: int = Field(default=1, ge=1)
+    acquired_at: str | None = Field(default=None)
+    note: str = ""
+    created_at: str
+    updated_at: str
+
+
+class CardCreate(BaseModel):
+    """POST /api/cards — server generates id + timestamps."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    pokemon_slug: str = Field(min_length=1)
+    set_id: str = ""
+    num: str = ""
+    variant: str = ""
+    lang: str = ""
+    condition: CardCondition = "near_mint"
+    qty: int = Field(default=1, ge=1)
+    acquired_at: str | None = Field(default=None)
+    note: str = ""
+
+
+class CardUpdate(BaseModel):
+    """PUT /api/cards/{id} — full replacement, id/timestamps preserved."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    pokemon_slug: str = Field(min_length=1)
+    set_id: str = ""
+    num: str = ""
+    variant: str = ""
+    lang: str = ""
+    condition: CardCondition = "near_mint"
+    qty: int = Field(default=1, ge=1)
+    acquired_at: str | None = Field(default=None)
+    note: str = ""
+
+
+class CardList(BaseModel):
+    """Persisted shape of ``data/collection-cards.json``."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    version: Literal[1] = 1
+    cards: list[Card] = Field(default_factory=list)
+
+
+class CardDeleteResponse(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    ok: bool = True
+    deleted: int = Field(ge=0)
+
+
+class ExportPayload(BaseModel):
+    """Full collection export — wraps progress + binder config + placements + cards."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    schema_version: Literal[2] = 2
     app: str = "pokevault"
     exported_at: str
     progress: CollectionProgress
     binder_config: BinderConfigPayload
     binder_placements: BinderPlacementsPayload
+    cards: list[Card] = Field(default_factory=list)
 
 
 class ImportPayload(BaseModel):
-    """Incoming import — same shape as ExportPayload."""
+    """Incoming import — accepts both schema v1 (legacy, no cards) and v2."""
 
     model_config = ConfigDict(extra="forbid")
 
-    schema_version: Literal[1]
+    schema_version: Literal[1, 2]
     app: str | None = None
     exported_at: str | None = None
     progress: CollectionProgress
     binder_config: BinderConfigPayload
     binder_placements: BinderPlacementsPayload
+    cards: list[Card] = Field(default_factory=list)
 
 
 class ImportResponse(BaseModel):
@@ -117,3 +195,4 @@ class ImportResponse(BaseModel):
     ok: bool = True
     caught_count: int = Field(ge=0)
     binder_count: int = Field(ge=0)
+    card_count: int = Field(default=0, ge=0)

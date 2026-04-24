@@ -49,6 +49,11 @@ class TrackerSettings(BaseSettings):
     def pokedex_path(self) -> Path:
         return self.data_dir / "pokedex.json"
 
+    @property
+    def cards_path(self) -> Path:
+        """F08 — carnet de cartes TCG physiques (user state)."""
+        return self.data_dir / "collection-cards.json"
+
 
 @lru_cache
 def get_settings() -> TrackerSettings:
