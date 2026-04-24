@@ -12,6 +12,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 - Public product roadmap in [docs/ROADMAP.md](docs/ROADMAP.md): 16 RICE-scored
   features organised in 4 delivery waves (Polish J1, Activation, Card Layer,
   Delights), each with user story, acceptance criteria and tech notes.
+- **Wave 1 · Polish J1** kickoff:
+  - **F07** Narrative empty states across list, stats, print and binder
+    views, centralised in `web/empty-states.js`.
+  - **F04** One-click regional Pokédex chips above the list grid, with
+    deep-linking via `#/liste?region=<id>`. The filter state is now
+    shareable and bookmarkable.
+  - **F01** Secondary progression line: `N cartes dans K sets`, visible
+    from the list hero and the stats view. Contract-first — currently
+    dormant, will light up with F08 (card data model).
+  - **F06** Fuzzy search (diacritic-insensitive + Levenshtein up to 2)
+    now also indexes types and unpadded numbers (e.g. `dracau` finds
+    Dracaufeu, `charmel` finds Charméléon). New keyboard shortcuts
+    (`/`, `Esc`, `j`/`k`, `c`, `?`) with a native `<dialog>` help
+    panel, plus a discreet "?" affordance in the progress row.
 - Full collection backup API:
   - `GET /api/export` exports progress + binder config + binder placements.
   - `POST /api/import` restores the same payload in one operation.

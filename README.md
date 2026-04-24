@@ -57,8 +57,15 @@
 
 - Visual Pokédex grid.
 - Click to mark **caught / missing**.
-- Status filters, dynamic search (name, number, slug).
-- Global counter and progress bar.
+- Status filters, **regional dex chips** with deep-linking
+  (`#/liste?region=johto`).
+- **Fuzzy search** (tolerates accents and typos) on name, number,
+  slug and types.
+- Keyboard shortcuts: `/` focus search, `Esc` clears, `j`/`k` move,
+  `c` catch, `?` open help.
+- Narrative empty states when filters match nothing.
+- Global counter, progress bar, and a secondary "cartes catalogu\u00e9es"
+  line (lights up with roadmap F08).
 
 ### Web UI — Binder View (`#/classeur`)
 
@@ -315,8 +322,10 @@ for the full 16-feature plan organised in 4 delivery waves (V1 Polish,
 V2 Activation, V3 Card Layer, V4 Delights). Each entry ships with a
 user story, acceptance criteria, tech notes and dependencies.
 
-Current focus: **Wave 1 — Polish immédiat** (empty states, regional chips,
-multi-level progression, keyboard shortcuts & fuzzy search).
+Current focus: **Wave 1 — Polish immédiat** — ✅ complete. See the
+[Unreleased](CHANGELOG.md) section for the full list of shipped items
+(F07 · F04 · F01 · F06). Next up: **Wave 2 — Activation** (onboarding
+wizard, enriched Pokédex states, narrative filters).
 
 ---
 
