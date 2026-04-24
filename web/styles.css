@@ -4657,3 +4657,69 @@ html[data-theme="paldea"] {
   flex-direction: column;
   gap: 6px;
 }
+
+/* ── F14 · Impression « Pokédex de poche » ─────────────────────── */
+
+.print-output.is-pocket {
+  --pocket-gap: 4px;
+}
+
+.print-section--pocket {
+  page-break-after: always;
+  break-after: page;
+  padding: 16px;
+}
+
+.print-table--pocket {
+  width: 100%;
+  font-size: 0.82rem;
+  border-collapse: collapse;
+}
+
+.print-table--pocket th,
+.print-table--pocket td {
+  border-bottom: 1px solid rgba(18, 20, 36, 0.15);
+  padding: 4px 6px;
+  text-align: left;
+}
+
+.print-table--pocket th {
+  font-weight: 700;
+  font-size: 0.7rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.print-table--pocket td.print-note-col {
+  min-width: 40%;
+}
+
+@media print {
+  .print-output.is-pocket {
+    background: #fff;
+  }
+
+  .print-output.is-pocket .print-section--pocket {
+    color: #000;
+    padding: 0;
+  }
+
+  .print-output.is-pocket .print-table--pocket th,
+  .print-output.is-pocket .print-table--pocket td {
+    border-bottom: 1px solid #000;
+  }
+
+  .print-output.is-pocket .print-table--pocket tbody tr {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  @page pocket {
+    size: A5;
+    margin: 10mm;
+  }
+
+  .print-output.is-pocket {
+    page: pocket;
+  }
+}

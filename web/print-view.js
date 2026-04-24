@@ -218,7 +218,23 @@ function renderPrintView() {
 
   let sectionIdx = 0;
 
-  if (groupMode === "region") {
+  output.classList.toggle("is-pocket", groupMode === "pocket");
+
+  if (groupMode === "pocket") {
+    const sections = buildRegionSections(
+      listScopedPokemon,
+      binders,
+      caughtMap,
+      defs,
+      cfg,
+      filterMode,
+      selectedBinder,
+    );
+    for (const section of sections) {
+      totalEntries += section.rows.length;
+      output.append(buildPocketSectionElement(section, date, sectionIdx++ > 0));
+    }
+  } else if (groupMode === "region") {
     const sections = buildRegionSections(
       listScopedPokemon,
       binders,
@@ -459,6 +475,69 @@ function buildSectionElement(section, date, showBinderCol, pageBreakBefore) {
   const footer = document.createElement("div");
   footer.className = "print-footer";
   footer.textContent = `pokevault · ${date} · ☑ = attrapé · ☐ = manquant`;
+  wrapper.append(footer);
+
+  frag.append(wrapper);
+  return frag;
+}
+
+function buildPocketSectionElement(section, date, pageBreakBefore) {
+  const frag = document.createDocumentFragment();
+  const wrapper = document.createElement("div");
+  wrapper.className = "print-section print-section--pocket";
+  if (pageBreakBefore) wrapper.classList.add("print-page-break");
+
+  const h2 = document.createElement("h2");
+  h2.className = "print-section-title";
+  h2.textContent = `${section.title} — ${section.subtitle}`;
+  wrapper.append(h2);
+
+  const table = document.createElement("table");
+  table.className = "print-table print-table--pocket";
+
+  const thead = document.createElement("thead");
+  const headRow = document.createElement("tr");
+  for (const col of ["#", "Nom", "✓", "Carte / note"]) {
+    const th = document.createElement("th");
+    th.textContent = col;
+    if (col === "✓") th.className = "print-check";
+    if (col === "Carte / note") th.className = "print-note-col";
+    headRow.append(th);
+  }
+  thead.append(headRow);
+  table.append(thead);
+
+  const tbody = document.createElement("tbody");
+  for (const row of section.rows) {
+    const tr = document.createElement("tr");
+    if (row.caught) tr.className = "is-caught";
+
+    const tdNum = document.createElement("td");
+    tdNum.textContent = row.number;
+    tr.append(tdNum);
+
+    const tdName = document.createElement("td");
+    tdName.textContent = row.name;
+    tr.append(tdName);
+
+    const tdCheck = document.createElement("td");
+    tdCheck.className = "print-check";
+    tdCheck.textContent = row.caught ? "☑" : "☐";
+    tr.append(tdCheck);
+
+    const tdNote = document.createElement("td");
+    tdNote.className = "print-note-col";
+    tdNote.textContent = "";
+    tr.append(tdNote);
+
+    tbody.append(tr);
+  }
+  table.append(tbody);
+  wrapper.append(table);
+
+  const footer = document.createElement("div");
+  footer.className = "print-footer";
+  footer.textContent = `pokevault pocket · ${date} · ☑ = attrapé · ☐ = manquant`;
   wrapper.append(footer);
 
   frag.append(wrapper);
