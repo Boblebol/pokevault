@@ -17,12 +17,16 @@
   <body>
     <header class="stitch-topbar">
       <div class="stitch-topbar-inner">
-        <div class="stitch-brand">pokevault</div>
+        <div class="stitch-brand-wrap">
+          <div class="stitch-brand">pokevault</div>
+          <span class="app-version-badge" id="appVersionBadge">UI --</span>
+        </div>
         <nav class="stitch-topnav">
           <a href="#/liste" class="app-switch-link is-active" data-view="liste" aria-current="page">Collection</a>
           <a href="#/classeur" class="app-switch-link" data-view="classeur">Classeurs</a>
+          <a href="#/print" class="app-switch-link" data-view="print">Impression</a>
           <a href="#/stats" class="app-switch-link" data-view="stats">Statistiques</a>
-          <a href="#/settings" class="app-switch-link" data-view="settings">Reglages</a>
+          <a href="#/settings" class="app-switch-link" data-view="settings">Réglages</a>
         </nav>
       </div>
     </header>
@@ -35,29 +39,24 @@
               <div>
                 <h1 class="title">Collection</h1>
                 <p class="collection-subtitle">
-                  Progression partagée avec les classeurs, synchronisée via les APIs locales.
+                  Ta progression Pokédex, synchronisée avec tes classeurs.
                 </p>
               </div>
-              <nav class="binder-pager list-pager" role="navigation" aria-label="Pagination liste">
-                <button type="button" class="binder-pager-btn" id="listPagePrev" aria-label="Page précédente">◀</button>
-                <div class="list-page-numbers" id="listPageNumbers" aria-label="Pages"></div>
-                <span class="binder-pager-label" id="listPageInfo">Page 1 / 1</span>
-                <button type="button" class="binder-pager-btn" id="listPageNext" aria-label="Page suivante">▶</button>
-              </nav>
+              <p class="list-display-info" id="listDisplayInfo" aria-live="polite"></p>
             </div>
 
             <div class="list-hero">
               <div class="list-hero-left">
-                <p class="list-kicker">Etat de collection</p>
+                <p class="list-kicker">État de collection</p>
               </div>
               <div class="list-hero-right">
                 <span id="listHeroPct" class="list-hero-pct">0%</span>
-                <p id="listHeroCount" class="list-hero-count">0 / 0 decouverts</p>
+                <p id="listHeroCount" class="list-hero-count">0 / 0 découverts</p>
               </div>
             </div>
 
             <div class="progress-row">
-              <div class="progress-bar" role="progressbar" aria-label="Collection progress" aria-valuemin="0" aria-valuemax="100">
+              <div class="progress-bar" role="progressbar" aria-label="Progression de la collection" aria-valuemin="0" aria-valuemax="100">
                 <div class="progress-bar-fill" id="progressFill"></div>
               </div>
               <span class="counter" id="counter">0 / 0</span>
@@ -69,8 +68,8 @@
                 type="search"
                 id="search"
                 class="search-input"
-                placeholder="Rechercher par nom ou numero..."
-                aria-label="Rechercher par nom ou numero"
+                placeholder="Rechercher par nom ou numéro..."
+                aria-label="Rechercher par nom ou numéro"
                 autocomplete="off"
                 spellcheck="false"
               />
@@ -81,7 +80,7 @@
                 Tous
               </button>
               <button type="button" class="filter-btn" data-filter="caught" aria-pressed="false">
-                Attrapes
+                Attrapés
               </button>
               <button type="button" class="filter-btn" data-filter="missing" aria-pressed="false">
                 Manquants
@@ -110,14 +109,14 @@
                 </select>
               </label>
               <label class="region-filter-wrap collection-dim-wrap">
-                <span class="region-filter-label">Emphasis</span>
+                <span class="region-filter-label">Mise en avant</span>
                 <select
                   id="collectionDimSelect"
                   class="region-filter"
-                  aria-label="Choose which cards to fade in the grid"
+                  aria-label="Choisir quelles cartes atténuer dans la grille"
                 >
-                      <option value="caught">Attenuer attrapes</option>
-                      <option value="missing">Attenuer manquants</option>
+                      <option value="caught">Atténuer attrapés</option>
+                      <option value="missing">Atténuer manquants</option>
                 </select>
               </label>
             </div>
@@ -125,15 +124,15 @@
           </header>
 
           <main class="grid" id="grid" aria-live="polite"></main>
-          
-          <footer class="list-footer" id="listFooterMeta" aria-live="polite"></footer>
+          <div id="listScrollSentinel" class="list-scroll-sentinel" aria-hidden="true"></div>
+          <p class="list-scroll-end" id="listScrollEnd" aria-live="polite" hidden></p>
         </div>
       </div>
 
       <div id="viewStats" class="app-view" hidden>
         <header class="header app-collection-header binder-header stats-header">
           <h1 class="title">Statistiques</h1>
-          <p class="collection-subtitle">Progression globale, regions et manques de la collection.</p>
+          <p class="collection-subtitle">Vue d'ensemble de ta progression, par région et par type.</p>
         </header>
         <section class="stats-main" id="statsBody"></section>
       </div>
@@ -141,10 +140,9 @@
       <div id="viewClasseur" class="app-view" hidden>
         <header class="header binder-header app-collection-header">
           <h1 class="title title-binder">Classeurs</h1>
-          <p class="collection-subtitle">Gestion des classeurs, pages, placements et synchronisation.</p>
+          <p class="collection-subtitle">Gère tes classeurs, tes pages et les placements de tes cartes.</p>
           <div class="binder-header-actions">
             <button type="button" class="binder-refresh" id="binderV2Refresh">Rafraîchir</button>
-            <a href="#/print" class="binder-refresh">Checklist impression</a>
           </div>
           <p class="sync-hint" id="binderV2Hint" hidden></p>
           <div id="binderAdvancedPanel" class="stitch-hidden" hidden>
@@ -173,9 +171,9 @@
                     </label>
                     <label class="binder-shell-select-wrap binder-dim-wrap">
                       <span class="binder-shell-select-label">Mise en avant</span>
-                      <select id="binderDimSelect" class="region-filter binder-shell-select" aria-label="Choisir quelles cartes attenuer dans le classeur">
-                        <option value="caught">Attenuer attrapes</option>
-                        <option value="missing">Attenuer manquants</option>
+                      <select id="binderDimSelect" class="region-filter binder-shell-select" aria-label="Choisir quelles cartes atténuer dans le classeur">
+                        <option value="caught">Atténuer attrapés</option>
+                        <option value="missing">Atténuer manquants</option>
                       </select>
                     </label>
                     <div class="binder-pager" role="navigation" aria-label="Pages du classeur">
@@ -220,45 +218,66 @@
       </div>
 
       <div id="viewPrint" class="app-view" hidden>
-        <header class="header app-collection-header binder-header">
-          <h1 class="title">Impression</h1>
-          <p class="collection-subtitle">Checklist d'impression basée sur les mêmes données que les classeurs.</p>
+        <header class="header binder-header app-collection-header">
+          <h1 class="title title-binder">Impression</h1>
+          <p class="collection-subtitle">Checklist imprimable, alignée sur la liste et les classeurs.</p>
         </header>
-        <div class="print-controls">
-          <div class="print-control-group">
-            <label for="printBinderSelect">Classeur</label>
-            <select id="printBinderSelect">
-              <option value="all">Tous les classeurs</option>
-            </select>
+
+        <section class="binder-main binder-main--v2">
+          <div class="binder-collection-shell print-shell">
+            <div class="binder-shell-layout">
+              <aside class="binder-vaults-nav">
+                <h2 class="binder-vaults-title">Tes classeurs</h2>
+                <div id="printVaultsNav" class="binder-vaults-list" aria-label="Choisir un classeur à imprimer"></div>
+              </aside>
+              <section class="binder-shell-main">
+                <div class="print-toolbar">
+                  <label class="search-wrap print-search-wrap">
+                    <span class="search-icon" aria-hidden="true">⌕</span>
+                    <input
+                      type="search"
+                      id="printSearch"
+                      class="search-input"
+                      placeholder="Rechercher par nom ou numéro..."
+                      aria-label="Rechercher dans la checklist"
+                      autocomplete="off"
+                      spellcheck="false"
+                    />
+                  </label>
+                  <div class="print-controls">
+                    <div class="print-control-group">
+                      <label for="printFilterSelect">Filtre</label>
+                      <select id="printFilterSelect" class="region-filter">
+                        <option value="all">Tous</option>
+                        <option value="caught">Attrapés</option>
+                        <option value="missing">Manquants</option>
+                      </select>
+                    </div>
+                    <div class="print-control-group">
+                      <label for="printGroupSelect">Regrouper par</label>
+                      <select id="printGroupSelect" class="region-filter">
+                        <option value="binder">Pages de classeur</option>
+                        <option value="region">Région</option>
+                      </select>
+                    </div>
+                    <span class="print-summary" id="printSummary"></span>
+                    <button type="button" class="print-action-btn" id="printBtn">
+                      <span class="material-symbols-outlined" aria-hidden="true">print</span>
+                      Imprimer
+                    </button>
+                  </div>
+                </div>
+                <div id="printOutput" class="print-output"></div>
+              </section>
+            </div>
           </div>
-          <div class="print-control-group">
-            <label for="printFilterSelect">Filtre</label>
-            <select id="printFilterSelect">
-              <option value="all">Tous</option>
-              <option value="caught">Attrapés seulement</option>
-              <option value="missing">Manquants seulement</option>
-            </select>
-          </div>
-          <div class="print-control-group">
-            <label for="printGroupSelect">Regrouper par</label>
-            <select id="printGroupSelect">
-              <option value="binder">Pages de classeur</option>
-              <option value="region">Région</option>
-            </select>
-          </div>
-          <span class="print-summary" id="printSummary"></span>
-          <button type="button" class="print-action-btn" id="printBtn">
-            <span class="material-symbols-outlined" aria-hidden="true">print</span>
-            Imprimer
-          </button>
-        </div>
-        <div id="printOutput"></div>
+        </section>
       </div>
 
       <div id="viewSettings" class="app-view" hidden>
         <header class="header app-collection-header binder-header">
-          <h1 class="title">Reglages</h1>
-          <p class="collection-subtitle">Réglages interface et préférences locales.</p>
+          <h1 class="title">Réglages</h1>
+          <p class="collection-subtitle">Préférences d'affichage, export et import de tes données.</p>
         </header>
         <section class="stats-main">
           <div class="stats-kpi-card">
@@ -267,14 +286,14 @@
             <label class="region-filter-wrap settings-dim-label">
               <span class="region-filter-label">Mise en avant</span>
               <select id="settingsDimSelect" class="region-filter" aria-label="Mode global de mise en avant">
-                <option value="caught">Attenuer attrapes</option>
-                <option value="missing">Attenuer manquants</option>
+                <option value="caught">Atténuer attrapés</option>
+                <option value="missing">Atténuer manquants</option>
               </select>
             </label>
           </div>
           <div class="stats-kpi-card">
-            <h2 class="stats-kpi-label">Donnees</h2>
-            <p class="stats-kpi-sub">Exporter ou importer toute la collection (attrapes + classeurs).</p>
+            <h2 class="stats-kpi-label">Données</h2>
+            <p class="stats-kpi-sub">Exporter ou importer toute la collection (attrapés + classeurs).</p>
             <div class="settings-data-actions">
               <button type="button" class="settings-action-btn" id="exportBtn">
                 <span class="material-symbols-outlined" aria-hidden="true">download</span>
@@ -303,9 +322,66 @@
             </div>
             <p id="exportImportHint" class="sync-hint" hidden></p>
           </div>
+          <div class="stats-kpi-card">
+            <h2 class="stats-kpi-label">Version</h2>
+            <p class="stats-kpi-sub" id="settingsVersionLabel">UI -- · API --</p>
+            <p class="stats-kpi-sub" id="settingsHealthLabel">État API : vérification...</p>
+          </div>
         </section>
       </div>
     </div>
+
+    <footer class="stitch-footer" role="contentinfo">
+      <div class="stitch-footer-inner">
+        <div class="stitch-footer-brand">
+          <span class="stitch-footer-logo">pokevault</span>
+          <span class="stitch-footer-sep" aria-hidden="true">·</span>
+          <span class="stitch-footer-credit">
+            conçu par
+            <a
+              class="stitch-footer-link stitch-footer-link--name"
+              href="https://alexandre-enouf.fr"
+              target="_blank"
+              rel="noopener noreferrer"
+            >Alexandre</a>
+          </span>
+          <span class="stitch-footer-sep" aria-hidden="true">·</span>
+          <span class="stitch-footer-version" id="footerVersionLabel">UI --</span>
+        </div>
+        <nav class="stitch-footer-links" aria-label="Liens développeur">
+          <a
+            class="stitch-footer-link"
+            href="https://alexandre-enouf.fr"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Portfolio d'Alexandre"
+          >
+            <span class="material-symbols-outlined" aria-hidden="true">public</span>
+            Portfolio
+          </a>
+          <a
+            class="stitch-footer-link"
+            href="https://github.com/boblebol"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="GitHub boblebol"
+          >
+            <span class="material-symbols-outlined" aria-hidden="true">code</span>
+            GitHub
+          </a>
+          <a
+            class="stitch-footer-link"
+            href="https://www.linkedin.com/in/boblebol"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="LinkedIn boblebol"
+          >
+            <span class="material-symbols-outlined" aria-hidden="true">hub</span>
+            LinkedIn
+          </a>
+        </nav>
+      </div>
+    </footer>
 
     <script src="/binder-v2.js" defer></script>
     <script src="/app.js" defer></script>

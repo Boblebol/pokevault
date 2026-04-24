@@ -1,12 +1,15 @@
 /**
- * Print view — textual checklist grouped by binder or region.
- * Each entry shows: number, name, binder page, slot, caught checkbox.
+ * Vue impression — checklist textuelle groupée par classeur ou région.
+ * Chaque entrée affiche : numéro, nom, page classeur, case, coche attrapé.
  */
 
 let printStarted = false;
+let printSelectedBinder = "all";
+let printSearchQuery = "";
 
 async function startPrintView() {
   if (printStarted) {
+    renderPrintVaultsNav();
     renderPrintView();
     return;
   }
@@ -18,40 +21,131 @@ async function startPrintView() {
   }
   await fetchBinderConfigIfNeeded();
 
-  fillPrintBinderSelect();
   wirePrintControls();
+  renderPrintVaultsNav();
   renderPrintView();
+
+  window.PokedexCollection?.subscribeCaught?.(() => {
+    renderPrintVaultsNav();
+    renderPrintView();
+  });
 }
 
-function fillPrintBinderSelect() {
-  const sel = document.getElementById("printBinderSelect");
-  if (!sel) return;
-  sel.replaceChildren();
-
-  const allOpt = document.createElement("option");
-  allOpt.value = "all";
-  allOpt.textContent = "Tous les classeurs";
-  sel.append(allOpt);
-
+function renderPrintVaultsNav() {
+  const host = document.getElementById("printVaultsNav");
+  if (!host) return;
   const cfg = getBinderConfig();
-  const binders = cfg?.binders || [];
+  const binders = (cfg?.binders || []).filter((b) => b?.id);
+  const PC = window.PokedexCollection;
+  const B = window.PokedexBinder;
+  const allPokemon = PC?.allPokemon || [];
+  const defs = PC?.regionDefinitions || [];
+  const caught = PC?.caughtMap || {};
+
+  host.replaceChildren();
+
+  const makeItem = ({ id, name, pct, got, total, isAll }) => {
+    const item = document.createElement("button");
+    item.type = "button";
+    item.className = "binder-vault-item";
+    if (String(id) === String(printSelectedBinder)) item.classList.add("is-active");
+
+    const top = document.createElement("div");
+    top.className = "binder-vault-item-top";
+    const nm = document.createElement("span");
+    nm.className = "binder-vault-item-name";
+    nm.textContent = name;
+    top.append(nm);
+    if (String(id) === String(printSelectedBinder)) {
+      const pill = document.createElement("span");
+      pill.className = "binder-vault-item-pill";
+      pill.textContent = isAll ? "SÉLECTION" : "ACTIF";
+      top.append(pill);
+    }
+
+    const progress = document.createElement("div");
+    progress.className = "binder-vault-progress";
+    const fill = document.createElement("div");
+    fill.className = "binder-vault-progress-fill";
+    fill.style.width = `${pct}%`;
+    progress.append(fill);
+
+    const meta = document.createElement("p");
+    meta.className = "binder-vault-meta";
+    const left = document.createElement("span");
+    left.textContent = `${pct}% COMPLÉTÉ`;
+    const right = document.createElement("span");
+    right.textContent = `${got} / ${total}`;
+    meta.append(left, right);
+
+    item.append(top, progress, meta);
+    item.addEventListener("click", () => {
+      printSelectedBinder = String(id);
+      renderPrintVaultsNav();
+      renderPrintView();
+    });
+    return item;
+  };
+
+  let allGot = 0;
+  let allTotal = 0;
+  const perBinder = [];
   for (const b of binders) {
-    if (!b?.id) continue;
-    const o = document.createElement("option");
-    o.value = String(b.id);
-    o.textContent = String(b.name || b.id);
-    sel.append(o);
+    const pool = B?.selectBinderPokemonPool
+      ? B.selectBinderPokemonPool(allPokemon, B.getFormRuleForBinder?.(cfg, b))
+      : allPokemon;
+    const ordered = B?.orderPokemonForBinder ? B.orderPokemonForBinder(b, pool, defs) : pool;
+    const total = ordered.length;
+    const got = ordered.filter((p) => p && caught[String(p.slug || "")]).length;
+    allGot += got;
+    allTotal += total;
+    perBinder.push({ binder: b, total, got });
+  }
+
+  const allPct = allTotal ? Math.round((allGot / allTotal) * 100) : 0;
+  host.append(
+    makeItem({
+      id: "all",
+      name: "Tous les classeurs",
+      pct: allPct,
+      got: allGot,
+      total: allTotal,
+      isAll: true,
+    }),
+  );
+
+  for (const entry of perBinder) {
+    const { binder, total, got } = entry;
+    const pct = total ? Math.round((got / total) * 100) : 0;
+    host.append(
+      makeItem({
+        id: binder.id,
+        name: String(binder.name || binder.id),
+        pct,
+        got,
+        total,
+        isAll: false,
+      }),
+    );
   }
 }
 
 function wirePrintControls() {
-  const ids = ["printBinderSelect", "printFilterSelect", "printGroupSelect"];
+  const ids = ["printFilterSelect", "printGroupSelect"];
   for (const id of ids) {
     const el = document.getElementById(id);
     if (el && !el.dataset.printWired) {
       el.dataset.printWired = "1";
       el.addEventListener("change", () => renderPrintView());
     }
+  }
+  const search = document.getElementById("printSearch");
+  if (search && !search.dataset.printWired) {
+    search.dataset.printWired = "1";
+    search.addEventListener("input", () => {
+      printSearchQuery = search.value || "";
+      renderPrintView();
+    });
   }
   const btn = document.getElementById("printBtn");
   if (btn && !btn.dataset.printWired) {
@@ -77,7 +171,7 @@ async function fetchBinderConfigIfNeeded() {
 }
 
 function getSelectedBinder() {
-  return document.getElementById("printBinderSelect")?.value || "all";
+  return printSelectedBinder || "all";
 }
 
 function getSelectedFilter() {
@@ -86,6 +180,19 @@ function getSelectedFilter() {
 
 function getSelectedGroup() {
   return document.getElementById("printGroupSelect")?.value || "binder";
+}
+
+function matchesPrintSearch(p, q) {
+  if (!q) return true;
+  const qq = q.toLowerCase().trim();
+  if (!qq) return true;
+  const num = String(p.number || "").toLowerCase();
+  const names = p.names || {};
+  const blob = [num, names.fr, names.en, names.ja, p.slug]
+    .filter(Boolean)
+    .join(" ")
+    .toLowerCase();
+  return blob.includes(qq);
 }
 
 function renderPrintView() {
@@ -162,6 +269,7 @@ function buildBinderSection(binder, allPokemon, caughtMap, defs, cfg, filterMode
     const caught = Boolean(caughtMap[slug]);
     if (filterMode === "caught" && !caught) continue;
     if (filterMode === "missing" && caught) continue;
+    if (!matchesPrintSearch(p, printSearchQuery)) continue;
 
     const pageIdx = Math.floor(i / perFace);
     const slotIdx = (i % perFace) + 1;
@@ -206,6 +314,7 @@ function buildRegionSections(allPokemon, binders, caughtMap, defs, cfg, filterMo
       const caught = Boolean(caughtMap[slug]);
       if (filterMode === "caught" && !caught) continue;
       if (filterMode === "missing" && caught) continue;
+      if (!matchesPrintSearch(p, printSearchQuery)) continue;
 
       const placement = binderLookup[slug];
       if (selectedBinder !== "all" && (!placement || placement.binderId !== selectedBinder)) continue;

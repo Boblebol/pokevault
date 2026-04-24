@@ -13,6 +13,19 @@ Merci de ton intérêt pour le projet ! Voici comment contribuer.
 git clone https://github.com/Boblebol/pokevault.git
 cd pokevault
 make install
+make dev          # lance le serveur (le Pokédex de référence est déjà versionné)
+```
+
+Le fichier `data/pokedex.json` est embarqué dans le dépôt : pas besoin de
+scraper Pokepedia pour démarrer. Les sprites (`data/images/`) et l'état
+utilisateur (`data/collection-progress.json`, `data/binder-*.json`) sont
+volontairement gitignorés.
+
+Pour télécharger les sprites localement :
+
+```bash
+make fetch              # scrape + images (~1500 fichiers)
+make fetch-test         # 10 entrées, sans images
 ```
 
 ## Workflow de développement
@@ -74,7 +87,19 @@ Préfixes recommandés :
 - Les tests sont dans `tests/` et utilisent [pytest](https://docs.pytest.org/).
 - Le module `tracker/` doit maintenir **100% de couverture** (lignes).
 - Les tests d'intégration API utilisent `httpx` avec le `TestClient` FastAPI.
-- Les endpoints `GET /api/export` et `POST /api/import` doivent rester couverts.
+- Les endpoints `GET /api/export`, `POST /api/import` et `GET /api/health` doivent rester couverts.
+
+### Données Pokédex
+
+- `data/pokedex.json` est versionné et sert de source de référence pour l'UI
+  et pour les tests end-to-end du filtrage de formes.
+- Toute modification du scraper doit être validée par `pytest tests/` puis
+  idéalement par un `make fetch-test` pour ne pas casser le format.
+- Cas sensibles à ne pas régresser :
+  - Méganium (#0154) : le nom contient « mega » mais n'est **pas** une forme
+    Méga. Cf. `tests/test_form_labels.py::test_meganium_name_is_not_mega_form`
+    et `tests/tracker/test_export.py::test_is_mega_form_excludes_meganium_base`.
+  - Zarbi (#0201) lettres, Arceus (#0493) types et Pikachu variantes.
 
 ### Front-end
 

@@ -206,7 +206,7 @@ function renderVaultsNav(cfg, activeBinderId, ordered) {
     if (String(b.id) === String(activeBinderId)) {
       const pill = document.createElement("span");
       pill.className = "binder-vault-item-pill";
-      pill.textContent = "ACTIVE";
+      pill.textContent = "ACTIF";
       top.append(pill);
     }
     const progress = document.createElement("div");
@@ -218,7 +218,7 @@ function renderVaultsNav(cfg, activeBinderId, ordered) {
     const meta = document.createElement("p");
     meta.className = "binder-vault-meta";
     const left = document.createElement("span");
-    left.textContent = `${pct}% COMPLETE`;
+    left.textContent = `${pct}% COMPLÉTÉ`;
     const right = document.createElement("span");
     right.textContent = `${got} / ${total}`;
     meta.append(left, right);
@@ -337,7 +337,7 @@ function renderBinderPageGrid() {
     };
 
     metricsHost.append(
-      makeMetric("Completion", `${pct}%`, `${totalCaught} / ${totalEntries}`),
+      makeMetric("Complétion", `${pct}%`, `${totalCaught} / ${totalEntries}`),
       makeMetric("Page spread", `${pageStart + 1}-${pageStart + nShow}`, `${totalPages} pages`),
     );
   }

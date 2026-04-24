@@ -4,6 +4,8 @@
  */
 
 const API_PROGRESS = "/api/progress";
+const API_HEALTH = "/api/health";
+const APP_UI_VERSION = "2026.04.17-p2";
 const PROGRESS_QUEUE_KEY = "pokedex_progress_queue";
 const FORM_FILTER_STORAGE_KEY = "pokedexFormFilter";
 const TYPE_FILTER_STORAGE_KEY = "pokedexTypeFilter";
@@ -17,8 +19,10 @@ let totalCount = 0;
 /** @type {"all" | "base_only" | "base_regional"} */
 let formFilterMode = "all";
 let typeFilter = "all";
-let listPage = 1;
 const LIST_PAGE_SIZE = 48;
+let displayedCount = LIST_PAGE_SIZE;
+/** @type {IntersectionObserver | null} */
+let listScrollObserver = null;
 /** @type {{ id: string; label_fr: string; low: number; high: number }[]} */
 let regionDefinitions = [];
 
@@ -227,6 +231,20 @@ window.PokedexCollection = {
   subscribeDimMode,
   wireDimModeSelectsOnce,
 };
+window.PokevaultMeta = { uiVersion: APP_UI_VERSION };
+
+function paintVersionLabels() {
+  const topBadge = document.getElementById("appVersionBadge");
+  if (topBadge) topBadge.textContent = `UI ${APP_UI_VERSION}`;
+  const footerLabel = document.getElementById("footerVersionLabel");
+  if (footerLabel) footerLabel.textContent = `UI ${APP_UI_VERSION}`;
+}
+
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", paintVersionLabels, { once: true });
+} else {
+  paintVersionLabels();
+}
 
 function pokemonKey(p) {
   return p.slug;
@@ -347,21 +365,16 @@ function visibleList() {
   );
 }
 
-function pagedVisibleList() {
+function slicedVisibleList() {
   const full = visibleList();
   const total = full.length;
-  const totalPages = Math.max(1, Math.ceil(total / LIST_PAGE_SIZE));
-  const current = Math.max(1, Math.min(totalPages, listPage));
-  const start = (current - 1) * LIST_PAGE_SIZE;
-  const end = Math.min(total, start + LIST_PAGE_SIZE);
+  const end = total === 0 ? 0 : Math.min(total, Math.max(LIST_PAGE_SIZE, displayedCount));
+  displayedCount = end || LIST_PAGE_SIZE;
   return {
     full,
-    pageItems: full.slice(start, end),
+    pageItems: full.slice(0, end),
     total,
-    start,
     end,
-    current,
-    totalPages,
   };
 }
 
@@ -400,7 +413,7 @@ function setupRegionFilter() {
   sel.dataset.wired = "1";
   sel.addEventListener("change", () => {
     regionFilter = sel.value || "all";
-    listPage = 1;
+    resetDisplayedCount();
     render();
   });
 }
@@ -441,7 +454,7 @@ function setupTypeFilter() {
     } catch {
       /* ignore */
     }
-    listPage = 1;
+    resetDisplayedCount();
     render();
   });
 }
@@ -459,28 +472,45 @@ function setupFormFilter() {
     } catch {
       /* ignore */
     }
-    listPage = 1;
+    resetDisplayedCount();
     render();
   });
 }
 
-function setupListPagination() {
-  const prev = document.getElementById("listPagePrev");
-  const next = document.getElementById("listPageNext");
-  if (prev && !prev.dataset.wired) {
-    prev.dataset.wired = "1";
-    prev.addEventListener("click", () => {
-      listPage = Math.max(1, listPage - 1);
-      render();
-    });
+function resetDisplayedCount() {
+  displayedCount = LIST_PAGE_SIZE;
+}
+
+function setupInfiniteScroll() {
+  const sentinel = document.getElementById("listScrollSentinel");
+  if (!sentinel || listScrollObserver) return;
+  listScrollObserver = new IntersectionObserver(
+    (entries) => {
+      for (const entry of entries) {
+        if (!entry.isIntersecting) continue;
+        const full = visibleList();
+        if (displayedCount >= full.length) continue;
+        displayedCount = Math.min(full.length, displayedCount + LIST_PAGE_SIZE);
+        appendVisibleItems(full);
+      }
+    },
+    { rootMargin: "600px 0px" },
+  );
+  listScrollObserver.observe(sentinel);
+}
+
+function appendVisibleItems(fullList) {
+  const grid = document.getElementById("grid");
+  if (!grid) return;
+  const full = fullList || visibleList();
+  const target = Math.min(full.length, displayedCount);
+  const already = grid.querySelectorAll(".card").length;
+  const frag = document.createDocumentFragment();
+  for (let i = already; i < target; i++) {
+    frag.append(createPokemonCard(full[i]));
   }
-  if (next && !next.dataset.wired) {
-    next.dataset.wired = "1";
-    next.addEventListener("click", () => {
-      listPage += 1;
-      render();
-    });
-  }
+  if (frag.childNodes.length) grid.append(frag);
+  updateListDisplayInfo({ full, end: target, total: full.length });
 }
 
 function setupSettingsView() {
@@ -492,6 +522,24 @@ function setupSettingsView() {
   subscribeDimMode((mode) => {
     sel.value = mode;
   });
+  paintVersionLabels();
+  const versionEl = document.getElementById("settingsVersionLabel");
+  const healthEl = document.getElementById("settingsHealthLabel");
+  if (versionEl) versionEl.textContent = `UI ${APP_UI_VERSION} · API vérification...`;
+  if (healthEl) healthEl.textContent = "État API : vérification...";
+  void (async () => {
+    try {
+      const res = await fetch(API_HEALTH);
+      if (!res.ok) throw new Error(String(res.status));
+      const data = await res.json();
+      const apiVer = String(data?.api_version || "n/a");
+      if (versionEl) versionEl.textContent = `UI ${APP_UI_VERSION} · API ${apiVer}`;
+      if (healthEl) healthEl.textContent = "État API : ok";
+    } catch {
+      if (versionEl) versionEl.textContent = `UI ${APP_UI_VERSION} · API indisponible`;
+      if (healthEl) healthEl.textContent = "État API : erreur de connexion";
+    }
+  })();
   setupExportImport();
 }
 
@@ -577,9 +625,9 @@ function setupExportImport() {
       a.click();
       a.remove();
       URL.revokeObjectURL(url);
-      showHint(`Exported ${Object.keys(data.progress?.caught || {}).length} caught, ${(data.binder_config?.binders || []).length} binders.`, false);
+      showHint(`Export : ${Object.keys(data.progress?.caught || {}).length} attrapés, ${(data.binder_config?.binders || []).length} classeurs.`, false);
     } catch (err) {
-      showHint(`Export failed: ${err.message}`, true);
+      showHint(`Échec export : ${err.message}`, true);
     }
   });
 
@@ -592,18 +640,18 @@ function setupExportImport() {
     reader.onload = () => {
       try {
         const data = JSON.parse(reader.result);
-        if (data.schema_version !== 1) throw new Error("Unsupported schema version");
+        if (data.schema_version !== 1) throw new Error("Version de schéma non supportée");
         if (!data.progress || !data.binder_config || !data.binder_placements) {
-          throw new Error("Missing required fields");
+          throw new Error("Champs requis manquants");
         }
         pendingImportPayload = sanitizeBackupPayloadToCollectionScope(data);
         const caught = Object.keys(pendingImportPayload.progress?.caught || {}).length;
         const binders = (pendingImportPayload.binder_config?.binders || []).length;
-        const date = data.exported_at ? new Date(data.exported_at).toLocaleDateString() : "unknown";
-        previewText.textContent = `${caught} caught, ${binders} binders — exported ${date}. This will replace your current data.`;
+        const date = data.exported_at ? new Date(data.exported_at).toLocaleDateString() : "inconnue";
+        previewText.textContent = `${caught} attrapés, ${binders} classeurs — export du ${date}. Cela remplacera les données actuelles.`;
         preview.hidden = false;
       } catch (err) {
-        showHint(`Invalid file: ${err.message}`, true);
+        showHint(`Fichier invalide: ${err.message}`, true);
         pendingImportPayload = null;
         preview.hidden = true;
       }
@@ -622,12 +670,12 @@ function setupExportImport() {
       });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const body = await res.json();
-      showHint(`Imported ${body.caught_count} caught, ${body.binder_count} binders. Reloading…`, false);
+      showHint(`Import : ${body.caught_count} attrapés, ${body.binder_count} classeurs. Rechargement…`, false);
       pendingImportPayload = null;
       preview.hidden = true;
       setTimeout(() => location.reload(), 1200);
     } catch (err) {
-      showHint(`Import failed: ${err.message}`, true);
+      showHint(`Échec import : ${err.message}`, true);
     }
   });
 
@@ -637,32 +685,22 @@ function setupExportImport() {
   });
 }
 
-function renderPageNumbers(current, totalPages) {
-  const host = document.getElementById("listPageNumbers");
-  if (!host) return;
-  host.replaceChildren();
-  if (totalPages <= 1) return;
-  const pages = new Set([1, totalPages, current - 1, current, current + 1]);
-  const sorted = [...pages].filter((p) => p >= 1 && p <= totalPages).sort((a, b) => a - b);
-  let last = 0;
-  for (const p of sorted) {
-    if (p - last > 1) {
-      const sep = document.createElement("span");
-      sep.className = "list-page-sep";
-      sep.textContent = "…";
-      host.append(sep);
+function updateListDisplayInfo({ full, end, total }) {
+  const info = document.getElementById("listDisplayInfo");
+  const endBanner = document.getElementById("listScrollEnd");
+  if (info) {
+    if (!total) {
+      info.textContent = "Aucune entrée à afficher.";
+    } else {
+      const caughtVisible = (full || []).filter((p) => Boolean(caughtMap[pokemonKey(p)])).length;
+      const pctVisible = total ? Math.round((caughtVisible / total) * 100) : 0;
+      info.textContent = `Affichage : 1-${end} sur ${total} entrées filtrées · ${pctVisible}% capturées dans cette vue.`;
     }
-    const btn = document.createElement("button");
-    btn.type = "button";
-    btn.className = `list-page-num${p === current ? " is-active" : ""}`;
-    btn.textContent = String(p);
-    btn.setAttribute("aria-label", `Aller a la page ${p}`);
-    btn.addEventListener("click", () => {
-      listPage = p;
-      render();
-    });
-    host.append(btn);
-    last = p;
+  }
+  if (endBanner) {
+    const done = total > 0 && end >= total;
+    endBanner.hidden = !done;
+    if (done) endBanner.textContent = `Fin de la liste — ${total} entrées affichées.`;
   }
 }
 
@@ -774,7 +812,7 @@ function createPokemonCard(p, opts) {
 
   const action = document.createElement("div");
   action.className = "card-action";
-  action.textContent = caught ? "Retirer de la collection" : "Marquer comme attrape";
+  action.textContent = caught ? "Retirer de la collection" : "Marquer comme attrapé";
   card.append(action);
 
   card.addEventListener("click", () => {
@@ -789,13 +827,8 @@ window.PokedexCollection.poolForCollectionScope = poolForCollectionScope;
 
 function render() {
   const grid = document.getElementById("grid");
-  const footer = document.getElementById("listFooterMeta");
-  const pageInfo = document.getElementById("listPageInfo");
-  const prevBtn = document.getElementById("listPagePrev");
-  const nextBtn = document.getElementById("listPageNext");
-  const paged = pagedVisibleList();
-  const list = paged.pageItems;
-  listPage = paged.current;
+  const sliced = slicedVisibleList();
+  const list = sliced.pageItems;
   const { caught: caughtCount, total: barTotal } = progressForRegionBar();
 
   document.getElementById("counter").textContent = `${caughtCount} / ${barTotal}`;
@@ -803,50 +836,33 @@ function render() {
   const heroPct = document.getElementById("listHeroPct");
   const heroCount = document.getElementById("listHeroCount");
   if (heroPct) heroPct.textContent = `${pct}%`;
-  if (heroCount) heroCount.textContent = `${caughtCount} / ${barTotal} decouverts`;
+  if (heroCount) heroCount.textContent = `${caughtCount} / ${barTotal} découverts`;
   const fill = document.getElementById("progressFill");
   fill.style.width = `${pct}%`;
   fill.parentElement.setAttribute("aria-valuenow", String(pct));
 
   grid.replaceChildren();
-  if (!paged.total) {
+  if (!sliced.total) {
     const empty = document.createElement("p");
     empty.className = "empty-state";
     empty.textContent = "Aucun Pokémon ne correspond à ce filtre.";
     grid.append(empty);
-    if (footer) footer.textContent = "0 resultat sur le perimetre courant.";
-    if (pageInfo) pageInfo.textContent = "Page 1 / 1";
-    renderPageNumbers(1, 1);
-    if (prevBtn) prevBtn.disabled = true;
-    if (nextBtn) nextBtn.disabled = true;
+    updateListDisplayInfo({ full: sliced.full, end: 0, total: 0 });
     return;
   }
 
-  for (const p of list) {
-    grid.append(createPokemonCard(p));
-  }
+  const frag = document.createDocumentFragment();
+  for (const p of list) frag.append(createPokemonCard(p));
+  grid.append(frag);
 
-  if (pageInfo) pageInfo.textContent = `Page ${paged.current} / ${paged.totalPages}`;
-  renderPageNumbers(paged.current, paged.totalPages);
-  if (prevBtn) prevBtn.disabled = paged.current <= 1;
-  if (nextBtn) nextBtn.disabled = paged.current >= paged.totalPages;
-
-  if (footer) {
-    const totalVisible = paged.total;
-    const pctVisible = totalVisible
-      ? Math.round(
-          (paged.full.filter((p) => Boolean(caughtMap[pokemonKey(p)])).length / totalVisible) * 100,
-        )
-      : 0;
-    footer.textContent = `Affichage: ${paged.start + 1}-${paged.end} sur ${totalVisible} entrees filtrees · ${pctVisible}% capturees dans cette vue.`;
-  }
+  updateListDisplayInfo({ full: sliced.full, end: sliced.end, total: sliced.total });
 }
 
 function setupFilters() {
   document.querySelectorAll(".filter-btn").forEach((btn) => {
     btn.addEventListener("click", () => {
       filterMode = btn.dataset.filter || "all";
-      listPage = 1;
+      resetDisplayedCount();
       document.querySelectorAll(".filter-btn").forEach((b) => {
         const on = b === btn;
         b.classList.toggle("is-active", on);
@@ -861,7 +877,7 @@ function setupSearch() {
   const input = document.getElementById("search");
   input.addEventListener("input", () => {
     searchQuery = input.value;
-    listPage = 1;
+    resetDisplayedCount();
     render();
   });
 }
@@ -896,7 +912,7 @@ async function startTracker() {
   setupRegionFilter();
   setupTypeFilter();
   setupFormFilter();
-  setupListPagination();
+  setupInfiniteScroll();
   setupSettingsView();
   const formSel = document.getElementById("formFilter");
   if (formSel) formSel.value = formFilterMode;
@@ -960,7 +976,7 @@ function applyAppRoute() {
   const titles = {
     liste: "pokevault — Collection",
     stats: "pokevault — Statistiques",
-    settings: "pokevault — Reglages",
+    settings: "pokevault — Réglages",
     print: "pokevault — Impression",
     classeur: "pokevault — Classeurs",
   };

@@ -9,6 +9,7 @@ htmlcov/
 .cursor/
 .claude/
 data/
+!data/pokedex.json
 outputs/
 stitch-html/
 docs/

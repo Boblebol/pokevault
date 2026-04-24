@@ -96,6 +96,7 @@
 | `/api/binder/placements`          | GET / PUT       | Binder placements              |
 | `/api/export`                     | GET             | Full backup export (JSON)      |
 | `/api/import`                     | POST            | Full backup restore (JSON)     |
+| `/api/health`                     | GET             | Liveness probe                 |
 | `/data/pokedex.json`              | GET             | Pokédex data                   |
 
 ---
@@ -118,27 +119,30 @@ make install
 ### Run
 
 ```bash
-# 1. Scrape the Pokédex (first time)
-make fetch
-
-# 2. Start the local server
+# 1. Start the local server (Pokédex data is shipped with the repo)
 make dev
 
-# 3. Open in browser
+# 2. Open in browser
 make open
 ```
 
 App available at [http://127.0.0.1:8765](http://127.0.0.1:8765/).
 
+The reference `data/pokedex.json` is bundled so the UI works right after
+`make install`. Sprites are downloaded on demand by `make fetch` (optional —
+they are not shipped to keep the repo small).
+
 ### Docker
 
 ```bash
 make docker-build
-make fetch              # scrape data locally first
 make docker-up          # start on localhost:8765
 make docker-logs        # tail logs
 make docker-down        # stop
 ```
+
+Optional: run `make fetch` first (on the host, before `docker-up`) to download
+sprites locally — the image mounts `./data` so sprites are served from disk.
 
 ---
 
@@ -259,15 +263,17 @@ pokevault/
 └── DESIGN.md                # Design system documentation
 ```
 
-### Data directory (`data/`, gitignored)
+### Data directory (`data/`)
 
-| File                          | Description                           |
-|-------------------------------|---------------------------------------|
-| `pokedex.json`                | Full Pokédex reference                |
-| `images/`                     | Downloaded sprites and images         |
-| `collection-progress.json`    | Caught/missing progress by slug       |
-| `binder-config.json`          | Binder configuration                  |
-| `binder-placements.json`      | Placements slug → page/slot           |
+| File                          | Tracked | Description                         |
+|-------------------------------|:-------:|-------------------------------------|
+| `pokedex.json`                | ✅      | Full Pokédex reference (shipped)    |
+| `images/`                     | ✖       | Downloaded sprites and images       |
+| `collection-progress.json`    | ✖       | Caught/missing progress by slug     |
+| `binder-config.json`          | ✖       | Binder configuration                |
+| `binder-placements.json`      | ✖       | Placements slug → page/slot         |
+
+Only `data/pokedex.json` is versioned — all user state stays out of Git.
 
 ---
 

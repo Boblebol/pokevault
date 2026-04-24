@@ -13,8 +13,10 @@ build/
 .coverage
 htmlcov/
 
-# Data (generated at runtime)
-data/
+# Data (generated at runtime or user state)
+data/*
+# Ship the reference Pokédex so the app runs out of the box.
+!data/pokedex.json
 
 # Legacy
 outputs/

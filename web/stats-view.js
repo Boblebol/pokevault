@@ -42,6 +42,54 @@ function topMissingTypes(pool, caught, limit = 3) {
     .slice(0, limit);
 }
 
+function typeCompletionRows(pool, caught) {
+  const byType = new Map();
+  for (const p of pool) {
+    const got = Boolean(caught[pokemonKeyStats(p)]);
+    const types = Array.isArray(p.types) ? p.types : [];
+    for (const t of types) {
+      const key = String(t || "").trim();
+      if (!key) continue;
+      const cur = byType.get(key) || { type: key, caught: 0, total: 0 };
+      cur.total += 1;
+      if (got) cur.caught += 1;
+      byType.set(key, cur);
+    }
+  }
+  return [...byType.values()]
+    .map((r) => ({
+      ...r,
+      pct: r.total ? Math.round((r.caught / r.total) * 100) : 0,
+    }))
+    .sort((a, b) => b.total - a.total || a.type.localeCompare(b.type, "fr"));
+}
+
+function nextPriorityRows(pool, caught, defs, limit = 6) {
+  const missing = pool.filter((p) => !caught[pokemonKeyStats(p)]);
+  if (!missing.length) return { targetRegion: "Toutes régions", rows: [] };
+  const byRegion = new Map();
+  for (const p of missing) {
+    const rid = effectiveRegionStats(p, defs);
+    const n = byRegion.get(rid) || 0;
+    byRegion.set(rid, n + 1);
+  }
+  let targetRegion = "Toutes régions";
+  let targetId = "";
+  let max = -1;
+  for (const [rid, n] of byRegion.entries()) {
+    if (n > max) {
+      max = n;
+      targetId = rid;
+    }
+  }
+  if (targetId) {
+    targetRegion = defs.find((d) => d.id === targetId)?.label_fr || targetId;
+  }
+  const scoped = targetId ? missing.filter((p) => effectiveRegionStats(p, defs) === targetId) : missing;
+  const sorted = [...scoped].sort((a, b) => nationalNumStats(a) - nationalNumStats(b));
+  return { targetRegion, rows: sorted.slice(0, limit) };
+}
+
 function renderKpiCard(label, value, sub) {
   const item = document.createElement("article");
   item.className = "stats-kpi-card";
@@ -102,13 +150,13 @@ function renderStats() {
   heroRight.className = "stats-hero-right";
   const heroTitle = document.createElement("h2");
   heroTitle.className = "stats-hero-title";
-  heroTitle.textContent = "Global Completion Status";
+  heroTitle.textContent = "État global de complétion";
   const heroPct = document.createElement("p");
   heroPct.className = "stats-hero-pct";
-  heroPct.textContent = `${globalPct}% archived`;
+  heroPct.textContent = `${globalPct}% complété`;
   const heroSub = document.createElement("p");
   heroSub.className = "stats-hero-sub";
-  heroSub.textContent = `${Math.max(0, gTotal - gCaught)} left to catch · ${gCaught} / ${gTotal}`;
+  heroSub.textContent = `${Math.max(0, gTotal - gCaught)} manquants · ${gCaught} / ${gTotal}`;
   const ring = document.createElement("div");
   ring.className = "stats-hero-ring";
   const ringVal = document.createElement("span");
@@ -116,7 +164,7 @@ function renderStats() {
   ringVal.textContent = String(Math.max(0, gTotal - gCaught));
   const ringSub = document.createElement("span");
   ringSub.className = "stats-hero-ring-sub";
-  ringSub.textContent = "LEFT TO CATCH";
+  ringSub.textContent = "A ATTRAPER";
   ring.style.setProperty("--pct", `${Math.max(0, Math.min(100, globalPct))}`);
   ring.append(ringVal, ringSub);
   heroLeft.append(heroTitle, heroPct, heroSub);
@@ -127,9 +175,9 @@ function renderStats() {
   const kpiGrid = document.createElement("section");
   kpiGrid.className = "stats-kpi-grid";
   kpiGrid.append(
-    renderKpiCard("Total specimens", String(gTotal), "Entrees suivies dans le dex local"),
-    renderKpiCard("Captured", String(gCaught), `${globalPct}% completion globale`),
-    renderKpiCard("Left to catch", String(Math.max(0, gTotal - gCaught)), "Priorite collection"),
+    renderKpiCard("Total spécimens", String(gTotal), "Entrées suivies dans le Pokédex local"),
+    renderKpiCard("Attrapés", String(gCaught), `${globalPct}% de complétion globale`),
+    renderKpiCard("Manquants", String(Math.max(0, gTotal - gCaught)), "Priorité collection"),
   );
   host.append(kpiGrid);
 
@@ -139,7 +187,7 @@ function renderStats() {
   regWrap.className = "stats-region-wrap";
   const regTitle = document.createElement("h2");
   regTitle.className = "stats-section-title";
-  regTitle.textContent = "Regional Archive";
+  regTitle.textContent = "Archive régionale";
   regWrap.append(regTitle);
 
   for (const d of defs) {
@@ -193,17 +241,67 @@ function renderStats() {
     sec.className = "stats-gaps";
     const h = document.createElement("h2");
     h.className = "stats-section-title";
-    h.textContent = "Archive gaps";
+    h.textContent = "Lacunes de collection";
     sec.append(h);
     for (const [type, count] of missing) {
       const line = document.createElement("p");
       line.className = "stats-gap-line";
-      line.textContent = `${type} · ${count} specimen(s) manquants`;
+      line.textContent = `${type} · ${count} spécimen(s) manquants`;
       sec.append(line);
     }
     sec.hidden = !showAdvanced;
     bento.append(sec);
   }
+
+  const objective = nextPriorityRows(pool, caught, defs, 6);
+  if (objective.rows.length) {
+    const sec = document.createElement("section");
+    sec.className = "stats-gaps";
+    const h = document.createElement("h2");
+    h.className = "stats-section-title";
+    h.textContent = `Objectif session — ${objective.targetRegion}`;
+    sec.append(h);
+    for (const p of objective.rows) {
+      const line = document.createElement("p");
+      line.className = "stats-gap-line";
+      const num = String(p.number || "").replace(/^#/, "");
+      const name = p?.names?.fr || p?.names?.en || p?.slug || "?";
+      line.textContent = `#${num} · ${name}`;
+      sec.append(line);
+    }
+    bento.append(sec);
+  }
+
+  const types = typeCompletionRows(pool, caught);
+  if (types.length) {
+    const sec = document.createElement("section");
+    sec.className = "stats-region-wrap";
+    const h = document.createElement("h2");
+    h.className = "stats-section-title";
+    h.textContent = "Complétion par type";
+    sec.append(h);
+    for (const row of types) {
+      const line = document.createElement("div");
+      line.className = "stats-region-line";
+      const top = document.createElement("div");
+      top.className = "stats-region-top";
+      const left = document.createElement("span");
+      left.textContent = `${row.type} · ${row.pct}%`;
+      const right = document.createElement("span");
+      right.textContent = `${row.caught} / ${row.total}`;
+      top.append(left, right);
+      const bar = document.createElement("div");
+      bar.className = "stats-region-bar";
+      const fill = document.createElement("div");
+      fill.className = "stats-region-fill";
+      fill.style.width = `${row.pct}%`;
+      bar.append(fill);
+      line.append(top, bar);
+      sec.append(line);
+    }
+    bento.append(sec);
+  }
+
   host.append(bento);
 }
 

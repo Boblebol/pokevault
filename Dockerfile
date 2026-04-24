@@ -16,6 +16,7 @@ COPY web/ web/
 COPY main.py .
 
 RUN mkdir -p data
+COPY data/pokedex.json data/pokedex.json
 
 ENV TRACKER_HOST=0.0.0.0
 ENV TRACKER_PORT=8765

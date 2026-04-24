@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import re
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -19,6 +20,8 @@ from tracker.repository.base import (
     BinderPlacementsRepository,
     ProgressRepository,
 )
+
+_MEGA_FORM_RE = re.compile(r"\b(?:méga|mega)\b", re.IGNORECASE)
 
 
 class ExportService:
@@ -133,12 +136,14 @@ class ExportService:
 
     @classmethod
     def _is_mega_form(cls, p: dict[str, Any]) -> bool:
+        # Bornes de mot sur le libellé `form` pour ne pas confondre un nom
+        # contenant « mega » (ex. Méganium #0154) avec une forme Méga.
         f = cls._norm_txt(p.get("form"))
         slug = cls._norm_txt(p.get("slug"))
+        if _MEGA_FORM_RE.search(f):
+            return True
         return (
-            "méga" in f
-            or "mega" in f
-            or "-mega-" in slug
+            "-mega-" in slug
             or slug.endswith("-mega-x")
             or slug.endswith("-mega-y")
             or slug.endswith("-mega")
@@ -184,9 +189,7 @@ class ExportService:
         form = str(p.get("form") or "").strip()
         if not form:
             return False
-        if cls._is_mega_form(p) or cls._is_gigamax(p) or cls._is_regional_form(p):
-            return False
-        return True
+        return not (cls._is_mega_form(p) or cls._is_gigamax(p) or cls._is_regional_form(p))
 
     @classmethod
     def _is_excluded_special_form_for_binder(cls, p: dict[str, Any]) -> bool:
@@ -197,9 +200,9 @@ class ExportService:
             form.startswith("lettre ") or "zarbi-" in slug or "unown-" in slug
         ):
             return True
-        if number == "0493" and (form.startswith("type ") or slug.startswith("0493-arceus-")):
-            return True
-        return False
+        return number == "0493" and (
+            form.startswith("type ") or slug.startswith("0493-arceus-")
+        )
 
     @classmethod
     def _pokemon_matches_form_rule(cls, p: dict[str, Any], rule: dict[str, Any]) -> bool:
@@ -242,7 +245,11 @@ class ExportService:
                 continue
             if (not cls._is_base_form(cur)) and cls._is_base_form(p):
                 by_number[number] = p
-        return [p for p in pokemon if str(p.get("number") or "") and by_number.get(str(p.get("number"))) is p]
+        return [
+            p
+            for p in pokemon
+            if str(p.get("number") or "") and by_number.get(str(p.get("number"))) is p
+        ]
 
     @staticmethod
     def _sanitize_progress(progress: CollectionProgress, allowed: set[str]) -> CollectionProgress:

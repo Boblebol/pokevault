@@ -17,7 +17,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 - Settings data tools:
   - `Export JSON` button to download a full backup.
   - `Import JSON` button with preview and confirmation before restore.
-- Test coverage for new export/import flows, keeping tracker coverage at 100%.
+- New `GET /api/health` endpoint (`{"ok": "true", "app": "pokevault", ...}`) for
+  container probes and uptime checks.
+- Reference `data/pokedex.json` is now shipped with the repository so the UI
+  runs out of the box without invoking the scraper on first boot.
+- Test coverage for new export/import flows, form-filtering helpers, health
+  endpoint and dependencies, keeping tracker coverage at 100%.
 
 ### Changed
 
@@ -29,6 +34,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 - Web static asset caching disabled in local tracker responses to always serve the latest frontend files.
 - Print view now uses the same collection scope as list/binders (excluding out-of-scope special forms).
 - Export/import payload sanitization now keeps only in-scope collection slugs (progress and binder placements), including backend-side enforcement.
+
+### Fixed
+
+- Mega-form detection now uses word boundaries on the `form` label so Pokémon
+  whose name contains the substring "mega" (notably Méganium #0154) are no
+  longer mistakenly filtered as Mega evolutions.
+- Normalized a stray `"form": "null"` string to a proper `null` value for the
+  Méganium base entry in the shipped Pokédex data.
 
 ## [0.1.0] — 2025
 

@@ -59,6 +59,7 @@ def test_get_export_service(tmp_path: Path) -> None:
     cfg_repo = get_binder_config_repository(settings=settings)
     pl_repo = get_binder_placements_repository(settings=settings)
     svc = get_export_service(
+        settings=settings,
         progress_repo=progress_repo,
         config_repo=cfg_repo,
         placements_repo=pl_repo,
