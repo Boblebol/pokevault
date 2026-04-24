@@ -61,7 +61,7 @@ Sorted by RICE descending. Tone/wave column drives the delivery plan below.
 | **V1 · Polish J1** ✅ | ~1 week  | F07 · F04 · F01 · F06       | App feels alive with zero structural change      |
 | **V2 · Activation** ✅ | ~2 weeks | F00 · F03 · F05             | First run is scripted, grid tells a story        |
 | **V3 · Layer Cartes** ✅ | ~3 weeks | F08 · F09 · F02 · F10      | Drawer + full-screen page, cards as opt-in layer |
-| **V4 · Délices**    | ~3 weeks | F11 · F12 · F15 · F14 · F13  | Full Pokédex identity, multi-profile, polish     |
+| **V4 · Délices** ✅ | ~3 weeks | F11 · F12 · F15 · F14 · F13  | Full Pokédex identity, multi-profile, polish     |
 
 Each wave can be tagged `v0.2`, `v0.3`, `v0.4`, `v1.0` on GitHub Releases.
 
@@ -369,10 +369,25 @@ back to type-only display.
 
 ---
 
-# Wave 4 — Délices & personnalisation
+# Wave 4 — Délices & personnalisation ✅
 
 **Goal.** 18 person-days. Premium polish, social dimension, long-term
 ergonomics. Each item is isolated and can ship in any order.
+
+**Status.** ✅ **Shipped.** F13 ships four `data-theme` skins applied via
+CSS custom properties (`web/themes.js`). F14 adds a "Pocket A5 (par
+région)" grouping mode in the print view with `@page { size: A5 }` page
+breaks. F12 introduces a `BadgeService` (12 declarative predicates), the
+`badges_unlocked` field on `CollectionProgress`, the `GET /api/badges`
+endpoint with auto-sync, plus `web/badges-view.js` + `web/toast.js` for
+the stats grid + accessible unlock notifications. F11 promotes
+`Card.image_url` to a first-class field and ships a three-mode
+(Sugimori · shiny · first card) artwork switcher with `<img onerror>`
+fallback chains. F15 introduces `ProfileService`, `data/profiles.json`
+and `data/profiles/<id>/...` storage with the `default` profile aliasing
+the legacy layout, exposes the `/api/profiles*` REST surface and the
+Réglages switcher (create / switch / delete with auto-reload). Tracker
+coverage: **100 % on 411 tests**.
 
 ## F11 — Artwork switcher
 

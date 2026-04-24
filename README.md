@@ -121,8 +121,40 @@
 
 - Text-first printable checklist (no images): number, name, binder location.
 - Filters before printing: **all**, **caught only**, **missing only**.
-- Grouping modes: **by binder** or **by region**.
+- Grouping modes: **by binder**, **by region**, or **Pocket A5 (par région)**
+  for a compact `@page { size: A5 }` checklist with `#`/Nom/✓/Carte · note
+  columns and a page break per region (F14).
 - A4 print stylesheet with page breaks between sections.
+
+### Web UI — Settings (`#/settings`)
+
+- **Affichage** — global "atténuer attrapés / manquants" toggle, four
+  regional themes (`Vault` default, `Kanto`, `Hoenn`, `Paldea`) applied
+  via `data-theme` on `<html>` (F13), and an artwork switcher (Sugimori
+  default, Shiny `data/images_shiny/<slug>.png`, First card scan) with
+  `<img onerror>` fallback chain (F11). Both choices persist in
+  `localStorage`.
+- **Données** — export / import the full backup (schema v2 carrying
+  cards), launch the printable checklist.
+- **Profil** — replay the onboarding wizard (F00).
+- **Pokédex multi-profils** — switcher + create/delete to maintain
+  several isolated Pokédex (e.g. *Hardcore*, *Casual*, *Shiny only*).
+  The default profile keeps the legacy `data/*.json` layout, additional
+  profiles store everything under `data/profiles/<id>/...`. Switching
+  reloads the page so every cache (progress, cards, binders) refreshes
+  against the active profile (F15).
+
+### Web UI — Badges (`#/stats`)
+
+- Server-evaluated badge catalog (F12) covering first encounter / catch
+  / shiny, Pokédex centuries, set diversity and regional milestones.
+- Unlocks are **monotonic** — once earned a badge stays unlocked even if
+  the underlying counter drops (e.g. uncatching a slug).
+- Persisted as `badges_unlocked: list[str]` inside
+  `data/collection-progress.json`. `GET /api/badges` returns the full
+  catalog with the `unlocked` flag and triggers a sync on each read.
+- Frontend toasts (`web/toast.js`) pop accessible notifications when new
+  badges land (silent on first load).
 
 ### Collection Backup / Restore
 
@@ -139,6 +171,10 @@
 | `/api/cards`                      | GET / POST      | F08 — list / create TCG cards  |
 | `/api/cards/{id}`                 | GET / PUT / DELETE | F08 — manage a single card  |
 | `/api/cards/by-pokemon/{slug}`    | GET             | F08 — cards for a Pokédex slug |
+| `/api/badges`                     | GET             | F12 — badge catalog + unlocked ids (auto-sync) |
+| `/api/profiles`                   | GET / POST      | F15 — list profiles / create a new one |
+| `/api/profiles/active`            | PUT             | F15 — switch the active profile |
+| `/api/profiles/{id}`              | DELETE          | F15 — delete a profile (default forbidden) |
 | `/api/binder`                     | GET             | List binders                   |
 | `/api/binder/{id}`                | GET / PUT / DELETE | Manage a binder             |
 | `/api/binder/config`              | GET / PUT       | Binder configuration           |

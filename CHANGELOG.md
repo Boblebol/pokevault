@@ -12,6 +12,52 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 - Public product roadmap in [docs/ROADMAP.md](docs/ROADMAP.md): 16 RICE-scored
   features organised in 4 delivery waves (Polish J1, Activation, Card Layer,
   Delights), each with user story, acceptance criteria and tech notes.
+- **Wave 4 · Délices** shipped:
+  - **F13** Thèmes de région — a lightweight `web/themes.js` module persists
+    the user's choice in `localStorage` and applies a `data-theme` attribute
+    on `<html>`. CSS overrides ship four skins (Vault default, Kanto retro,
+    Hoenn ocean, Paldea terracotta) by reassigning the existing `--bg`,
+    `--card`, `--accent`, `--text`, `--muted` custom properties, with no
+    component refactor required. Switcher lives in **Réglages → Affichage**.
+  - **F14** Impression Pokédex de poche (A5) — the print view exposes a new
+    "Pocket A5 (par région)" grouping mode that emits a compact `#`/Nom/✓/
+    Carte · note checklist with `@page { size: A5; }` and per-region page
+    breaks, perfect for slipping inside a binder pouch. The pre-existing
+    "Pages de classeur" and "Région" modes stay unchanged.
+  - **F12** Pokédex badges — server-side `BadgeService` evaluates 12
+    declarative `BadgeDef` predicates (first encounter / catch / shiny,
+    Pokédex centuries, set diversity, monotype starters, regional perfect
+    runs…) against `CollectionProgress` + the live card list. Unlocks are
+    monotonic — once a badge is earned it never drops, even if the user
+    later un-catches a slug. Persisted as `badges_unlocked: list[str]`
+    inside `data/collection-progress.json` (with safe migration). New
+    `GET /api/badges` returns `{catalog: BadgeDefinition[], unlocked:
+    string[]}` and triggers a sync on each read. Frontend `web/badges-view.js`
+    polls the endpoint, diffs against the cached state and pops accessible
+    `web/toast.js` notifications for each new unlock; the **Statistiques**
+    view renders the full grid (locked / unlocked tiles).
+  - **F11** Artwork switcher — `Card.image_url` is now a first-class field
+    on the model and surfaced through the drawer's add-card form. The new
+    `web/artwork-switcher.js` module exposes three modes (Sugimori default,
+    Shiny `data/images_shiny/<slug>.png`, First card scan) with
+    `localStorage` persistence, indexes the live cards on
+    `pokevault:cards-changed`, and resolves a per-Pokémon `{src, fallbacks}`
+    that the list grid wires through `<img onerror>` cascades. Switcher
+    lives in **Réglages → Affichage** and triggers a re-render.
+  - **F15** Multi-Pokédex profiles — the new `ProfileService` reads / writes
+    a `data/profiles.json` registry (`active_id` + list of profiles) and
+    resolves every storage path (progress, cards, binder config &
+    placements) from the active profile id. The historical "default" profile
+    stays mapped onto the legacy `data/*.json` layout for seamless upgrades;
+    additional profiles live under `data/profiles/<id>/...`. New REST surface:
+    `GET /api/profiles`, `POST /api/profiles`, `PUT /api/profiles/active`,
+    `DELETE /api/profiles/{id}`. Réglages exposes a switcher with create /
+    delete buttons and a full reload after switch so every cached collection
+    refreshes against the new dataset.
+  - Backend coverage stays at 100% (411 passing tests on the `tracker/`
+    module) including new modules `test_badge_service`, `test_badge_api`,
+    `test_profile_service`, `test_profile_api`, plus updates to
+    `test_dependencies` and `test_config` for the new path resolver.
 - **Wave 3 · Layer Cartes** shipped:
   - **F08** Card data model — a new versioned `data/collection-cards.json`
     user-state file (gitignored) stores TCG cards per Pokémon with fields
