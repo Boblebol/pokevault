@@ -308,6 +308,10 @@ class BadgeDefinition(BaseModel):
     title: str
     description: str
     unlocked: bool = False
+    current: int = Field(default=0, ge=0)
+    target: int = Field(default=1, ge=1)
+    percent: int = Field(default=0, ge=0, le=100)
+    hint: str = "Commence par une première action."
 
 
 class BadgeState(BaseModel):
