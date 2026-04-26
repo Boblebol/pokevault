@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- `v0.6.0` Next Best Action: Focus and Statistics now share a deterministic
+  recommendation engine that prioritizes near-complete regions, moves
+  seen-but-not-caught targets first, and renders a visible "Pourquoi ?" reason
+  so the next target is understandable rather than arbitrary.
 - `v0.5.0` Focus Session MVP: Collection and Statistics rails now expose a
   local-first six-target session that picks a near-complete region, tracks
   completion from caught status, highlights active grid targets, and jumps
