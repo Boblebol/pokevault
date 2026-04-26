@@ -1501,11 +1501,14 @@ function render() {
 }
 
 function setupFilters() {
-  document.querySelectorAll(".filter-btn").forEach((btn) => {
+  const buttons = document.querySelectorAll("#viewListe .filter-btn[data-filter]");
+  buttons.forEach((btn) => {
+    if (btn.dataset.filterWired) return;
+    btn.dataset.filterWired = "1";
     btn.addEventListener("click", () => {
       filterMode = btn.dataset.filter || "all";
       resetDisplayedCount();
-      document.querySelectorAll(".filter-btn").forEach((b) => {
+      buttons.forEach((b) => {
         const on = b === btn;
         b.classList.toggle("is-active", on);
         b.setAttribute("aria-pressed", on ? "true" : "false");
