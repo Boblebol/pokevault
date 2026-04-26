@@ -41,6 +41,7 @@ function installBrowserStubs() {
 
 async function loadModule() {
   installBrowserStubs();
+  await import(`../../web/recommendations.js?case=${Date.now()}`);
   await import(`../../web/focus-session.js?case=${Date.now()}`);
   return globalThis.window.PokevaultFocus._test;
 }
@@ -86,4 +87,3 @@ test("syncSessionCompletion keeps only caught targets as completed", async () =>
   assert.equal(next.done, 1);
   assert.equal(next.total, 3);
 });
-

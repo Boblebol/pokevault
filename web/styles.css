@@ -3343,11 +3343,16 @@ body {
 }
 
 .focus-panel__body,
-.focus-panel__hint {
+.focus-panel__hint,
+.focus-panel__why {
   margin: 0;
   color: #c9a9a3;
   font-size: 0.76rem;
   line-height: 1.35;
+}
+
+.focus-panel__why {
+  color: #dfc4bd;
 }
 
 .focus-panel__meter {

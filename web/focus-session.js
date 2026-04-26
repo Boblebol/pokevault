@@ -45,66 +45,43 @@
     return found?.label_fr || (id === "unknown" ? "Autre" : String(id || "National"));
   }
 
-  function sortByDexOrder(items) {
-    return [...items].sort((a, b) => nationalNum(a) - nationalNum(b));
-  }
-
-  function groupMissingByRegion(pool, caughtMap, defs) {
-    const byRegion = new Map();
-    for (const p of pool || []) {
-      const slug = slugOf(p);
-      if (!slug) continue;
-      const id = regionIdFor(p, defs);
-      const cur = byRegion.get(id) || {
-        id,
-        label: regionLabel(id, defs),
-        total: 0,
-        caught: 0,
-        items: [],
-        firstNum: nationalNum(p),
-      };
-      cur.total += 1;
-      cur.firstNum = Math.min(cur.firstNum, nationalNum(p));
-      if (caughtMap?.[slug]) cur.caught += 1;
-      else cur.items.push(p);
-      byRegion.set(id, cur);
-    }
-
-    return [...byRegion.values()]
-      .filter((r) => r.items.length > 0)
-      .map((r) => {
-        const pct = r.total ? r.caught / r.total : 0;
-        const missing = r.items.length;
-        return {
-          ...r,
-          pct,
-          items: sortByDexOrder(r.items),
-          reason: `${r.label} est proche d'etre completee : ${missing} restant${missing > 1 ? "s" : ""}.`,
-        };
-      })
-      .sort((a, b) => {
-        if (b.pct !== a.pct) return b.pct - a.pct;
-        if (a.items.length !== b.items.length) return a.items.length - b.items.length;
-        return a.firstNum - b.firstNum;
-      });
-  }
-
-  function buildSessionPlan(pool, caughtMap, regionDefinitions) {
+  function fallbackRankTargets(pool, caughtMap, statusMap, regionDefinitions, limit) {
     const missing = (pool || []).filter((p) => {
       const slug = slugOf(p);
       return slug && !caughtMap?.[slug];
     });
     if (!missing.length) return null;
-    const grouped = groupMissingByRegion(pool, caughtMap || {}, regionDefinitions || []);
-    const best = grouped[0];
-    if (!best) return null;
+    const target = missing.sort((a, b) => nationalNum(a) - nationalNum(b)).slice(0, limit);
+    const first = target[0];
+    const rid = first ? regionIdFor(first, regionDefinitions || []) : "all";
+    const label = regionLabel(rid, regionDefinitions || []);
+    return {
+      targetRegionId: rid,
+      targetLabel: label,
+      reason: `${label} est proche d'etre completee.`,
+      rows: target,
+    };
+  }
+
+  function buildSessionPlan(pool, caughtMap, regionDefinitions, statusMap = {}) {
+    const recommender = window.PokevaultRecommendations?.rankTargets;
+    const ranked = recommender
+      ? recommender({
+          pool,
+          caughtMap: caughtMap || {},
+          statusMap: statusMap || {},
+          regionDefinitions: regionDefinitions || [],
+          limit: SESSION_SIZE,
+        })
+      : fallbackRankTargets(pool, caughtMap || {}, statusMap || {}, regionDefinitions || [], SESSION_SIZE);
+    if (!ranked?.rows?.length) return null;
     return {
       version: 1,
       startedAt: new Date().toISOString(),
-      targetRegion: best.id,
-      targetLabel: best.label,
-      reason: best.reason,
-      slugs: best.items.slice(0, SESSION_SIZE).map(slugOf).filter(Boolean),
+      targetRegion: ranked.targetRegionId || "all",
+      targetLabel: ranked.targetLabel || ranked.targetRegion || "National",
+      reason: ranked.reason || "Session courte pour garder le fil.",
+      slugs: ranked.rows.slice(0, SESSION_SIZE).map(slugOf).filter(Boolean),
       completed: [],
     };
   }
@@ -201,6 +178,7 @@
     return {
       pool: Array.isArray(pool) ? pool : [],
       caughtMap: PC.caughtMap || {},
+      statusMap: PC.statusMap || {},
       regionDefinitions: PC.regionDefinitions || [],
     };
   }
@@ -208,7 +186,7 @@
   function startSession() {
     const state = currentCollectionState();
     if (!state) return null;
-    const plan = buildSessionPlan(state.pool, state.caughtMap, state.regionDefinitions);
+    const plan = buildSessionPlan(state.pool, state.caughtMap, state.regionDefinitions, state.statusMap);
     if (!plan) {
       resetSession();
       return null;
@@ -280,6 +258,7 @@
   function renderIdle(host, plan) {
     renderShell(host, "Session focus", "");
     host.append(el("p", "focus-panel__body", "Six cibles, pas plus. Le but est de finir une petite boucle sans perdre le fil."));
+    if (plan?.reason) host.append(el("p", "focus-panel__why", `Pourquoi ? ${plan.reason}`));
     const actions = el("div", "focus-panel__actions");
     actions.append(button("focus-panel__btn", "Lancer", () => startSession()));
     if (plan) actions.append(el("span", "focus-panel__hint", plan.targetLabel));
@@ -299,7 +278,7 @@
     bar.style.width = `${session.total ? Math.round((session.done / session.total) * 100) : 0}%`;
     meter.append(bar);
     host.append(meter);
-    host.append(el("p", "focus-panel__body", complete ? "Boucle terminée. Tu peux relancer une session courte." : session.reason));
+    host.append(el("p", "focus-panel__body", complete ? "Boucle terminée. Tu peux relancer une session courte." : `Pourquoi ? ${session.reason}`));
 
     const list = el("div", "focus-panel__targets");
     for (const slug of session.slugs) {
@@ -378,7 +357,7 @@
         }
       }
       if (!session) {
-        plan = buildSessionPlan(state.pool, state.caughtMap, state.regionDefinitions);
+        plan = buildSessionPlan(state.pool, state.caughtMap, state.regionDefinitions, state.statusMap);
       }
     }
 
@@ -405,7 +384,6 @@
   if (window.__POKEVAULT_FOCUS_TESTS__) {
     api._test = {
       buildSessionPlan,
-      groupMissingByRegion,
       normalizeSession,
       readSession,
       writeSession,

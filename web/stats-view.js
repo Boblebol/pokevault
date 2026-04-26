@@ -64,32 +64,6 @@ function typeCompletionRows(pool, caught) {
     .sort((a, b) => b.total - a.total || a.type.localeCompare(b.type, "fr"));
 }
 
-function nextPriorityRows(pool, caught, defs, limit = 6) {
-  const missing = pool.filter((p) => !caught[pokemonKeyStats(p)]);
-  if (!missing.length) return { targetRegion: "Toutes régions", rows: [] };
-  const byRegion = new Map();
-  for (const p of missing) {
-    const rid = effectiveRegionStats(p, defs);
-    const n = byRegion.get(rid) || 0;
-    byRegion.set(rid, n + 1);
-  }
-  let targetRegion = "Toutes régions";
-  let targetId = "";
-  let max = -1;
-  for (const [rid, n] of byRegion.entries()) {
-    if (n > max) {
-      max = n;
-      targetId = rid;
-    }
-  }
-  if (targetId) {
-    targetRegion = defs.find((d) => d.id === targetId)?.label_fr || targetId;
-  }
-  const scoped = targetId ? missing.filter((p) => effectiveRegionStats(p, defs) === targetId) : missing;
-  const sorted = [...scoped].sort((a, b) => nationalNumStats(a) - nationalNumStats(b));
-  return { targetRegion, rows: sorted.slice(0, limit) };
-}
-
 function renderKpiCard(label, value, sub, modifier) {
   const item = document.createElement("article");
   item.className = "stats-kpi-card";
@@ -288,7 +262,13 @@ function renderStats() {
     bento.append(sec);
   }
 
-  const objective = nextPriorityRows(pool, caught, defs, 6);
+  const objective = window.PokevaultRecommendations?.rankTargets?.({
+    pool,
+    caughtMap: caught,
+    statusMap: PC?.statusMap || {},
+    regionDefinitions: defs,
+    limit: 6,
+  }) || { targetRegion: "Toutes régions", reason: "", rows: [] };
   if (objective.rows.length) {
     const sec = document.createElement("section");
     sec.className = "stats-gaps";
@@ -296,6 +276,12 @@ function renderStats() {
     h.className = "stats-section-title";
     h.textContent = `Objectif session — ${objective.targetRegion}`;
     sec.append(h);
+    if (objective.reason) {
+      const why = document.createElement("p");
+      why.className = "stats-gap-line stats-gap-line--why";
+      why.textContent = `Pourquoi ? ${objective.reason}`;
+      sec.append(why);
+    }
     for (const p of objective.rows) {
       const line = document.createElement("p");
       line.className = "stats-gap-line";
