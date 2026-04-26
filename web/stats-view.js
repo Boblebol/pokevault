@@ -107,6 +107,16 @@ function renderKpiCard(label, value, sub, modifier) {
   return item;
 }
 
+function renderStatsRail(caught, total) {
+  const pct = total ? Math.round((caught / total) * 100) : 0;
+  const pctEl = document.getElementById("statsRailPct");
+  const countEl = document.getElementById("statsRailCount");
+  const missingEl = document.getElementById("statsRailMissing");
+  if (pctEl) pctEl.textContent = `${pct}%`;
+  if (countEl) countEl.textContent = `${caught} / ${total} attrapés`;
+  if (missingEl) missingEl.textContent = `${Math.max(0, total - caught)} manquants`;
+}
+
 function renderStats() {
   const host = document.getElementById("statsBody");
   if (!host) return;
@@ -123,6 +133,7 @@ function renderStats() {
     if (ES?.render) {
       const node = ES.render(host, "statsEmpty");
       if (node) host.append(node);
+      renderStatsRail(0, pool.length);
       return;
     }
   }
@@ -152,6 +163,7 @@ function renderStats() {
   }
 
   const globalPct = gTotal ? Math.round((gCaught / gTotal) * 100) : 0;
+  renderStatsRail(gCaught, gTotal);
   const showAdvanced = true;
   const hero = document.createElement("section");
   hero.className = "stats-hero";
