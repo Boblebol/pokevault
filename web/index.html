@@ -44,115 +44,121 @@
               </div>
               <p class="list-display-info" id="listDisplayInfo" aria-live="polite"></p>
             </div>
-
-            <div class="list-hero">
-              <div class="list-hero-left">
-                <p class="list-kicker">État de collection</p>
-              </div>
-              <div class="list-hero-right">
-                <span id="listHeroPct" class="list-hero-pct">0%</span>
-                <p id="listHeroCount" class="list-hero-count">0 / 0 découverts</p>
-                <p
-                  id="listHeroCards"
-                  class="list-hero-cards is-dormant"
-                  aria-live="polite"
-                >0 carte dans 0 set</p>
-              </div>
-            </div>
-
-            <div class="progress-row">
-              <div class="progress-bar" role="progressbar" aria-label="Progression de la collection" aria-valuemin="0" aria-valuemax="100">
-                <div class="progress-bar-fill" id="progressFill"></div>
-              </div>
-              <span class="counter" id="counter">0 / 0</span>
-              <button
-                type="button"
-                class="kb-hint-btn"
-                id="kbHelpTrigger"
-                aria-label="Afficher les raccourcis clavier"
-                title="Raccourcis clavier (touche ?)"
-              >?</button>
-            </div>
-
-            <label class="search-wrap">
-              <span class="search-icon" aria-hidden="true">⌕</span>
-              <input
-                type="search"
-                id="search"
-                class="search-input"
-                placeholder="Rechercher par nom ou numéro..."
-                aria-label="Rechercher par nom ou numéro"
-                autocomplete="off"
-                spellcheck="false"
-              />
-            </label>
-
-            <div class="filters" role="group" aria-label="Filtrer par statut">
-              <button type="button" class="filter-btn is-active" data-filter="all" aria-pressed="true">
-                Tous
-              </button>
-              <button type="button" class="filter-btn" data-filter="caught" aria-pressed="false">
-                Attrapés
-              </button>
-              <button type="button" class="filter-btn" data-filter="missing" aria-pressed="false">
-                Manquants
-              </button>
-            </div>
-
-            <nav
-              class="region-chips"
-              id="regionChips"
-              role="group"
-              aria-label="Filtrer par région du Pokédex"
-            ></nav>
-
-            <nav
-              class="narrative-chips"
-              id="narrativeChips"
-              role="group"
-              aria-label="Filtrer par catégorie narrative (Starter, Légendaire…)"
-              hidden
-            ></nav>
-
-            <div class="advanced-filters stitch-hidden" id="advancedFiltersPanel" hidden>
-              <label class="region-filter-wrap">
-                <span class="region-filter-label">Région</span>
-                <select id="regionFilter" class="region-filter" aria-label="Filtrer par région du Pokédex">
-                  <option value="all">Toutes les régions</option>
-                </select>
-              </label>
-              <label class="region-filter-wrap">
-                <span class="region-filter-label">Formes</span>
-                <select id="formFilter" class="region-filter" aria-label="Filtrer les formes dans la liste uniquement">
-                  <option value="all">Tout le dex</option>
-                  <option value="base_only">Base uniquement</option>
-                  <option value="base_regional">Base + régional</option>
-                </select>
-              </label>
-              <label class="region-filter-wrap">
-                <span class="region-filter-label">Type</span>
-                <select id="typeFilter" class="region-filter" aria-label="Filtrer par type Pokémon">
-                  <option value="all">Tous les types</option>
-                </select>
-              </label>
-              <label class="region-filter-wrap collection-dim-wrap">
-                <span class="region-filter-label">Mise en avant</span>
-                <select
-                  id="collectionDimSelect"
-                  class="region-filter"
-                  aria-label="Choisir quelles cartes atténuer dans la grille"
-                >
-                      <option value="caught">Atténuer attrapés</option>
-                      <option value="missing">Atténuer manquants</option>
-                </select>
-              </label>
-            </div>
-            <p class="sync-hint" id="syncHint" hidden></p>
           </header>
 
-          <main class="grid" id="grid" aria-live="polite"></main>
-          <div id="listScrollSentinel" class="list-scroll-sentinel" aria-hidden="true"></div>
-          <p class="list-scroll-end" id="listScrollEnd" aria-live="polite" hidden></p>
+          <section class="collection-shell" aria-label="Collection Pokédex">
+            <aside class="collection-rail" aria-label="Filtres de collection">
+              <div class="list-hero">
+                <div class="list-hero-left">
+                  <p class="list-kicker">État de collection</p>
+                </div>
+                <div class="list-hero-right">
+                  <span id="listHeroPct" class="list-hero-pct">0%</span>
+                  <p id="listHeroCount" class="list-hero-count">0 / 0 découverts</p>
+                  <p
+                    id="listHeroCards"
+                    class="list-hero-cards is-dormant"
+                    aria-live="polite"
+                  >0 carte dans 0 set</p>
+                </div>
+              </div>
+
+              <div class="progress-row">
+                <div class="progress-bar" role="progressbar" aria-label="Progression de la collection" aria-valuemin="0" aria-valuemax="100">
+                  <div class="progress-bar-fill" id="progressFill"></div>
+                </div>
+                <span class="counter" id="counter">0 / 0</span>
+                <button
+                  type="button"
+                  class="kb-hint-btn"
+                  id="kbHelpTrigger"
+                  aria-label="Afficher les raccourcis clavier"
+                  title="Raccourcis clavier (touche ?)"
+                >?</button>
+              </div>
+
+              <label class="search-wrap">
+                <span class="search-icon" aria-hidden="true">⌕</span>
+                <input
+                  type="search"
+                  id="search"
+                  class="search-input"
+                  placeholder="Rechercher par nom ou numéro..."
+                  aria-label="Rechercher par nom ou numéro"
+                  autocomplete="off"
+                  spellcheck="false"
+                />
+              </label>
+
+              <div class="filters" role="group" aria-label="Filtrer par statut">
+                <button type="button" class="filter-btn is-active" data-filter="all" aria-pressed="true">
+                  Tous
+                </button>
+                <button type="button" class="filter-btn" data-filter="caught" aria-pressed="false">
+                  Attrapés
+                </button>
+                <button type="button" class="filter-btn" data-filter="missing" aria-pressed="false">
+                  Manquants
+                </button>
+              </div>
+
+              <nav
+                class="region-chips"
+                id="regionChips"
+                role="group"
+                aria-label="Filtrer par région du Pokédex"
+              ></nav>
+
+              <nav
+                class="narrative-chips"
+                id="narrativeChips"
+                role="group"
+                aria-label="Filtrer par catégorie narrative (Starter, Légendaire…)"
+                hidden
+              ></nav>
+
+              <div class="advanced-filters" id="advancedFiltersPanel">
+                <label class="region-filter-wrap">
+                  <span class="region-filter-label">Région</span>
+                  <select id="regionFilter" class="region-filter" aria-label="Filtrer par région du Pokédex">
+                    <option value="all">Toutes les régions</option>
+                  </select>
+                </label>
+                <label class="region-filter-wrap">
+                  <span class="region-filter-label">Formes</span>
+                  <select id="formFilter" class="region-filter" aria-label="Filtrer les formes dans la liste uniquement">
+                    <option value="all">Tout le dex</option>
+                    <option value="base_only">Base uniquement</option>
+                    <option value="base_regional">Base + régional</option>
+                  </select>
+                </label>
+                <label class="region-filter-wrap">
+                  <span class="region-filter-label">Type</span>
+                  <select id="typeFilter" class="region-filter" aria-label="Filtrer par type Pokémon">
+                    <option value="all">Tous les types</option>
+                  </select>
+                </label>
+                <label class="region-filter-wrap collection-dim-wrap">
+                  <span class="region-filter-label">Mise en avant</span>
+                  <select
+                    id="collectionDimSelect"
+                    class="region-filter"
+                    aria-label="Choisir quelles cartes atténuer dans la grille"
+                  >
+                    <option value="caught">Atténuer attrapés</option>
+                    <option value="missing">Atténuer manquants</option>
+                  </select>
+                </label>
+              </div>
+              <p class="sync-hint" id="syncHint" hidden></p>
+            </aside>
+
+            <section class="collection-main" aria-label="Liste des Pokémon">
+              <main class="grid" id="grid" aria-live="polite"></main>
+              <div id="listScrollSentinel" class="list-scroll-sentinel" aria-hidden="true"></div>
+              <p class="list-scroll-end" id="listScrollEnd" aria-live="polite" hidden></p>
+            </section>
+          </section>
         </div>
       </div>
 
