@@ -171,32 +171,67 @@ class CardDeleteResponse(BaseModel):
     deleted: int = Field(ge=0)
 
 
+HuntPriority = Literal["normal", "high"]
+
+
+class HuntEntry(BaseModel):
+    """A local-first search target tracked by the user."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    wanted: bool = True
+    priority: HuntPriority = "normal"
+    note: str = ""
+    updated_at: str
+
+
+class HuntList(BaseModel):
+    """Persisted shape of ``data/hunts.json``."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    version: Literal[1] = 1
+    hunts: dict[str, HuntEntry] = Field(default_factory=dict)
+
+
+class HuntPatch(BaseModel):
+    """PATCH /api/hunts/{slug} — create/update or clear a hunt target."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    wanted: bool = True
+    priority: HuntPriority = "normal"
+    note: str = Field(default="", max_length=280)
+
+
 class ExportPayload(BaseModel):
     """Full collection export — wraps progress + binder config + placements + cards."""
 
     model_config = ConfigDict(extra="forbid")
 
-    schema_version: Literal[2] = 2
+    schema_version: Literal[3] = 3
     app: str = "pokevault"
     exported_at: str
     progress: CollectionProgress
     binder_config: BinderConfigPayload
     binder_placements: BinderPlacementsPayload
     cards: list[Card] = Field(default_factory=list)
+    hunts: HuntList = Field(default_factory=HuntList)
 
 
 class ImportPayload(BaseModel):
-    """Incoming import — accepts both schema v1 (legacy, no cards) and v2."""
+    """Incoming import — accepts v1 legacy, v2 cards and v3 hunts."""
 
     model_config = ConfigDict(extra="forbid")
 
-    schema_version: Literal[1, 2]
+    schema_version: Literal[1, 2, 3]
     app: str | None = None
     exported_at: str | None = None
     progress: CollectionProgress
     binder_config: BinderConfigPayload
     binder_placements: BinderPlacementsPayload
     cards: list[Card] = Field(default_factory=list)
+    hunts: HuntList = Field(default_factory=HuntList)
 
 
 class ImportResponse(BaseModel):
@@ -206,6 +241,7 @@ class ImportResponse(BaseModel):
     caught_count: int = Field(ge=0)
     binder_count: int = Field(ge=0)
     card_count: int = Field(default=0, ge=0)
+    hunt_count: int = Field(default=0, ge=0)
 
 
 class Profile(BaseModel):

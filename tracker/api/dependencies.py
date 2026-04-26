@@ -11,11 +11,13 @@ from tracker.repository.base import (
     BinderConfigRepository,
     BinderPlacementsRepository,
     CardRepository,
+    HuntRepository,
     ProgressRepository,
 )
 from tracker.repository.json_binder_config_repository import JsonBinderConfigRepository
 from tracker.repository.json_binder_placements_repository import JsonBinderPlacementsRepository
 from tracker.repository.json_card_repository import JsonCardRepository
+from tracker.repository.json_hunt_repository import JsonHuntRepository
 from tracker.repository.json_progress_repository import JsonProgressRepository
 from tracker.services.badge_service import BadgeService
 from tracker.services.binder_config_service import BinderConfigService
@@ -23,6 +25,7 @@ from tracker.services.binder_placements_service import BinderPlacementsService
 from tracker.services.binder_workspace_service import BinderWorkspaceService
 from tracker.services.card_service import CardService
 from tracker.services.export_service import ExportService
+from tracker.services.hunt_service import HuntService
 from tracker.services.profile_service import ProfileService
 from tracker.services.progress_service import ProgressService
 
@@ -92,6 +95,19 @@ def get_card_repository(
     return JsonCardRepository(profiles.cards_path())
 
 
+def get_hunt_repository(
+    settings: Annotated[TrackerSettings, Depends(get_settings)],
+    profiles: Annotated[ProfileService, Depends(get_profile_service)],
+) -> HuntRepository:
+    return JsonHuntRepository(profiles.hunts_path())
+
+
+def get_hunt_service(
+    repository: Annotated[HuntRepository, Depends(get_hunt_repository)],
+) -> HuntService:
+    return HuntService(repository)
+
+
 def get_card_service(
     repository: Annotated[CardRepository, Depends(get_card_repository)],
     progress_service: Annotated[ProgressService, Depends(get_progress_service)],
@@ -115,11 +131,13 @@ def get_export_service(
         Depends(get_binder_placements_repository),
     ],
     card_repo: Annotated[CardRepository, Depends(get_card_repository)],
+    hunt_repo: Annotated[HuntRepository, Depends(get_hunt_repository)],
 ) -> ExportService:
     return ExportService(
         progress_repo,
         config_repo,
         placements_repo,
         card_repo,
+        hunt_repo,
         settings.pokedex_path,
     )
