@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- `v0.7.0` Hunt List: users can mark Pokémon as active searches, set high
+  priority, keep a short note, filter Collection by "Mes recherches", and let
+  Focus/Stats recommendations prioritize those hunt targets. The state is
+  persisted through `GET/PATCH /api/hunts` and included in export schema v3.
 - `v0.6.0` Next Best Action: Focus and Statistics now share a deterministic
   recommendation engine that prioritizes near-complete regions, moves
   seen-but-not-caught targets first, and renders a visible "Pourquoi ?" reason

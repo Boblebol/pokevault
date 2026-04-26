@@ -61,6 +61,8 @@
   flag with a golden glow and a ★ marker.
 - Status filters, **regional dex chips** with deep-linking
   (`#/liste?region=johto`).
+- **Mes recherches** hunt filter — mark targets from the drawer/full fiche,
+  set high priority, keep a note, and feed those priorities back into Focus.
 - **Narrative filter chips** (F05) — Starter · Légendaire · Mythique ·
   Pseudo-légendaire · Fossile · Bébé · Ultra-Chimère. Multi-select,
   deep-linked via `?tags=starter,legendary`.
@@ -174,6 +176,8 @@
 | `/api/cards`                      | GET / POST      | F08 — list / create TCG cards  |
 | `/api/cards/{id}`                 | GET / PUT / DELETE | F08 — manage a single card  |
 | `/api/cards/by-pokemon/{slug}`    | GET             | F08 — cards for a Pokédex slug |
+| `/api/hunts`                      | GET             | v0.7 — active hunt list         |
+| `/api/hunts/{slug}`               | PATCH           | v0.7 — add/update/remove a hunt target |
 | `/api/badges`                     | GET             | F12 — badge catalog + unlocked ids (auto-sync) |
 | `/api/profiles`                   | GET / POST      | F15 — list profiles / create a new one |
 | `/api/profiles/active`            | PUT             | F15 — switch the active profile |
