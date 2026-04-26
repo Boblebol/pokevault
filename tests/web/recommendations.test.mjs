@@ -57,3 +57,23 @@ test("rankTargets sorts seen-but-not-caught targets before never-seen targets", 
   assert.deepEqual(result.rows.map((p) => p.slug), ["003-c", "001-a", "002-b"]);
   assert.match(result.reason, /apercu/);
 });
+
+test("rankTargets promotes high-priority hunt targets", async () => {
+  const api = await loadModule();
+  const pool = [
+    { slug: "001-a", number: "#001", region: "kanto", names: { fr: "A" } },
+    { slug: "002-b", number: "#002", region: "kanto", names: { fr: "B" } },
+    { slug: "003-c", number: "#003", region: "kanto", names: { fr: "C" } },
+  ];
+  const statusMap = {
+    "001-a": { state: "seen", shiny: false },
+  };
+  const huntMap = {
+    "003-c": { wanted: true, priority: "high", note: "" },
+  };
+
+  const result = api.rankTargets({ pool, caughtMap: {}, statusMap, huntMap, regionDefinitions: [], limit: 3 });
+
+  assert.deepEqual(result.rows.map((p) => p.slug), ["003-c", "001-a", "002-b"]);
+  assert.match(result.reason, /recherche prioritaire/);
+});

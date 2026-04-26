@@ -4500,6 +4500,16 @@ body {
   border-color: rgba(18, 20, 36, 0.24);
 }
 
+.drawer-status-row__btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.drawer-status-row .region-filter {
+  flex: 1 1 170px;
+  min-width: 0;
+}
+
 .drawer-empty {
   margin: 0;
   font-size: 0.86rem;

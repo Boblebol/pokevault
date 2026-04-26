@@ -523,6 +523,7 @@ function matchesFilter(p) {
   const got = !!caughtMap[k];
   if (filterMode === "caught") return got;
   if (filterMode === "missing") return !got;
+  if (filterMode === "hunts") return Boolean(window.PokevaultHunts?.isWanted?.(k));
   return true;
 }
 
@@ -1540,6 +1541,7 @@ function setupKeyboardHelpTrigger() {
 
 let listCaughtSubscribed = false;
 let listDimSubscribed = false;
+let listHuntsSubscribed = false;
 
 function readStoredFormFilterMode() {
   try {
@@ -1579,6 +1581,11 @@ async function startTracker() {
   } catch {
     return;
   }
+  try {
+    await window.PokevaultHunts?.ensureLoaded?.();
+  } catch {
+    /* hunts are optional local state */
+  }
   const hashRegion = readRegionFromHash();
   if (hashRegion) {
     regionFilter = hashRegion;
@@ -1595,6 +1602,13 @@ async function startTracker() {
   if (!listDimSubscribed) {
     listDimSubscribed = true;
     window.PokedexCollection.subscribeDimMode(() => render());
+  }
+  if (!listHuntsSubscribed) {
+    listHuntsSubscribed = true;
+    window.PokevaultHunts?.subscribe?.(() => {
+      resetDisplayedCount();
+      render();
+    });
   }
   if (!window.__pokedexOnlineFlushWired) {
     window.__pokedexOnlineFlushWired = true;

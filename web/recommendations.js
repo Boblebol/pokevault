@@ -43,21 +43,31 @@
     return "not_met";
   }
 
-  function targetRank(p, caughtMap, statusMap) {
-    const state = statusState(slugOf(p), caughtMap, statusMap);
-    if (state === "seen") return 0;
-    return 1;
+  function huntRank(slug, huntMap) {
+    const hunt = huntMap?.[slug];
+    if (hunt?.wanted && hunt.priority === "high") return 0;
+    if (hunt?.wanted) return 1;
+    return 2;
   }
 
-  function sortTargets(items, caughtMap, statusMap) {
+  function targetRank(p, caughtMap, statusMap, huntMap) {
+    const slug = slugOf(p);
+    const byHunt = huntRank(slug, huntMap);
+    if (byHunt < 2) return byHunt;
+    const state = statusState(slug, caughtMap, statusMap);
+    if (state === "seen") return 2;
+    return 3;
+  }
+
+  function sortTargets(items, caughtMap, statusMap, huntMap) {
     return [...items].sort((a, b) => {
-      const byState = targetRank(a, caughtMap, statusMap) - targetRank(b, caughtMap, statusMap);
+      const byState = targetRank(a, caughtMap, statusMap, huntMap) - targetRank(b, caughtMap, statusMap, huntMap);
       if (byState !== 0) return byState;
       return nationalNum(a) - nationalNum(b);
     });
   }
 
-  function regionGroups(pool, caughtMap, statusMap, defs) {
+  function regionGroups(pool, caughtMap, statusMap, huntMap, defs) {
     const byRegion = new Map();
     for (const p of pool || []) {
       const slug = slugOf(p);
@@ -83,7 +93,7 @@
       .map((g) => ({
         ...g,
         pct: g.total ? g.caught / g.total : 0,
-        items: sortTargets(g.items, caughtMap, statusMap),
+        items: sortTargets(g.items, caughtMap, statusMap, huntMap),
       }))
       .sort((a, b) => {
         if (b.pct !== a.pct) return b.pct - a.pct;
@@ -92,8 +102,15 @@
       });
   }
 
-  function reasonFor(group, rows, caughtMap, statusMap) {
+  function reasonFor(group, rows, caughtMap, statusMap, huntMap) {
     const first = rows[0];
+    const hunt = first ? huntMap?.[slugOf(first)] : null;
+    if (hunt?.wanted && hunt.priority === "high") {
+      return `Ta recherche prioritaire ${displayName(first)} avance ${group.label}.`;
+    }
+    if (hunt?.wanted) {
+      return `Dans tes recherches : ${displayName(first)} avance ${group.label}.`;
+    }
     if (first && statusState(slugOf(first), caughtMap, statusMap) === "seen") {
       return `Deja apercu : ${displayName(first)} est le meilleur prochain pas pour ${group.label}.`;
     }
@@ -105,10 +122,11 @@
     pool = [],
     caughtMap = {},
     statusMap = {},
+    huntMap = {},
     regionDefinitions = [],
     limit = 6,
   } = {}) {
-    const groups = regionGroups(pool, caughtMap, statusMap, regionDefinitions);
+    const groups = regionGroups(pool, caughtMap, statusMap, huntMap, regionDefinitions);
     const best = groups[0];
     if (!best) {
       return {
@@ -125,7 +143,7 @@
       targetRegionId: best.id,
       targetRegion: best.label,
       targetLabel: best.label,
-      reason: reasonFor(best, rows, caughtMap, statusMap),
+      reason: reasonFor(best, rows, caughtMap, statusMap, huntMap),
       rows,
       groups,
     };
@@ -137,10 +155,10 @@
       rankTargets,
       regionGroups,
       statusState,
+      huntRank,
       sortTargets,
     };
   }
 
   window.PokevaultRecommendations = api;
 })();
-

@@ -70,6 +70,7 @@
           pool,
           caughtMap: caughtMap || {},
           statusMap: statusMap || {},
+          huntMap: window.PokevaultHunts?.state?.hunts || {},
           regionDefinitions: regionDefinitions || [],
           limit: SESSION_SIZE,
         })
@@ -179,6 +180,7 @@
       pool: Array.isArray(pool) ? pool : [],
       caughtMap: PC.caughtMap || {},
       statusMap: PC.statusMap || {},
+      huntMap: window.PokevaultHunts?.state?.hunts || {},
       regionDefinitions: PC.regionDefinitions || [],
     };
   }
@@ -369,6 +371,7 @@
   function start() {
     refresh();
     window.PokedexCollection?.subscribeCaught?.(() => refresh());
+    window.PokevaultHunts?.subscribe?.(() => refresh());
   }
 
   const api = {

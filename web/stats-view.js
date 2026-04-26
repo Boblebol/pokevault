@@ -266,6 +266,7 @@ function renderStats() {
     pool,
     caughtMap: caught,
     statusMap: PC?.statusMap || {},
+    huntMap: window.PokevaultHunts?.state?.hunts || {},
     regionDefinitions: defs,
     limit: 6,
   }) || { targetRegion: "Toutes régions", reason: "", rows: [] };
