@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Added
+
+- `v0.5.0` Focus Session MVP: Collection and Statistics rails now expose a
+  local-first six-target session that picks a near-complete region, tracks
+  completion from caught status, highlights active grid targets, and jumps
+  directly to each target without adding backend persistence.
+
 ## [1.0.0] — 2026-04-24
 
 Wave 1 → Wave 4 of the public roadmap (16 RICE-scored features) are
