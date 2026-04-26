@@ -5,6 +5,7 @@ function installBrowserStubs() {
   const storage = new Map();
   globalThis.__POKEVAULT_FOCUS_TESTS__ = true;
   globalThis.window = globalThis;
+  delete globalThis.PokevaultBadges;
   globalThis.localStorage = {
     getItem(key) {
       return storage.has(key) ? storage.get(key) : null;
@@ -67,6 +68,30 @@ test("buildSessionPlan picks the closest completable region", async () => {
   assert.equal(plan.targetLabel, "Johto");
   assert.deepEqual(plan.slugs, ["154-e"]);
   assert.match(plan.reason, /proche/);
+});
+
+test("buildSessionPlan includes the nearest badge when available", async () => {
+  const api = await loadModule();
+  globalThis.window.PokevaultBadges = {
+    nearest() {
+      return {
+        id: "century",
+        title: "Centenaire",
+        unlocked: false,
+        current: 97,
+        target: 100,
+        percent: 97,
+      };
+    },
+  };
+  const pool = [
+    { slug: "001-a", number: "#001", region: "kanto", names: { fr: "A" } },
+    { slug: "002-b", number: "#002", region: "kanto", names: { fr: "B" } },
+  ];
+
+  const plan = api.buildSessionPlan(pool, {}, []);
+
+  assert.match(plan.reason, /Badge proche : Centenaire \(97\/100\)/);
 });
 
 test("syncSessionCompletion keeps only caught targets as completed", async () => {

@@ -5220,6 +5220,28 @@ html[data-theme="paldea"] {
   color: var(--muted);
 }
 
+.badge-tile__meter {
+  position: relative;
+  height: 5px;
+  margin-top: 8px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.badge-tile__meter-fill {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--accent);
+}
+
+.badge-tile__progress {
+  margin: 5px 0 0;
+  font-size: 0.74rem;
+  color: var(--muted);
+}
+
 .badge-tile__status {
   font-size: 0.7rem;
   text-transform: uppercase;
@@ -5234,6 +5256,47 @@ html[data-theme="paldea"] {
 .stats-badges-empty {
   color: var(--muted);
   font-size: 0.85rem;
+}
+
+.stats-rail-badge {
+  padding: 10px 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.stats-rail-badge__kicker {
+  margin: 0 0 4px;
+  color: var(--muted);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.stats-rail-badge__title {
+  margin: 0;
+  font-size: 0.92rem;
+  font-weight: 700;
+}
+
+.stats-rail-badge__meta {
+  margin: 3px 0 8px;
+  color: var(--muted);
+  font-size: 0.78rem;
+  line-height: 1.35;
+}
+
+.stats-rail-badge__bar {
+  height: 6px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.stats-rail-badge__fill {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--accent);
 }
 
 /* ── F15: Profil multi-Pokédex ── */

@@ -81,6 +81,33 @@ function renderKpiCard(label, value, sub, modifier) {
   return item;
 }
 
+function renderStatsRailBadge(badge) {
+  const host = document.getElementById("statsRailBadge");
+  if (!host) return;
+  host.replaceChildren();
+  if (!badge || badge.unlocked) {
+    host.hidden = true;
+    return;
+  }
+  host.hidden = false;
+  const title = document.createElement("p");
+  title.className = "stats-rail-badge__kicker";
+  title.textContent = "Prochain badge";
+  const name = document.createElement("p");
+  name.className = "stats-rail-badge__title";
+  name.textContent = badge.title || "Badge";
+  const meta = document.createElement("p");
+  meta.className = "stats-rail-badge__meta";
+  meta.textContent = `${badge.current || 0} / ${badge.target || 1} · ${badge.hint || ""}`;
+  const bar = document.createElement("div");
+  bar.className = "stats-rail-badge__bar";
+  const fill = document.createElement("span");
+  fill.className = "stats-rail-badge__fill";
+  fill.style.width = `${Math.max(0, Math.min(100, Number(badge.percent) || 0))}%`;
+  bar.append(fill);
+  host.append(title, name, meta, bar);
+}
+
 function renderStatsRail(caught, total) {
   const pct = total ? Math.round((caught / total) * 100) : 0;
   const pctEl = document.getElementById("statsRailPct");
@@ -89,6 +116,7 @@ function renderStatsRail(caught, total) {
   if (pctEl) pctEl.textContent = `${pct}%`;
   if (countEl) countEl.textContent = `${caught} / ${total} attrapés`;
   if (missingEl) missingEl.textContent = `${Math.max(0, total - caught)} manquants`;
+  renderStatsRailBadge(window.PokevaultBadges?.nearest?.());
 }
 
 function renderStats() {
@@ -348,7 +376,10 @@ function startStatsIfNeeded() {
     if (!statsStarted) {
       statsStarted = true;
       window.PokedexCollection?.subscribeCaught?.(() => renderStats());
-      window.PokevaultBadges?.subscribe?.(() => renderBadgesBlock());
+      window.PokevaultBadges?.subscribe?.(() => {
+        renderStats();
+        renderBadgesBlock();
+      });
     }
     renderStats();
     window.PokevaultBadges?.poll?.().then(() => renderBadgesBlock());

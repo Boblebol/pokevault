@@ -63,6 +63,22 @@
     };
   }
 
+  function nearestBadgeReason() {
+    const badge = window.PokevaultBadges?.nearest?.();
+    if (!badge || badge.unlocked) return "";
+    const current = Number.isFinite(Number(badge.current)) ? Number(badge.current) : 0;
+    const target = Number.isFinite(Number(badge.target)) ? Number(badge.target) : 1;
+    const title = String(badge.title || "").trim();
+    if (!title) return "";
+    return `Badge proche : ${title} (${current}/${target}).`;
+  }
+
+  function appendBadgeReason(reason) {
+    const badgeReason = nearestBadgeReason();
+    if (!badgeReason) return reason;
+    return `${reason || "Session courte pour garder le fil."} ${badgeReason}`;
+  }
+
   function buildSessionPlan(pool, caughtMap, regionDefinitions, statusMap = {}) {
     const recommender = window.PokevaultRecommendations?.rankTargets;
     const ranked = recommender
@@ -81,7 +97,7 @@
       startedAt: new Date().toISOString(),
       targetRegion: ranked.targetRegionId || "all",
       targetLabel: ranked.targetLabel || ranked.targetRegion || "National",
-      reason: ranked.reason || "Session courte pour garder le fil.",
+      reason: appendBadgeReason(ranked.reason),
       slugs: ranked.rows.slice(0, SESSION_SIZE).map(slugOf).filter(Boolean),
       completed: [],
     };
