@@ -424,10 +424,10 @@ git commit -m "docs: document focus session release"
 - Modify: `tests/tracker/test_badge_service.py`
 - Modify: `tests/tracker/test_badge_api.py`
 
-- [ ] Extend `BadgeDefinition` with `current`, `target`, `percent`, and `hint`.
-- [ ] Replace predicate-only badge definitions with evaluator functions returning progress.
-- [ ] Preserve monotonic `unlocked` behavior.
-- [ ] Commit with `feat(tracker): expose badge progress`.
+- [x] Extend `BadgeDefinition` with `current`, `target`, `percent`, and `hint`.
+- [x] Replace predicate-only badge definitions with evaluator functions returning progress.
+- [x] Preserve monotonic `unlocked` behavior.
+- [x] Commit with `feat(tracker): expose badge progress`.
 
 ### Task 2: Render Badge Guidance
 
@@ -437,9 +437,8 @@ git commit -m "docs: document focus session release"
 - Modify: `web/stats-view.js`
 - Modify: `web/styles.css`
 
-- [ ] Add progress bars to locked badge tiles.
-- [ ] Surface nearest badge in Stats rail.
-- [ ] Add nearest badge as an optional Focus session reason.
-- [ ] Run JS syntax checks and full pytest.
-- [ ] Commit with `feat(ui): show badge progression`.
-
+- [x] Add progress bars to locked badge tiles.
+- [x] Surface nearest badge in Stats rail.
+- [x] Add nearest badge as an optional Focus session reason.
+- [x] Run JS syntax checks and full pytest.
+- [x] Commit with `feat(ui): show badge progression`.

@@ -9,6 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- `v0.8.0` Badge Progression V2: `GET /api/badges` now exposes progress
+  metadata (`current`, `target`, `percent`, `hint`) for every badge. Locked
+  badge tiles render progress bars, the Stats rail surfaces the nearest badge,
+  and Focus sessions can mention that badge as an extra reason to keep the next
+  action tied to a visible milestone.
 - `v0.7.0` Hunt List: users can mark Pokémon as active searches, set high
   priority, keep a short note, filter Collection by "Mes recherches", and let
   Focus/Stats recommendations prioritize those hunt targets. The state is

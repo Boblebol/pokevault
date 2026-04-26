@@ -139,8 +139,8 @@
   offline with `make fetch-shiny` (downloads the 1025 artworks from
   PokéAPI, respects `--limit` / `--force`). Both the theme and artwork
   choices persist in `localStorage`.
-- **Données** — export / import the full backup (schema v2 carrying
-  cards), launch the printable checklist.
+- **Données** — export / import the full backup (schema v3 carrying
+  cards and hunt-list targets), launch the printable checklist.
 - **Profil** — replay the onboarding wizard (F00).
 - **Pokédex multi-profils** — switcher + create/delete to maintain
   several isolated Pokédex (e.g. *Hardcore*, *Casual*, *Shiny only*).
@@ -157,7 +157,11 @@
   the underlying counter drops (e.g. uncatching a slug).
 - Persisted as `badges_unlocked: list[str]` inside
   `data/collection-progress.json`. `GET /api/badges` returns the full
-  catalog with the `unlocked` flag and triggers a sync on each read.
+  catalog with `unlocked`, `current`, `target`, `percent` and `hint`
+  metadata, and triggers a sync on each read.
+- Locked badge tiles show progress bars. The Statistics rail highlights
+  the nearest locked badge, and Focus sessions can reuse it as a visible
+  reason to keep the next action tied to a milestone.
 - Frontend toasts (`web/toast.js`) pop accessible notifications when new
   badges land (silent on first load).
 
@@ -178,7 +182,7 @@
 | `/api/cards/by-pokemon/{slug}`    | GET             | F08 — cards for a Pokédex slug |
 | `/api/hunts`                      | GET             | v0.7 — active hunt list         |
 | `/api/hunts/{slug}`               | PATCH           | v0.7 — add/update/remove a hunt target |
-| `/api/badges`                     | GET             | F12 — badge catalog + unlocked ids (auto-sync) |
+| `/api/badges`                     | GET             | F12/v0.8 — badge catalog, progress metadata + unlocked ids |
 | `/api/profiles`                   | GET / POST      | F15 — list profiles / create a new one |
 | `/api/profiles/active`            | PUT             | F15 — switch the active profile |
 | `/api/profiles/{id}`              | DELETE          | F15 — delete a profile (default forbidden) |
@@ -186,8 +190,8 @@
 | `/api/binder/{id}`                | GET / PUT / DELETE | Manage a binder             |
 | `/api/binder/config`              | GET / PUT       | Binder configuration           |
 | `/api/binder/placements`          | GET / PUT       | Binder placements              |
-| `/api/export`                     | GET             | Full backup export (JSON, v2)  |
-| `/api/import`                     | POST            | Full backup restore (v1 or v2) |
+| `/api/export`                     | GET             | Full backup export (JSON, v3)  |
+| `/api/import`                     | POST            | Full backup restore (v1, v2 or v3) |
 | `/api/health`                     | GET             | Liveness probe                 |
 | `/data/pokedex.json`              | GET             | Pokédex data                   |
 | `/data/narrative-tags.json`       | GET             | Narrative tags (Starter, Légendaire, …) |
