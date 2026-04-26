@@ -77,6 +77,12 @@
                 >?</button>
               </div>
 
+              <section
+                class="focus-panel"
+                id="focusPanelList"
+                aria-label="Session focus collection"
+              ></section>
+
               <label class="search-wrap">
                 <span class="search-icon" aria-hidden="true">⌕</span>
                 <input
@@ -178,6 +184,11 @@
             <div class="stats-rail-note">
               Les statistiques suivent le même périmètre de formes que la collection.
             </div>
+            <section
+              class="focus-panel focus-panel--stats"
+              id="focusPanelStats"
+              aria-label="Session focus statistiques"
+            ></section>
           </aside>
           <main class="stats-content">
             <section class="stats-main" id="statsBody"></section>
@@ -653,6 +664,7 @@
     <script src="/pokemon-full-view.js" defer></script>
     <script src="/binder-v2.js" defer></script>
     <script src="/app.js" defer></script>
+    <script src="/focus-session.js" defer></script>
     <script src="/binder-collection-view.js" defer></script>
     <script src="/stats-view.js" defer></script>
     <script src="/print-view.js" defer></script>

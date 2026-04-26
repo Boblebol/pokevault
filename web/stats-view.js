@@ -134,6 +134,7 @@ function renderStats() {
       const node = ES.render(host, "statsEmpty");
       if (node) host.append(node);
       renderStatsRail(0, pool.length);
+      window.PokevaultFocus?.refresh?.();
       return;
     }
   }
@@ -337,6 +338,7 @@ function renderStats() {
   }
 
   host.append(bento);
+  window.PokevaultFocus?.refresh?.();
 }
 
 let statsStarted = false;

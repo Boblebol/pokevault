@@ -1489,6 +1489,7 @@ function render() {
         })();
     if (node) grid.append(node);
     updateListDisplayInfo({ full: sliced.full, end: 0, total: 0 });
+    window.PokevaultFocus?.refresh?.();
     return;
   }
 
@@ -1498,6 +1499,7 @@ function render() {
 
   updateListDisplayInfo({ full: sliced.full, end: sliced.end, total: sliced.total });
   window.PokevaultKeyboard?.repaint?.();
+  window.PokevaultFocus?.refresh?.();
 }
 
 function setupFilters() {
