@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Install - Pokevault</title>
+    <meta name="description" content="Install and run Pokevault locally with uv, make or Docker.">
+    <link rel="stylesheet" href="assets/site.css">
+    <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+    <script src="assets/site.js" defer></script>
+  </head>
+  <body>
+    <header class="site-header">
+      <nav class="nav" aria-label="Main navigation">
+        <a class="brand" href="index.html" data-nav><span class="brand-mark" aria-hidden="true"><img src="assets/logo-mark.svg" alt=""></span><span>pokevault</span></a>
+        <div class="nav-links">
+          <a href="features.html" data-nav>Features</a>
+          <a href="install.html" data-nav>Install</a>
+          <a href="architecture.html" data-nav>Architecture</a>
+          <a href="roadmap.html" data-nav>Roadmap</a>
+          <a href="contributing.html" data-nav>Contribute</a>
+          <a href="https://github.com/Boblebol/pokevault">GitHub</a>
+        </div>
+      </nav>
+    </header>
+
+    <main class="page">
+      <section class="section">
+        <div class="section-head">
+          <p class="eyebrow">Run locally</p>
+          <h1>Install</h1>
+          <p>Use Python 3.10+ and uv. The reference Pokedex JSON is already shipped, so the UI starts without scraping first.</p>
+        </div>
+        <div class="grid grid-2">
+          <div class="step">
+            <h3>1. Local server</h3>
+            <p>Recommended for development and everyday use.</p>
+            <div class="code-card">
+              <button class="copy-btn" type="button" data-copy="#local-install">Copy</button>
+              <pre id="local-install"><code>git clone https://github.com/Boblebol/pokevault.git
+cd pokevault
+make install
+make dev</code></pre>
+            </div>
+          </div>
+          <div class="step">
+            <h3>2. Docker</h3>
+            <p>Build and run the tracker container on localhost.</p>
+            <div class="code-card">
+              <button class="copy-btn" type="button" data-copy="#docker-install">Copy</button>
+              <pre id="docker-install"><code>make docker-build
+make docker-up
+make docker-logs</code></pre>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-head">
+          <p class="eyebrow">Data files</p>
+          <h2>Readable JSON, versionable if you want it.</h2>
+        </div>
+        <table class="table">
+          <thead><tr><th>Path</th><th>Purpose</th></tr></thead>
+          <tbody>
+            <tr><td><code>data/pokedex.json</code></td><td>Tracked reference Pokedex shipped with the repository.</td></tr>
+            <tr><td><code>data/narrative-tags.json</code></td><td>Tracked narrative tag definitions.</td></tr>
+            <tr><td><code>data/collection-progress.json</code></td><td>Local user progress and badge unlocks.</td></tr>
+            <tr><td><code>data/collection-cards.json</code></td><td>Local physical card catalog.</td></tr>
+            <tr><td><code>data/binder-*.json</code></td><td>Local binder configuration and placements.</td></tr>
+            <tr><td><code>data/profiles/</code></td><td>Per-profile local state for additional Pokedex profiles.</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section class="section">
+        <div class="section-head">
+          <p class="eyebrow">Useful commands</p>
+          <h2>Scrape, test and export.</h2>
+        </div>
+        <div class="grid grid-3">
+          <article class="feature"><h3>Fast scrape</h3><p><code>make fetch-test</code> scrapes 10 entries without images.</p></article>
+          <article class="feature"><h3>Full scrape</h3><p><code>make fetch</code> refreshes the Pokedex and sprite images.</p></article>
+          <article class="feature"><h3>Quality gate</h3><p><code>make check</code> runs lint and tracker coverage.</p></article>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="footer-inner">
+        <span>Default URL: http://127.0.0.1:8765</span>
+        <span><a href="../README.md">Full README</a> · <a href="../Makefile">Makefile</a></span>
+      </div>
+    </footer>
+  </body>
+</html>

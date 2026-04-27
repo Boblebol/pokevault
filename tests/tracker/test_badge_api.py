@@ -47,6 +47,33 @@ def test_badges_endpoint_empty_state(tmp_path: Path) -> None:
     assert all(b["unlocked"] is False for b in body["catalog"])
 
 
+def test_badges_endpoint_exposes_progress_metadata(tmp_path: Path) -> None:
+    client = _build_app(tmp_path)
+    pr = client.patch(
+        "/api/progress/status",
+        json={"slug": "0025-pikachu", "state": "caught"},
+    )
+    assert pr.status_code == 200
+
+    body = client.get("/api/badges").json()
+
+    by_id = {b["id"]: b for b in body["catalog"]}
+    assert by_id["first_catch"] == {
+        "id": "first_catch",
+        "title": "Premier Pokéball",
+        "description": "Attraper ton premier Pokémon.",
+        "unlocked": True,
+        "current": 1,
+        "target": 1,
+        "percent": 100,
+        "hint": "Badge obtenu.",
+    }
+    assert by_id["century"]["current"] == 1
+    assert by_id["century"]["target"] == 100
+    assert by_id["century"]["percent"] == 1
+    assert by_id["century"]["hint"] == "Encore 99 Pokémon à attraper."
+
+
 def test_badges_auto_sync_on_read(tmp_path: Path) -> None:
     client = _build_app(tmp_path)
     pr = client.patch(

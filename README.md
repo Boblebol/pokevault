@@ -8,6 +8,10 @@
 > No account, no cloud — your data stays yours.
 
 <p align="center">
+  <img src="docs/assets/logo.svg" alt="pokevault logo" width="140">
+</p>
+
+<p align="center">
   <img src="docs/screenshots/list-view.png" alt="List View — Specimens" width="100%">
 </p>
 
@@ -61,6 +65,8 @@
   flag with a golden glow and a ★ marker.
 - Status filters, **regional dex chips** with deep-linking
   (`#/liste?region=johto`).
+- **Mes recherches** hunt filter — mark targets from the drawer/full fiche,
+  set high priority, keep a note, and feed those priorities back into Focus.
 - **Narrative filter chips** (F05) — Starter · Légendaire · Mythique ·
   Pseudo-légendaire · Fossile · Bébé · Ultra-Chimère. Multi-select,
   deep-linked via `?tags=starter,legendary`.
@@ -137,8 +143,8 @@
   offline with `make fetch-shiny` (downloads the 1025 artworks from
   PokéAPI, respects `--limit` / `--force`). Both the theme and artwork
   choices persist in `localStorage`.
-- **Données** — export / import the full backup (schema v2 carrying
-  cards), launch the printable checklist.
+- **Données** — export / import the full backup (schema v3 carrying
+  cards and hunt-list targets), launch the printable checklist.
 - **Profil** — replay the onboarding wizard (F00).
 - **Pokédex multi-profils** — switcher + create/delete to maintain
   several isolated Pokédex (e.g. *Hardcore*, *Casual*, *Shiny only*).
@@ -155,7 +161,11 @@
   the underlying counter drops (e.g. uncatching a slug).
 - Persisted as `badges_unlocked: list[str]` inside
   `data/collection-progress.json`. `GET /api/badges` returns the full
-  catalog with the `unlocked` flag and triggers a sync on each read.
+  catalog with `unlocked`, `current`, `target`, `percent` and `hint`
+  metadata, and triggers a sync on each read.
+- Locked badge tiles show progress bars. The Statistics rail highlights
+  the nearest locked badge, and Focus sessions can reuse it as a visible
+  reason to keep the next action tied to a milestone.
 - Frontend toasts (`web/toast.js`) pop accessible notifications when new
   badges land (silent on first load).
 
@@ -174,7 +184,9 @@
 | `/api/cards`                      | GET / POST      | F08 — list / create TCG cards  |
 | `/api/cards/{id}`                 | GET / PUT / DELETE | F08 — manage a single card  |
 | `/api/cards/by-pokemon/{slug}`    | GET             | F08 — cards for a Pokédex slug |
-| `/api/badges`                     | GET             | F12 — badge catalog + unlocked ids (auto-sync) |
+| `/api/hunts`                      | GET             | v0.7 — active hunt list         |
+| `/api/hunts/{slug}`               | PATCH           | v0.7 — add/update/remove a hunt target |
+| `/api/badges`                     | GET             | F12/v0.8 — badge catalog, progress metadata + unlocked ids |
 | `/api/profiles`                   | GET / POST      | F15 — list profiles / create a new one |
 | `/api/profiles/active`            | PUT             | F15 — switch the active profile |
 | `/api/profiles/{id}`              | DELETE          | F15 — delete a profile (default forbidden) |
@@ -182,8 +194,8 @@
 | `/api/binder/{id}`                | GET / PUT / DELETE | Manage a binder             |
 | `/api/binder/config`              | GET / PUT       | Binder configuration           |
 | `/api/binder/placements`          | GET / PUT       | Binder placements              |
-| `/api/export`                     | GET             | Full backup export (JSON, v2)  |
-| `/api/import`                     | POST            | Full backup restore (v1 or v2) |
+| `/api/export`                     | GET             | Full backup export (JSON, v3)  |
+| `/api/import`                     | POST            | Full backup restore (v1, v2 or v3) |
 | `/api/health`                     | GET             | Liveness probe                 |
 | `/data/pokedex.json`              | GET             | Pokédex data                   |
 | `/data/narrative-tags.json`       | GET             | Narrative tags (Starter, Légendaire, …) |
@@ -358,12 +370,19 @@ pokevault/
 | File                          | Tracked | Description                         |
 |-------------------------------|:-------:|-------------------------------------|
 | `pokedex.json`                | ✅      | Full Pokédex reference (shipped)    |
+| `narrative-tags.json`         | ✅      | Curated narrative tags              |
 | `images/`                     | ✖       | Downloaded sprites and images       |
+| `images_shiny/`               | ✖       | Optional shiny artwork cache        |
 | `collection-progress.json`    | ✖       | Caught/missing progress by slug     |
+| `collection-cards.json`       | ✖       | Physical card catalog               |
+| `hunts.json`                  | ✖       | Active search targets               |
 | `binder-config.json`          | ✖       | Binder configuration                |
 | `binder-placements.json`      | ✖       | Placements slug → page/slot         |
+| `profiles.json`               | ✖       | Active profile registry             |
+| `profiles/<id>/...`           | ✖       | Per-profile local state             |
 
-Only `data/pokedex.json` is versioned — all user state stays out of Git.
+Only `data/pokedex.json` and `data/narrative-tags.json` are versioned — all
+user state stays out of Git.
 
 ---
 
@@ -409,12 +428,12 @@ Delivery status:
 
 - **Wave 1 — Polish immédiat** — ✅ complete (F07 · F04 · F01 · F06).
 - **Wave 2 — Activation & Pokédex identity** — ✅ complete (F00 · F03 · F05).
-- **Wave 3 — Card Layer** — next up (F08 card data model unblocks the
-  cards drawer, auto-derivation of caught from cards, full-screen
-  Pokédex page).
+- **Wave 3 — Card Layer** — ✅ complete (F08 · F09 · F02 · F10).
+- **Wave 4 — Delights** — ✅ complete (F11 · F12 · F15 · F14 · F13).
 
-See the [Unreleased](CHANGELOG.md) section for the complete list of
-shipped items in the latest wave.
+Post-1.0 work currently on `main` is documented in [CHANGELOG.md](CHANGELOG.md).
+Ideas that are known but intentionally delayed live in
+[docs/POSTPONED.md](docs/POSTPONED.md).
 
 ---
 
@@ -448,6 +467,17 @@ Quick version:
 **Alexandre Enouf** — [alexandre-enouf.fr](https://alexandre-enouf.fr)
 
 Live demo: [pokevault.alexandre-enouf.fr](https://pokevault.alexandre-enouf.fr)
+
+---
+
+## Project Site
+
+The GitHub Pages site lives in [docs/index.html](docs/index.html). It is a
+zero-build static site that presents the product, install guide, architecture,
+roadmap and contribution flow.
+
+When GitHub Pages is enabled for the repository, configure it to deploy from the
+`docs/` folder on `main`.
 
 ---
 

@@ -26,14 +26,15 @@ Pour télécharger les sprites localement :
 ```bash
 make fetch              # scrape + images (~1500 fichiers)
 make fetch-test         # 10 entrées, sans images
+make fetch-shiny        # artworks shiny optionnels
 ```
 
 ## Roadmap produit
 
 Avant de proposer une nouvelle feature, jette un œil à [docs/ROADMAP.md](docs/ROADMAP.md)
-pour voir où elle s'inscrit (priorisation RICE, vagues de livraison, dépendances
-techniques). Les PR qui ciblent une feature déjà priorisée sont particulièrement
-bienvenues.
+et [docs/POSTPONED.md](docs/POSTPONED.md). La roadmap publique v1 est livrée ;
+les idées explicitement repoussées ne doivent pas revenir dans une PR sans une
+nouvelle user story, des critères d'acceptation et une décision de scope claire.
 
 ## Workflow de développement
 
@@ -100,6 +101,8 @@ l'historique mais ne sont plus recommandés pour les nouvelles PR.
 
 - Les tests sont dans `tests/` et utilisent [pytest](https://docs.pytest.org/).
 - Le module `tracker/` doit maintenir **100% de couverture** (lignes).
+- Les tests web légers utilisent le runner Node natif :
+  `node --test tests/web/*.test.mjs`.
 - Les tests d'intégration API utilisent `httpx` avec le `TestClient` FastAPI.
 - Les endpoints `GET /api/export`, `POST /api/import` et `GET /api/health` doivent rester couverts.
 
@@ -118,6 +121,11 @@ l'historique mais ne sont plus recommandés pour les nouvelles PR.
 
 - `data/pokedex.json` est versionné et sert de source de référence pour l'UI
   et pour les tests end-to-end du filtrage de formes.
+- `data/narrative-tags.json` est versionné avec les tags narratifs.
+- Les fichiers d'état utilisateur restent gitignorés :
+  `collection-progress.json`, `collection-cards.json`, `hunts.json`,
+  `binder-config.json`, `binder-placements.json`, `profiles.json` et
+  `profiles/<id>/...`.
 - Toute modification du scraper doit être validée par `pytest tests/` puis
   idéalement par un `make fetch-test` pour ne pas casser le format.
 - Cas sensibles à ne pas régresser :
@@ -132,6 +140,19 @@ l'historique mais ne sont plus recommandés pour les nouvelles PR.
 - Les fichiers sont dans `web/` et servis directement par FastAPI.
 - La vue `#/print` doit rester légère et orientée impression (pas d'images).
 - Toute évolution export/import doit mettre à jour `README.md` et `CHANGELOG.md`.
+
+### GitHub Pages
+
+- Le site public statique vit dans `docs/`.
+- Il est volontairement sans build : HTML, CSS et JavaScript vanilla.
+- Toute nouvelle page doit être couverte par `tests/test_docs_site.py`.
+- Les liens internes du site doivent rester relatifs pour fonctionner sur
+  GitHub Pages depuis le dossier `/docs`.
+
+### Sécurité
+
+Ne publie pas de faille de sécurité en issue publique. Consulte
+[SECURITY.md](SECURITY.md) pour le canal de signalement et le périmètre.
 
 ## Structure des contributions
 

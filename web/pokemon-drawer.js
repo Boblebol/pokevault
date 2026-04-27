@@ -37,6 +37,7 @@
   /** @type {Map<string, Array<object>>} */ const cardsCache = new Map();
   /** @type {{cards: number, sets: number} | null} */ let summaryCache = null;
   /** @type {Promise<object> | null} */ let summaryPromise = null;
+  let huntsSubscribed = false;
 
   function ensureMarkup() {
     if (rootEl) return;
@@ -50,6 +51,12 @@
     if (closeBtn) closeBtn.addEventListener("click", () => close());
     if (scrim) scrim.addEventListener("click", () => close());
     rootEl.addEventListener("keydown", onKeydown);
+    if (!huntsSubscribed) {
+      huntsSubscribed = true;
+      window.PokevaultHunts?.subscribe?.(() => {
+        if (currentSlug) renderAll();
+      });
+    }
   }
 
   function onKeydown(event) {
@@ -466,6 +473,86 @@
     section.parentElement.replaceWith(newSection);
   }
 
+  function buildHuntSection(slug) {
+    const section = document.createElement("section");
+    section.className = "drawer-section";
+    const h = document.createElement("h3");
+    h.className = "drawer-section__title";
+    h.textContent = "Mes recherches";
+    section.append(h);
+
+    const entry = window.PokevaultHunts?.entry?.(slug);
+    const row = document.createElement("div");
+    row.className = "drawer-status-row";
+
+    const label = document.createElement("span");
+    label.className = "drawer-status-row__label";
+    label.textContent = entry
+      ? entry.priority === "high" ? "Priorite haute" : "Recherche active"
+      : "Pas dans tes recherches";
+    row.append(label);
+
+    const toggle = document.createElement("button");
+    toggle.type = "button";
+    toggle.className = "drawer-status-row__btn";
+    toggle.textContent = entry ? "Retirer" : "Rechercher";
+    toggle.addEventListener("click", async () => {
+      await patchHunt(slug, entry ? { wanted: false } : { wanted: true, priority: "normal" });
+    });
+    row.append(toggle);
+
+    const priority = document.createElement("button");
+    priority.type = "button";
+    priority.className = "drawer-status-row__btn";
+    priority.textContent = entry?.priority === "high" ? "Priorite normale" : "Priorite haute";
+    priority.disabled = !entry;
+    priority.addEventListener("click", async () => {
+      await patchHunt(slug, {
+        wanted: true,
+        priority: entry?.priority === "high" ? "normal" : "high",
+        note: entry?.note || "",
+      });
+    });
+    row.append(priority);
+    section.append(row);
+
+    const noteRow = document.createElement("div");
+    noteRow.className = "drawer-status-row";
+    const note = document.createElement("input");
+    note.className = "region-filter";
+    note.type = "text";
+    note.maxLength = 280;
+    note.placeholder = "Note de recherche";
+    note.value = entry?.note || "";
+    note.disabled = !entry;
+    noteRow.append(note);
+    const save = document.createElement("button");
+    save.type = "button";
+    save.className = "drawer-status-row__btn";
+    save.textContent = "Sauver";
+    save.disabled = !entry;
+    save.addEventListener("click", async () => {
+      await patchHunt(slug, {
+        wanted: true,
+        priority: entry?.priority || "normal",
+        note: note.value,
+      });
+    });
+    noteRow.append(save);
+    section.append(noteRow);
+    return section;
+  }
+
+  async function patchHunt(slug, body) {
+    try {
+      await window.PokevaultHunts?.patch?.(slug, body);
+      notify("Recherche mise a jour.", "ok");
+    } catch (err) {
+      console.error("drawer: hunt patch failed", err);
+      notify("Recherche impossible a modifier.", "error");
+    }
+  }
+
   function buildCardsSection() {
     const section = document.createElement("section");
     section.className = "drawer-section";
@@ -508,6 +595,7 @@
     contentEl.append(
       buildHeader(p),
       buildStatusSection(currentSlug),
+      buildHuntSection(currentSlug),
       buildCardsSection(),
     );
     void renderCardList();

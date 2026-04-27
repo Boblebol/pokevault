@@ -36,6 +36,51 @@
     return (next.unlocked || []).filter((id) => !before.has(id));
   }
 
+  function progressNumber(value, fallback = 0) {
+    const n = Number.parseInt(String(value ?? ""), 10);
+    return Number.isFinite(n) ? n : fallback;
+  }
+
+  function normalizeProgress(badge) {
+    const target = Math.max(1, progressNumber(badge?.target, 1));
+    const current = Math.max(0, Math.min(progressNumber(badge?.current, 0), target));
+    const rawPercent = progressNumber(badge?.percent, -1);
+    const computedPercent = current >= target ? 100 : Math.floor((current / target) * 100);
+    const percent = Math.max(0, Math.min(rawPercent >= 0 ? rawPercent : computedPercent, 100));
+    return {
+      current,
+      target,
+      percent: badge?.unlocked ? 100 : percent,
+      remaining: Math.max(0, target - current),
+      hint: typeof badge?.hint === "string" ? badge.hint : "",
+    };
+  }
+
+  function nearestBadge(state = cachedState) {
+    const catalog = Array.isArray(state?.catalog) ? state.catalog : [];
+    const locked = catalog
+      .filter((b) => b && !b.unlocked)
+      .map((b, index) => ({ ...b, _progress: normalizeProgress(b), _index: index }));
+    if (!locked.length) return null;
+    locked.sort((a, b) => {
+      if (b._progress.percent !== a._progress.percent) {
+        return b._progress.percent - a._progress.percent;
+      }
+      if (a._progress.remaining !== b._progress.remaining) {
+        return a._progress.remaining - b._progress.remaining;
+      }
+      return a._index - b._index;
+    });
+    const { _progress, _index, ...badge } = locked[0];
+    return {
+      ...badge,
+      current: _progress.current,
+      target: _progress.target,
+      percent: _progress.percent,
+      hint: _progress.hint,
+    };
+  }
+
   function announce(newIds, next) {
     const T = window.PokevaultToast;
     if (!T || !newIds.length) return;
@@ -136,6 +181,7 @@
     tile.className = "badge-tile";
     if (badge.unlocked) tile.classList.add("is-unlocked");
     tile.setAttribute("role", "listitem");
+    const progress = normalizeProgress(badge);
 
     const icon = document.createElement("span");
     icon.className = "material-symbols-outlined badge-tile__icon";
@@ -152,11 +198,28 @@
     d.className = "badge-tile__desc";
     d.textContent = badge.description;
     body.append(t, d);
+    if (!badge.unlocked) {
+      const meter = document.createElement("div");
+      meter.className = "badge-tile__meter";
+      meter.setAttribute("role", "progressbar");
+      meter.setAttribute("aria-valuemin", "0");
+      meter.setAttribute("aria-valuemax", "100");
+      meter.setAttribute("aria-valuenow", String(progress.percent));
+      const fill = document.createElement("span");
+      fill.className = "badge-tile__meter-fill";
+      fill.style.width = `${progress.percent}%`;
+      meter.append(fill);
+
+      const meta = document.createElement("p");
+      meta.className = "badge-tile__progress";
+      meta.textContent = `${progress.current} / ${progress.target} · ${progress.hint}`;
+      body.append(meter, meta);
+    }
     tile.append(body);
 
     const status = document.createElement("span");
     status.className = "badge-tile__status";
-    status.textContent = badge.unlocked ? "Obtenu" : "Verrouillé";
+    status.textContent = badge.unlocked ? "Obtenu" : `${progress.percent}%`;
     tile.append(status);
 
     return tile;
@@ -184,8 +247,15 @@
     poll,
     subscribe,
     renderInto,
+    nearest: nearestBadge,
     get state() {
       return cachedState;
     },
   };
+  if (window.__POKEVAULT_BADGES_TESTS__) {
+    window.PokevaultBadges._test = {
+      nearestBadge,
+      normalizeProgress,
+    };
+  }
 })();

@@ -11,24 +11,58 @@ Persisted as ``badges_unlocked: list[str]`` inside
 
 from __future__ import annotations
 
-from collections.abc import Callable
 from dataclasses import dataclass
 
 from tracker.models import BadgeDefinition, BadgeState, Card, CollectionProgress
 from tracker.repository.base import CardRepository, ProgressRepository
 
-BadgePredicate = Callable[[CollectionProgress, list[Card]], bool]
+
+@dataclass(frozen=True)
+class BadgeProgress:
+    current: int
+    target: int
+    hint_unit: str
+
+    @property
+    def complete(self) -> bool:
+        return self.current >= self.target
+
+    @property
+    def percent(self) -> int:
+        if self.complete:
+            return 100
+        return max(0, min(99, int((self.current / self.target) * 100)))
+
+    @property
+    def hint(self) -> str:
+        if self.complete:
+            return "Badge obtenu."
+        remaining = self.target - self.current
+        return f"Encore {remaining} {self.hint_unit}."
 
 
 @dataclass(frozen=True)
 class BadgeDef:
-    """Internal badge definition — ``id`` is public & stable, ``predicate``
-    is evaluated on every mutation."""
+    """Internal badge definition — ``id`` is public & stable."""
 
     id: str
     title: str
     description: str
-    predicate: BadgePredicate
+    metric: str
+    target: int
+    hint_unit: str
+
+    def progress(
+        self,
+        progress: CollectionProgress,
+        cards: list[Card],
+    ) -> BadgeProgress:
+        current = _metric_value(self.metric, progress, cards)
+        return BadgeProgress(
+            current=max(0, min(current, self.target)),
+            target=self.target,
+            hint_unit=self.hint_unit,
+        )
 
 
 def _caught_count(progress: CollectionProgress) -> int:
@@ -53,78 +87,122 @@ def _card_total_qty(cards: list[Card]) -> int:
     return sum(int(c.qty) for c in cards)
 
 
+def _metric_value(
+    metric: str,
+    progress: CollectionProgress,
+    cards: list[Card],
+) -> int:
+    if metric == "seen":
+        return _seen_count(progress)
+    if metric == "caught":
+        return _caught_count(progress)
+    if metric == "shiny":
+        return _shiny_count(progress)
+    if metric == "cards":
+        return len(cards)
+    if metric == "sets":
+        return _unique_sets(cards)
+    if metric == "card_qty":
+        return _card_total_qty(cards)
+    raise ValueError(f"Unknown badge metric: {metric}")
+
+
 BADGES: list[BadgeDef] = [
     BadgeDef(
         "first_encounter",
         "Première rencontre",
         "Identifier ton premier Pokémon.",
-        lambda p, c: _seen_count(p) >= 1,
+        "seen",
+        1,
+        "Pokémon à identifier",
     ),
     BadgeDef(
         "first_catch",
         "Premier Pokéball",
         "Attraper ton premier Pokémon.",
-        lambda p, c: _caught_count(p) >= 1,
+        "caught",
+        1,
+        "Pokémon à attraper",
     ),
     BadgeDef(
         "first_shiny",
         "Premier chromatique",
         "Attraper ton premier Pokémon shiny.",
-        lambda p, c: _shiny_count(p) >= 1,
+        "shiny",
+        1,
+        "Pokémon shiny à attraper",
     ),
     BadgeDef(
         "first_card",
         "Première carte",
         "Ajouter ta première carte TCG au carnet.",
-        lambda p, c: len(c) >= 1,
+        "cards",
+        1,
+        "carte TCG à ajouter",
     ),
     BadgeDef(
         "century",
         "Centenaire",
         "Attraper 100 Pokémon différents.",
-        lambda p, c: _caught_count(p) >= 100,
+        "caught",
+        100,
+        "Pokémon à attraper",
     ),
     BadgeDef(
         "five_hundred",
         "Cinq cents",
         "Attraper 500 Pokémon différents.",
-        lambda p, c: _caught_count(p) >= 500,
+        "caught",
+        500,
+        "Pokémon à attraper",
     ),
     BadgeDef(
         "thousand",
         "Millénaire",
         "Attraper 1000 Pokémon différents.",
-        lambda p, c: _caught_count(p) >= 1000,
+        "caught",
+        1000,
+        "Pokémon à attraper",
     ),
     BadgeDef(
         "shiny_ten",
         "Chasseur",
         "Attraper 10 Pokémon chromatiques.",
-        lambda p, c: _shiny_count(p) >= 10,
+        "shiny",
+        10,
+        "Pokémon shiny à attraper",
     ),
     BadgeDef(
         "shiny_hundred",
         "Chasseur légendaire",
         "Attraper 100 Pokémon chromatiques.",
-        lambda p, c: _shiny_count(p) >= 100,
+        "shiny",
+        100,
+        "Pokémon shiny à attraper",
     ),
     BadgeDef(
         "ten_sets",
         "Inter-extensions",
         "Posséder des cartes de 10 sets différents.",
-        lambda p, c: _unique_sets(c) >= 10,
+        "sets",
+        10,
+        "set TCG à cataloguer",
     ),
     BadgeDef(
         "hundred_cards",
         "Centenaire TCG",
         "Catalogue de 100 cartes uniques.",
-        lambda p, c: len(c) >= 100,
+        "cards",
+        100,
+        "carte TCG à cataloguer",
     ),
     BadgeDef(
         "dedicated_collector",
         "Collectionneur dévoué",
         "500 cartes en stock (cumul des quantités).",
-        lambda p, c: _card_total_qty(c) >= 500,
+        "card_qty",
+        500,
+        "carte en stock à ajouter",
     ),
 ]
 
@@ -150,7 +228,7 @@ class BadgeService:
         progress: CollectionProgress,
         cards: list[Card],
     ) -> set[str]:
-        return {b.id for b in BADGES if b.predicate(progress, cards)}
+        return {b.id for b in BADGES if b.progress(progress, cards).complete}
 
     def sync_unlocked(self) -> list[str]:
         """Re-evaluate predicates and persist any newly unlocked badges.
@@ -175,13 +253,41 @@ class BadgeService:
         """Return the full catalog + persisted unlocked ids."""
         progress = self._progress_repo.load()
         unlocked = set(progress.badges_unlocked)
-        catalog = [
-            BadgeDefinition(
-                id=b.id,
-                title=b.title,
-                description=b.description,
-                unlocked=b.id in unlocked,
+        cards = list(self._card_repo.load().cards)
+        catalog = []
+        for badge in BADGES:
+            badge_progress = self._definition_progress(
+                badge,
+                progress,
+                cards,
+                unlocked,
             )
-            for b in BADGES
-        ]
+            catalog.append(
+                BadgeDefinition(
+                    id=badge.id,
+                    title=badge.title,
+                    description=badge.description,
+                    unlocked=badge.id in unlocked,
+                    current=badge_progress.current,
+                    target=badge_progress.target,
+                    percent=badge_progress.percent,
+                    hint=badge_progress.hint,
+                )
+            )
         return BadgeState(catalog=catalog, unlocked=sorted(unlocked))
+
+    def _definition_progress(
+        self,
+        badge: BadgeDef,
+        progress: CollectionProgress,
+        cards: list[Card],
+        unlocked: set[str],
+    ) -> BadgeProgress:
+        current = badge.progress(progress, cards)
+        if badge.id not in unlocked or current.complete:
+            return current
+        return BadgeProgress(
+            current=current.target,
+            target=current.target,
+            hint_unit=current.hint_unit,
+        )

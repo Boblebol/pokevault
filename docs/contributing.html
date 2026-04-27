@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Contribute - Pokevault</title>
+    <meta name="description" content="How to contribute to Pokevault: setup, checks, coverage, issues, pull requests and security.">
+    <link rel="stylesheet" href="assets/site.css">
+    <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+    <script src="assets/site.js" defer></script>
+  </head>
+  <body>
+    <header class="site-header">
+      <nav class="nav" aria-label="Main navigation">
+        <a class="brand" href="index.html" data-nav><span class="brand-mark" aria-hidden="true"><img src="assets/logo-mark.svg" alt=""></span><span>pokevault</span></a>
+        <div class="nav-links">
+          <a href="features.html" data-nav>Features</a>
+          <a href="install.html" data-nav>Install</a>
+          <a href="architecture.html" data-nav>Architecture</a>
+          <a href="roadmap.html" data-nav>Roadmap</a>
+          <a href="contributing.html" data-nav>Contribute</a>
+          <a href="https://github.com/Boblebol/pokevault">GitHub</a>
+        </div>
+      </nav>
+    </header>
+
+    <main class="page">
+      <section class="section">
+        <div class="section-head">
+          <p class="eyebrow">Open source</p>
+          <h1>Contribute</h1>
+          <p>
+            Contributions are welcome when they preserve the local-first promise,
+            keep the Pokedex as the primary workflow and maintain the quality bar.
+          </p>
+        </div>
+        <div class="grid grid-3">
+          <article class="step"><h3>1. Set up</h3><p>Install Python 3.10+, uv, then run <code>make install</code> and <code>make dev</code>.</p></article>
+          <article class="step"><h3>2. Scope work</h3><p>Check the completed roadmap and postponed backlog before proposing features.</p></article>
+          <article class="step"><h3>3. Verify</h3><p>Run <code>make check</code>. Tracker coverage must remain at 100%.</p></article>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-head">
+          <p class="eyebrow">Quality gate</p>
+          <h2>One command before opening a PR.</h2>
+        </div>
+        <div class="code-card">
+          <button class="copy-btn" type="button" data-copy="#check-command">Copy</button>
+          <pre id="check-command"><code>make check</code></pre>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-head">
+          <p class="eyebrow">Contributor links</p>
+          <h2>Everything a contributor needs.</h2>
+        </div>
+        <div class="grid grid-2">
+          <article class="feature"><h3>Contribution guide</h3><p><a href="../CONTRIBUTING.md">CONTRIBUTING.md</a> covers setup, style, tests, CI and pull requests.</p></article>
+          <article class="feature"><h3>Security policy</h3><p><a href="../SECURITY.md">SECURITY.md</a> explains responsible disclosure for vulnerabilities.</p></article>
+          <article class="feature"><h3>Code of conduct</h3><p><a href="../CODE_OF_CONDUCT.md">CODE_OF_CONDUCT.md</a> defines expected community behavior.</p></article>
+          <article class="feature"><h3>License</h3><p><a href="../LICENSE">MIT license</a> keeps reuse straightforward.</p></article>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="footer-inner">
+        <span>Prefer small, focused PRs with tests.</span>
+        <span><a href="https://github.com/Boblebol/pokevault/issues">Issues</a> · <a href="https://github.com/Boblebol/pokevault/pulls">Pull requests</a></span>
+      </div>
+    </footer>
+  </body>
+</html>

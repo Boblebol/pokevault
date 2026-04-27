@@ -160,6 +160,47 @@
     statusBox.append(shiny);
 
     meta.append(statusBox);
+
+    const huntBox = document.createElement("div");
+    huntBox.className = "fullview-hero__status";
+    const hunt = window.PokevaultHunts?.entry?.(p.slug);
+    const huntLabel = document.createElement("span");
+    huntLabel.className = "fullview-hero__status-label";
+    huntLabel.textContent = hunt
+      ? hunt.priority === "high" ? "Recherche prioritaire" : "Dans mes recherches"
+      : "Pas dans mes recherches";
+    huntLabel.dataset.state = hunt ? "seen" : "not_met";
+    huntBox.append(huntLabel);
+
+    const toggleHunt = document.createElement("button");
+    toggleHunt.type = "button";
+    toggleHunt.className = "fullview-status-btn";
+    toggleHunt.textContent = hunt ? "Retirer recherche" : "Rechercher";
+    toggleHunt.addEventListener("click", async () => {
+      await window.PokevaultHunts?.patch?.(
+        p.slug,
+        hunt ? { wanted: false } : { wanted: true, priority: "normal" },
+      );
+      renderInto(document.getElementById("viewPokemon"), p.slug);
+    });
+    huntBox.append(toggleHunt);
+
+    const priorityHunt = document.createElement("button");
+    priorityHunt.type = "button";
+    priorityHunt.className = "fullview-status-btn";
+    priorityHunt.textContent = hunt?.priority === "high" ? "Priorite normale" : "Priorite haute";
+    priorityHunt.disabled = !hunt;
+    priorityHunt.addEventListener("click", async () => {
+      await window.PokevaultHunts?.patch?.(p.slug, {
+        wanted: true,
+        priority: hunt?.priority === "high" ? "normal" : "high",
+        note: hunt?.note || "",
+      });
+      renderInto(document.getElementById("viewPokemon"), p.slug);
+    });
+    huntBox.append(priorityHunt);
+    meta.append(huntBox);
+
     hero.append(meta);
     root.append(hero);
   }
@@ -377,6 +418,7 @@
     if (typeof window.PokedexCollection?.ensureLoaded === "function") {
       await window.PokedexCollection.ensureLoaded();
     }
+    await window.PokevaultHunts?.ensureLoaded?.();
     renderInto(root, slug);
     window.scrollTo({ top: 0, behavior: "instant" });
   }

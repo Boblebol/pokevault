@@ -4,10 +4,12 @@ from __future__ import annotations
 
 from pathlib import Path
 
+import pytest
+
 from tracker.models import CardCreate, ProgressStatusPatch
 from tracker.repository.json_card_repository import JsonCardRepository
 from tracker.repository.json_progress_repository import JsonProgressRepository
-from tracker.services.badge_service import BADGES, BadgeService
+from tracker.services.badge_service import BADGES, BadgeService, _metric_value
 from tracker.services.card_service import CardService
 from tracker.services.progress_service import ProgressService
 
@@ -28,6 +30,37 @@ def test_catalog_exposes_all_definitions(tmp_path: Path) -> None:
     assert {b.id for b in state.catalog} == {b.id for b in BADGES}
     assert all(not b.unlocked for b in state.catalog)
     assert state.unlocked == []
+
+
+def test_catalog_exposes_progress_metadata(tmp_path: Path) -> None:
+    badge_service, progress, _ = _wire(tmp_path)
+    for i in range(1, 4):
+        progress.patch_status(
+            ProgressStatusPatch(slug=f"slug-{i:04d}", state="caught")
+        )
+
+    state = badge_service.state()
+
+    by_id = {b.id: b for b in state.catalog}
+    assert by_id["century"].current == 3
+    assert by_id["century"].target == 100
+    assert by_id["century"].percent == 3
+    assert by_id["century"].hint == "Encore 97 Pokémon à attraper."
+
+
+def test_unlocked_badge_progress_stays_complete_if_source_drops(tmp_path: Path) -> None:
+    badge_service, progress, _ = _wire(tmp_path)
+    progress.patch_status(ProgressStatusPatch(slug="0025-pikachu", state="caught"))
+    badge_service.sync_unlocked()
+    progress.patch_status(ProgressStatusPatch(slug="0025-pikachu", state="not_met"))
+
+    state = badge_service.state()
+
+    first_catch = {b.id: b for b in state.catalog}["first_catch"]
+    assert first_catch.unlocked is True
+    assert first_catch.current == 1
+    assert first_catch.target == 1
+    assert first_catch.percent == 100
 
 
 def test_sync_unlocks_first_encounter_when_something_seen(tmp_path: Path) -> None:
@@ -108,3 +141,10 @@ def test_state_reports_unlocked_on_catalog_entries(tmp_path: Path) -> None:
     assert by_id["first_encounter"].unlocked is True
     assert by_id["first_catch"].unlocked is False
     assert state.unlocked == ["first_encounter"]
+
+
+def test_metric_value_rejects_unknown_metric(tmp_path: Path) -> None:
+    _, progress, cards = _wire(tmp_path)
+
+    with pytest.raises(ValueError, match="Unknown badge metric"):
+        _metric_value("unknown", progress.get_progress(), cards.list_all().cards)

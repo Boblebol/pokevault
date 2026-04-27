@@ -523,6 +523,7 @@ function matchesFilter(p) {
   const got = !!caughtMap[k];
   if (filterMode === "caught") return got;
   if (filterMode === "missing") return !got;
+  if (filterMode === "hunts") return Boolean(window.PokevaultHunts?.isWanted?.(k));
   return true;
 }
 
@@ -1489,6 +1490,7 @@ function render() {
         })();
     if (node) grid.append(node);
     updateListDisplayInfo({ full: sliced.full, end: 0, total: 0 });
+    window.PokevaultFocus?.refresh?.();
     return;
   }
 
@@ -1498,14 +1500,18 @@ function render() {
 
   updateListDisplayInfo({ full: sliced.full, end: sliced.end, total: sliced.total });
   window.PokevaultKeyboard?.repaint?.();
+  window.PokevaultFocus?.refresh?.();
 }
 
 function setupFilters() {
-  document.querySelectorAll(".filter-btn").forEach((btn) => {
+  const buttons = document.querySelectorAll("#viewListe .filter-btn[data-filter]");
+  buttons.forEach((btn) => {
+    if (btn.dataset.filterWired) return;
+    btn.dataset.filterWired = "1";
     btn.addEventListener("click", () => {
       filterMode = btn.dataset.filter || "all";
       resetDisplayedCount();
-      document.querySelectorAll(".filter-btn").forEach((b) => {
+      buttons.forEach((b) => {
         const on = b === btn;
         b.classList.toggle("is-active", on);
         b.setAttribute("aria-pressed", on ? "true" : "false");
@@ -1535,6 +1541,7 @@ function setupKeyboardHelpTrigger() {
 
 let listCaughtSubscribed = false;
 let listDimSubscribed = false;
+let listHuntsSubscribed = false;
 
 function readStoredFormFilterMode() {
   try {
@@ -1574,6 +1581,11 @@ async function startTracker() {
   } catch {
     return;
   }
+  try {
+    await window.PokevaultHunts?.ensureLoaded?.();
+  } catch {
+    /* hunts are optional local state */
+  }
   const hashRegion = readRegionFromHash();
   if (hashRegion) {
     regionFilter = hashRegion;
@@ -1590,6 +1602,13 @@ async function startTracker() {
   if (!listDimSubscribed) {
     listDimSubscribed = true;
     window.PokedexCollection.subscribeDimMode(() => render());
+  }
+  if (!listHuntsSubscribed) {
+    listHuntsSubscribed = true;
+    window.PokevaultHunts?.subscribe?.(() => {
+      resetDisplayedCount();
+      render();
+    });
   }
   if (!window.__pokedexOnlineFlushWired) {
     window.__pokedexOnlineFlushWired = true;

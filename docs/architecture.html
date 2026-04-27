@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Architecture - Pokevault</title>
+    <meta name="description" content="Understand Pokevault architecture: CLI scraper, FastAPI backend, vanilla JavaScript UI and JSON persistence.">
+    <link rel="stylesheet" href="assets/site.css">
+    <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+    <script src="assets/site.js" defer></script>
+  </head>
+  <body>
+    <header class="site-header">
+      <nav class="nav" aria-label="Main navigation">
+        <a class="brand" href="index.html" data-nav><span class="brand-mark" aria-hidden="true"><img src="assets/logo-mark.svg" alt=""></span><span>pokevault</span></a>
+        <div class="nav-links">
+          <a href="features.html" data-nav>Features</a>
+          <a href="install.html" data-nav>Install</a>
+          <a href="architecture.html" data-nav>Architecture</a>
+          <a href="roadmap.html" data-nav>Roadmap</a>
+          <a href="contributing.html" data-nav>Contribute</a>
+          <a href="https://github.com/Boblebol/pokevault">GitHub</a>
+        </div>
+      </nav>
+    </header>
+
+    <main class="page">
+      <section class="section">
+        <div class="section-head">
+          <p class="eyebrow">System shape</p>
+          <h1>Architecture</h1>
+          <p>
+            The app stays deliberately small: Python for scraping and local API,
+            vanilla JavaScript for the UI, JSON for persistence.
+          </p>
+        </div>
+        <div class="grid grid-2">
+          <article class="panel"><h3>CLI scraper</h3><p><code>main.py</code> and <code>pokedex/</code> scrape Pokepedia, normalize forms, attach regions and export JSON/CSV/YAML/XML.</p></article>
+          <article class="panel"><h3>FastAPI tracker</h3><p><code>tracker/</code> exposes progress, cards, binders, hunts, badges, profiles, backup and health endpoints.</p></article>
+          <article class="panel"><h3>Vanilla SPA</h3><p><code>web/</code> is served directly. No framework, no frontend build step, no hosted runtime.</p></article>
+          <article class="panel"><h3>JSON repositories</h3><p>Each local state surface has a small repository/service pair for predictable file persistence.</p></article>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-head">
+          <p class="eyebrow">Data flow</p>
+          <h2>From reference data to user state.</h2>
+        </div>
+        <table class="table">
+          <thead><tr><th>Layer</th><th>Responsibility</th><th>Key files</th></tr></thead>
+          <tbody>
+            <tr><td>Reference Pokedex</td><td>Stable catalog used by UI and tests.</td><td><code>data/pokedex.json</code>, <code>pokedex/</code></td></tr>
+            <tr><td>API models</td><td>Typed contracts for progress, cards, hunts, export and profiles.</td><td><code>tracker/models.py</code>, <code>tracker/binder_models.py</code></td></tr>
+            <tr><td>Services</td><td>Business rules such as card-to-caught promotion and monotonic badges.</td><td><code>tracker/services/</code></td></tr>
+            <tr><td>Frontend modules</td><td>Route rendering, focus sessions, badges, binders and settings.</td><td><code>web/*.js</code></td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section class="section">
+        <div class="section-head">
+          <p class="eyebrow">API surface</p>
+          <h2>Local integrations stay simple.</h2>
+        </div>
+        <div class="grid grid-3">
+          <article class="feature"><h3>Progress</h3><p><code>/api/progress</code> and <code>/api/progress/status</code>.</p></article>
+          <article class="feature"><h3>Cards</h3><p><code>/api/cards</code> and <code>/api/cards/by-pokemon/{slug}</code>.</p></article>
+          <article class="feature"><h3>Workspace</h3><p><code>/api/binder</code>, <code>/api/profiles</code>, <code>/api/export</code>, <code>/api/import</code>.</p></article>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="footer-inner">
+        <span>Architecture favors explicit files over hidden services.</span>
+        <span><a href="../README.md">Repository structure</a> · <a href="install.html">Install</a></span>
+      </div>
+    </footer>
+  </body>
+</html>
