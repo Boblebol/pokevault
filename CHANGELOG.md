@@ -9,23 +9,38 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
-- `v0.8.0` Badge Progression V2: `GET /api/badges` now exposes progress
+- Focus Session: Collection and Statistics rails expose a local-first
+  six-target session that picks a near-complete region, tracks completion from
+  caught status, highlights active grid targets, and jumps directly to each
+  target without adding backend persistence.
+- Next Best Action: Focus and Statistics share a deterministic recommendation
+  engine that prioritizes near-complete regions, moves seen-but-not-caught
+  targets first, and renders a visible "Pourquoi ?" reason so the next target is
+  understandable rather than arbitrary.
+- Hunt List: users can mark Pokémon as active searches, set high priority, keep
+  a short note, filter Collection by "Mes recherches", and let Focus/Stats
+  recommendations prioritize those hunt targets. The state is persisted through
+  `GET/PATCH /api/hunts` and included in export schema v3.
+- Badge Progression V2: `GET /api/badges` now exposes progress
   metadata (`current`, `target`, `percent`, `hint`) for every badge. Locked
   badge tiles render progress bars, the Stats rail surfaces the nearest badge,
   and Focus sessions can mention that badge as an extra reason to keep the next
   action tied to a visible milestone.
-- `v0.7.0` Hunt List: users can mark Pokémon as active searches, set high
-  priority, keep a short note, filter Collection by "Mes recherches", and let
-  Focus/Stats recommendations prioritize those hunt targets. The state is
-  persisted through `GET/PATCH /api/hunts` and included in export schema v3.
-- `v0.6.0` Next Best Action: Focus and Statistics now share a deterministic
-  recommendation engine that prioritizes near-complete regions, moves
-  seen-but-not-caught targets first, and renders a visible "Pourquoi ?" reason
-  so the next target is understandable rather than arbitrary.
-- `v0.5.0` Focus Session MVP: Collection and Statistics rails now expose a
-  local-first six-target session that picks a near-complete region, tracks
-  completion from caught status, highlights active grid targets, and jumps
-  directly to each target without adding backend persistence.
+- Explicit postponed backlog in [docs/POSTPONED.md](docs/POSTPONED.md) for
+  known ideas that are intentionally outside the active roadmap.
+- Zero-build GitHub Pages site under `docs/` with landing, features,
+  installation, architecture, roadmap and contribution pages.
+- `SECURITY.md` responsible-disclosure policy for public vulnerability reports.
+
+### Changed
+
+- Documentation now treats the public RICE roadmap as complete through Wave 4
+  and points delayed ideas to the postponed backlog instead of scattering them
+  through planning notes.
+- `CONTRIBUTING.md` now documents the current local state files, Node web tests,
+  GitHub Pages rules and security reporting path.
+- FastAPI and `/api/health` now expose the same application version as the
+  project metadata (`1.0.0`) instead of the legacy API version.
 
 ## [1.0.0] — 2026-04-24
 

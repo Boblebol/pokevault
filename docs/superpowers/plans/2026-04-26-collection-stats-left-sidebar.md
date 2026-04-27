@@ -8,6 +8,10 @@
 
 **Tech Stack:** Static HTML, vanilla JavaScript, CSS, FastAPI static serving through `tracker`, existing `make dev` workflow.
 
+> Historical note: this file is an implementation plan, not the active backlog.
+> Unchecked checklist items describe the original execution steps and should not
+> be read as open product work.
+
 ---
 
 ## File Structure

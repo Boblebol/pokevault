@@ -3,6 +3,10 @@
 > Single source of truth for product direction. Priorities are **RICE-scored**
 > and grouped into four **delivery waves**. Each feature ships with a
 > dev-ready spec (user story, acceptance criteria, tech notes, dependencies).
+>
+> Current status: this public roadmap is complete through Wave 4. Known ideas
+> that are intentionally delayed are tracked separately in
+> [POSTPONED.md](POSTPONED.md).
 
 **Positioning.** Pokevault is a **Pokédex-first** tracker. TCG physical cards
 are a **per-Pokémon enrichment layer** (a user can attach the cards they own
@@ -63,7 +67,8 @@ Sorted by RICE descending. Tone/wave column drives the delivery plan below.
 | **V3 · Layer Cartes** ✅ | ~3 weeks | F08 · F09 · F02 · F10      | Drawer + full-screen page, cards as opt-in layer |
 | **V4 · Délices** ✅ | ~3 weeks | F11 · F12 · F15 · F14 · F13  | Full Pokédex identity, multi-profile, polish     |
 
-Each wave can be tagged `v0.2`, `v0.3`, `v0.4`, `v1.0` on GitHub Releases.
+Release history: the four waves are bundled into the public `v1.0.0` release.
+Future work should use the normal `v1.x.y` semver line.
 
 ---
 
@@ -82,8 +87,8 @@ final status model, not retrofitted.
 
 ### 100 % tracker coverage must hold
 Every feature touching `tracker/` ships with tests that keep coverage at
-100 %. Adding a GitHub Actions CI that runs `make check` on every PR is a
-v0.2 prerequisite.
+100 %. GitHub Actions runs lint, coverage and a Docker build smoke test on every
+push and pull request to `main`.
 
 ---
 
@@ -266,8 +271,8 @@ the anchor: keep the Card schema locked before writing anything downstream.
 into `CardService.create/update` via `ProgressService.ensure_caught`. F02
 ships the right-side drawer with inline CRUD. F10 delivers the full-screen
 `#/pokemon/:slug` route with a static 18×18 type chart
-(`web/type-chart.js`), the « Autres formes » grid, and the owned-cards
-table. Tracker coverage: **100 % on 367 tests**.
+(`web/type-chart.js`), the « Autres formes » grid, and the owned-cards table.
+Backend tests cover the card model, service, API and export/import round trips.
 
 ## F08 — Modèle de données Carte
 
@@ -348,24 +353,24 @@ F08, F09.
 **RICE 25** · Effort 4 j · Wave 3
 
 > As a fan, from the drawer I want to open a full-screen Pokédex page with
-> description, evolutions, weaknesses and my cards at the bottom.
+> identity, weaknesses, alternate forms and my cards at the bottom.
 
 ### Acceptance
 - Route `#/pokemon/:slug`, triggered by « Voir fiche complète » in the drawer.
-- Sections: official artwork, Pokepedia description, types + computed
-  weaknesses, clickable evolutions, forms, my cards.
+- Sections: official artwork, types + computed weaknesses, forms, my cards.
 - Browser back preserves grid scroll position.
 - Responsive: 1 column `< 720 px`, 2 columns `≥ 720 px`.
+- Pokepedia descriptions and evolution chains are intentionally deferred; see
+  [POSTPONED.md](POSTPONED.md).
 
 ### Tech
 - `web/pokemon-full-view.js` + new route in `web/app.js`.
-- Scrape descriptions: extend `pokedex/scraper.py` to enrich each entry with `description_fr`.
 - Type-effectiveness computed front-side: static 18×18 matrix in `web/type-chart.js`.
-- Tests: type-chart (Fire vs Grass = 2×), description scrape (HTML fixture).
+- Tests: type-chart (Fire vs Grass = 2×), route rendering and card list
+  integration.
 
 ### Deps
-F02 for drawer entry-point. Non-blocking if description scrape fails: fall
-back to type-only display.
+F02 for drawer entry-point.
 
 ---
 
@@ -387,7 +392,7 @@ fallback chains. F15 introduces `ProfileService`, `data/profiles.json`
 and `data/profiles/<id>/...` storage with the `default` profile aliasing
 the legacy layout, exposes the `/api/profiles*` REST surface and the
 Réglages switcher (create / switch / delete with auto-reload). Tracker
-coverage: **100 % on 411 tests**.
+tests cover strict profile isolation.
 
 ## F11 — Artwork switcher
 
@@ -397,14 +402,15 @@ coverage: **100 % on 411 tests**.
 > Sugimori artwork, shiny version or a photo of one of my owned cards.
 
 ### Acceptance
-- Cyclic button top-right of each tile + `a` keyboard shortcut.
-- Sources: sprite (existing), Sugimori (scrape), shiny (scrape), card-art (F08 if card exists).
+- Artwork selector in Settings.
+- Sources: default Pokédex image, shiny local/CDN fallback, first owned card scan
+  when `Card.image_url` exists.
 - Choice persisted per user in LocalStorage.
 
 ### Tech
-- `pokedex/scraper.py`: add `download_sugimori()` + `download_shiny()` under `data/images/artwork/`.
-- Extend `Pokemon` model: `artwork_sugimori`, `artwork_shiny` (relative URLs).
 - `web/artwork-switcher.js` micro-component.
+- `Card.image_url` feeds first-card artwork mode.
+- `make fetch-shiny` can pre-populate `data/images_shiny/` for offline use.
 
 ---
 
@@ -439,7 +445,7 @@ F03, F08 maximise the available predicates.
 > (main, shiny living dex, vintage FR).
 
 ### Acceptance
-- Profile switcher in the header: create / rename / delete.
+- Profile switcher in Settings: create / switch / delete.
 - Each profile has its own progress + cards + binder.
 - Export / Import applies to the current profile only.
 

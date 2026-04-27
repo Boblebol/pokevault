@@ -8,20 +8,25 @@
 
 **Tech Stack:** Vanilla JavaScript SPA, CSS, FastAPI/Pydantic backend, JSON repositories, pytest, node syntax checks, local-first export/import.
 
+> Historical note: this is an implementation plan, not the active roadmap.
+> The engagement work has shipped on `main`; deferred ideas live in
+> [../../POSTPONED.md](../../POSTPONED.md). Old pre-1.0 planning labels were
+> removed here to avoid version confusion.
+
 ---
 
 ## Release Map
 
-| Release | Product Name | Main Outcome | Persistence | Tag |
-|---------|--------------|--------------|-------------|-----|
-| `v0.5.0` | Focus Session MVP | One short session of six missing Pokémon | `localStorage` | `v0.5.0-focus-session` |
-| `v0.6.0` | Next Best Action | Explain the recommended target | none new | `v0.6.0-next-best-action` |
-| `v0.7.0` | Hunt List | Track personal searches and priorities | JSON + export schema v3 | `v0.7.0-hunt-list` |
-| `v0.8.0` | Badge Progression V2 | Locked badges show progress and hints | existing progress JSON | `v0.8.0-badge-progression` |
+| Slice | Product Name | Main Outcome | Persistence |
+|-------|--------------|--------------|-------------|
+| Engagement 1 | Focus Session MVP | One short session of six missing Pokémon | `localStorage` |
+| Engagement 2 | Next Best Action | Explain the recommended target | none new |
+| Engagement 3 | Hunt List | Track personal searches and priorities | JSON + export schema v3 |
+| Engagement 4 | Badge Progression V2 | Locked badges show progress and hints | existing progress JSON |
 
 ## File Structure
 
-### v0.5.0
+### Focus Session
 
 - Create: `web/focus-session.js`
   - Owns Focus state, session planning, localStorage persistence, and panel rendering.
@@ -35,9 +40,9 @@
 - Modify: `web/styles.css`
   - Adds compact rail panel, target rows, progress, and responsive styling.
 - Modify: `CHANGELOG.md`
-  - Adds unreleased `v0.5.0` note.
+  - Adds an Unreleased changelog note.
 
-### v0.6.0
+### Next Best Action
 
 - Create: `web/recommendations.js`
   - Extracts scoring currently embedded in `focus-session.js`.
@@ -46,7 +51,7 @@
 - Modify: `web/stats-view.js`
   - Replaces passive `nextPriorityRows()` with the shared recommendation engine.
 
-### v0.7.0
+### Hunt List
 
 - Modify: `tracker/models.py`
   - Adds `HuntEntry`, `HuntList`, `HuntPatch`, and export/import schema v3 support.
@@ -62,7 +67,7 @@
   - Adds hunt filter and quick actions.
 - Add tests under `tests/tracker/test_hunt_*.py`.
 
-### v0.8.0
+### Badge Progression V2
 
 - Modify: `tracker/models.py`
   - Extends `BadgeDefinition` with optional progress fields.
@@ -76,7 +81,7 @@
 
 ---
 
-## v0.5.0 - Focus Session MVP
+## Focus Session MVP
 
 ### Task 1: Add Focus Panel Hosts
 
@@ -328,7 +333,7 @@ git commit -m "feat(ui): keep focus session in sync"
 
 - [ ] **Step 1: Add changelog entry**
 
-Add a `v0.5.0 - Focus Session` section describing the local-first Focus panel.
+Add an Unreleased changelog entry describing the local-first Focus panel.
 
 - [ ] **Step 2: Run verification**
 
@@ -350,7 +355,7 @@ PY
 Expected:
 - JS checks exit `0`.
 - Static check exits `0`.
-- `411 passed`.
+- the Python test suite passes.
 
 - [ ] **Step 3: Commit**
 
@@ -361,7 +366,7 @@ git commit -m "docs: document focus session release"
 
 ---
 
-## v0.6.0 - Next Best Action
+## Next Best Action
 
 ### Task 1: Extract Recommendation Engine
 
@@ -378,7 +383,7 @@ git commit -m "docs: document focus session release"
 - [ ] Run `node --check web/recommendations.js web/focus-session.js web/stats-view.js`.
 - [ ] Commit with `feat(ui): add next best action recommendations`.
 
-## v0.7.0 - Hunt List
+## Hunt List
 
 ### Task 1: Add Hunt Persistence
 
@@ -414,7 +419,7 @@ git commit -m "docs: document focus session release"
 - [ ] Run JS syntax checks and full pytest.
 - [ ] Commit with `feat(ui): add hunt list controls`.
 
-## v0.8.0 - Badge Progression V2
+## Badge Progression V2
 
 ### Task 1: Add Badge Progress Metadata
 

@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Pokevault - Local-first Pokemon collection tracker</title>
+    <meta name="description" content="Pokevault is a local-first Pokemon collection tracker for Pokedex progress, physical cards, binders, focus sessions and printable checklists.">
+    <link rel="stylesheet" href="assets/site.css">
+    <script src="assets/site.js" defer></script>
+  </head>
+  <body>
+    <header class="site-header">
+      <nav class="nav" aria-label="Main navigation">
+        <a class="brand" href="index.html" data-nav><span class="brand-mark" aria-hidden="true"></span><span>pokevault</span></a>
+        <div class="nav-links">
+          <a href="features.html" data-nav>Features</a>
+          <a href="install.html" data-nav>Install</a>
+          <a href="architecture.html" data-nav>Architecture</a>
+          <a href="roadmap.html" data-nav>Roadmap</a>
+          <a href="contributing.html" data-nav>Contribute</a>
+          <a href="https://github.com/Boblebol/pokevault">GitHub</a>
+        </div>
+      </nav>
+    </header>
+
+    <main class="page">
+      <section class="hero">
+        <div class="hero-inner">
+          <figure class="hero-shot" aria-label="Pokevault collection view screenshot">
+            <img src="screenshots/list-view.png" alt="Pokevault collection grid with progress rail and Pokemon cards">
+          </figure>
+          <div class="hero-copy">
+            <p class="eyebrow">Local-first Pokemon collection tracker</p>
+            <h1>pokevault</h1>
+            <p class="lead">
+              Track your Pokedex, physical cards and binders from one private
+              local workspace. No account, no cloud lock-in, readable JSON.
+            </p>
+            <div class="actions">
+              <a class="btn btn-primary" href="install.html">Start locally</a>
+              <a class="btn" href="features.html">Explore features</a>
+              <a class="btn" href="https://github.com/Boblebol/pokevault">View source</a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="grid grid-3">
+          <div class="metric"><strong>1457</strong><span>reference Pokedex entries including forms</span></div>
+          <div class="metric"><strong>100%</strong><span>required tracker backend line coverage</span></div>
+          <div class="metric"><strong>0</strong><span>accounts or hosted databases required</span></div>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-head">
+          <p class="eyebrow">Why it exists</p>
+          <h2>A collector tool that keeps the collection yours.</h2>
+          <p>
+            Pokevault combines a scraped Pokedex reference, a local REST API and
+            a fast vanilla web app. It is built for people who want to organize
+            real collections without giving their data to a hosted tracker.
+          </p>
+        </div>
+        <div class="grid grid-3">
+          <article class="feature">
+            <h3>Pokedex-first</h3>
+            <p>Seen, caught and shiny status stay centered on each Pokemon entry.</p>
+          </article>
+          <article class="feature">
+            <h3>Cards as enrichment</h3>
+            <p>Attach owned cards to Pokemon without turning the app into a market tracker.</p>
+          </article>
+          <article class="feature">
+            <h3>Binder-aware</h3>
+            <p>Model physical binders, grids, pages and printable checklists.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-head">
+          <p class="eyebrow">Screenshots</p>
+          <h2>One workspace for browsing, organizing and measuring progress.</h2>
+        </div>
+        <div class="grid grid-2">
+          <figure class="screenshot">
+            <img src="screenshots/binder-view.png" alt="Binder view with vault navigation and binder grid">
+            <figcaption>Binder view for page-by-page physical collection planning.</figcaption>
+          </figure>
+          <figure class="screenshot">
+            <img src="screenshots/stats-view.png" alt="Statistics view with completion metrics and progress cards">
+            <figcaption>Statistics view with regional progress, badges and next actions.</figcaption>
+          </figure>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-head">
+          <p class="eyebrow">Quick start</p>
+          <h2>Run it locally in a few commands.</h2>
+        </div>
+        <div class="code-card">
+          <button class="copy-btn" type="button" data-copy="#quick-start">Copy</button>
+          <pre id="quick-start"><code>git clone https://github.com/Boblebol/pokevault.git
+cd pokevault
+make install
+make dev</code></pre>
+        </div>
+        <div class="actions">
+          <a class="btn btn-primary" href="install.html">Read install guide</a>
+          <a class="btn" href="../README.md">Open README</a>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="footer-inner">
+        <span>MIT licensed. Local-first by design.</span>
+        <span><a href="contributing.html">Contribute</a> · <a href="../SECURITY.md">Security</a> · <a href="../CHANGELOG.md">Changelog</a></span>
+      </div>
+    </footer>
+  </body>
+</html>

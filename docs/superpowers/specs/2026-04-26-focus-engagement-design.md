@@ -18,7 +18,7 @@ Social sharing is intentionally delayed until the app can generate a valuable re
 
 ## Release Sequence
 
-### v0.5.0 - Focus Session MVP
+### Focus Session MVP
 
 **User promise:** "I open the app and immediately know what to catch next."
 
@@ -30,19 +30,15 @@ Scope:
 - Auto-complete checklist items when their Pokédex status becomes `caught`.
 - Let each checklist item jump the user back to the Collection view with the relevant region and a narrowed search.
 
-Out of scope:
-- No backend persistence.
-- No streaks.
-- No sharing.
-- No custom session builder.
-- No new navigation route.
+Deferred ideas from this release are tracked in
+[../../POSTPONED.md](../../POSTPONED.md).
 
 Success criteria:
 - A user can start a session in under one click from stats or collection.
 - The grid remains the main work surface.
 - The session never asks the user to process more than six Pokémon at once.
 
-### v0.6.0 - Next Best Action
+### Next Best Action
 
 **User promise:** "The app explains the best next target, not just a random missing one."
 
@@ -56,16 +52,14 @@ Scope:
 - Add one "Pourquoi ?" line in the Focus panel explaining the recommendation.
 - Add deep links for recommended targets.
 
-Out of scope:
-- No machine learning.
-- No remote popularity data.
-- No opaque scoring.
+No machine learning, remote popularity data or opaque scoring is planned for
+this local recommendation engine.
 
 Success criteria:
 - The user understands why a target is recommended.
 - The recommendation remains stable enough to trust during a session.
 
-### v0.7.0 - Hunt List
+### Hunt List
 
 **User promise:** "I can keep track of my own searches without losing my place."
 
@@ -80,16 +74,14 @@ Scope:
 - Let Focus sessions prioritize hunt-list items when present.
 - Include hunt data in export/import schema v3.
 
-Out of scope:
-- No marketplace links.
-- No price tracking.
-- No public wishlist page.
+Deferred TCG marketplace and wishlist ideas are tracked in
+[../../POSTPONED.md](../../POSTPONED.md).
 
 Success criteria:
 - A user can mark a Pokémon as actively searched from its drawer.
 - A returning user can resume their hunt list without remembering filters.
 
-### v0.8.0 - Badge Progression V2
+### Badge Progression V2
 
 **User promise:** "Badges show progress and guide the next session."
 
@@ -106,10 +98,8 @@ Scope:
   - hunt-list closer
 - Keep unlocks monotonic.
 
-Out of scope:
-- No badge flood for every tiny action.
-- No daily streak badges in this release.
-- No competitive leaderboard.
+Deferred streak and leaderboard ideas are tracked in
+[../../POSTPONED.md](../../POSTPONED.md).
 
 Success criteria:
 - Locked badges stop feeling like dead tiles.
@@ -119,16 +109,17 @@ Success criteria:
 
 The first release is frontend-only. It reuses `window.PokedexCollection` as the collection source of truth and persists session state to localStorage. This keeps the feature low-risk and compatible with the local-first model.
 
-Future releases should add small, focused modules rather than expanding `web/app.js` further:
+The shipped implementation uses small, focused modules rather than expanding
+`web/app.js` further:
 
 - `web/focus-session.js`: session state, planner, and panel rendering.
 - `web/recommendations.js`: shared target ranking for Focus and Stats.
-- `tracker/models.py` + progress repository: hunt-list persistence when v0.7.0 moves beyond localStorage.
-- `tracker/services/badge_service.py`: badge progress metadata in v0.8.0.
+- `tracker/models.py` + hunt repository: hunt-list persistence.
+- `tracker/services/badge_service.py`: badge progress metadata.
 
 ## Data Model
 
-v0.5.0 localStorage:
+Focus Session localStorage:
 
 ```json
 {
@@ -143,7 +134,7 @@ v0.5.0 localStorage:
 
 The `completed` list is derived again from current caught status on every render. Stored completion is only a UI convenience.
 
-v0.7.0 persisted hunt shape:
+Persisted hunt shape:
 
 ```json
 {
@@ -179,7 +170,7 @@ The panel must not use a marketing layout. It should feel like a workbench contr
 
 ## Testing
 
-v0.5.0:
+Focus Session:
 - `node --check web/focus-session.js`
 - `node --check web/app.js`
 - `node --check web/stats-view.js`
@@ -187,7 +178,7 @@ v0.5.0:
 - Full Python regression suite.
 - Manual UI verification on Collection and Stats.
 
-v0.7.0 and v0.8.0:
+Hunt List and Badge Progression:
 - Add backend model/service tests before implementation.
 - Add export/import tests for any new persisted shape.
 
@@ -200,9 +191,5 @@ Each release must pass:
 - Changelog entry.
 - Git tag only after the release branch is merged.
 
-Recommended tags:
-- `v0.5.0-focus-session`
-- `v0.6.0-next-best-action`
-- `v0.7.0-hunt-list`
-- `v0.8.0-badge-progression`
-
+Release tags should follow the project semver line (`v1.x.y`) rather than the
+historical planning labels in this document.

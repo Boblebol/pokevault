@@ -24,6 +24,7 @@ from tracker.services.binder_config_service import BinderConfigService
 from tracker.services.binder_placements_service import BinderPlacementsService
 from tracker.services.binder_workspace_service import BinderWorkspaceService
 from tracker.services.progress_service import ProgressService
+from tracker.version import APP_VERSION
 
 
 def _minimal_layout(root: Path) -> None:
@@ -104,3 +105,4 @@ def test_pokedex_json_absent_returns_404(tmp_path: Path) -> None:
 
 def test_default_app_module_loads() -> None:
     assert default_app.title == "pokevault"
+    assert default_app.version == APP_VERSION

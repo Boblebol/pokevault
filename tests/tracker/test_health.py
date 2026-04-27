@@ -6,6 +6,7 @@ from fastapi import FastAPI
 from fastapi.testclient import TestClient
 
 from tracker.api.controllers.health_controller import router as health_router
+from tracker.version import APP_VERSION
 
 
 def test_health_ok() -> None:
@@ -18,4 +19,4 @@ def test_health_ok() -> None:
     body = r.json()
     assert body["ok"] == "true"
     assert body["app"] == "pokevault"
-    assert "api_version" in body
+    assert body["api_version"] == APP_VERSION

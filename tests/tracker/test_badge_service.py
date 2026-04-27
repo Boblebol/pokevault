@@ -4,10 +4,12 @@ from __future__ import annotations
 
 from pathlib import Path
 
+import pytest
+
 from tracker.models import CardCreate, ProgressStatusPatch
 from tracker.repository.json_card_repository import JsonCardRepository
 from tracker.repository.json_progress_repository import JsonProgressRepository
-from tracker.services.badge_service import BADGES, BadgeService
+from tracker.services.badge_service import BADGES, BadgeService, _metric_value
 from tracker.services.card_service import CardService
 from tracker.services.progress_service import ProgressService
 
@@ -139,3 +141,10 @@ def test_state_reports_unlocked_on_catalog_entries(tmp_path: Path) -> None:
     assert by_id["first_encounter"].unlocked is True
     assert by_id["first_catch"].unlocked is False
     assert state.unlocked == ["first_encounter"]
+
+
+def test_metric_value_rejects_unknown_metric(tmp_path: Path) -> None:
+    _, progress, cards = _wire(tmp_path)
+
+    with pytest.raises(ValueError, match="Unknown badge metric"):
+        _metric_value("unknown", progress.get_progress(), cards.list_all().cards)

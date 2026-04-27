@@ -203,7 +203,7 @@ function renderStats() {
   const cardStats = PC?.computeCardStats ? PC.computeCardStats() : { cards: 0, sets: 0 };
   const cardSub =
     cardStats.cards === 0
-      ? "Disponible avec le module cartes (roadmap F08)"
+      ? "Ajoute une carte pour activer le suivi TCG"
       : `${cardStats.sets} set(s) catalogué(s)`;
   kpiGrid.append(
     renderKpiCard("Total spécimens", String(gTotal), "Entrées suivies dans le Pokédex local"),

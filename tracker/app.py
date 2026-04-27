@@ -17,13 +17,14 @@ from tracker.api.controllers import (
     progress_router,
 )
 from tracker.config import TrackerSettings, get_settings
+from tracker.version import APP_VERSION
 
 
 def create_app(settings: TrackerSettings | None = None) -> FastAPI:
     s = settings or get_settings()
     app = FastAPI(
         title="pokevault",
-        version="0.1.0",
+        version=APP_VERSION,
         description="Local-first Pokémon collection tracker API.",
     )
 

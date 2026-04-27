@@ -366,12 +366,19 @@ pokevault/
 | File                          | Tracked | Description                         |
 |-------------------------------|:-------:|-------------------------------------|
 | `pokedex.json`                | ✅      | Full Pokédex reference (shipped)    |
+| `narrative-tags.json`         | ✅      | Curated narrative tags              |
 | `images/`                     | ✖       | Downloaded sprites and images       |
+| `images_shiny/`               | ✖       | Optional shiny artwork cache        |
 | `collection-progress.json`    | ✖       | Caught/missing progress by slug     |
+| `collection-cards.json`       | ✖       | Physical card catalog               |
+| `hunts.json`                  | ✖       | Active search targets               |
 | `binder-config.json`          | ✖       | Binder configuration                |
 | `binder-placements.json`      | ✖       | Placements slug → page/slot         |
+| `profiles.json`               | ✖       | Active profile registry             |
+| `profiles/<id>/...`           | ✖       | Per-profile local state             |
 
-Only `data/pokedex.json` is versioned — all user state stays out of Git.
+Only `data/pokedex.json` and `data/narrative-tags.json` are versioned — all
+user state stays out of Git.
 
 ---
 
@@ -417,12 +424,12 @@ Delivery status:
 
 - **Wave 1 — Polish immédiat** — ✅ complete (F07 · F04 · F01 · F06).
 - **Wave 2 — Activation & Pokédex identity** — ✅ complete (F00 · F03 · F05).
-- **Wave 3 — Card Layer** — next up (F08 card data model unblocks the
-  cards drawer, auto-derivation of caught from cards, full-screen
-  Pokédex page).
+- **Wave 3 — Card Layer** — ✅ complete (F08 · F09 · F02 · F10).
+- **Wave 4 — Delights** — ✅ complete (F11 · F12 · F15 · F14 · F13).
 
-See the [Unreleased](CHANGELOG.md) section for the complete list of
-shipped items in the latest wave.
+Post-1.0 work currently on `main` is documented in [CHANGELOG.md](CHANGELOG.md).
+Ideas that are known but intentionally delayed live in
+[docs/POSTPONED.md](docs/POSTPONED.md).
 
 ---
 
@@ -456,6 +463,17 @@ Quick version:
 **Alexandre Enouf** — [alexandre-enouf.fr](https://alexandre-enouf.fr)
 
 Live demo: [pokevault.alexandre-enouf.fr](https://pokevault.alexandre-enouf.fr)
+
+---
+
+## Project Site
+
+The GitHub Pages site lives in [docs/index.html](docs/index.html). It is a
+zero-build static site that presents the product, install guide, architecture,
+roadmap and contribution flow.
+
+When GitHub Pages is enabled for the repository, configure it to deploy from the
+`docs/` folder on `main`.
 
 ---
 
