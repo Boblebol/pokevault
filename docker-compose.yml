@@ -1,6 +1,6 @@
 services:
   tracker:
-    image: ${DOCKER_IMAGE:-pokevault}:${DOCKER_TAG:-latest}
+    image: ${DOCKER_IMAGE:-ghcr.io/boblebol/pokevault}:${DOCKER_TAG:-latest}
     build: .
     ports:
       - "8765:8765"

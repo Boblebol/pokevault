@@ -7,15 +7,18 @@ TRACKER_HOST ?= 127.0.0.1
 TRACKER_PORT ?= 8765
 FRONT_URL ?= http://$(TRACKER_HOST):$(TRACKER_PORT)/
 
-DOCKER_IMAGE ?= pokevault
+DOCKER_IMAGE ?= ghcr.io/boblebol/pokevault
 DOCKER_TAG ?= latest
+DOCKER_PLATFORM ?= linux/amd64
+DOCKER_BUILD_IMAGE ?= pokevault
+DOCKER_BUILD_TAG ?= local
 
 AWK ?= awk
 
 .DEFAULT_GOAL := help
 
 .PHONY: help vars install dev open fetch fetch-test fetch-shiny test test-cov lint fmt check clean \
-	build docker-build docker-up docker-down docker-logs
+	build docker-build docker-up docker-up-local docker-down docker-logs
 
 ##@ General
 
@@ -36,17 +39,21 @@ help: ## Afficher l'aide (sections + descriptions)
 	@printf "\n\033[36mExemples:\033[0m\n"
 	@printf "  make dev\n"
 	@printf "  make open TRACKER_PORT=9000\n"
-	@printf "  make docker-up DOCKER_TAG=latest\n\n"
+	@printf "  make docker-up DOCKER_TAG=latest\n"
+	@printf "  make docker-up-local\n\n"
 
 vars: ## Afficher les variables utiles (et leurs valeurs)
 	@printf "\033[1mVariables actives\033[0m\n"
-	@printf "  %-14s %s\n" "UV" "$(UV)"
-	@printf "  %-14s %s\n" "PYTHON" "$(PYTHON)"
-	@printf "  %-14s %s\n" "TRACKER_HOST" "$(TRACKER_HOST)"
-	@printf "  %-14s %s\n" "TRACKER_PORT" "$(TRACKER_PORT)"
-	@printf "  %-14s %s\n" "FRONT_URL" "$(FRONT_URL)"
-	@printf "  %-14s %s\n" "DOCKER_IMAGE" "$(DOCKER_IMAGE)"
-	@printf "  %-14s %s\n" "DOCKER_TAG" "$(DOCKER_TAG)"
+	@printf "  %-18s %s\n" "UV" "$(UV)"
+	@printf "  %-18s %s\n" "PYTHON" "$(PYTHON)"
+	@printf "  %-18s %s\n" "TRACKER_HOST" "$(TRACKER_HOST)"
+	@printf "  %-18s %s\n" "TRACKER_PORT" "$(TRACKER_PORT)"
+	@printf "  %-18s %s\n" "FRONT_URL" "$(FRONT_URL)"
+	@printf "  %-18s %s\n" "DOCKER_IMAGE" "$(DOCKER_IMAGE)"
+	@printf "  %-18s %s\n" "DOCKER_TAG" "$(DOCKER_TAG)"
+	@printf "  %-18s %s\n" "DOCKER_PLATFORM" "$(DOCKER_PLATFORM)"
+	@printf "  %-18s %s\n" "DOCKER_BUILD_IMAGE" "$(DOCKER_BUILD_IMAGE)"
+	@printf "  %-18s %s\n" "DOCKER_BUILD_TAG" "$(DOCKER_BUILD_TAG)"
 
 install: ## Installer les dependances dev (uv sync)
 	$(UV) sync --dev
@@ -89,15 +96,18 @@ check: lint test-cov ## Executer lint + tests couverture
 build: docker-build ## Alias: builder l'image Docker
 
 docker-build: ## Builder l'image Docker
-	DOCKER_IMAGE=$(DOCKER_IMAGE) DOCKER_TAG=$(DOCKER_TAG) docker compose build --no-cache tracker
+	DOCKER_IMAGE=$(DOCKER_BUILD_IMAGE) DOCKER_TAG=$(DOCKER_BUILD_TAG) docker compose build tracker
 	@echo ""
-	@echo "Pour servir cette image: recreer le conteneur (make docker-up ou"
-	@echo "  docker compose up -d --force-recreate tracker)"
+	@echo "Pour servir cette image: recreer le conteneur avec make docker-up-local."
 	@echo "Sinon, l'ancien conteneur peut encore tourner avec l'image precedente."
 
-docker-up: ## Demarrer le tracker via docker compose
-	DOCKER_IMAGE=$(DOCKER_IMAGE) DOCKER_TAG=$(DOCKER_TAG) docker compose build --no-cache tracker
-	DOCKER_IMAGE=$(DOCKER_IMAGE) DOCKER_TAG=$(DOCKER_TAG) docker compose up -d --force-recreate tracker
+docker-up: ## Demarrer le tracker depuis l'image publiee GHCR
+	docker pull --platform $(DOCKER_PLATFORM) $(DOCKER_IMAGE):$(DOCKER_TAG)
+	DOCKER_IMAGE=$(DOCKER_IMAGE) DOCKER_TAG=$(DOCKER_TAG) DOCKER_DEFAULT_PLATFORM=$(DOCKER_PLATFORM) docker compose up -d --no-build --pull never --force-recreate tracker
+	@$(MAKE) --no-print-directory open
+
+docker-up-local: docker-build ## Builder le checkout local puis demarrer le tracker
+	DOCKER_IMAGE=$(DOCKER_BUILD_IMAGE) DOCKER_TAG=$(DOCKER_BUILD_TAG) docker compose up -d --force-recreate tracker
 	@$(MAKE) --no-print-directory open
 
 docker-down: ## Arreter les services docker compose
