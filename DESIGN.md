@@ -31,65 +31,62 @@ shape.
 ---
 
 ## 2. Colors & Surface Philosophy
-The palette is rooted in a deep, monochromatic foundation, allowing the iconic Red and Electric Blue to function as functional beacons rather than just decorative elements.
+The app ships four production palettes. They share the same semantic CSS
+tokens, so components stay readable when the user changes themes. A theme is
+allowed to change mood; it is not allowed to reduce contrast.
 
-### The Palette (Material Design Tokens)
+### Contrast Standard
 
-| Token                | Hex       | Role                                              |
-|----------------------|-----------|---------------------------------------------------|
-| Primary              | `#ffb4a9` | Brand pulse. Critical actions and high-value status |
-| Primary Container    | `#ff5544` | CTA gradients, active highlights                   |
-| Secondary            | `#b9c9d3` | Subdued slate for supporting UI elements           |
-| Tertiary             | `#00daf3` | "Electric Blue" — interactive accents, data viz    |
-| Surface / Background | `#131313` | Core "Ink" of the interface                        |
-| On-Surface           | `#e5e2e1` | Primary text on dark backgrounds                   |
-| Error                | `#ffb4ab` | Destructive actions and warnings                   |
-| Outline              | `#af8782` | Subtle decorative accents                          |
-| Outline Variant      | `#5e3f3a` | Ghost borders (15% opacity only)                   |
+- `--text` must reach at least WCAG AAA contrast (7:1) on `--bg`, `--card`,
+  `--surface-low` and `--surface-high`.
+- `--muted`, `--accent`, `--accent-strong` and `--electric` must reach at least
+  WCAG AA contrast (4.5:1) on `--bg` and `--card`.
+- Primary buttons use `--accent` with `--accent-ink`; that pair must also clear
+  4.5:1.
+- These requirements are enforced by `tests/test_theme_palettes.py`.
 
-### Full Color Map
+### Theme Tokens
 
-```
-background:               #131313
-surface:                  #131313
-surface-dim:              #131313
-surface-bright:           #393939
-surface-container-lowest: #0e0e0e
-surface-container-low:    #1c1b1b
-surface-container:        #201f1f
-surface-container-high:   #2a2a2a
-surface-container-highest:#353534
+Every theme must define this token set:
 
-primary:                  #ffb4a9
-primary-container:        #ff5544
-primary-fixed:            #ffdad5
-primary-fixed-dim:        #ffb4a9
-on-primary:               #690002
-on-primary-container:     #5c0001
+| Token | Role |
+|-------|------|
+| `--bg` | Page background |
+| `--card` | Main panel/card surface |
+| `--surface-low` | Nested or quiet surface |
+| `--surface-high` | Hover/control surface |
+| `--surface-highest` | Progress track and strongest neutral surface |
+| `--accent` | Primary action and active state |
+| `--accent-strong` | Gradient endpoint and warm emphasis |
+| `--accent-ink` | Text/icon color on `--accent` |
+| `--electric` | Secondary highlight, progress and data-viz line |
+| `--text` | Primary text |
+| `--muted` | Secondary text and labels |
+| `--outline-soft` | Quiet component edge |
+| `--outline-strong` | Stronger component edge |
+| `--control-bg` | Inputs and low-emphasis buttons |
+| `--control-border` | Default control border |
+| `--control-hover` | Hover/focus border |
+| `--success`, `--danger`, `--warning` | Status colors |
 
-secondary:                #b9c9d3
-secondary-container:      #3c4b53
-on-secondary:             #23323a
+### Palettes
 
-tertiary:                 #00daf3
-tertiary-container:       #009fb2
-on-tertiary:              #00363d
+| Theme | Mood | Core colors |
+|-------|------|-------------|
+| Vault Lab | Default dark laboratory archive | Charcoal `#111418`, red-orange `#ff6b5f`, cyan `#36d5e8` |
+| Kanto Archive | Warm open notebook / field guide | Ivory `#f7efe3`, deep red `#b72234`, badge blue `#1d6fb8` |
+| Hoenn Deepsea | Night-sea research station | Abyss blue `#071522`, reef cyan `#4fd5df`, sea-glass `#6ee0b6` |
+| Paldea Field Lab | Deep violet field kit | Aubergine `#17141f`, amber `#f2bd5b`, mint `#78ddc9` |
 
-error:                    #ffb4ab
-error-container:          #93000a
-on-error:                 #690005
+### Surface Rule
+Prefer tonal layering over decorative outlines. Borders are allowed when they
+improve scannability in dense tools, but they must use `--outline-soft` or
+`--outline-strong`; avoid hard-coded white/black alpha borders in app surfaces.
 
-on-surface:               #e5e2e1
-on-surface-variant:       #e9bcb6
-outline:                  #af8782
-outline-variant:          #5e3f3a
-```
-
-### The "No-Line" Rule
-**Standard 1px borders are strictly prohibited.** To section content, you must use **Tonal Transitions**. A card does not have an outline; it is a `surface-container-low` element resting on a `surface` background. This creates a more organic, premium feel that mimics high-end hardware interfaces.
-
-### The "Glass & Gradient" Rule
-Floating panels and high-priority card overlays must utilize **Glassmorphism**. Use a semi-transparent `surface-variant` with a `backdrop-filter: blur(20px)`. To add "soul" to the techy aesthetic, apply a subtle linear gradient to main CTAs, transitioning from `primary` to `primary-container` at a 135-degree angle.
+### Gradient Rule
+Use gradients only for active progress, primary actions and small status
+signals. The standard gradient is `linear-gradient(90deg, var(--electric),
+var(--accent-strong))` for progress and `var(--accent)` for primary controls.
 
 ---
 
@@ -115,32 +112,32 @@ Hierarchy is achieved through **Tonal Layering** rather than drop shadows.
 
 | Level         | Token                     | Hex       |
 |---------------|---------------------------|-----------|
-| Base          | `surface`                 | `#131313` |
-| Sectioning    | `surface-container-low`   | `#1c1b1b` |
-| Interactive   | `surface-container-high`  | `#2a2a2a` |
+| Base          | `--bg`                    | Theme-specific |
+| Sectioning    | `--card` / `--surface-low` | Theme-specific |
+| Interactive   | `--surface-high`          | Theme-specific |
 
 - **Ambient Shadows:** If a card must "float" (e.g., a card detail modal), use a highly diffused shadow: `box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4)`. The shadow color should never be pure black; it should be a deep tint of the underlying surface.
-- **The "Ghost Border" Fallback:** For accessibility in high-density data tables, use the `outline-variant` token at **15% opacity**. It should be felt, not seen.
+- **The "Ghost Border" Fallback:** For accessibility in high-density data tables, use `--outline-soft`. It should be felt, not seen.
 
 ---
 
 ## 5. Components
 
 ### Cards (The "Specimen" Container)
-- **Style:** No borders. Use `surface-container-lowest` for the card body.
-- **Interaction:** On hover, the card should transition to `surface-container-highest` and scale by 1.02x.
+- **Style:** Use `--card` for the card body and `--outline-soft` only when the edge improves scanning.
+- **Interaction:** On hover, the card should transition toward `--surface-high` and scale subtly.
 - **Spacing:** Content must have generous internal padding (1.5rem) to avoid the "toy-like" cramped feeling.
 
 ### Buttons (Tactile Triggers)
-- **Primary:** Solid `primary` background. No rounded-pill shapes; use the `md` (0.375rem) corner radius for a more architectural look.
-- **Secondary:** `surface-container-high` background with `on-surface` text.
-- **Tertiary:** Transparent background with `tertiary` (Electric Blue) text and a `0.75rem` bottom border (accent line) that expands on hover.
+- **Primary:** Solid `--accent` background with `--accent-ink`. No rounded-pill shapes; use the `md` (0.375rem) corner radius for a more architectural look.
+- **Secondary:** `--control-bg` background with `--text`.
+- **Tertiary:** Transparent background with `--electric` text and a quiet edge that strengthens on hover.
 
 ### Status Toggles (The "Vault" Switch)
-Replace standard iOS-style toggles with custom "Scanner" switches. When "Caught," the toggle should glow with a `tertiary-container` inner shadow, mimicking a lit hardware button.
+Replace standard iOS-style toggles with custom "Scanner" switches. When "Caught," the toggle should glow with an `--electric` inner shadow, mimicking a lit hardware button.
 
 ### Progress & Stats (Data Visualization)
-- **Collection Bar:** Use a thin, 2px horizontal bar. The "Missing" portion should be `surface-variant`, and the "Caught" portion should be a gradient of `tertiary`.
+- **Collection Bar:** Use a thin horizontal bar. The track should be `--surface-highest`, and the "Caught" portion should be the standard `--electric` to `--accent-strong` gradient.
 - **Metric Blocks:** Avoid boxes. Place the number (Display-SM) directly on the surface, with a Label-SM description above it.
 
 ---
@@ -153,8 +150,8 @@ Replace standard iOS-style toggles with custom "Scanner" switches. When "Caught,
 - **Focus on Stats:** Treat the collection progress with the same typographic weight as the specimen name.
 
 ### Don't
-- **Don't use Divider Lines:** Never use a horizontal rule `<hr>` to separate list items. Use a 16px vertical gap or a subtle shift from `surface-container-low` to `surface-container-lowest`.
-- **Don't use Pure Black:** Avoid `#000000`. It kills the depth. Use the `surface` token (#131313) to allow for subtle shadows.
+- **Don't use Divider Lines:** Never use a horizontal rule `<hr>` to separate list items. Use a 16px vertical gap or a subtle shift between theme surfaces.
+- **Don't use Pure Black:** Avoid `#000000`. It kills depth and makes theme transitions harsher.
 - **Don't use Rounded Pills:** Avoid `9999px` radius on buttons or cards. It feels too "Web 2.0" and playful. Stick to the `md` (0.375rem) or `lg` (0.5rem) scale.
 
 ---
@@ -163,15 +160,11 @@ Replace standard iOS-style toggles with custom "Scanner" switches. When "Caught,
 
 | Property         | Value           |
 |------------------|-----------------|
-| Color Mode       | Dark            |
-| Color Variant    | Fidelity        |
+| Color Mode       | Themeable dark + light |
+| Color Variant    | Contrast-first archive |
 | Headline Font    | Space Grotesk   |
 | Body Font        | Inter           |
 | Label Font       | Inter           |
 | Roundness        | Round 4 (0.25rem) |
 | Spacing Scale    | 2 (Normal)      |
 | Seed Color       | `#EE1515`       |
-
----
-
-*Design system generated from [Google Stitch](https://stitch.googleapis.com/) — Project "Pokémon Card Tracker"*

@@ -1,11 +1,26 @@
 /* DESIGN.md — dense, peu de bruit */
 
 :root {
-  --bg: #1a1a1a;
-  --card: #2a2a2a;
-  --accent: #e63946;
-  --text: #f0f0f0;
-  --muted: #888;
+  color-scheme: dark;
+  --bg: #111418;
+  --card: #1d232a;
+  --surface-low: #171c22;
+  --surface-high: #27313a;
+  --surface-highest: #34404b;
+  --accent: #ff6b5f;
+  --accent-strong: #ff9b54;
+  --accent-ink: #210806;
+  --electric: #36d5e8;
+  --text: #f4f7f9;
+  --muted: #b3c1cb;
+  --outline-soft: rgba(143, 163, 178, 0.28);
+  --outline-strong: rgba(179, 193, 203, 0.42);
+  --control-bg: #222a32;
+  --control-border: #526170;
+  --control-hover: #697987;
+  --success: #5dd39e;
+  --danger: #ff8f8f;
+  --warning: #ffd166;
 }
 
 *,
@@ -1754,26 +1769,35 @@ html.site-onboarding-pending .app-view {
   margin-left: auto;
 }
 
-/* Stitch theme: project 4432466507628938255 ("Pokemon Card Tracker") */
+/* Core app theme tokens */
 :root {
-  --bg: #131313;
-  --card: #201f1f;
-  --surface-low: #1c1b1b;
-  --surface-high: #2a2a2a;
-  --surface-highest: #353534;
-  --accent: #ff5544;
-  --accent-strong: #f26522;
-  --electric: #00daf3;
-  --text: #e5e2e1;
-  --muted: #af8782;
-  --outline-soft: rgba(94, 63, 58, 0.28);
+  color-scheme: dark;
+  --bg: #111418;
+  --card: #1d232a;
+  --surface-low: #171c22;
+  --surface-high: #27313a;
+  --surface-highest: #34404b;
+  --accent: #ff6b5f;
+  --accent-strong: #ff9b54;
+  --accent-ink: #210806;
+  --electric: #36d5e8;
+  --text: #f4f7f9;
+  --muted: #b3c1cb;
+  --outline-soft: rgba(143, 163, 178, 0.28);
+  --outline-strong: rgba(179, 193, 203, 0.42);
+  --control-bg: #222a32;
+  --control-border: #526170;
+  --control-hover: #697987;
+  --success: #5dd39e;
+  --danger: #ff8f8f;
+  --warning: #ffd166;
 }
 
 html,
 body {
   font-family: "Inter", "Space Grotesk", system-ui, -apple-system, "Segoe UI", sans-serif;
   background:
-    radial-gradient(120% 120% at 100% 0%, rgba(255, 85, 68, 0.07), transparent 48%),
+    radial-gradient(120% 120% at 100% 0%, color-mix(in oklab, var(--accent) 9%, transparent), transparent 48%),
     var(--bg);
 }
 
@@ -4985,27 +5009,72 @@ body.drawer-open {
 /* ── F13 · Thèmes de région ────────────────────────────────────── */
 
 html[data-theme="kanto"] {
-  --bg: #fff8ed;
-  --card: #fff2d4;
-  --accent: #d7263d;
-  --text: #1f1a17;
-  --muted: #6a5950;
+  color-scheme: light;
+  --bg: #f7efe3;
+  --card: #fffaf0;
+  --surface-low: #efe1cc;
+  --surface-high: #e3cfb4;
+  --surface-highest: #d6bc9a;
+  --accent: #b72234;
+  --accent-strong: #a3411f;
+  --accent-ink: #fffaf4;
+  --electric: #1d6fb8;
+  --text: #211a16;
+  --muted: #5f5047;
+  --outline-soft: rgba(91, 72, 58, 0.28);
+  --outline-strong: rgba(78, 58, 42, 0.44);
+  --control-bg: #fff6e8;
+  --control-border: #a78b6d;
+  --control-hover: #7f6752;
+  --success: #19784e;
+  --danger: #b72234;
+  --warning: #8a6400;
 }
 
 html[data-theme="hoenn"] {
-  --bg: #071a2b;
-  --card: #0e2b44;
-  --accent: #33c2d9;
-  --text: #e8f3fb;
-  --muted: #7ea5bf;
+  color-scheme: dark;
+  --bg: #071522;
+  --card: #102536;
+  --surface-low: #0c1d2b;
+  --surface-high: #18364a;
+  --surface-highest: #214b63;
+  --accent: #4fd5df;
+  --accent-strong: #6ee0b6;
+  --accent-ink: #032328;
+  --electric: #8bd7ff;
+  --text: #eef8fb;
+  --muted: #a9c6d3;
+  --outline-soft: rgba(137, 191, 213, 0.25);
+  --outline-strong: rgba(169, 198, 211, 0.42);
+  --control-bg: #142f42;
+  --control-border: #4f7f95;
+  --control-hover: #6a9bb3;
+  --success: #72e1ac;
+  --danger: #ff9d9d;
+  --warning: #ffd36a;
 }
 
 html[data-theme="paldea"] {
-  --bg: #2a1a10;
-  --card: #3d281a;
-  --accent: #d9843a;
-  --text: #f6ead8;
-  --muted: #a88d74;
+  color-scheme: dark;
+  --bg: #17141f;
+  --card: #231d2d;
+  --surface-low: #1d1927;
+  --surface-high: #30283d;
+  --surface-highest: #3e334e;
+  --accent: #f2bd5b;
+  --accent-strong: #e97961;
+  --accent-ink: #211506;
+  --electric: #78ddc9;
+  --text: #f7f0e7;
+  --muted: #c8b9d0;
+  --outline-soft: rgba(200, 185, 208, 0.25);
+  --outline-strong: rgba(215, 202, 224, 0.42);
+  --control-bg: #2a2436;
+  --control-border: #766785;
+  --control-hover: #9181a1;
+  --success: #84dda8;
+  --danger: #ff9a9a;
+  --warning: #f2bd5b;
 }
 
 /* Default skin = no attribute, so :root variables apply as-is. */
@@ -5330,4 +5399,147 @@ html[data-theme="paldea"] {
 
 .sync-hint--err {
   color: #f87171;
+}
+
+/* Final theme contrast pass: keep late feature modules token-driven. */
+.app-nav-stack,
+.app-switch {
+  background: color-mix(in oklab, var(--bg) 88%, transparent);
+  border-bottom-color: var(--outline-soft);
+}
+
+.app-switch-link {
+  color: var(--muted);
+}
+
+.app-switch-link:hover,
+.app-switch-link.is-active {
+  color: var(--text);
+}
+
+.app-switch-link.is-active {
+  border-bottom-color: var(--electric);
+}
+
+.region-filter,
+.onboarding__field select,
+.print-control-group select,
+.profiles-name-input {
+  border-color: var(--control-border);
+  background: var(--control-bg);
+  color: var(--text);
+}
+
+.region-filter:focus,
+.search-input:focus,
+.profiles-name-input:focus {
+  outline: 2px solid var(--electric);
+  outline-offset: 2px;
+}
+
+.stats-pct,
+.card-region,
+.binder-page-panel-title,
+.binder-refresh--ghost,
+.toast__icon {
+  color: var(--electric);
+}
+
+.collection-subtitle code,
+.binder-intro code,
+.binder-pager-label,
+.binder-empty-placeholder__text,
+.binder-pre {
+  color: var(--text);
+}
+
+.binder-refresh,
+.filter-btn,
+.binder-pager-btn,
+.settings-action-btn,
+.print-action-btn {
+  border-color: var(--control-border);
+  background: var(--control-bg);
+  color: var(--text);
+}
+
+.binder-refresh:hover,
+.filter-btn:hover,
+.binder-pager-btn:hover,
+.settings-action-btn:hover,
+.print-action-btn:hover {
+  border-color: var(--control-hover);
+  background: var(--surface-high);
+}
+
+.binder-pager-btn,
+.onboarding__btn--primary {
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+
+.binder-refresh--ghost,
+.filter-btn.is-active,
+.region-chip.is-active,
+.narrative-chip.is-active,
+.badge-tile.is-unlocked {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.header,
+.search-wrap,
+.binder-empty-placeholder,
+.binder-pre,
+.toast,
+.badge-tile,
+.stats-kpi-card,
+.print-controls,
+.import-preview,
+.profiles-name-input {
+  border-color: var(--outline-soft);
+  background: var(--card);
+  color: var(--text);
+}
+
+.progress-bar,
+.badge-tile__meter,
+.stats-rail-badge__bar {
+  background: var(--surface-highest);
+}
+
+.progress-bar-fill,
+.badge-tile__meter-fill,
+.stats-rail-badge__fill {
+  background: linear-gradient(90deg, var(--electric), var(--accent-strong));
+}
+
+.settings-action-btn--confirm,
+.toast--ok .toast__icon {
+  color: var(--success);
+  border-color: color-mix(in oklab, var(--success) 45%, transparent);
+}
+
+.settings-action-btn--cancel,
+.sync-hint--err,
+.toast--error .toast__icon {
+  color: var(--danger);
+}
+
+.print-control-group label,
+.print-summary,
+.print-table th,
+.print-section-title,
+.badge-tile__desc,
+.badge-tile__progress,
+.badge-tile__status,
+.stats-rail-badge__kicker,
+.stats-rail-badge__meta {
+  color: var(--muted);
+}
+
+.print-table th,
+.print-table td,
+.stats-rail-badge {
+  border-color: var(--outline-soft);
 }

@@ -13,6 +13,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   forcing a fresh local build; use `make docker-up-local` to build the current
   checkout.
 - Docker release images are published for both `linux/amd64` and `linux/arm64`.
+- Regional themes now use full contrast-tested design tokens, updated labels
+  and open-source-ready palette documentation.
 
 ## [1.0.1] — 2026-04-27
 
