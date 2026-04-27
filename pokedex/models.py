@@ -4,7 +4,7 @@ pokedex/models.py — Modèles Pydantic pour le Pokédex
 
 from __future__ import annotations
 
-from datetime import datetime, timezone  # noqa: UP017
+from datetime import UTC, datetime
 
 from pydantic import BaseModel, Field, model_validator
 
@@ -82,7 +82,7 @@ class Pokemon(BaseModel):
 class Pokedex(BaseModel):
     pokemon: list[Pokemon] = Field(default_factory=list)
     generated_at: datetime = Field(
-        default_factory=lambda: datetime.now(timezone.utc)
+        default_factory=lambda: datetime.now(UTC)
     )
     source_url: str = SOURCE_URL
     total: int = 0

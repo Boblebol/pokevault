@@ -1,9 +1,9 @@
 # pokevault
 
-[![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue.svg)](https://www.python.org/downloads/)
+[![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![Tests](https://img.shields.io/badge/tracker_coverage-100%25-brightgreen.svg)](#quality)
-[![Version: 1.0.1](https://img.shields.io/badge/version-1.0.1-00daf3.svg)](CHANGELOG.md)
+[![Version: 1.0.2](https://img.shields.io/badge/version-1.0.2-00daf3.svg)](CHANGELOG.md)
 
 <p align="center">
   <img src="docs/assets/logo.svg" alt="pokevault logo" width="140">
@@ -21,18 +21,20 @@ your collection data in readable JSON files.
 
 ## Links
 
+- [Project site](https://boblebol.github.io/pokevault/)
 - [Release notes](CHANGELOG.md)
 - [Roadmap](docs/ROADMAP.md)
 - [Postponed ideas](docs/POSTPONED.md)
 - [Design system](DESIGN.md)
 - [Contributing](CONTRIBUTING.md)
+- [Release process](RELEASING.md)
 - [Security policy](SECURITY.md)
 
 ## Quick Start
 
 Requirements:
 
-- Python 3.10+
+- Python 3.11+
 - [uv](https://github.com/astral-sh/uv)
 
 ```bash
@@ -58,6 +60,9 @@ works immediately after install. Optional artwork caches are generated locally.
 - Exports/imports full local backups.
 - Prints binder or regional checklists.
 - Exposes a local FastAPI REST API for integrations.
+
+Pokevault is an unofficial fan project. It is not affiliated with Nintendo,
+The Pokémon Company, Game Freak, Creatures, Poképédia or the Pokémon brand.
 
 ## Screenshots
 

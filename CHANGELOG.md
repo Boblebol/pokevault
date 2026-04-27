@@ -7,8 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [1.0.2] — 2026-04-27
+
+### Added
+
+- GitHub Actions now runs the vanilla web module tests on pull requests.
+- `RELEASING.md` documents the release checklist, version surfaces, tag flow
+  and post-release verification.
+- Repository ownership is declared through `.github/CODEOWNERS`.
+- `.gitattributes` normalizes text line endings and marks binary media files.
+
 ### Changed
 
+- Project metadata now points package homepage/documentation at the GitHub
+  Pages site and advertises the local-first TCG tracker keywords.
+- The uv project is explicitly marked as a non-packaged app so sync does not
+  advertise ignored entry points.
+- CI now validates the declared Python support range from 3.11 through 3.14.
+- Dependabot now tracks the `uv.lock` workflow with the dedicated `uv`
+  package ecosystem.
 - `make docker-up` now pulls and starts the published GHCR image instead of
   forcing a fresh local build; use `make docker-up-local` to build the current
   checkout.

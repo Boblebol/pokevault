@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import json
 import re
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
@@ -59,7 +59,7 @@ class ExportService:
             cards = self._sanitize_cards(cards, allowed)
             hunts = self._sanitize_hunts(hunts, allowed)
         return ExportPayload(
-            exported_at=datetime.now(timezone.utc).isoformat(),
+            exported_at=datetime.now(UTC).isoformat(),
             progress=progress,
             binder_config=cfg,
             binder_placements=placements,

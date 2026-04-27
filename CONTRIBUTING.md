@@ -4,7 +4,7 @@ Merci de ton intérêt pour le projet ! Voici comment contribuer.
 
 ## Prérequis
 
-- Python 3.10+
+- Python 3.11+
 - [uv](https://github.com/astral-sh/uv)
 
 ## Mise en place
@@ -96,6 +96,7 @@ l'historique mais ne sont plus recommandés pour les nouvelles PR.
 - Configuration dans `pyproject.toml` : `line-length = 100`, cible `py311`.
 - `make fmt` formate automatiquement le code.
 - `make check` vérifie lint + couverture avant push.
+- Le workflow complet de release est documenté dans [RELEASING.md](RELEASING.md).
 
 ### Tests
 
@@ -110,8 +111,8 @@ l'historique mais ne sont plus recommandés pour les nouvelles PR.
 
 - Chaque PR déclenche [`.github/workflows/ci.yml`](.github/workflows/ci.yml) :
   `ruff check`, `pytest --cov=tracker --cov-fail-under=100` sur Python
-  **3.11 et 3.12**, puis un smoke-test `docker build` pour garantir que
-  l'image reste publiable.
+  **3.11, 3.12, 3.13 et 3.14**, les tests web Node natifs, puis un
+  smoke-test `docker build` pour garantir que l'image reste publiable.
 - Un tag `vX.Y.Z` déclenche [`.github/workflows/release.yml`](.github/workflows/release.yml) :
   création automatique de la Release GitHub (notes extraites du
   CHANGELOG) + push de l'image `ghcr.io/<owner>/pokevault:<semver>`.
