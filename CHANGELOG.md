@@ -7,8 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [1.0.1] — 2026-04-27
+
 ### Added
 
+- Vault Binder brand logo as SVG assets across the app topbar, documentation
+  site, favicon surfaces and README.
+- Unified release version visibility: README badge, GitHub Pages footers, app
+  topbar, app footer, settings panel, FastAPI metadata and `/api/health` now
+  all point at `1.0.1`.
 - Focus Session: Collection and Statistics rails expose a local-first
   six-target session that picks a near-complete region, tracks completion from
   caught status, highlights active grid targets, and jumps directly to each
@@ -34,13 +41,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- Docker image base updated from `python:3.12-slim` to `python:3.14-slim`.
+- Public documentation no longer ships internal planning notes;
+  contributor-facing markdown stays in the top-level docs and `docs/`.
 - Documentation now treats the public RICE roadmap as complete through Wave 4
   and points delayed ideas to the postponed backlog instead of scattering them
   through planning notes.
 - `CONTRIBUTING.md` now documents the current local state files, Node web tests,
   GitHub Pages rules and security reporting path.
 - FastAPI and `/api/health` now expose the same application version as the
-  project metadata (`1.0.0`) instead of the legacy API version.
+  project metadata (`1.0.1`) instead of the legacy API version.
 
 ## [1.0.0] — 2026-04-24
 

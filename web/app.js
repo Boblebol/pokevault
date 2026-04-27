@@ -5,7 +5,7 @@
 
 const API_PROGRESS = "/api/progress";
 const API_HEALTH = "/api/health";
-const APP_UI_VERSION = "1.0.0";
+const APP_VERSION = "1.0.1";
 const PROGRESS_QUEUE_KEY = "pokedex_progress_queue";
 const FORM_FILTER_STORAGE_KEY = "pokedexFormFilter";
 const TYPE_FILTER_STORAGE_KEY = "pokedexTypeFilter";
@@ -381,13 +381,17 @@ window.PokedexCollection = {
   subscribeDimMode,
   wireDimModeSelectsOnce,
 };
-window.PokevaultMeta = { uiVersion: APP_UI_VERSION };
+window.PokevaultMeta = { version: APP_VERSION };
+
+function appVersionLabel() {
+  return `v${APP_VERSION}`;
+}
 
 function paintVersionLabels() {
   const topBadge = document.getElementById("appVersionBadge");
-  if (topBadge) topBadge.textContent = `UI ${APP_UI_VERSION}`;
+  if (topBadge) topBadge.textContent = appVersionLabel();
   const footerLabel = document.getElementById("footerVersionLabel");
-  if (footerLabel) footerLabel.textContent = `UI ${APP_UI_VERSION}`;
+  if (footerLabel) footerLabel.textContent = appVersionLabel();
 }
 
 if (document.readyState === "loading") {
@@ -1086,7 +1090,7 @@ function setupSettingsView() {
   paintVersionLabels();
   const versionEl = document.getElementById("settingsVersionLabel");
   const healthEl = document.getElementById("settingsHealthLabel");
-  if (versionEl) versionEl.textContent = `UI ${APP_UI_VERSION} · API vérification...`;
+  if (versionEl) versionEl.textContent = `Application ${appVersionLabel()} · API vérification...`;
   if (healthEl) healthEl.textContent = "État API : vérification...";
   void (async () => {
     try {
@@ -1094,10 +1098,11 @@ function setupSettingsView() {
       if (!res.ok) throw new Error(String(res.status));
       const data = await res.json();
       const apiVer = String(data?.api_version || "n/a");
-      if (versionEl) versionEl.textContent = `UI ${APP_UI_VERSION} · API ${apiVer}`;
+      const apiStatus = apiVer === APP_VERSION ? "API ok" : `API ${apiVer}`;
+      if (versionEl) versionEl.textContent = `Application ${appVersionLabel()} · ${apiStatus}`;
       if (healthEl) healthEl.textContent = "État API : ok";
     } catch {
-      if (versionEl) versionEl.textContent = `UI ${APP_UI_VERSION} · API indisponible`;
+      if (versionEl) versionEl.textContent = `Application ${appVersionLabel()} · API indisponible`;
       if (healthEl) healthEl.textContent = "État API : erreur de connexion";
     }
   })();
