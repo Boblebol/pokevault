@@ -79,8 +79,8 @@ make fetch        # Full Pokepedia scrape
 make fetch-test   # Small scrape for development
 make fetch-shiny  # Download shiny artworks locally
 make check        # Lint + tests + tracker coverage
-make docker-build # Build Docker image
-make docker-up    # Start with docker compose
+make docker-up    # Pull and start the published Docker image
+make docker-up-local # Build this checkout and start it
 make docker-down  # Stop docker compose
 ```
 
@@ -120,12 +120,15 @@ The local API is mounted next to the web UI:
 ## Docker
 
 ```bash
-make docker-build
-make docker-up
+make docker-up       # Pull ghcr.io/boblebol/pokevault:latest and start it
+make docker-up-local # Build this checkout as pokevault:local and start it
 ```
 
 The container serves the app on [http://127.0.0.1:8765](http://127.0.0.1:8765/)
-and mounts `./data` for local persistence.
+and mounts `./data` for local persistence. `make docker-up` does not build from
+the local checkout, so it avoids the Python base-image pull during everyday
+startup. Override `DOCKER_TAG` to pin a release, or `DOCKER_PLATFORM` to force a
+Docker platform.
 
 ## Project Site
 
