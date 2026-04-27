@@ -1,20 +1,31 @@
 [project]
 name = "pokevault"
-version = "1.0.1"
-description = "Local-first Pokémon collection tracker — scraper, binder manager, and web UI"
+version = "1.0.2"
+description = "Local-first Pokédex and Pokémon card collection tracker with FastAPI and Docker"
 readme = "README.md"
 license = "MIT"
 authors = [{ name = "Alexandre Enouf", email = "alexandre.enouf@gmail.com" }]
-requires-python = ">=3.10"
-keywords = ["pokemon", "pokedex", "scraper", "collection", "tracker", "binder", "pokepedia"]
+requires-python = ">=3.11"
+keywords = [
+    "pokemon",
+    "pokedex",
+    "scraper",
+    "collection",
+    "tracker",
+    "binder",
+    "pokepedia",
+    "local-first",
+    "tcg",
+]
 classifiers = [
-    "Development Status :: 4 - Beta",
+    "Development Status :: 5 - Production/Stable",
     "Intended Audience :: End Users/Desktop",
     "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
     "Topic :: Games/Entertainment",
 ]
 
@@ -33,13 +44,11 @@ dependencies = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/Boblebol/pokevault"
+Homepage = "https://boblebol.github.io/pokevault/"
+Documentation = "https://boblebol.github.io/pokevault/"
 Repository = "https://github.com/Boblebol/pokevault"
 Issues = "https://github.com/Boblebol/pokevault/issues"
-
-[project.scripts]
-pokedex = "main:app"
-pokedex-tracker = "tracker.main:run"
+Changelog = "https://github.com/Boblebol/pokevault/blob/main/CHANGELOG.md"
 
 [dependency-groups]
 dev = [
@@ -49,6 +58,9 @@ dev = [
     "httpx>=0.27.0",
     "ruff>=0.4.0",
 ]
+
+[tool.uv]
+package = false
 
 # ── pytest ────────────────────────────────────────────────────────────────────
 [tool.pytest.ini_options]
@@ -93,7 +105,6 @@ ignore = [
     "N999",  # module name (main.py)
     "B008",  # typer default arguments
     "UP007", # Optional[X] → X | None (pydantic compat)
-    "UP017", # datetime.UTC → not available in Python 3.10
     "UP042", # StrEnum → keep str+Enum for Typer compat
 ]
 

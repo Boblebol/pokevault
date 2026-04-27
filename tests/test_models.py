@@ -2,7 +2,7 @@
 tests/test_models.py — Tests des modèles Pydantic
 """
 
-from datetime import timezone
+from datetime import UTC
 
 from pokedex.models import Pokedex, Pokemon, PokemonNames
 
@@ -134,7 +134,7 @@ class TestPokedex:
 
     def test_generated_at_is_utc(self):
         dex = _make_pokedex(1)
-        assert dex.generated_at.tzinfo == timezone.utc
+        assert dex.generated_at.tzinfo == UTC
 
     def test_by_number_found(self):
         dex = _make_pokedex(3)
