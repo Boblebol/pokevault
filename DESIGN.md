@@ -7,6 +7,27 @@ This design system moves away from the playful, rounded aesthetics typically ass
 
 The layout breaks the traditional rigid grid by utilizing **intentional asymmetry**. Hero stats and rare card displays should feel like high-end editorial spreads, with overlapping "glass" containers and varying typographic scales that prioritize data density without sacrificing elegance.
 
+### Brand Logo: Vault Binder
+
+The Pokevault mark is a compact "Vault Binder" icon: a dark collector binder
+with a cyan spine and a red clasp inspired by a Poke Ball. It should read first
+as secure collection storage, then as Pokemon-adjacent through color and clasp
+geometry. Avoid character silhouettes or franchise-style mascot shapes.
+
+Use these source assets:
+
+| Asset | Usage |
+|-------|-------|
+| `docs/assets/logo.svg` | README and larger documentation contexts |
+| `docs/assets/logo-mark.svg` | GitHub Pages navigation mark |
+| `docs/assets/favicon.svg` | GitHub Pages favicon |
+| `web/assets/logo-mark.svg` | Local app topbar mark |
+| `web/assets/favicon.svg` | Local app favicon |
+
+The logo must stay geometric and SVG-native. Do not recreate it as a CSS
+gradient square; use the asset so the app, docs and README keep the same brand
+shape.
+
 ---
 
 ## 2. Colors & Surface Philosophy

@@ -2630,6 +2630,13 @@ body {
   color: #ee1515;
 }
 
+.stitch-brand-logo {
+  width: 30px;
+  height: 30px;
+  flex: 0 0 auto;
+  border-radius: 7px;
+}
+
 .stitch-brand-wrap {
   display: flex;
   align-items: center;
