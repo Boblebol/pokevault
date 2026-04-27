@@ -4,10 +4,9 @@
  * Simple theme switcher applied via ``document.documentElement.dataset.theme``.
  * Persisted in ``localStorage['pokevault.ui.theme']``.
  *
- * The four v1 skins derive from the existing CSS custom properties
- * exposed in ``:root`` (``--bg``, ``--card``, ``--accent``, ``--text``,
- * ``--muted``). Concrete overrides live in ``web/styles.css`` under
- * ``html[data-theme="…"]`` selectors.
+ * The four v1 skins derive from the shared CSS custom properties exposed in
+ * ``:root``. Concrete overrides live in ``web/styles.css`` under
+ * ``html[data-theme="…"]`` selectors and are checked for contrast in tests.
  */
 (function initThemes() {
   "use strict";
@@ -15,10 +14,10 @@
   const STORAGE_KEY = "pokevault.ui.theme";
   const DEFAULT_THEME = "default";
   const THEMES = [
-    { id: "default", label: "Vault (défaut)" },
-    { id: "kanto", label: "Kanto (retro)" },
-    { id: "hoenn", label: "Hoenn (océan)" },
-    { id: "paldea", label: "Paldea (terracotta)" },
+    { id: "default", label: "Vault Lab" },
+    { id: "kanto", label: "Kanto Archive" },
+    { id: "hoenn", label: "Hoenn Deepsea" },
+    { id: "paldea", label: "Paldea Field Lab" },
   ];
 
   function readStored() {
