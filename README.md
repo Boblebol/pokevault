@@ -8,6 +8,10 @@
 > No account, no cloud — your data stays yours.
 
 <p align="center">
+  <img src="docs/assets/logo.svg" alt="pokevault logo" width="140">
+</p>
+
+<p align="center">
   <img src="docs/screenshots/list-view.png" alt="List View — Specimens" width="100%">
 </p>
 

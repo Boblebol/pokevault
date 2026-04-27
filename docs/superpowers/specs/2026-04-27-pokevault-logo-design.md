@@ -43,8 +43,13 @@ Add source SVG assets under `docs/assets/`:
 - `logo-mark.svg`: compact mark used by the app and docs navigation;
 - `favicon.svg`: favicon target using the same geometry.
 
-The same SVG can be reused by the app via relative paths instead of duplicating
-the design in CSS.
+Add runtime app copies under `web/assets/` because the local FastAPI app serves
+`web/` as its static root:
+
+- `logo-mark.svg`: compact mark used by the app topbar;
+- `favicon.svg`: app favicon.
+
+The app and docs should use file assets instead of recreating the mark in CSS.
 
 ## Integration
 

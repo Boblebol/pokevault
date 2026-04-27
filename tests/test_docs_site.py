@@ -8,6 +8,7 @@ from urllib.parse import urlsplit
 
 ROOT = Path(__file__).resolve().parents[1]
 DOCS = ROOT / "docs"
+WEB = ROOT / "web"
 
 PAGES = [
     "index.html",
@@ -70,6 +71,24 @@ def test_public_site_navigation_is_complete() -> None:
     text = " ".join(_parse(DOCS / "index.html").text)
     for label in NAV_LABELS:
         assert label in text
+
+
+def test_brand_assets_exist() -> None:
+    for asset in [
+        DOCS / "assets" / "logo.svg",
+        DOCS / "assets" / "logo-mark.svg",
+        DOCS / "assets" / "favicon.svg",
+        WEB / "assets" / "logo-mark.svg",
+        WEB / "assets" / "favicon.svg",
+    ]:
+        assert asset.is_file(), asset
+
+
+def test_web_app_references_runtime_brand_assets() -> None:
+    links = set(_parse(WEB / "index.html").links)
+
+    assert ("href", "/assets/favicon.svg") in links
+    assert ("src", "/assets/logo-mark.svg") in links
 
 
 def test_open_source_security_policy_exists() -> None:
