@@ -84,6 +84,12 @@ def _contrast(foreground: str, background: str) -> float:
     return (lighter + 0.05) / (darker + 0.05)
 
 
+def _channel_distance(left: str, right: str) -> float:
+    left_rgb = _hex_to_rgb(left)
+    right_rgb = _hex_to_rgb(right)
+    return sum(abs(a - b) for a, b in zip(left_rgb, right_rgb, strict=True))
+
+
 def test_theme_tokens_cover_readable_open_source_palettes() -> None:
     css = STYLES.read_text(encoding="utf-8")
 
@@ -103,6 +109,28 @@ def test_theme_tokens_cover_readable_open_source_palettes() -> None:
             assert _contrast(tokens[signal], tokens["--card"]) >= 4.5, f"{theme}: {signal} on card"
 
         assert _contrast(tokens["--accent-ink"], tokens["--accent"]) >= 4.5, f"{theme}: accent ink"
+
+
+def test_theme_surfaces_are_visually_distinct() -> None:
+    css = STYLES.read_text(encoding="utf-8")
+
+    for theme in EXPECTED_THEMES:
+        tokens = _theme_tokens(css, theme)
+        assert _channel_distance(tokens["--bg"], tokens["--card"]) >= 0.10, f"{theme}: bg/card"
+        assert _channel_distance(tokens["--card"], tokens["--control-bg"]) >= 0.05, (
+            f"{theme}: card/control"
+        )
+        assert _channel_distance(tokens["--card"], tokens["--surface-high"]) >= 0.14, (
+            f"{theme}: card/surface-high"
+        )
+
+        if theme == "kanto":
+            assert _channel_distance(tokens["--bg"], tokens["--card"]) >= 0.28, (
+                "kanto: bg/card"
+            )
+            assert _channel_distance(tokens["--card"], tokens["--control-bg"]) >= 0.24, (
+                "kanto: card/control"
+            )
 
 
 def test_theme_labels_match_design_language() -> None:

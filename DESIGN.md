@@ -74,7 +74,7 @@ Every theme must define this token set:
 | Theme | Mood | Core colors |
 |-------|------|-------------|
 | Vault Lab | Default dark laboratory archive | Charcoal `#111418`, red-orange `#ff6b5f`, cyan `#36d5e8` |
-| Kanto Archive | Warm open notebook / field guide | Ivory `#f7efe3`, deep red `#b72234`, badge blue `#1d6fb8` |
+| Kanto Archive | Warm open notebook / field guide | Parchment `#e5ceb0`, deep red `#9f1d2e`, badge blue `#075b9c` |
 | Hoenn Deepsea | Night-sea research station | Abyss blue `#071522`, reef cyan `#4fd5df`, sea-glass `#6ee0b6` |
 | Paldea Field Lab | Deep violet field kit | Aubergine `#17141f`, amber `#f2bd5b`, mint `#78ddc9` |
 

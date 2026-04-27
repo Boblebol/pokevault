@@ -5010,25 +5010,25 @@ body.drawer-open {
 
 html[data-theme="kanto"] {
   color-scheme: light;
-  --bg: #f7efe3;
-  --card: #fffaf0;
-  --surface-low: #efe1cc;
-  --surface-high: #e3cfb4;
-  --surface-highest: #d6bc9a;
-  --accent: #b72234;
-  --accent-strong: #a3411f;
+  --bg: #e5ceb0;
+  --card: #fffdf7;
+  --surface-low: #f0dfc6;
+  --surface-high: #dfc095;
+  --surface-highest: #cfa476;
+  --accent: #9f1d2e;
+  --accent-strong: #7d3a18;
   --accent-ink: #fffaf4;
-  --electric: #1d6fb8;
+  --electric: #075b9c;
   --text: #211a16;
-  --muted: #5f5047;
-  --outline-soft: rgba(91, 72, 58, 0.28);
-  --outline-strong: rgba(78, 58, 42, 0.44);
-  --control-bg: #fff6e8;
-  --control-border: #a78b6d;
-  --control-hover: #7f6752;
-  --success: #19784e;
-  --danger: #b72234;
-  --warning: #8a6400;
+  --muted: #4f4038;
+  --outline-soft: rgba(81, 58, 37, 0.32);
+  --outline-strong: rgba(81, 58, 37, 0.52);
+  --control-bg: #f1dfc6;
+  --control-border: #8d6f50;
+  --control-hover: #64492f;
+  --success: #126f45;
+  --danger: #9f1d2e;
+  --warning: #765600;
 }
 
 html[data-theme="hoenn"] {
