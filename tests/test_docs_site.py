@@ -91,6 +91,16 @@ def test_web_app_references_runtime_brand_assets() -> None:
     assert ("src", "/assets/logo-mark.svg") in links
 
 
+def test_readme_links_changelog_without_hosted_demo() -> None:
+    text = (ROOT / "README.md").read_text(encoding="utf-8")
+    old_hosted_url = "pokevault" + ".alexandre-enouf.fr"
+    old_demo_label = "Live " + "demo:"
+
+    assert "[Release notes](CHANGELOG.md)" in text
+    assert old_hosted_url not in text
+    assert old_demo_label not in text
+
+
 def test_open_source_security_policy_exists() -> None:
     security = ROOT / "SECURITY.md"
     assert security.is_file()
