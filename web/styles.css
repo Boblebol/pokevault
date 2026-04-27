@@ -5010,25 +5010,25 @@ body.drawer-open {
 
 html[data-theme="kanto"] {
   color-scheme: light;
-  --bg: #e5ceb0;
+  --bg: #d1a76d;
   --card: #fffdf7;
-  --surface-low: #f0dfc6;
-  --surface-high: #dfc095;
-  --surface-highest: #cfa476;
-  --accent: #9f1d2e;
-  --accent-strong: #7d3a18;
+  --surface-low: #f2d9ad;
+  --surface-high: #d8b172;
+  --surface-highest: #b7793c;
+  --accent: #7c1424;
+  --accent-strong: #5f2b0f;
   --accent-ink: #fffaf4;
-  --electric: #075b9c;
+  --electric: #073d73;
   --text: #211a16;
-  --muted: #4f4038;
-  --outline-soft: rgba(81, 58, 37, 0.32);
-  --outline-strong: rgba(81, 58, 37, 0.52);
-  --control-bg: #f1dfc6;
-  --control-border: #8d6f50;
-  --control-hover: #64492f;
-  --success: #126f45;
-  --danger: #9f1d2e;
-  --warning: #765600;
+  --muted: #3d3028;
+  --outline-soft: rgba(64, 42, 24, 0.46);
+  --outline-strong: rgba(64, 42, 24, 0.68);
+  --control-bg: #f0cf92;
+  --control-border: #6f4729;
+  --control-hover: #4d301d;
+  --success: #075f35;
+  --danger: #7c1424;
+  --warning: #5f4200;
 }
 
 html[data-theme="hoenn"] {

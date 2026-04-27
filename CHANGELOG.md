@@ -15,6 +15,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 - Docker release images are published for both `linux/amd64` and `linux/arm64`.
 - Regional themes now use full contrast-tested design tokens, updated labels
   and open-source-ready palette documentation.
+- Kanto Archive now has stronger page, card and control separation for better
+  readability on the light theme.
 
 ## [1.0.1] — 2026-04-27
 
