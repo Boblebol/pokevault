@@ -74,7 +74,7 @@ Every theme must define this token set:
 | Theme | Mood | Core colors |
 |-------|------|-------------|
 | Vault Lab | Default dark laboratory archive | Charcoal `#111418`, red-orange `#ff6b5f`, cyan `#36d5e8` |
-| Kanto Archive | Warm open notebook / field guide | Parchment `#e5ceb0`, deep red `#9f1d2e`, badge blue `#075b9c` |
+| Kanto Archive | Warm open notebook / field guide | Parchment `#d1a76d`, deep red `#7c1424`, badge blue `#073d73` |
 | Hoenn Deepsea | Night-sea research station | Abyss blue `#071522`, reef cyan `#4fd5df`, sea-glass `#6ee0b6` |
 | Paldea Field Lab | Deep violet field kit | Aubergine `#17141f`, amber `#f2bd5b`, mint `#78ddc9` |
 
@@ -82,6 +82,8 @@ Every theme must define this token set:
 Prefer tonal layering over decorative outlines. Borders are allowed when they
 improve scannability in dense tools, but they must use `--outline-soft` or
 `--outline-strong`; avoid hard-coded white/black alpha borders in app surfaces.
+Kanto Archive is the light-theme exception that must keep a visibly stronger
+page/card/control split so parchment surfaces do not collapse into each other.
 
 ### Gradient Rule
 Use gradients only for active progress, primary actions and small status

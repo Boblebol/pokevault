@@ -125,11 +125,14 @@ def test_theme_surfaces_are_visually_distinct() -> None:
         )
 
         if theme == "kanto":
-            assert _channel_distance(tokens["--bg"], tokens["--card"]) >= 0.28, (
+            assert _channel_distance(tokens["--bg"], tokens["--card"]) >= 0.90, (
                 "kanto: bg/card"
             )
-            assert _channel_distance(tokens["--card"], tokens["--control-bg"]) >= 0.24, (
+            assert _channel_distance(tokens["--card"], tokens["--control-bg"]) >= 0.50, (
                 "kanto: card/control"
+            )
+            assert _channel_distance(tokens["--card"], tokens["--surface-high"]) >= 0.90, (
+                "kanto: card/surface-high"
             )
 
 
