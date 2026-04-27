@@ -33,7 +33,7 @@ dependencies = [
 ]
 
 [project.urls]
-Homepage = "https://pokevault.alexandre-enouf.fr"
+Homepage = "https://github.com/Boblebol/pokevault"
 Repository = "https://github.com/Boblebol/pokevault"
 Issues = "https://github.com/Boblebol/pokevault/issues"
 
