@@ -1464,6 +1464,15 @@ function render() {
     heroCards.textContent = formatCardSummary(stats);
     heroCards.classList.toggle("is-dormant", stats.cards === 0);
   }
+  window.PokevaultDashboard?.renderFromState?.({
+    cardsHost: document.getElementById("pokedexDashboardCards"),
+    regionsHost: document.getElementById("pokedexDashboardRegions"),
+    pool: poolForCollectionScope(),
+    statusMap,
+    caughtMap,
+    regionDefinitions,
+    cardStats: computeCardStats(),
+  });
   const fill = document.getElementById("progressFill");
   fill.style.width = `${pct}%`;
   fill.parentElement.setAttribute("aria-valuenow", String(pct));
@@ -1547,6 +1556,7 @@ function setupKeyboardHelpTrigger() {
 let listCaughtSubscribed = false;
 let listDimSubscribed = false;
 let listHuntsSubscribed = false;
+let listCardsSubscribed = false;
 
 function readStoredFormFilterMode() {
   try {
@@ -1614,6 +1624,10 @@ async function startTracker() {
       resetDisplayedCount();
       render();
     });
+  }
+  if (!listCardsSubscribed) {
+    listCardsSubscribed = true;
+    document.addEventListener("pokevault:cards-changed", () => render());
   }
   if (!window.__pokedexOnlineFlushWired) {
     window.__pokedexOnlineFlushWired = true;

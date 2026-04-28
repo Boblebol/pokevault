@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- Collection home now includes a Pokédex-first dashboard with not-met, seen,
+  caught, shiny bonus, card add-on and regional progress metrics.
 - Drawer card creation can search the public Pokemon TCG API, select a result
   and prefill set, number, rarity, official image URL and catalog id.
 - `GET /api/tcg/cards/search` exposes a small local search adapter with optional
