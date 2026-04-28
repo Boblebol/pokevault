@@ -165,6 +165,8 @@ comprendre en quelques secondes ce qui manque et quoi faire ensuite.
 
 **Type** : frontend design.
 
+**Status** : implemented.
+
 **Scope**
 
 - Revoir les espacements, tailles et ordres de blocs pour mobile.
