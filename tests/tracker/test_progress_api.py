@@ -110,3 +110,32 @@ def test_patch_status_endpoint(tmp_path: Path) -> None:
     body = client.get("/api/progress").json()
     assert body["statuses"] == {}
     assert body["caught"] == {}
+
+
+def test_patch_note_endpoint_saves_and_clears_profile_note(tmp_path: Path) -> None:
+    prog = tmp_path / "data" / "collection-progress.json"
+    prog.parent.mkdir(parents=True)
+
+    def service_override() -> ProgressService:
+        return ProgressService(JsonProgressRepository(prog))
+
+    app = FastAPI()
+    app.include_router(progress_router)
+    app.dependency_overrides[get_progress_service] = service_override
+    client = TestClient(app)
+
+    r = client.patch(
+        "/api/progress/notes",
+        json={"slug": "pikachu", "note": "  échange prévu  "},
+    )
+    assert r.status_code == 200
+    body = client.get("/api/progress").json()
+    assert body["notes"]["pikachu"]["text"] == "échange prévu"
+    assert body["notes"]["pikachu"]["updated_at"]
+
+    r = client.patch(
+        "/api/progress/notes",
+        json={"slug": "pikachu", "note": ""},
+    )
+    assert r.status_code == 200
+    assert client.get("/api/progress").json()["notes"] == {}

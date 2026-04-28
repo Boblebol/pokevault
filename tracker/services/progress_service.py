@@ -6,7 +6,9 @@ from datetime import UTC, datetime
 
 from tracker.models import (
     CollectionProgress,
+    PokemonNoteEntry,
     PokemonStatusEntry,
+    ProgressNotePatch,
     ProgressPatch,
     ProgressPutBody,
     ProgressSaveResponse,
@@ -23,9 +25,15 @@ class ProgressService:
         return self._repository.load()
 
     def replace_caught(self, body: ProgressPutBody) -> ProgressSaveResponse:
+        current = self._repository.load()
         cleaned = _normalize_caught(body.caught)
         statuses = {slug: PokemonStatusEntry(state="caught") for slug in cleaned}
-        to_store = CollectionProgress(caught=cleaned, statuses=statuses)
+        to_store = CollectionProgress(
+            caught=cleaned,
+            statuses=statuses,
+            notes=current.notes,
+            badges_unlocked=current.badges_unlocked,
+        )
         self._repository.save(to_store)
         return ProgressSaveResponse(ok=True, saved=len(cleaned))
 
@@ -44,7 +52,11 @@ class ProgressService:
             )
         else:
             statuses.pop(key, None)
-        to_store = CollectionProgress(statuses=statuses)
+        to_store = CollectionProgress(
+            statuses=statuses,
+            notes=current.notes,
+            badges_unlocked=current.badges_unlocked,
+        )
         self._repository.save(to_store)
         return ProgressSaveResponse(ok=True, saved=_count_caught(statuses))
 
@@ -68,7 +80,13 @@ class ProgressService:
             shiny=bool(prev.shiny) if prev else False,
             seen_at=prev.seen_at if prev and prev.seen_at else _now_iso(),
         )
-        self._repository.save(CollectionProgress(statuses=statuses))
+        self._repository.save(
+            CollectionProgress(
+                statuses=statuses,
+                notes=current.notes,
+                badges_unlocked=current.badges_unlocked,
+            )
+        )
         return True
 
     def patch_status(self, body: ProgressStatusPatch) -> ProgressSaveResponse:
@@ -86,9 +104,30 @@ class ProgressService:
                 shiny=shiny,
                 seen_at=seen_at,
             )
-        to_store = CollectionProgress(statuses=statuses)
+        to_store = CollectionProgress(
+            statuses=statuses,
+            notes=current.notes,
+            badges_unlocked=current.badges_unlocked,
+        )
         self._repository.save(to_store)
         return ProgressSaveResponse(ok=True, saved=_count_caught(statuses))
+
+    def patch_note(self, body: ProgressNotePatch) -> ProgressSaveResponse:
+        current = self._repository.load()
+        notes = dict(current.notes)
+        key = body.slug.strip()
+        note = body.note.strip()
+        if not note:
+            notes.pop(key, None)
+        else:
+            notes[key] = PokemonNoteEntry(text=note, updated_at=_now_iso())
+        to_store = CollectionProgress(
+            statuses=current.statuses,
+            notes=notes,
+            badges_unlocked=current.badges_unlocked,
+        )
+        self._repository.save(to_store)
+        return ProgressSaveResponse(ok=True, saved=_count_caught(current.statuses))
 
 
 _TRUTHY = {True, "1", "true", "True"}

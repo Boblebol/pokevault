@@ -5,7 +5,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from tracker.models import CollectionProgress, PokemonStatusEntry
+from tracker.models import CollectionProgress, PokemonNoteEntry, PokemonStatusEntry
 
 
 class JsonProgressRepository:
@@ -35,6 +35,7 @@ class JsonProgressRepository:
             return CollectionProgress()
 
         statuses = _load_statuses(raw.get("statuses"))
+        notes = _load_notes(raw.get("notes"))
         caught = _load_caught(raw.get("caught"))
         badges = _load_badges(raw.get("badges_unlocked"))
 
@@ -49,6 +50,7 @@ class JsonProgressRepository:
         return CollectionProgress(
             caught=derived_caught,
             statuses=statuses,
+            notes=notes,
             badges_unlocked=badges,
         )
 
@@ -64,6 +66,7 @@ class JsonProgressRepository:
         reconciled = CollectionProgress(
             caught=_derive_caught(data.statuses) or data.caught,
             statuses=data.statuses,
+            notes=data.notes,
             badges_unlocked=list(badges),
         )
         payload = reconciled.model_dump(mode="json")
@@ -108,6 +111,26 @@ def _load_statuses(raw: object) -> dict[str, PokemonStatusEntry]:
 
 def _derive_caught(statuses: dict[str, PokemonStatusEntry]) -> dict[str, bool]:
     return {slug: True for slug, entry in statuses.items() if entry.state == "caught"}
+
+
+def _load_notes(raw: object) -> dict[str, PokemonNoteEntry]:
+    if not isinstance(raw, dict):
+        return {}
+    out: dict[str, PokemonNoteEntry] = {}
+    for slug, entry in raw.items():
+        if not isinstance(slug, str) or not slug.strip():
+            continue
+        if not isinstance(entry, dict):
+            continue
+        text = entry.get("text")
+        updated_at = entry.get("updated_at")
+        if not isinstance(text, str) or not isinstance(updated_at, str):
+            continue
+        clean = text.strip()
+        if not clean:
+            continue
+        out[slug.strip()] = PokemonNoteEntry(text=clean, updated_at=updated_at)
+    return out
 
 
 def _load_badges(raw: object) -> list[str]:

@@ -3,7 +3,7 @@
 [![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![Tests](https://img.shields.io/badge/tracker_coverage-100%25-brightgreen.svg)](#quality)
-[![Version: 1.0.2](https://img.shields.io/badge/version-1.0.2-00daf3.svg)](CHANGELOG.md)
+[![Version: 1.1.0](https://img.shields.io/badge/version-1.1.0-00daf3.svg)](CHANGELOG.md)
 
 <p align="center">
   <img src="docs/assets/logo.svg" alt="pokevault logo" width="140">
@@ -53,7 +53,9 @@ works immediately after install. Optional artwork caches are generated locally.
 ## What It Does
 
 - Scrapes and exports a National Pokédex reference from Pokepedia.
-- Tracks seen, caught and shiny status per Pokemon.
+- Tracks not-met, seen, caught and shiny status per Pokemon.
+- Opens Pokédex-first Pokémon fiches with direct status controls, linked forms,
+  personal notes and collapsible card details.
 - Attaches owned physical cards to Pokemon entries.
 - Searches the public Pokemon TCG API to prefill card metadata.
 - Models binder pages, grids and card placements.

@@ -1,7 +1,91 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 
+let importCase = 0;
+
+class FakeElement {
+  constructor(tagName) {
+    this.tagName = tagName.toUpperCase();
+    this.children = [];
+    this.dataset = {};
+    this.className = "";
+    this.textContent = "";
+    this.hidden = false;
+    this.type = "";
+    this.id = "";
+    this.events = {};
+    this.classList = {
+      add: (...classes) => {
+        const existing = new Set(String(this.className || "").split(/\s+/).filter(Boolean));
+        for (const cls of classes) existing.add(cls);
+        this.className = [...existing].join(" ");
+      },
+      remove: (...classes) => {
+        const remove = new Set(classes);
+        this.className = String(this.className || "")
+          .split(/\s+/)
+          .filter((cls) => cls && !remove.has(cls))
+          .join(" ");
+      },
+    };
+  }
+
+  append(...nodes) {
+    for (const node of nodes) {
+      if (typeof node === "string") {
+        this.children.push(new FakeText(node));
+      } else {
+        this.children.push(node);
+      }
+    }
+  }
+
+  replaceChildren(...nodes) {
+    this.children = [];
+    this.append(...nodes);
+  }
+
+  addEventListener(type, handler) {
+    this.events[type] = handler;
+  }
+
+  setAttribute(name, value) {
+    this[name] = String(value);
+  }
+
+  querySelector(selector) {
+    return findInTree(this, selector);
+  }
+}
+
+class FakeText {
+  constructor(text) {
+    this.tagName = "#TEXT";
+    this.textContent = text;
+    this.children = [];
+  }
+}
+
+function matchesSelector(node, selector) {
+  if (!node || node.tagName === "#TEXT") return false;
+  if (selector.startsWith(".")) {
+    return String(node.className || "").split(/\s+/).includes(selector.slice(1));
+  }
+  if (selector.startsWith("#")) return node.id === selector.slice(1);
+  return node.tagName === selector.toUpperCase();
+}
+
+function findInTree(root, selector) {
+  for (const child of root.children || []) {
+    if (matchesSelector(child, selector)) return child;
+    const found = findInTree(child, selector);
+    if (found) return found;
+  }
+  return null;
+}
+
 function installBrowserStubs() {
+  globalThis.__POKEVAULT_FICHE_TESTS__ = true;
   globalThis.__POKEVAULT_DRAWER_TESTS__ = true;
   globalThis.window = globalThis;
   globalThis.addEventListener = () => {};
@@ -14,22 +98,21 @@ function installBrowserStubs() {
     getElementById() {
       return null;
     },
-    createElement() {
-      return {
-        append() {},
-        addEventListener() {},
-        classList: { add() {}, remove() {} },
-        dataset: {},
-        replaceChildren() {},
-        setAttribute() {},
-      };
+    createElement(tagName) {
+      return new FakeElement(tagName);
+    },
+    createTextNode(text) {
+      return new FakeText(text);
     },
   };
 }
 
 async function loadModule() {
   installBrowserStubs();
-  await import(`../../web/pokemon-drawer.js?case=${Date.now()}`);
+  importCase += 1;
+  const stamp = `${Date.now()}-${importCase}`;
+  await import(`../../web/pokemon-fiche.js?case=${stamp}-fiche`);
+  await import(`../../web/pokemon-drawer.js?case=${stamp}-drawer`);
   return globalThis.window.PokevaultDrawer._test;
 }
 
@@ -87,4 +170,22 @@ test("applyTcgCardToForm prefills local card fields", async () => {
   assert.equal(form.elements.num.value, "4");
   assert.equal(form.elements.variant.value, "Rare Holo");
   assert.equal(form.elements.image_url.value, "https://images.example/base1-4_hires.png");
+});
+
+test("buildCardsSection keeps add-card and TCG search inside a collapsed B5 body", async () => {
+  const api = await loadModule();
+
+  const section = api.buildCardsSection();
+  const body = section.children.find((child) =>
+    String(child.className || "").includes("pokemon-fiche-section__body"),
+  );
+  const heading = section.children[0];
+  const toggle = heading.children[0];
+
+  assert.equal(section.dataset.section, "cards");
+  assert.equal(section.dataset.collapsed, "true");
+  assert.equal(body.hidden, true);
+  assert.equal(toggle["aria-expanded"], "false");
+  assert.ok(body.querySelector("#drawerAddCardForm"));
+  assert.ok(body.querySelector(".drawer-tcg-search"));
 });

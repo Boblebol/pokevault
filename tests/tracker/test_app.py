@@ -73,6 +73,7 @@ def test_create_app_serves_static_and_api(tmp_path: Path) -> None:
         "version": 1,
         "caught": {},
         "statuses": {},
+        "notes": {},
         "badges_unlocked": [],
     }
     assert client.get("/api/binder/config").status_code == 200

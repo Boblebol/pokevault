@@ -72,10 +72,9 @@ Sorted by RICE descending. Tone/wave column drives the delivery plan below.
 Release history: the four waves are bundled into the public `v1.0.0` release.
 Future work should use the normal `v1.x.y` semver line.
 
-The next planned product cycle is documented in
-[V1.1 Pokédex-First Backlog](V1_1_POKEDEX_FIRST.md): first a completion-focused
-Pokédex center, then richer Pokémon fiches, then carefully sourced Pokédex
-metadata.
+The v1.1 Pokédex-first home and richer Pokémon fiche work has shipped. The
+remaining active v1.1 track is carefully sourced Pokédex metadata, documented in
+[V1.1 Pokédex-First Backlog](V1_1_POKEDEX_FIRST.md).
 
 ---
 

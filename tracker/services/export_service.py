@@ -82,6 +82,8 @@ class ExportService:
         progress = CollectionProgress(
             caught=progress_in.caught,
             statuses=progress_in.statuses,
+            notes=progress_in.notes,
+            badges_unlocked=progress_in.badges_unlocked,
         )
         self._progress.save(progress)
 
@@ -295,7 +297,17 @@ class ExportService:
             for slug, entry in progress.statuses.items()
             if str(slug) in allowed
         }
-        return CollectionProgress(caught=filtered_caught, statuses=filtered_statuses)
+        filtered_notes = {
+            slug: entry
+            for slug, entry in progress.notes.items()
+            if str(slug) in allowed
+        }
+        return CollectionProgress(
+            caught=filtered_caught,
+            statuses=filtered_statuses,
+            notes=filtered_notes,
+            badges_unlocked=progress.badges_unlocked,
+        )
 
     @staticmethod
     def _sanitize_cards(cards: CardList, allowed: set[str]) -> CardList:

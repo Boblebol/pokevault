@@ -6,7 +6,9 @@ from pathlib import Path
 
 from tracker.models import (
     CollectionProgress,
+    PokemonNoteEntry,
     PokemonStatusEntry,
+    ProgressNotePatch,
     ProgressPatch,
     ProgressPutBody,
     ProgressSaveResponse,
@@ -114,6 +116,39 @@ def test_patch_status_preserves_seen_at(tmp_path: Path) -> None:
     entry = repo.load().statuses["pika"]
     assert entry.state == "caught"
     assert entry.seen_at == "2026-01-01T00:00:00+00:00"
+
+
+def test_patch_note_trims_saves_and_clears_empty_note(tmp_path: Path) -> None:
+    repo = JsonProgressRepository(tmp_path / "p.json")
+    svc = ProgressService(repo)
+    res = svc.patch_note(ProgressNotePatch(slug=" pikachu ", note="  Route 4 / échange  "))
+    assert res.ok is True
+    loaded = repo.load()
+    assert loaded.notes["pikachu"].text == "Route 4 / échange"
+    assert loaded.notes["pikachu"].updated_at
+
+    svc.patch_note(ProgressNotePatch(slug="pikachu", note="   "))
+    assert repo.load().notes == {}
+
+
+def test_status_changes_preserve_pokedex_notes(tmp_path: Path) -> None:
+    repo = JsonProgressRepository(tmp_path / "p.json")
+    repo.save(
+        CollectionProgress(
+            notes={
+                "pika": PokemonNoteEntry(
+                    text="Version Jaune",
+                    updated_at="2026-04-28T10:00:00+00:00",
+                )
+            }
+        )
+    )
+    svc = ProgressService(repo)
+    svc.patch_status(ProgressStatusPatch(slug="pika", state="caught", shiny=True))
+    svc.patch_caught(ProgressPatch(slug="pika", caught=False))
+    loaded = repo.load()
+    assert loaded.notes["pika"].text == "Version Jaune"
+    assert "pika" not in loaded.statuses
 
 
 def test_patch_caught_removes_entry(tmp_path: Path) -> None:
