@@ -23,7 +23,7 @@ let filterMode = "all";
 let regionFilter = "all";
 let searchQuery = "";
 let totalCount = 0;
-/** @type {"all" | "base_only" | "base_regional"} */
+/** @type {"all" | "base_only" | "base_regional" | "regional_only"} */
 let formFilterMode = "all";
 let typeFilter = "all";
 /** Multi-select narrative filter (F05) — set of tag ids. */
@@ -354,6 +354,76 @@ function formatCardSummary({ cards, sets }) {
   return `${c} dans ${s}`;
 }
 
+function availableTypeIds() {
+  const ids = new Set();
+  for (const p of allPokemon) {
+    for (const t of p.types || []) {
+      if (t) ids.add(String(t));
+    }
+  }
+  return [...ids];
+}
+
+function currentFilterState() {
+  return {
+    status: filterMode,
+    region: regionFilter,
+    forms: formFilterMode,
+    type: typeFilter,
+    tags: [...narrativeTagFilter],
+  };
+}
+
+function filterHashOptions() {
+  return {
+    regionIds: regionDefinitions.map((r) => String(r.id)),
+    typeIds: availableTypeIds(),
+    tagIds: narrativeTagOrder,
+  };
+}
+
+function writeFiltersToHash() {
+  const next = window.PokevaultFilters?.buildFilterHash?.(
+    location.hash || "#/liste",
+    currentFilterState(),
+    filterHashOptions(),
+  );
+  if (next && location.hash !== next) {
+    history.replaceState(null, "", next);
+  }
+}
+
+function readFiltersFromHash() {
+  return window.PokevaultFilters?.parseFilterHash?.(
+    location.hash || "#/liste",
+    filterHashOptions(),
+  )?.filters || currentFilterState();
+}
+
+function applyFilterState(filters) {
+  const clean = window.PokevaultFilters?.normalizeFilterState?.(
+    filters || {},
+    filterHashOptions(),
+  ) || filters || {};
+  filterMode = clean.status || "all";
+  regionFilter = clean.region || "all";
+  formFilterMode = clean.forms || "all";
+  typeFilter = clean.type || "all";
+  narrativeTagFilter = new Set(clean.tags || []);
+}
+
+function syncFilterControlsFromState() {
+  const regionSel = document.getElementById("regionFilter");
+  if (regionSel) regionSel.value = regionFilter;
+  const typeSel = document.getElementById("typeFilter");
+  if (typeSel) typeSel.value = typeFilter;
+  const formSel = document.getElementById("formFilter");
+  if (formSel) formSel.value = formFilterMode;
+  syncQuickFilterButtons();
+  syncRegionChipsActive();
+  renderNarrativeChips();
+}
+
 window.PokedexCollection = {
   ensureLoaded: () => getCollectionBootstrap(),
   get caughtMap() {
@@ -524,9 +594,15 @@ function matchesSearch(p, q) {
 
 function matchesFilter(p) {
   const k = pokemonKey(p);
-  const got = !!caughtMap[k];
+  const status = window.PokevaultFilters?.statusForPokemon?.(k, caughtMap, statusMap) || {
+    state: caughtMap[k] ? "caught" : "not_met",
+    shiny: false,
+  };
+  const got = status.state === "caught";
   if (filterMode === "caught") return got;
   if (filterMode === "missing") return !got;
+  if (filterMode === "seen") return status.state === "seen";
+  if (filterMode === "shiny") return got && status.shiny;
   if (filterMode === "hunts") return Boolean(window.PokevaultHunts?.isWanted?.(k));
   return true;
 }
@@ -583,6 +659,13 @@ function matchesRegion(p) {
 
 /** Filtre formes — local à la liste (localStorage), sans lien avec les classeurs. */
 function matchesListFormFilter(p) {
+  if (window.PokevaultFilters?.matchesPokemonFilters) {
+    return window.PokevaultFilters.matchesPokemonFilters(p, {
+      filters: { status: "all", region: "all", forms: formFilterMode, type: "all", tags: [] },
+      caughtMap,
+      statusMap,
+    });
+  }
   if (formFilterMode === "all") return true;
   const B = window.PokedexBinder;
   if (!B?.pokemonMatchesFormRule || !B.formRuleFromScope) return true;
@@ -622,12 +705,28 @@ function visibleList() {
   const scoped = poolForCollectionScope();
   return scoped.filter(
     (p) =>
-      matchesListFormFilter(p) &&
-      matchesTypeFilter(p) &&
       matchesSearch(p, searchQuery) &&
-      matchesFilter(p) &&
-      matchesRegion(p) &&
-      matchesNarrativeTags(p),
+      matchesPokedexFilterState(p),
+  );
+}
+
+function matchesPokedexFilterState(p) {
+  if (window.PokevaultFilters?.matchesPokemonFilters) {
+    return window.PokevaultFilters.matchesPokemonFilters(p, {
+      filters: currentFilterState(),
+      caughtMap,
+      statusMap,
+      effectiveRegion,
+      isWanted: (slug) => Boolean(window.PokevaultHunts?.isWanted?.(slug)),
+      narrativeTagsFor,
+    });
+  }
+  return (
+    matchesListFormFilter(p) &&
+    matchesTypeFilter(p) &&
+    matchesFilter(p) &&
+    matchesRegion(p) &&
+    matchesNarrativeTags(p)
   );
 }
 
@@ -730,32 +829,9 @@ function syncRegionChipsActive() {
   }
 }
 
-function parseHashQuery() {
-  const raw = (location.hash || "").replace(/^#\/?/, "");
-  const q = raw.indexOf("?");
-  if (q < 0) return { view: raw, params: new URLSearchParams() };
-  return {
-    view: raw.slice(0, q),
-    params: new URLSearchParams(raw.slice(q + 1)),
-  };
-}
-
 function writeRegionToHash(region) {
-  const { view, params } = parseHashQuery();
-  if (region && region !== "all") params.set("region", region);
-  else params.delete("region");
-  const qs = params.toString();
-  const next = `#/${view}${qs ? `?${qs}` : ""}`;
-  if (location.hash !== next) {
-    history.replaceState(null, "", next);
-  }
-}
-
-function readRegionFromHash() {
-  const { params } = parseHashQuery();
-  const v = params.get("region");
-  if (!v || v === "all") return null;
-  return v;
+  void region;
+  writeFiltersToHash();
 }
 
 function renderNarrativeChips() {
@@ -824,27 +900,7 @@ function clearNarrativeTags() {
 }
 
 function writeTagsToHash() {
-  const { view, params } = parseHashQuery();
-  const ordered = narrativeTagOrder.filter((t) => narrativeTagFilter.has(t));
-  if (ordered.length) params.set("tags", ordered.join(","));
-  else params.delete("tags");
-  const qs = params.toString();
-  const next = `#/${view}${qs ? `?${qs}` : ""}`;
-  if (location.hash !== next) {
-    history.replaceState(null, "", next);
-  }
-}
-
-function readTagsFromHash() {
-  const { params } = parseHashQuery();
-  const raw = params.get("tags");
-  if (!raw) return new Set();
-  const out = new Set();
-  for (const part of raw.split(",")) {
-    const t = part.trim();
-    if (t && narrativeTagLabels[t]) out.add(t);
-  }
-  return out;
+  writeFiltersToHash();
 }
 
 function setupRegionFilter() {
@@ -892,6 +948,7 @@ function setupTypeFilter() {
     } catch {
       /* ignore */
     }
+    writeFiltersToHash();
     resetDisplayedCount();
     render();
   });
@@ -904,12 +961,14 @@ function setupFormFilter() {
   sel.value = formFilterMode;
   sel.addEventListener("change", () => {
     const v = sel.value || "all";
-    formFilterMode = v === "base_only" || v === "base_regional" ? v : "all";
+    formFilterMode = v === "base_only" || v === "base_regional" || v === "regional_only" ? v : "all";
     try {
       localStorage.setItem(FORM_FILTER_STORAGE_KEY, formFilterMode);
     } catch {
       /* ignore */
     }
+    writeFiltersToHash();
+    syncQuickFilterButtons();
     resetDisplayedCount();
     render();
   });
@@ -1487,7 +1546,7 @@ function render() {
   window.PokevaultDashboard?.renderFromState?.({
     cardsHost: document.getElementById("pokedexDashboardCards"),
     regionsHost: document.getElementById("pokedexDashboardRegions"),
-    pool: poolForCollectionScope(),
+    pool: sliced.full,
     statusMap,
     caughtMap,
     regionDefinitions,
@@ -1547,22 +1606,48 @@ function render() {
   window.PokevaultFocus?.refresh?.();
 }
 
+function syncQuickFilterButtons() {
+  const buttons = document.querySelectorAll("#viewListe .filter-btn[data-filter], #viewListe .filter-btn[data-form-filter]");
+  buttons.forEach((btn) => {
+    let on = false;
+    if (btn.dataset.filter) {
+      on = btn.dataset.filter === filterMode;
+      if (btn.dataset.filter === "all") on = filterMode === "all" && formFilterMode === "all";
+    } else if (btn.dataset.formFilter) {
+      on = btn.dataset.formFilter === formFilterMode;
+    }
+    btn.classList.toggle("is-active", on);
+    btn.setAttribute("aria-pressed", on ? "true" : "false");
+  });
+}
+
 function setupFilters() {
-  const buttons = document.querySelectorAll("#viewListe .filter-btn[data-filter]");
+  const buttons = document.querySelectorAll("#viewListe .filter-btn[data-filter], #viewListe .filter-btn[data-form-filter]");
   buttons.forEach((btn) => {
     if (btn.dataset.filterWired) return;
     btn.dataset.filterWired = "1";
     btn.addEventListener("click", () => {
-      filterMode = btn.dataset.filter || "all";
+      if (btn.dataset.filter) {
+        filterMode = btn.dataset.filter || "all";
+        if (filterMode === "all") formFilterMode = "all";
+      } else if (btn.dataset.formFilter) {
+        const next = btn.dataset.formFilter || "all";
+        formFilterMode = formFilterMode === next ? "all" : next;
+      }
+      const formSel = document.getElementById("formFilter");
+      if (formSel) formSel.value = formFilterMode;
+      try {
+        localStorage.setItem(FORM_FILTER_STORAGE_KEY, formFilterMode);
+      } catch {
+        /* ignore */
+      }
+      writeFiltersToHash();
       resetDisplayedCount();
-      buttons.forEach((b) => {
-        const on = b === btn;
-        b.classList.toggle("is-active", on);
-        b.setAttribute("aria-pressed", on ? "true" : "false");
-      });
+      syncQuickFilterButtons();
       render();
     });
   });
+  syncQuickFilterButtons();
 }
 
 function setupSearch() {
@@ -1592,7 +1677,7 @@ let listBadgesSubscribed = false;
 function readStoredFormFilterMode() {
   try {
     const v = localStorage.getItem(FORM_FILTER_STORAGE_KEY);
-    if (v === "base_only" || v === "base_regional") return v;
+    if (v === "base_only" || v === "base_regional" || v === "regional_only") return v;
   } catch {
     /* ignore */
   }
@@ -1632,15 +1717,9 @@ async function startTracker() {
   } catch {
     /* hunts are optional local state */
   }
-  const hashRegion = readRegionFromHash();
-  if (hashRegion) {
-    regionFilter = hashRegion;
-    const sel = document.getElementById("regionFilter");
-    if (sel) sel.value = hashRegion;
-  }
-  narrativeTagFilter = readTagsFromHash();
+  applyFilterState(readFiltersFromHash());
   renderRegionChips();
-  renderNarrativeChips();
+  syncFilterControlsFromState();
   if (!listCaughtSubscribed) {
     listCaughtSubscribed = true;
     window.PokedexCollection.subscribeCaught(() => render());
@@ -1730,6 +1809,11 @@ function applyAppRoute() {
   if (view === "liste" && !listViewStarted) {
     listViewStarted = true;
     void startTracker();
+  } else if (view === "liste" && listViewStarted && allPokemon.length) {
+    applyFilterState(readFiltersFromHash());
+    syncFilterControlsFromState();
+    resetDisplayedCount();
+    render();
   }
   if (view === "classeur" && typeof window.startBinderV2IfNeeded === "function") {
     window.startBinderV2IfNeeded();
