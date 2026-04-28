@@ -97,6 +97,8 @@ comprendre en quelques secondes ce qui manque et quoi faire ensuite.
 
 **Type** : frontend.
 
+**Status** : implemented.
+
 **Scope**
 
 - Ajouter un bloc "À compléter maintenant".

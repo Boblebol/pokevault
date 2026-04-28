@@ -1446,6 +1446,26 @@ function hasActiveFilterExceptMissing() {
   );
 }
 
+function openRecommendedPokemon(slug, action, trigger) {
+  if (!slug) return;
+  const escaped = window.CSS?.escape ? window.CSS.escape(slug) : String(slug).replace(/["\\]/g, "\\$&");
+  const card = document.querySelector?.(`.card[data-slug="${escaped}"]`) || null;
+  if (window.PokevaultDrawer?.open) {
+    window.PokevaultDrawer.open(slug, card || trigger || null);
+    return;
+  }
+  const pokemon = action?.pokemon || allPokemon.find((p) => pokemonKey(p) === slug);
+  const input = document.getElementById("search");
+  if (input && pokemon) {
+    input.value = displayName(pokemon);
+    input.dispatchEvent(new Event("input", { bubbles: true }));
+  }
+  window.setTimeout(() => {
+    const target = document.querySelector?.(`.card[data-slug="${escaped}"]`);
+    target?.scrollIntoView?.({ block: "center", inline: "nearest", behavior: "smooth" });
+  }, 80);
+}
+
 function render() {
   const grid = document.getElementById("grid");
   const sliced = slicedVisibleList();
@@ -1472,6 +1492,16 @@ function render() {
     caughtMap,
     regionDefinitions,
     cardStats: computeCardStats(),
+  });
+  window.PokevaultNextActions?.renderFromState?.({
+    host: document.getElementById("pokedexNextActions"),
+    pool: poolForCollectionScope(),
+    caughtMap,
+    statusMap,
+    regionDefinitions,
+    activeRegionId: regionFilter,
+    nearestBadge: window.PokevaultBadges?.nearest?.(),
+    onOpen: openRecommendedPokemon,
   });
   const fill = document.getElementById("progressFill");
   fill.style.width = `${pct}%`;
@@ -1557,6 +1587,7 @@ let listCaughtSubscribed = false;
 let listDimSubscribed = false;
 let listHuntsSubscribed = false;
 let listCardsSubscribed = false;
+let listBadgesSubscribed = false;
 
 function readStoredFormFilterMode() {
   try {
@@ -1628,6 +1659,10 @@ async function startTracker() {
   if (!listCardsSubscribed) {
     listCardsSubscribed = true;
     document.addEventListener("pokevault:cards-changed", () => render());
+  }
+  if (!listBadgesSubscribed) {
+    listBadgesSubscribed = true;
+    window.PokevaultBadges?.subscribe?.(() => render());
   }
   if (!window.__pokedexOnlineFlushWired) {
     window.__pokedexOnlineFlushWired = true;
