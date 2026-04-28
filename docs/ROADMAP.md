@@ -201,18 +201,20 @@ None.
 **RICE 53** · Effort 3 j · Wave 2
 
 > As a new user, I want a short welcome wizard that sets the stage and lets
-> me pick my collector profile.
+> me start from a Pokédex-first setup.
 
 ### Acceptance
-- Step 1 — Welcome: pitch + « C'est parti ». Skippable.
-- Step 2 — Profile: Pokédex pur · TCG physique · Mixte (controls which features surface).
-- Step 3 — Preferences: language (FR / EN / JA), favourite region, theme.
-  Stored in LocalStorage + exported in backup.
+- Step 1 — Goal: complete my Pokédex. Skippable.
+- Step 2 — Favourite region: National or a specific region for the first list.
+- Step 3 — Tracking mode: simple or advanced, with cards kept as a later add-on.
+  Stored in LocalStorage and used to guide the initial collection filters.
 - Unlocks a « Première rencontre » badge at completion (see F12).
 
 ### Tech
-- New `web/onboarding.js`, bootstrap-triggered when `ui.profile` is missing.
-- Add `ui.profile` to backup JSON under schema v2 (backward-compat).
+- `web/onboarding.js`, bootstrap-triggered when the local onboarding profile is
+  missing.
+- Local onboarding profile schema v2 remains backward-compatible with the
+  previous collector-profile shape.
 - Optional: new `GET / PUT /api/ui` controller to persist server-side.
 - Design: centred `<dialog>`, no dedicated route.
 

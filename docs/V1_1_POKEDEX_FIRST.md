@@ -191,6 +191,8 @@ comprendre en quelques secondes ce qui manque et quoi faire ensuite.
 
 **Type** : frontend + stockage local/profil.
 
+**Status** : implemented.
+
 **Scope**
 
 - Remplacer le positionnement mixte par un onboarding Pokédex-first.

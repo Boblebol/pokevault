@@ -18,6 +18,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   missing, seen, caught, shiny and regional forms, with shareable hash state.
 - Collection home now has a dedicated mobile layout that keeps progress,
   recommendations, filters and the grid usable down to narrow phone widths.
+- Onboarding now starts from a Pokédex-first goal, favorite region and
+  simple/advanced tracking mode while keeping cards as a later add-on.
 - Drawer card creation can search the public Pokemon TCG API, select a result
   and prefill set, number, rarity, official image URL and catalog id.
 - `GET /api/tcg/cards/search` exposes a small local search adapter with optional
