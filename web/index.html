@@ -553,11 +553,11 @@
           <h3 class="onboarding__step-title">Compléter mon Pokédex.</h3>
           <p class="onboarding__lede">
             Pokevault démarre sur la progression Pokédex : non rencontrés,
-            vus, capturés, puis les bonus quand tu en as besoin.
+            vus, capturés, puis les notes, formes et cartes quand tu en as besoin.
           </p>
           <ul class="onboarding__bullets">
-            <li>1025 Pokémon couverts, du Gen 1 au Gen 9.</li>
-            <li>États <em>non rencontré</em>, <em>vu</em> et <em>capturé</em>.</li>
+            <li>1457 entrées Pokédex locales, formes incluses.</li>
+            <li>États <em>non rencontré</em>, <em>vu</em>, <em>capturé</em> et bonus shiny.</li>
             <li>Tes données restent dans <code>data/</code>, exportables à tout moment.</li>
           </ul>
         </section>
@@ -592,7 +592,7 @@
           <h3 class="onboarding__step-title">Simple ou avancé ?</h3>
           <p class="onboarding__lede">
             Simple garde la liste concentrée sur les statuts Pokédex. Avancé
-            rend les formes, shiny, notes et cartes plus visibles.
+            rend les formes, shiny, notes, recherches et cartes plus visibles.
           </p>
           <div class="onboarding__choices" role="radiogroup" aria-label="Mode de suivi Pokédex">
             <label class="onboarding__choice">
@@ -603,12 +603,12 @@
             <label class="onboarding__choice">
               <input type="radio" name="onboardingTrackingMode" value="advanced" />
               <span class="onboarding__choice-title">Avancé</span>
-              <span class="onboarding__choice-sub">Shiny, formes spéciales, notes, hunts et cartes plus accessibles.</span>
+              <span class="onboarding__choice-sub">Shiny, formes spéciales, notes, recherches, TCG et cartes plus accessibles.</span>
             </label>
           </div>
           <p class="onboarding__hint">
-            Les cartes TCG restent un add-on : tu peux les ajouter depuis une
-            fiche Pokémon ou les classeurs, sans changer ton objectif principal.
+            Les cartes TCG restent un add-on : la fiche garde statut, formes et
+            notes en premier, puis replie les cartes longues.
           </p>
         </section>
 
@@ -685,6 +685,7 @@
     <script src="/artwork-switcher.js" defer></script>
     <script src="/onboarding.js" defer></script>
     <script src="/type-chart.js" defer></script>
+    <script src="/pokemon-fiche.js" defer></script>
     <script src="/pokemon-drawer.js" defer></script>
     <script src="/pokemon-full-view.js" defer></script>
     <script src="/binder-v2.js" defer></script>

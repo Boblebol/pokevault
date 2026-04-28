@@ -102,6 +102,37 @@ def test_load_statuses_full(tmp_path: Path) -> None:
     assert out.caught == {"pikachu": True}
 
 
+def test_load_and_save_pokedex_notes(tmp_path: Path) -> None:
+    p = tmp_path / "prog.json"
+    raw = {
+        "version": 1,
+        "notes": {
+            "": {
+                "text": "no slug",
+                "updated_at": "2026-04-28T10:00:00+00:00",
+            },
+            "pikachu": {
+                "text": "Route 4",
+                "updated_at": "2026-04-28T10:00:00+00:00",
+            },
+            "not_dict": "oops",
+            "blank": {"text": "   ", "updated_at": "2026-04-28T10:00:00+00:00"},
+            "bad": {"text": 123, "updated_at": "2026-04-28T10:00:00+00:00"},
+            "missing_date": {"text": "ok"},
+        },
+    }
+    p.write_text(json.dumps(raw), encoding="utf-8")
+    repo = JsonProgressRepository(p)
+
+    out = repo.load()
+
+    assert list(out.notes.keys()) == ["pikachu"]
+    assert out.notes["pikachu"].text == "Route 4"
+    repo.save(out)
+    stored = json.loads(p.read_text(encoding="utf-8"))
+    assert stored["notes"]["pikachu"]["text"] == "Route 4"
+
+
 def test_load_statuses_skips_invalid_entries(tmp_path: Path) -> None:
     p = tmp_path / "prog.json"
     raw = {

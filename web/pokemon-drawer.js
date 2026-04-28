@@ -95,17 +95,57 @@
     return null;
   }
 
+  function ficheHelpers() {
+    return window.PokevaultPokemonFiche || {};
+  }
+
+  function createDrawerSection(id, title) {
+    const helper = ficheHelpers();
+    if (typeof helper.createFicheSection === "function") {
+      return helper.createFicheSection({
+        id,
+        title,
+        headingLevel: 3,
+        className: "drawer-section",
+        headingClassName: "drawer-section__title",
+      });
+    }
+    const section = document.createElement("section");
+    section.className = "drawer-section";
+    section.dataset.section = id;
+    const h = document.createElement("h3");
+    h.className = "drawer-section__title";
+    h.textContent = title;
+    section.append(h);
+    return section;
+  }
+
+  function decorateFicheSection(element, id, options = {}) {
+    const helper = ficheHelpers();
+    if (typeof helper.decorateFicheSection === "function") {
+      return helper.decorateFicheSection(element, id, options);
+    }
+    element.dataset.section = id;
+    return element;
+  }
+
   function displayName(p) {
+    const helper = ficheHelpers();
+    if (typeof helper.displayName === "function") return helper.displayName(p);
     const n = p?.names || {};
     return n.fr || n.en || p?.name_fr || p?.slug || "Inconnu";
   }
 
   function subtitleName(p) {
+    const helper = ficheHelpers();
+    if (typeof helper.subtitleName === "function") return helper.subtitleName(p);
     const n = p?.names || {};
     return n.en || p?.name_en || "";
   }
 
   function normalizeImgPath(img) {
+    const helper = ficheHelpers();
+    if (typeof helper.normalizeImgPath === "function") return helper.normalizeImgPath(img);
     if (!img) return null;
     const s = String(img).replace(/^\.\//, "");
     if (s.startsWith("http")) return s;
@@ -113,9 +153,46 @@
   }
 
   function displayNumber(num) {
+    const helper = ficheHelpers();
+    if (typeof helper.displayNumber === "function") return helper.displayNumber(num);
     if (!num) return "—";
     const s = String(num);
     return s.startsWith("#") ? s : `#${s}`;
+  }
+
+  function statusLabel(status) {
+    const helper = ficheHelpers();
+    if (typeof helper.statusLabel === "function") return helper.statusLabel(status);
+    return status.state === "caught"
+      ? status.shiny ? "Attrapé shiny" : "Attrapé"
+      : status.state === "seen" ? "Aperçu" : "Non rencontré";
+  }
+
+  function findForms(pokemon) {
+    const helper = ficheHelpers();
+    const all = window.PokedexCollection?.allPokemon || [];
+    if (typeof helper.findForms === "function") return helper.findForms(pokemon, all);
+    const number = String(pokemon?.number || "");
+    if (!number) return [];
+    return all.filter(
+      (p) => String(p?.number || "") === number && (p?.slug || "") !== pokemon.slug,
+    );
+  }
+
+  function listReturnHash() {
+    const helper = ficheHelpers();
+    if (typeof helper.listReturnHash === "function") {
+      return helper.listReturnHash(location.hash || "");
+    }
+    return "#/liste";
+  }
+
+  function pokemonRouteHref(slug) {
+    const helper = ficheHelpers();
+    if (typeof helper.pokemonRouteHref === "function") {
+      return helper.pokemonRouteHref(slug, listReturnHash());
+    }
+    return `#/pokemon/${encodeURIComponent(slug)}`;
   }
 
   async function fetchCards(slug) {
@@ -517,8 +594,9 @@
   }
 
   function buildHeader(p) {
-    const header = document.createElement("header");
+    const header = document.createElement("section");
     header.className = "drawer-header";
+    decorateFicheSection(header, "identity");
     const imgWrap = document.createElement("div");
     imgWrap.className = "drawer-header__img";
     const src = normalizeImgPath(p?.image);
@@ -566,7 +644,7 @@
     meta.append(region);
     const link = document.createElement("a");
     link.className = "drawer-header__full-link";
-    link.href = `#/pokemon/${encodeURIComponent(p?.slug || currentSlug || "")}`;
+    link.href = pokemonRouteHref(p?.slug || currentSlug || "");
     link.textContent = "Voir fiche complète →";
     link.addEventListener("click", () => close());
     meta.append(link);
@@ -575,64 +653,86 @@
   }
 
   function buildStatusSection(slug) {
-    const section = document.createElement("section");
-    section.className = "drawer-section";
-    const h = document.createElement("h3");
-    h.className = "drawer-section__title";
-    h.textContent = "Statut Pokédex";
-    section.append(h);
-    const row = document.createElement("div");
-    row.className = "drawer-status-row";
+    const section = createDrawerSection("pokedex_status", "Statut Pokédex");
     const status =
       window.PokedexCollection?.getStatus?.(slug) || { state: "not_met", shiny: false };
     const label = document.createElement("span");
     label.className = "drawer-status-row__label";
-    const labelText = status.state === "caught"
-      ? status.shiny ? "Attrapé shiny" : "Attrapé"
-      : status.state === "seen" ? "Aperçu" : "Non rencontré";
-    label.textContent = labelText;
-    row.append(label);
+    label.textContent = statusLabel(status);
+    section.append(label);
 
-    const cycle = document.createElement("button");
-    cycle.type = "button";
-    cycle.className = "drawer-status-row__btn";
-    cycle.textContent = "Cycler statut";
-    cycle.addEventListener("click", () => {
-      window.PokedexCollection?.cycleStatusBySlug?.(slug);
-      refreshStatus(slug);
-    });
-    row.append(cycle);
+    const helper = ficheHelpers();
+    if (typeof helper.createStatusActions === "function") {
+      section.append(helper.createStatusActions(status, (patch) => {
+        window.PokedexCollection?.setStatus?.(slug, patch.state, patch.shiny);
+        refreshStatus(slug);
+      }));
+    }
 
-    const shiny = document.createElement("button");
-    shiny.type = "button";
-    shiny.className = "drawer-status-row__btn";
-    shiny.textContent = status.shiny ? "Retirer shiny" : "Marquer shiny";
-    shiny.addEventListener("click", () => {
-      window.PokedexCollection?.cycleStatusBySlug?.(slug, { shift: true });
-      refreshStatus(slug);
-    });
-    row.append(shiny);
-
-    section.append(row);
     return section;
   }
 
   function refreshStatus(slug) {
     if (!contentEl || !currentSlug || currentSlug !== slug) return;
-    const section = contentEl.querySelector(".drawer-status-row");
-    if (!section || !section.parentElement) return;
+    const section = contentEl.querySelector("[data-section='pokedex_status']");
+    if (!section) return;
     const newSection = buildStatusSection(slug);
-    section.parentElement.replaceWith(newSection);
+    section.replaceWith(newSection);
   }
 
-  function buildHuntSection(slug) {
-    const section = document.createElement("section");
-    section.className = "drawer-section";
-    const h = document.createElement("h3");
-    h.className = "drawer-section__title";
-    h.textContent = "Mes recherches";
-    section.append(h);
+  function buildFormsSection(pokemon) {
+    const section = createDrawerSection("forms", "Formes");
+    const helper = ficheHelpers();
+    const all = window.PokedexCollection?.allPokemon || [];
+    const entries = typeof helper.buildFormEntries === "function"
+      ? helper.buildFormEntries(pokemon, all, (slug) => window.PokedexCollection?.getStatus?.(slug))
+      : [pokemon, ...findForms(pokemon)].filter(Boolean).map((form) => {
+          const status = window.PokedexCollection?.getStatus?.(form.slug) || {
+            state: "not_met",
+            shiny: false,
+          };
+          return {
+            pokemon: form,
+            slug: form.slug,
+            label: form.form || displayName(form),
+            current: form.slug === pokemon?.slug,
+            status,
+            statusLabel: statusLabel(status),
+          };
+        });
+    if (entries.length <= 1) {
+      const empty = document.createElement("p");
+      empty.className = "drawer-empty";
+      empty.textContent = "Aucune autre forme dans le Pokédex local.";
+      section.append(empty);
+      return section;
+    }
+    const list = document.createElement("div");
+    list.className = "drawer-forms-list";
+    for (const entry of entries) {
+      const link = document.createElement("a");
+      link.className = "drawer-form-link";
+      link.href = pokemonRouteHref(entry.slug);
+      link.dataset.current = entry.current ? "true" : "false";
+      if (entry.current) link.setAttribute("aria-current", "page");
+      const label = document.createElement("span");
+      label.className = "drawer-form-link__label";
+      label.textContent = entry.label;
+      const status = document.createElement("span");
+      status.className = "drawer-form-link__status";
+      status.dataset.state = entry.status.state;
+      if (entry.status.shiny) status.dataset.shiny = "true";
+      status.textContent = entry.statusLabel;
+      link.append(label, status);
+      link.addEventListener("click", () => close());
+      list.append(link);
+    }
+    section.append(list);
+    return section;
+  }
 
+  function buildProgressSection(slug) {
+    const section = createDrawerSection("personal_progress", "Progression personnelle");
     const entry = window.PokevaultHunts?.entry?.(slug);
     const row = document.createElement("div");
     row.className = "drawer-status-row";
@@ -667,31 +767,19 @@
     });
     row.append(priority);
     section.append(row);
+    return section;
+  }
 
-    const noteRow = document.createElement("div");
-    noteRow.className = "drawer-status-row";
-    const note = document.createElement("input");
-    note.className = "region-filter";
-    note.type = "text";
-    note.maxLength = 280;
-    note.placeholder = "Note de recherche";
-    note.value = entry?.note || "";
-    note.disabled = !entry;
-    noteRow.append(note);
-    const save = document.createElement("button");
-    save.type = "button";
-    save.className = "drawer-status-row__btn";
-    save.textContent = "Sauver";
-    save.disabled = !entry;
-    save.addEventListener("click", async () => {
-      await patchHunt(slug, {
-        wanted: true,
-        priority: entry?.priority || "normal",
-        note: note.value,
-      });
-    });
-    noteRow.append(save);
-    section.append(noteRow);
+  function buildNotesSection(slug) {
+    const section = createDrawerSection("notes", "Notes");
+    const note = window.PokedexCollection?.getNote?.(slug) || "";
+    const helper = ficheHelpers();
+    if (typeof helper.createNoteEditor === "function") {
+      section.append(helper.createNoteEditor(note, async (text) => {
+        await window.PokedexCollection?.setNote?.(slug, text);
+        notify(text ? "Note sauvegardée." : "Note supprimée.", "ok");
+      }));
+    }
     return section;
   }
 
@@ -706,30 +794,41 @@
   }
 
   function buildCardsSection() {
-    const section = document.createElement("section");
-    section.className = "drawer-section";
-    const h = document.createElement("h3");
-    h.className = "drawer-section__title";
-    h.textContent = "Mes cartes (";
+    const section = createDrawerSection("cards", "Mes cartes");
+    section.classList?.add?.("is-secondary");
+    let title = section.querySelector?.(".drawer-section__title")
+      || section.querySelector?.(".pokemon-fiche-section__title");
+    if (!title) {
+      title = document.createElement("h3");
+      title.className = "drawer-section__title";
+      section.append(title);
+    }
+    title.textContent = "Mes cartes (";
     const counter = document.createElement("span");
     counter.id = "drawerCardCount";
     counter.textContent = "0";
-    h.append(counter, document.createTextNode(")"));
-    section.append(h);
+    title.append(counter, document.createTextNode(")"));
+    const helper = ficheHelpers();
+    const body = typeof helper.createCollapsibleBody === "function"
+      ? helper.createCollapsibleBody(section, {
+          collapsed: true,
+          bodyClassName: "drawer-cards-body",
+        })
+      : section;
 
     const empty = document.createElement("p");
     empty.id = "drawerCardEmpty";
     empty.className = "drawer-empty";
     empty.textContent = "Aucune carte pour l'instant. Ajoute la première ci-dessous.";
-    section.append(empty);
+    body.append(empty);
 
     const list = document.createElement("ul");
     list.id = "drawerCardList";
     list.className = "drawer-card-list";
     list.hidden = true;
-    section.append(list);
+    body.append(list);
 
-    section.append(buildAddForm());
+    body.append(buildAddForm());
     return section;
   }
 
@@ -747,7 +846,9 @@
     contentEl.append(
       buildHeader(p),
       buildStatusSection(currentSlug),
-      buildHuntSection(currentSlug),
+      buildFormsSection(p),
+      buildProgressSection(currentSlug),
+      buildNotesSection(currentSlug),
       buildCardsSection(),
     );
     void renderCardList();
@@ -856,6 +957,7 @@
   if (window.__POKEVAULT_DRAWER_TESTS__) {
     drawerApi._test = {
       applyTcgCardToForm,
+      buildCardsSection,
       payloadFromFormData,
     };
   }

@@ -368,6 +368,37 @@ def test_export_import_roundtrips_hunts(tmp_path: Path) -> None:
     assert exported["hunts"]["hunts"]["0025-pikachu"]["priority"] == "high"
 
 
+def test_export_import_roundtrips_pokedex_notes(tmp_path: Path) -> None:
+    client = _setup(tmp_path)
+    payload = {
+        "schema_version": 3,
+        "progress": {
+            "version": 1,
+            "caught": {},
+            "notes": {
+                "0025-pikachu": {
+                    "text": "À échanger depuis Jaune",
+                    "updated_at": "2026-04-28T10:00:00+00:00",
+                }
+            },
+        },
+        "binder_config": {
+            "version": 1,
+            "convention": "sheet_recto_verso",
+            "binders": [],
+            "form_rules": [],
+        },
+        "binder_placements": {"version": 1, "by_binder": {}},
+        "cards": [],
+        "hunts": {"version": 1, "hunts": {}},
+    }
+    r = client.post("/api/import", json=payload)
+    assert r.status_code == 200
+
+    exported = client.get("/api/export").json()
+    assert exported["progress"]["notes"]["0025-pikachu"]["text"] == "À échanger depuis Jaune"
+
+
 def test_import_rejects_malformed_json(tmp_path: Path) -> None:
     client = _setup(tmp_path)
     r = client.post("/api/import", json={"garbage": True})

@@ -31,12 +31,22 @@ class PokemonStatusEntry(BaseModel):
     )
 
 
+class PokemonNoteEntry(BaseModel):
+    """Personal Pokédex note stored per Pokémon slug and profile."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    text: str = Field(min_length=1, max_length=500)
+    updated_at: str
+
+
 class CollectionProgress(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     version: Literal[1] = 1
     caught: dict[str, bool] = Field(default_factory=dict)
     statuses: dict[str, PokemonStatusEntry] = Field(default_factory=dict)
+    notes: dict[str, PokemonNoteEntry] = Field(default_factory=dict)
     badges_unlocked: list[str] = Field(
         default_factory=list,
         description="Roadmap F12 — monotonically growing list of unlocked badge ids.",
@@ -70,6 +80,15 @@ class ProgressStatusPatch(BaseModel):
     slug: str = Field(min_length=1)
     state: Literal["not_met", "seen", "caught"]
     shiny: bool = False
+
+
+class ProgressNotePatch(BaseModel):
+    """Mise à jour de note personnelle Pokédex (B4)."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    slug: str = Field(min_length=1)
+    note: str = Field(default="", max_length=500)
 
 
 class ProgressSaveResponse(BaseModel):

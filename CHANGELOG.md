@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [1.1.0] — 2026-04-28
+
 ### Added
 
 - Collection home now includes a Pokédex-first dashboard with not-met, seen,
@@ -20,10 +22,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   recommendations, filters and the grid usable down to narrow phone widths.
 - Onboarding now starts from a Pokédex-first goal, favorite region and
   simple/advanced tracking mode while keeping cards as a later add-on.
+- Pokémon drawer and full page now share a Pokédex-first fiche structure:
+  identity, direct status actions, linked forms, personal progress, notes and
+  secondary cards.
+- Pokémon status can now be edited directly with not-met, seen, caught and shiny
+  actions, with shiny gated behind caught state.
+- Linked forms now keep their own independent status and preserve the return to
+  the filtered collection list.
+- Personal Pokédex notes are stored in progress data, exposed through
+  `PATCH /api/progress/notes`, and preserved by export/import.
+- Card sections in Pokémon fiches are now collapsible by default so long card
+  details stay secondary to Pokédex progress.
+- Full Pokémon fiches now have a compact mobile layout that keeps status and
+  forms visible before cards.
 - Drawer card creation can search the public Pokemon TCG API, select a result
   and prefill set, number, rarity, official image URL and catalog id.
 - `GET /api/tcg/cards/search` exposes a small local search adapter with optional
   `TRACKER_TCG_API_KEY` support.
+
+### Changed
+
+- Public docs, roadmap copy and the onboarding tour now describe the v1.1.0
+  Pokédex-first workflow and identify metadata enrichment as the next active
+  track.
 
 ## [1.0.2] — 2026-04-27
 

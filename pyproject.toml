@@ -1,6 +1,6 @@
 [project]
 name = "pokevault"
-version = "1.0.2"
+version = "1.1.0"
 description = "Local-first Pokédex and Pokémon card collection tracker with FastAPI and Docker"
 readme = "README.md"
 license = "MIT"

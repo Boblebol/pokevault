@@ -232,6 +232,8 @@ cartes restent présentes, mais en section secondaire.
 
 **Type** : frontend.
 
+**Status** : implemented.
+
 **Scope**
 
 - Structurer la fiche en sections :
@@ -262,6 +264,8 @@ cartes restent présentes, mais en section secondaire.
 
 **Type** : frontend + API existante.
 
+**Status** : implemented.
+
 **Scope**
 
 - Rendre les actions statut plus claires :
@@ -290,6 +294,8 @@ cartes restent présentes, mais en section secondaire.
 
 **Type** : frontend + fixtures.
 
+**Status** : implemented.
+
 **Scope**
 
 - Afficher les formes liées à une espèce.
@@ -314,6 +320,8 @@ cartes restent présentes, mais en section secondaire.
 ### B4 — Notes Pokédex
 
 **Type** : backend + frontend.
+
+**Status** : implemented.
 
 **Scope**
 
@@ -340,6 +348,8 @@ cartes restent présentes, mais en section secondaire.
 
 **Type** : frontend.
 
+**Status** : implemented.
+
 **Scope**
 
 - Garder les cartes dans la fiche, mais visuellement secondaires.
@@ -363,6 +373,8 @@ cartes restent présentes, mais en section secondaire.
 ### B6 — Mobile Fiche
 
 **Type** : frontend design.
+
+**Status** : implemented.
 
 **Scope**
 

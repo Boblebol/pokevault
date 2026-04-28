@@ -9,6 +9,7 @@ from fastapi import APIRouter, Depends
 from tracker.api.dependencies import get_progress_service
 from tracker.models import (
     CollectionProgress,
+    ProgressNotePatch,
     ProgressPatch,
     ProgressPutBody,
     ProgressSaveResponse,
@@ -48,3 +49,11 @@ def patch_progress_status(
     service: Annotated[ProgressService, Depends(get_progress_service)],
 ) -> ProgressSaveResponse:
     return service.patch_status(body)
+
+
+@router.patch("/progress/notes", response_model=ProgressSaveResponse)
+def patch_progress_note(
+    body: ProgressNotePatch,
+    service: Annotated[ProgressService, Depends(get_progress_service)],
+) -> ProgressSaveResponse:
+    return service.patch_note(body)

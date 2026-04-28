@@ -24,7 +24,44 @@
     poor: "Poor",
   };
 
+  function ficheHelpers() {
+    return window.PokevaultPokemonFiche || {};
+  }
+
+  function createFullSection(id, title, options = {}) {
+    const helper = ficheHelpers();
+    if (typeof helper.createFicheSection === "function") {
+      return helper.createFicheSection({
+        id,
+        title,
+        headingLevel: 2,
+        className: "fullview-section",
+        headingClassName: "fullview-section__title",
+        secondary: options.secondary,
+      });
+    }
+    const section = document.createElement("section");
+    section.className = "fullview-section";
+    section.dataset.section = id;
+    const h = document.createElement("h2");
+    h.className = "fullview-section__title";
+    h.textContent = title;
+    section.append(h);
+    return section;
+  }
+
+  function decorateFicheSection(element, id, options = {}) {
+    const helper = ficheHelpers();
+    if (typeof helper.decorateFicheSection === "function") {
+      return helper.decorateFicheSection(element, id, options);
+    }
+    element.dataset.section = id;
+    return element;
+  }
+
   function normalizeImgPath(img) {
+    const helper = ficheHelpers();
+    if (typeof helper.normalizeImgPath === "function") return helper.normalizeImgPath(img);
     if (!img) return null;
     const s = String(img).replace(/^\.\//, "");
     if (s.startsWith("http")) return s;
@@ -32,11 +69,17 @@
   }
 
   function displayName(p) {
+    const helper = ficheHelpers();
+    if (typeof helper.displayName === "function") return helper.displayName(p);
     const n = p?.names || {};
     return n.fr || n.en || p?.slug || "?";
   }
 
   function displayNumber(num) {
+    const helper = ficheHelpers();
+    if (typeof helper.displayNumber === "function") {
+      return helper.displayNumber(num, { compact: true, blank: "#—" });
+    }
     if (!num) return "#—";
     const s = String(num).replace(/^#/, "").replace(/^0+/, "") || "0";
     return `#${s}`;
@@ -51,13 +94,37 @@
   }
 
   function findForms(pokemon) {
+    const helper = ficheHelpers();
+    const all = window.PokedexCollection?.allPokemon || [];
+    if (typeof helper.findForms === "function") return helper.findForms(pokemon, all);
     if (!pokemon) return [];
     const number = String(pokemon.number || "");
     if (!number) return [];
-    const all = window.PokedexCollection?.allPokemon || [];
-    return all.filter(
-      (p) => String(p?.number || "") === number && (p?.slug || "") !== pokemon.slug,
-    );
+    return all.filter((p) => String(p?.number || "") === number && (p?.slug || "") !== pokemon.slug);
+  }
+
+  function statusLabel(status) {
+    const helper = ficheHelpers();
+    if (typeof helper.statusLabel === "function") return helper.statusLabel(status);
+    return status.state === "caught"
+      ? status.shiny ? "Attrapé shiny" : "Attrapé"
+      : status.state === "seen" ? "Aperçu" : "Non rencontré";
+  }
+
+  function listReturnHash() {
+    const helper = ficheHelpers();
+    if (typeof helper.listReturnHash === "function") {
+      return helper.listReturnHash(location.hash || "");
+    }
+    return "#/liste";
+  }
+
+  function pokemonRouteHref(slug) {
+    const helper = ficheHelpers();
+    if (typeof helper.pokemonRouteHref === "function") {
+      return helper.pokemonRouteHref(slug, listReturnHash());
+    }
+    return `#/pokemon/${encodeURIComponent(slug)}`;
   }
 
   function buildBackBar(root) {
@@ -65,7 +132,7 @@
     bar.className = "fullview-topbar";
     const back = document.createElement("a");
     back.className = "fullview-back";
-    back.href = "#/liste";
+    back.href = listReturnHash();
     back.textContent = "← Retour à la collection";
     bar.append(back);
     root.append(bar);
@@ -74,6 +141,7 @@
   function buildHero(root, p) {
     const hero = document.createElement("section");
     hero.className = "fullview-hero";
+    decorateFicheSection(hero, "identity");
 
     const imgWrap = document.createElement("div");
     imgWrap.className = "fullview-hero__img";
@@ -124,43 +192,35 @@
     region.textContent = p.region_label_fr || p.region || "";
     if (region.textContent) meta.append(region);
 
-    const statusBox = document.createElement("div");
-    statusBox.className = "fullview-hero__status";
+    hero.append(meta);
+    root.append(hero);
+  }
+
+  function buildStatusSection(root, p) {
+    const section = createFullSection("pokedex_status", "Statut Pokédex");
     const status = window.PokedexCollection?.getStatus?.(p.slug) || {
       state: "not_met",
       shiny: false,
     };
-    const statusLabel = document.createElement("span");
-    statusLabel.className = "fullview-hero__status-label";
-    statusLabel.textContent =
-      status.state === "caught"
-        ? status.shiny ? "Attrapé shiny" : "Attrapé"
-        : status.state === "seen" ? "Aperçu" : "Non rencontré";
-    statusLabel.dataset.state = status.state;
-    statusBox.append(statusLabel);
+    const label = document.createElement("span");
+    label.className = "fullview-hero__status-label";
+    label.textContent = statusLabel(status);
+    label.dataset.state = status.state;
+    section.append(label);
 
-    const cycle = document.createElement("button");
-    cycle.type = "button";
-    cycle.className = "fullview-status-btn";
-    cycle.textContent = "Cycler statut";
-    cycle.addEventListener("click", () => {
-      window.PokedexCollection?.cycleStatusBySlug?.(p.slug);
-      renderInto(document.getElementById("viewPokemon"), p.slug);
-    });
-    statusBox.append(cycle);
+    const helper = ficheHelpers();
+    if (typeof helper.createStatusActions === "function") {
+      section.append(helper.createStatusActions(status, (patch) => {
+        window.PokedexCollection?.setStatus?.(p.slug, patch.state, patch.shiny);
+        renderInto(document.getElementById("viewPokemon"), p.slug);
+      }));
+    }
 
-    const shiny = document.createElement("button");
-    shiny.type = "button";
-    shiny.className = "fullview-status-btn";
-    shiny.textContent = status.shiny ? "Retirer shiny" : "Marquer shiny";
-    shiny.addEventListener("click", () => {
-      window.PokedexCollection?.cycleStatusBySlug?.(p.slug, { shift: true });
-      renderInto(document.getElementById("viewPokemon"), p.slug);
-    });
-    statusBox.append(shiny);
+    root.append(section);
+  }
 
-    meta.append(statusBox);
-
+  function buildProgressSection(root, p) {
+    const section = createFullSection("personal_progress", "Progression personnelle");
     const huntBox = document.createElement("div");
     huntBox.className = "fullview-hero__status";
     const hunt = window.PokevaultHunts?.entry?.(p.slug);
@@ -199,10 +259,25 @@
       renderInto(document.getElementById("viewPokemon"), p.slug);
     });
     huntBox.append(priorityHunt);
-    meta.append(huntBox);
+    section.append(huntBox);
+    root.append(section);
+  }
 
-    hero.append(meta);
-    root.append(hero);
+  function buildNotesSection(root, p) {
+    const section = createFullSection("notes", "Notes");
+    const note = window.PokedexCollection?.getNote?.(p.slug) || "";
+    const helper = ficheHelpers();
+    if (typeof helper.createNoteEditor === "function") {
+      section.append(helper.createNoteEditor(note, async (text) => {
+        await window.PokedexCollection?.setNote?.(p.slug, text);
+      }));
+    } else {
+      const empty = document.createElement("p");
+      empty.className = "drawer-empty";
+      empty.textContent = note || "Aucune note personnelle pour l'instant.";
+      section.append(empty);
+    }
+    root.append(section);
   }
 
   function buildWeaknessGrid(root, p) {
@@ -269,20 +344,42 @@
   }
 
   function buildForms(root, p) {
-    const others = findForms(p);
-    if (!others.length) return;
-    const section = document.createElement("section");
-    section.className = "fullview-section";
-    const h = document.createElement("h2");
-    h.className = "fullview-section__title";
-    h.textContent = "Autres formes";
-    section.append(h);
+    const helper = ficheHelpers();
+    const all = window.PokedexCollection?.allPokemon || [];
+    const entries = typeof helper.buildFormEntries === "function"
+      ? helper.buildFormEntries(p, all, (slug) => window.PokedexCollection?.getStatus?.(slug))
+      : [p, ...findForms(p)].map((form) => {
+          const status = window.PokedexCollection?.getStatus?.(form.slug) || {
+            state: "not_met",
+            shiny: false,
+          };
+          return {
+            pokemon: form,
+            slug: form.slug,
+            label: form.form || displayName(form),
+            current: form.slug === p.slug,
+            status,
+            statusLabel: statusLabel(status),
+          };
+        });
+    const section = createFullSection("forms", "Formes");
+    if (entries.length <= 1) {
+      const empty = document.createElement("p");
+      empty.className = "drawer-empty";
+      empty.textContent = "Aucune autre forme dans le Pokédex local.";
+      section.append(empty);
+      root.append(section);
+      return;
+    }
     const list = document.createElement("div");
     list.className = "fullview-forms-grid";
-    for (const f of others) {
+    for (const entry of entries) {
+      const f = entry.pokemon;
       const a = document.createElement("a");
       a.className = "fullview-form-tile";
-      a.href = `#/pokemon/${encodeURIComponent(f.slug)}`;
+      a.href = pokemonRouteHref(entry.slug);
+      a.dataset.current = entry.current ? "true" : "false";
+      if (entry.current) a.setAttribute("aria-current", "page");
       const src = normalizeImgPath(f.image);
       if (src) {
         const img = document.createElement("img");
@@ -293,8 +390,14 @@
       }
       const label = document.createElement("span");
       label.className = "fullview-form-tile__label";
-      label.textContent = f.form || displayName(f);
+      label.textContent = entry.label;
       a.append(label);
+      const status = document.createElement("span");
+      status.className = "fullview-form-tile__status";
+      status.dataset.state = entry.status.state;
+      if (entry.status.shiny) status.dataset.shiny = "true";
+      status.textContent = entry.statusLabel;
+      a.append(status);
       list.append(a);
     }
     section.append(list);
@@ -302,17 +405,19 @@
   }
 
   async function buildCardsSection(root, slug) {
-    const section = document.createElement("section");
-    section.className = "fullview-section";
-    const h = document.createElement("h2");
-    h.className = "fullview-section__title";
-    h.textContent = "Mes cartes";
-    section.append(h);
+    const section = createFullSection("cards", "Mes cartes", { secondary: true });
+    const helper = ficheHelpers();
+    const disclosureBody = typeof helper.createCollapsibleBody === "function"
+      ? helper.createCollapsibleBody(section, {
+          collapsed: true,
+          bodyClassName: "fullview-cards-disclosure",
+        })
+      : section;
 
     const body = document.createElement("div");
     body.className = "fullview-cards-body";
     body.textContent = "Chargement…";
-    section.append(body);
+    disclosureBody.append(body);
     root.append(section);
 
     try {
@@ -408,8 +513,11 @@
     root.replaceChildren();
     buildBackBar(root);
     buildHero(root, p);
-    buildWeaknessGrid(root, p);
+    buildStatusSection(root, p);
     buildForms(root, p);
+    buildProgressSection(root, p);
+    buildNotesSection(root, p);
+    buildWeaknessGrid(root, p);
     void buildCardsSection(root, slug);
   }
 
@@ -424,5 +532,11 @@
   }
 
   ensureRoot();
-  window.PokevaultFullView = { render };
+  const fullViewApi = { render };
+  if (window.__POKEVAULT_FULLVIEW_TESTS__) {
+    fullViewApi._test = {
+      renderInto,
+    };
+  }
+  window.PokevaultFullView = fullViewApi;
 })();

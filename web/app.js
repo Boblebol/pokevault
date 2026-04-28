@@ -5,7 +5,7 @@
 
 const API_PROGRESS = "/api/progress";
 const API_HEALTH = "/api/health";
-const APP_VERSION = "1.0.2";
+const APP_VERSION = "1.1.0";
 const PROGRESS_QUEUE_KEY = "pokedex_progress_queue";
 const FORM_FILTER_STORAGE_KEY = "pokedexFormFilter";
 const TYPE_FILTER_STORAGE_KEY = "pokedexTypeFilter";
@@ -19,6 +19,8 @@ let allPokemon = [];
 let statusMap = Object.create(null);
 /** Derived mirror kept in sync with `statusMap` for legacy consumers. */
 let caughtMap = Object.create(null);
+/** @type {Record<string, { text: string; updated_at?: string | null }>} */
+let noteMap = Object.create(null);
 let filterMode = "all";
 let regionFilter = "all";
 let searchQuery = "";
@@ -100,7 +102,7 @@ function wireDimModeSelectsOnce() {
 async function getCollectionBootstrap() {
   if (collectionBootstrapPromise) return collectionBootstrapPromise;
   collectionBootstrapPromise = (async () => {
-    let progress = { caught: {}, statuses: {} };
+    let progress = { caught: {}, statuses: {}, notes: {} };
     try {
       progress = await fetchProgressFile();
     } catch {
@@ -186,12 +188,17 @@ async function flushOfflineProgressQueue() {
 }
 
 function endpointForQueueItem(item) {
-  return item && item.kind === "status" ? `${API_PROGRESS}/status` : API_PROGRESS;
+  if (item && item.kind === "status") return `${API_PROGRESS}/status`;
+  if (item && item.kind === "note") return `${API_PROGRESS}/notes`;
+  return API_PROGRESS;
 }
 
 function bodyForQueueItem(item) {
   if (item && item.kind === "status") {
     return { slug: item.slug, state: item.state, shiny: Boolean(item.shiny) };
+  }
+  if (item && item.kind === "note") {
+    return { slug: item.slug, note: String(item.note || "") };
   }
   return { slug: item.slug, caught: Boolean(item.caught) };
 }
@@ -218,12 +225,46 @@ async function persistStatusPatch(slug, state, shiny) {
   }
 }
 
+async function persistNotePatch(slug, note) {
+  const hint = document.getElementById("syncHint");
+  const text = normalizeNoteText(note);
+  try {
+    const res = await fetch(`${API_PROGRESS}/notes`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ slug, note: text }),
+    });
+    if (!res.ok) throw new Error(String(res.status));
+    await flushOfflineProgressQueue();
+    if (hint) hint.hidden = true;
+  } catch {
+    const q = loadProgressQueue();
+    q.push({ kind: "note", slug, note: text, ts: Date.now() });
+    saveProgressQueue(q);
+    if (hint) {
+      hint.textContent = "Hors ligne ou serveur indisponible — synchro différée.";
+      hint.hidden = false;
+    }
+  }
+}
+
 /**
- * @param {{ caught?: Record<string, unknown>; statuses?: Record<string, unknown> }} payload
+ * @param {{ caught?: Record<string, unknown>; statuses?: Record<string, unknown>; notes?: Record<string, unknown> }} payload
  */
 function hydrateProgressMaps(payload) {
   statusMap = Object.create(null);
   caughtMap = Object.create(null);
+  noteMap = Object.create(null);
+  const notes = payload && typeof payload.notes === "object" ? payload.notes : null;
+  if (notes) {
+    for (const [slug, raw] of Object.entries(notes)) {
+      if (!slug || !raw || typeof raw !== "object") continue;
+      const text = normalizeNoteText(raw.text);
+      if (!text) continue;
+      const updatedAt = typeof raw.updated_at === "string" ? raw.updated_at : null;
+      noteMap[slug] = { text, updated_at: updatedAt };
+    }
+  }
   const statuses = payload && typeof payload.statuses === "object" ? payload.statuses : null;
   if (statuses) {
     for (const [slug, raw] of Object.entries(statuses)) {
@@ -250,6 +291,26 @@ function getStatus(slug) {
   const s = statusMap[slug];
   if (!s) return { state: "not_met", shiny: false };
   return { state: s.state, shiny: Boolean(s.shiny) };
+}
+
+function normalizeNoteText(value) {
+  return String(value || "").trim().slice(0, 500);
+}
+
+function getNote(slug) {
+  return noteMap[String(slug || "")]?.text || "";
+}
+
+function setNote(slug, note) {
+  const key = String(slug || "").trim();
+  if (!key) return Promise.resolve();
+  const text = normalizeNoteText(note);
+  if (text) {
+    noteMap[key] = { text, updated_at: new Date().toISOString() };
+  } else {
+    delete noteMap[key];
+  }
+  return persistNotePatch(key, text);
 }
 
 /**
@@ -442,9 +503,14 @@ window.PokedexCollection = {
   toggleCaughtBySlug,
   getStatus,
   setStatus,
+  getNote,
+  setNote,
   cycleStatusBySlug,
   get statusMap() {
     return statusMap;
+  },
+  get noteMap() {
+    return noteMap;
   },
   getDimMode,
   setDimMode,
@@ -1764,6 +1830,8 @@ function currentViewFromHash() {
 }
 
 function currentPokemonSlugFromHash() {
+  const shared = window.PokevaultPokemonFiche?.parsePokemonRouteSlug?.(location.hash || "");
+  if (shared) return shared;
   const raw = (location.hash || "").replace(/^#/, "").replace(/^\//, "");
   const before = raw.split("?")[0];
   if (!before.startsWith("pokemon/")) return null;
