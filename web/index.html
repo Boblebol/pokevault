@@ -123,14 +123,20 @@
                 <button type="button" class="filter-btn is-active" data-filter="all" aria-pressed="true">
                   Tous
                 </button>
-                <button type="button" class="filter-btn" data-filter="caught" aria-pressed="false">
-                  Attrapés
-                </button>
                 <button type="button" class="filter-btn" data-filter="missing" aria-pressed="false">
                   Manquants
                 </button>
-                <button type="button" class="filter-btn" data-filter="hunts" aria-pressed="false">
-                  Mes recherches
+                <button type="button" class="filter-btn" data-filter="seen" aria-pressed="false">
+                  Vus
+                </button>
+                <button type="button" class="filter-btn" data-filter="caught" aria-pressed="false">
+                  Capturés
+                </button>
+                <button type="button" class="filter-btn filter-btn--bonus" data-filter="shiny" aria-pressed="false">
+                  Shiny
+                </button>
+                <button type="button" class="filter-btn" data-form-filter="regional_only" aria-pressed="false">
+                  Formes régionales
                 </button>
               </div>
 
@@ -162,6 +168,7 @@
                     <option value="all">Tout le dex</option>
                     <option value="base_only">Base uniquement</option>
                     <option value="base_regional">Base + régional</option>
+                    <option value="regional_only">Formes régionales seules</option>
                   </select>
                 </label>
                 <label class="region-filter-wrap">
@@ -691,6 +698,7 @@
     <script src="/pokemon-full-view.js" defer></script>
     <script src="/binder-v2.js" defer></script>
     <script src="/hunt-list.js" defer></script>
+    <script src="/pokedex-filters.js" defer></script>
     <script src="/recommendations.js" defer></script>
     <script src="/pokedex-next-actions.js" defer></script>
     <script src="/pokedex-dashboard.js" defer></script>
