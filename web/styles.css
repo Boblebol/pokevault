@@ -2584,6 +2584,95 @@ body {
   font-style: italic;
 }
 
+.pokedex-dashboard {
+  display: grid;
+  gap: 10px;
+}
+
+.pokedex-dashboard-cards {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.pokedex-dashboard-card {
+  min-width: 0;
+  padding: 8px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+}
+
+.pokedex-dashboard-card.is-secondary {
+  background: rgba(255, 255, 255, 0.035);
+  opacity: 0.82;
+}
+
+.pokedex-dashboard-card__label,
+.pokedex-dashboard-card__detail,
+.pokedex-dashboard-title {
+  display: block;
+  color: var(--muted, #c9a9a3);
+  font-size: 0.62rem;
+  line-height: 1.25;
+}
+
+.pokedex-dashboard-card__label,
+.pokedex-dashboard-title {
+  text-transform: uppercase;
+  letter-spacing: 0;
+  font-weight: 700;
+}
+
+.pokedex-dashboard-card__value {
+  display: block;
+  margin: 4px 0 2px;
+  color: var(--text, #fff8f4);
+  font-family: "Space Grotesk", "Inter", system-ui, sans-serif;
+  font-size: 1.15rem;
+  line-height: 1;
+}
+
+.pokedex-dashboard-regions-wrap {
+  display: grid;
+  gap: 7px;
+  padding: 9px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.035);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.07);
+}
+
+.pokedex-dashboard-title {
+  margin: 0;
+}
+
+.pokedex-dashboard-regions {
+  display: grid;
+  gap: 6px;
+}
+
+.pokedex-dashboard-region {
+  display: grid;
+  gap: 4px;
+  color: var(--text, #fff8f4);
+  font-size: 0.72rem;
+}
+
+.pokedex-dashboard-region__bar {
+  display: block;
+  height: 5px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.pokedex-dashboard-region__fill {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--electric, #00daf3), #89f8c8);
+}
+
 .search-wrap {
   border-radius: 12px;
   min-height: 52px;
@@ -3181,6 +3270,10 @@ body {
 #viewListe .collection-rail .list-hero-right {
   min-width: 0;
   text-align: left;
+}
+
+#viewListe .collection-rail .pokedex-dashboard-cards {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
 #viewListe .collection-rail .progress-row {
@@ -4273,6 +4366,18 @@ body {
   }
 
   #viewClasseur .binder-pages-host.is-double-spread {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 720px) {
+  #viewListe .collection-rail .pokedex-dashboard-cards {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 380px) {
+  #viewListe .collection-rail .pokedex-dashboard-cards {
     grid-template-columns: 1fr;
   }
 }

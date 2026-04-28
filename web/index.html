@@ -52,7 +52,7 @@
             <aside class="collection-rail" aria-label="Filtres de collection">
               <div class="list-hero">
                 <div class="list-hero-left">
-                  <p class="list-kicker">État de collection</p>
+                  <p class="list-kicker">Centre Pokédex</p>
                 </div>
                 <div class="list-hero-right">
                   <span id="listHeroPct" class="list-hero-pct">0%</span>
@@ -64,6 +64,21 @@
                   >0 carte dans 0 set</p>
                 </div>
               </div>
+
+              <section class="pokedex-dashboard" aria-label="Tableau de bord Pokédex">
+                <div
+                  id="pokedexDashboardCards"
+                  class="pokedex-dashboard-cards"
+                  aria-live="polite"
+                ></div>
+                <div class="pokedex-dashboard-regions-wrap">
+                  <p class="pokedex-dashboard-title">Progression par région</p>
+                  <div
+                    id="pokedexDashboardRegions"
+                    class="pokedex-dashboard-regions"
+                  ></div>
+                </div>
+              </section>
 
               <div class="progress-row">
                 <div class="progress-bar" role="progressbar" aria-label="Progression de la collection" aria-valuemin="0" aria-valuemax="100">
@@ -671,6 +686,7 @@
     <script src="/binder-v2.js" defer></script>
     <script src="/hunt-list.js" defer></script>
     <script src="/recommendations.js" defer></script>
+    <script src="/pokedex-dashboard.js" defer></script>
     <script src="/app.js" defer></script>
     <script src="/focus-session.js" defer></script>
     <script src="/binder-collection-view.js" defer></script>

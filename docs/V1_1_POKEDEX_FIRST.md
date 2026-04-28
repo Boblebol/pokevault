@@ -63,6 +63,8 @@ comprendre en quelques secondes ce qui manque et quoi faire ensuite.
 
 **Type** : frontend.
 
+**Status** : implemented.
+
 **Scope**
 
 - Renforcer la home avec une lecture claire :
