@@ -101,6 +101,19 @@ def test_readme_links_changelog_without_hosted_demo() -> None:
     assert old_demo_label not in text
 
 
+def test_pokedex_first_backlog_is_linked_from_public_docs() -> None:
+    plan = DOCS / "V1_1_POKEDEX_FIRST.md"
+    assert plan.is_file()
+
+    readme = (ROOT / "README.md").read_text(encoding="utf-8")
+    roadmap = (DOCS / "ROADMAP.md").read_text(encoding="utf-8")
+    roadmap_page = (DOCS / "roadmap.html").read_text(encoding="utf-8")
+
+    assert "docs/V1_1_POKEDEX_FIRST.md" in readme
+    assert "V1_1_POKEDEX_FIRST.md" in roadmap
+    assert "V1_1_POKEDEX_FIRST.md" in roadmap_page
+
+
 def test_open_source_security_policy_exists() -> None:
     security = ROOT / "SECURITY.md"
     assert security.is_file()

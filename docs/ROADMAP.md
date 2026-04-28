@@ -7,6 +7,8 @@
 > Current status: this public roadmap is complete through Wave 4. Known ideas
 > that are intentionally delayed are tracked separately in
 > [POSTPONED.md](POSTPONED.md).
+>
+> Next active planning track: [V1.1 Pokédex-First Backlog](V1_1_POKEDEX_FIRST.md).
 
 **Positioning.** Pokevault is a **Pokédex-first** tracker. TCG physical cards
 are a **per-Pokémon enrichment layer** (a user can attach the cards they own
@@ -69,6 +71,11 @@ Sorted by RICE descending. Tone/wave column drives the delivery plan below.
 
 Release history: the four waves are bundled into the public `v1.0.0` release.
 Future work should use the normal `v1.x.y` semver line.
+
+The next planned product cycle is documented in
+[V1.1 Pokédex-First Backlog](V1_1_POKEDEX_FIRST.md): first a completion-focused
+Pokédex center, then richer Pokémon fiches, then carefully sourced Pokédex
+metadata.
 
 ---
 
