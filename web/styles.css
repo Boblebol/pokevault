@@ -4615,6 +4615,122 @@ body {
   gap: 10px;
 }
 
+.drawer-tcg-search {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.drawer-tcg-search__label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 0.76rem;
+  font-weight: 600;
+  color: rgba(18, 20, 36, 0.7);
+}
+
+.drawer-tcg-search__row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+}
+
+.drawer-tcg-search__row input {
+  min-width: 0;
+  font: inherit;
+  padding: 7px 9px;
+  border-radius: 8px;
+  border: 1px solid rgba(18, 20, 36, 0.16);
+  background: #fff;
+}
+
+.drawer-tcg-search__row input:focus-visible {
+  outline: 2px solid rgba(53, 108, 240, 0.4);
+  outline-offset: 1px;
+}
+
+.drawer-tcg-search__row button {
+  font-size: 0.78rem;
+  padding: 7px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(18, 20, 36, 0.16);
+  background: #fff;
+  color: rgba(18, 20, 36, 0.86);
+  cursor: pointer;
+}
+
+.drawer-tcg-search__row button:hover {
+  background: rgba(18, 20, 36, 0.04);
+}
+
+.drawer-tcg-search__row button:disabled {
+  cursor: progress;
+  opacity: 0.6;
+}
+
+.drawer-tcg-search__status {
+  min-height: 1rem;
+  font-size: 0.75rem;
+  color: rgba(18, 20, 36, 0.58);
+}
+
+.drawer-tcg-results {
+  display: grid;
+  gap: 6px;
+}
+
+.drawer-tcg-result {
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr);
+  gap: 9px;
+  align-items: center;
+  width: 100%;
+  padding: 7px 8px;
+  border-radius: 8px;
+  border: 1px solid rgba(18, 20, 36, 0.1);
+  background: rgba(245, 247, 252, 0.78);
+  color: inherit;
+  cursor: pointer;
+  text-align: left;
+}
+
+.drawer-tcg-result:hover {
+  border-color: rgba(53, 108, 240, 0.34);
+  background: rgba(53, 108, 240, 0.08);
+}
+
+.drawer-tcg-result img {
+  width: 34px;
+  height: 47px;
+  border-radius: 4px;
+  object-fit: cover;
+  background: rgba(18, 20, 36, 0.06);
+}
+
+.drawer-tcg-result__meta {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.drawer-tcg-result__meta strong {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.82rem;
+  color: rgba(18, 20, 36, 0.88);
+}
+
+.drawer-tcg-result__meta span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.73rem;
+  color: rgba(18, 20, 36, 0.6);
+}
+
 .drawer-add-form__grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);

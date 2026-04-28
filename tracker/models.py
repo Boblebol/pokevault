@@ -113,6 +113,13 @@ class Card(BaseModel):
     qty: int = Field(default=1, ge=1)
     acquired_at: str | None = Field(default=None)
     note: str = ""
+    tcg_api_id: str = Field(
+        default="",
+        description=(
+            "Optional Pokémon TCG API card id used to reconnect local cards "
+            "to catalog metadata."
+        ),
+    )
     image_url: str = Field(
         default="",
         description="F11 — optional scan/preview URL used by the artwork switcher.",
@@ -135,6 +142,7 @@ class CardCreate(BaseModel):
     qty: int = Field(default=1, ge=1)
     acquired_at: str | None = Field(default=None)
     note: str = ""
+    tcg_api_id: str = ""
     image_url: str = ""
 
 
@@ -152,6 +160,7 @@ class CardUpdate(BaseModel):
     qty: int = Field(default=1, ge=1)
     acquired_at: str | None = Field(default=None)
     note: str = ""
+    tcg_api_id: str = ""
     image_url: str = ""
 
 
@@ -169,6 +178,28 @@ class CardDeleteResponse(BaseModel):
 
     ok: bool = True
     deleted: int = Field(ge=0)
+
+
+class TcgCardSearchResult(BaseModel):
+    """Compact card metadata returned by the external Pokémon TCG catalog."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    id: str = ""
+    name: str = ""
+    set_id: str = ""
+    set_name: str = ""
+    number: str = ""
+    rarity: str = ""
+    small_image_url: str = ""
+    large_image_url: str = ""
+    tcgplayer_url: str = ""
+
+
+class TcgCardSearchResponse(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    cards: list[TcgCardSearchResult] = Field(default_factory=list)
 
 
 HuntPriority = Literal["normal", "high"]

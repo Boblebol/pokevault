@@ -28,6 +28,7 @@ from tracker.services.export_service import ExportService
 from tracker.services.hunt_service import HuntService
 from tracker.services.profile_service import ProfileService
 from tracker.services.progress_service import ProgressService
+from tracker.services.tcg_catalog_service import TcgCatalogService
 
 
 def get_profile_service(
@@ -113,6 +114,15 @@ def get_card_service(
     progress_service: Annotated[ProgressService, Depends(get_progress_service)],
 ) -> CardService:
     return CardService(repository, progress_service)
+
+
+def get_tcg_catalog_service(
+    settings: Annotated[TrackerSettings, Depends(get_settings)],
+) -> TcgCatalogService:
+    return TcgCatalogService(
+        base_url=settings.tcg_api_base_url,
+        api_key=settings.tcg_api_key,
+    )
 
 
 def get_badge_service(

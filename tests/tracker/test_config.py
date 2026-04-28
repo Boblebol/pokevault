@@ -26,11 +26,15 @@ def test_tracker_settings_paths(tmp_path: Path, monkeypatch: pytest.MonkeyPatch)
     assert s.pokedex_path == root / "data" / "pokedex.json"
     assert s.cards_path == root / "data" / "collection-cards.json"
     assert s.profiles_registry_path == root / "data" / "profiles.json"
+    assert s.tcg_api_base_url == "https://api.pokemontcg.io/v2"
+    assert s.tcg_api_key == ""
 
 
 def test_tracker_settings_from_env(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setenv("TRACKER_HOST", "0.0.0.0")
     monkeypatch.setenv("TRACKER_PORT", "9999")
+    monkeypatch.setenv("TRACKER_TCG_API_BASE_URL", "https://api.example.test/v2")
+    monkeypatch.setenv("TRACKER_TCG_API_KEY", "secret")
     root = tmp_path / "r"
     root.mkdir()
     monkeypatch.setenv("TRACKER_REPO_ROOT", str(root))
@@ -38,6 +42,8 @@ def test_tracker_settings_from_env(tmp_path: Path, monkeypatch: pytest.MonkeyPat
     assert s.host == "0.0.0.0"
     assert s.port == 9999
     assert s.repo_root == root.resolve()
+    assert s.tcg_api_base_url == "https://api.example.test/v2"
+    assert s.tcg_api_key == "secret"
 
 
 def test_get_settings_is_cached() -> None:

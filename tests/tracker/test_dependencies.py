@@ -19,6 +19,7 @@ from tracker.api.dependencies import (
     get_profile_service,
     get_progress_repository,
     get_progress_service,
+    get_tcg_catalog_service,
 )
 from tracker.config import TrackerSettings
 from tracker.repository.json_binder_config_repository import JsonBinderConfigRepository
@@ -35,6 +36,7 @@ from tracker.services.export_service import ExportService
 from tracker.services.hunt_service import HuntService
 from tracker.services.profile_service import ProfileService
 from tracker.services.progress_service import ProgressService
+from tracker.services.tcg_catalog_service import TcgCatalogService
 
 
 def _profiles(settings: TrackerSettings) -> ProfileService:
@@ -142,3 +144,9 @@ def test_get_badge_service(tmp_path: Path) -> None:
     )
     svc = get_badge_service(progress_repo=progress_repo, card_repo=card_repo)
     assert isinstance(svc, BadgeService)
+
+
+def test_get_tcg_catalog_service(tmp_path: Path) -> None:
+    settings = TrackerSettings(repo_root=tmp_path)
+    svc = get_tcg_catalog_service(settings=settings)
+    assert isinstance(svc, TcgCatalogService)

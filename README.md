@@ -54,6 +54,7 @@ works immediately after install. Optional artwork caches are generated locally.
 - Scrapes and exports a National Pokédex reference from Pokepedia.
 - Tracks seen, caught and shiny status per Pokemon.
 - Attaches owned physical cards to Pokemon entries.
+- Searches the public Pokemon TCG API to prefill card metadata.
 - Models binder pages, grids and card placements.
 - Maintains multiple local collection profiles.
 - Shows collection stats, badge progress and focus recommendations.
@@ -119,8 +120,13 @@ The local API is mounted next to the web UI:
 | `/api/badges` | Badge catalog and progress |
 | `/api/profiles` | Local collection profiles |
 | `/api/binder/*` | Binder configuration and placements |
+| `/api/tcg/cards/search` | Pokemon TCG catalog search for card prefill |
 | `/api/export` | Full backup export |
 | `/api/import` | Full backup restore |
+
+The TCG catalog lookup uses the public [Pokemon TCG API](https://docs.pokemontcg.io/).
+Set `TRACKER_TCG_API_KEY` if you have an API key; the local card inventory stays
+in `data/collection-cards.json`.
 
 ## Docker
 

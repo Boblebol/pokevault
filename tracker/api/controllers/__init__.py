@@ -6,6 +6,7 @@ from .health_controller import router as health_router
 from .hunt_controller import router as hunt_router
 from .profile_controller import router as profile_router
 from .progress_controller import router as progress_router
+from .tcg_controller import router as tcg_router
 
 __all__ = [
     "badge_router",
@@ -16,4 +17,5 @@ __all__ = [
     "hunt_router",
     "profile_router",
     "progress_router",
+    "tcg_router",
 ]

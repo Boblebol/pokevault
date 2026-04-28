@@ -18,6 +18,8 @@ class TrackerSettings(BaseSettings):
 
     host: str = "127.0.0.1"
     port: int = 8765
+    tcg_api_base_url: str = "https://api.pokemontcg.io/v2"
+    tcg_api_key: str = ""
     repo_root: Path = Field(
         default_factory=lambda: Path(__file__).resolve().parent.parent,
         description="Racine du dépôt (web/, data/).",

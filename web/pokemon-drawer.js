@@ -15,6 +15,7 @@
   "use strict";
 
   const API_BASE = "/api/cards";
+  const TCG_SEARCH_API = "/api/tcg/cards/search";
   const CONDITIONS = [
     { id: "mint", label: "Mint" },
     { id: "near_mint", label: "Near mint" },
@@ -256,6 +257,18 @@
     form.className = "drawer-add-form";
     form.id = "drawerAddCardForm";
 
+    const tcgIdInput = document.createElement("input");
+    tcgIdInput.type = "hidden";
+    tcgIdInput.name = "tcg_api_id";
+    form.append(tcgIdInput);
+
+    const imageInput = document.createElement("input");
+    imageInput.type = "hidden";
+    imageInput.name = "image_url";
+    form.append(imageInput);
+
+    form.append(buildTcgSearchBlock(form));
+
     const grid = document.createElement("div");
     grid.className = "drawer-add-form__grid";
 
@@ -327,13 +340,142 @@
     return form;
   }
 
-  async function onSubmitAddCard(event) {
-    event.preventDefault();
-    if (!currentSlug) return;
-    const form = event.currentTarget;
-    const fd = new FormData(form);
-    const payload = {
-      pokemon_slug: currentSlug,
+  function buildTcgSearchBlock(form) {
+    const wrap = document.createElement("div");
+    wrap.className = "drawer-tcg-search";
+
+    const label = document.createElement("label");
+    label.className = "drawer-tcg-search__label";
+    const labelText = document.createElement("span");
+    labelText.textContent = "Catalogue TCG";
+    const row = document.createElement("div");
+    row.className = "drawer-tcg-search__row";
+
+    const input = document.createElement("input");
+    input.type = "search";
+    input.autocomplete = "off";
+    input.placeholder = "Nom anglais";
+    input.value = defaultTcgSearchQuery();
+    row.append(input);
+
+    const button = document.createElement("button");
+    button.type = "button";
+    button.textContent = "Chercher";
+    row.append(button);
+
+    label.append(labelText, row);
+    wrap.append(label);
+
+    const status = document.createElement("div");
+    status.className = "drawer-tcg-search__status";
+    wrap.append(status);
+
+    const results = document.createElement("div");
+    results.className = "drawer-tcg-results";
+    wrap.append(results);
+
+    async function runSearch() {
+      const query = input.value.trim();
+      if (!query) {
+        results.replaceChildren();
+        status.textContent = "Entre un nom de carte.";
+        return;
+      }
+      button.disabled = true;
+      status.textContent = "Recherche...";
+      try {
+        const params = new URLSearchParams({ q: query, page_size: "8" });
+        const response = await fetch(`${TCG_SEARCH_API}?${params.toString()}`);
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        const body = await response.json();
+        const cards = Array.isArray(body?.cards) ? body.cards : [];
+        renderTcgResults(cards, form, results, status);
+      } catch (err) {
+        console.error("drawer: tcg search failed", err);
+        results.replaceChildren();
+        status.textContent = "Recherche catalogue indisponible.";
+      } finally {
+        button.disabled = false;
+      }
+    }
+
+    button.addEventListener("click", () => {
+      void runSearch();
+    });
+    input.addEventListener("keydown", (event) => {
+      if (event.key !== "Enter") return;
+      event.preventDefault();
+      void runSearch();
+    });
+
+    return wrap;
+  }
+
+  function defaultTcgSearchQuery() {
+    if (!currentSlug) return "";
+    const pokemon = findPokemon(currentSlug);
+    return subtitleName(pokemon) || pokemon?.name_en || displayName(pokemon);
+  }
+
+  function renderTcgResults(cards, form, resultsEl, statusEl) {
+    resultsEl.replaceChildren();
+    if (!cards.length) {
+      statusEl.textContent = "Aucun resultat.";
+      return;
+    }
+    statusEl.textContent = `${cards.length} resultat${cards.length > 1 ? "s" : ""}.`;
+    for (const card of cards) {
+      const item = document.createElement("button");
+      item.type = "button";
+      item.className = "drawer-tcg-result";
+      const imageUrl = card.small_image_url || card.large_image_url || "";
+      if (imageUrl) {
+        const img = document.createElement("img");
+        img.src = imageUrl;
+        img.alt = "";
+        img.loading = "lazy";
+        item.append(img);
+      }
+      const meta = document.createElement("span");
+      meta.className = "drawer-tcg-result__meta";
+      const title = document.createElement("strong");
+      title.textContent = card.name || "Carte sans nom";
+      const details = document.createElement("span");
+      const detailParts = [];
+      if (card.set_name) detailParts.push(card.set_name);
+      if (card.number) detailParts.push(`#${card.number}`);
+      if (card.rarity) detailParts.push(card.rarity);
+      details.textContent = detailParts.join(" · ");
+      meta.append(title, details);
+      item.append(meta);
+      item.addEventListener("click", () => {
+        applyTcgCardToForm(form, card);
+        notify("Carte TCG selectionnee.", "ok");
+      });
+      resultsEl.append(item);
+    }
+  }
+
+  function applyTcgCardToForm(form, card) {
+    const elements = form?.elements || {};
+    setFormElementValue(elements.tcg_api_id, card?.id || "");
+    setFormElementValue(elements.set_id, card?.set_id || "");
+    setFormElementValue(elements.num, card?.number || "");
+    setFormElementValue(elements.variant, card?.rarity || "");
+    setFormElementValue(
+      elements.image_url,
+      card?.large_image_url || card?.small_image_url || "",
+    );
+  }
+
+  function setFormElementValue(element, value) {
+    if (!element) return;
+    element.value = String(value || "");
+  }
+
+  function payloadFromFormData(fd, slug) {
+    return {
+      pokemon_slug: slug,
       set_id: String(fd.get("set_id") || "").trim(),
       num: String(fd.get("num") || "").trim(),
       variant: String(fd.get("variant") || "").trim(),
@@ -342,7 +484,17 @@
       qty: Math.max(1, Number(fd.get("qty") || 1) | 0),
       acquired_at: null,
       note: String(fd.get("note") || "").trim(),
+      image_url: String(fd.get("image_url") || "").trim(),
+      tcg_api_id: String(fd.get("tcg_api_id") || "").trim(),
     };
+  }
+
+  async function onSubmitAddCard(event) {
+    event.preventDefault();
+    if (!currentSlug) return;
+    const form = event.currentTarget;
+    const fd = new FormData(form);
+    const payload = payloadFromFormData(fd, currentSlug);
     try {
       const r = await fetch(API_BASE, {
         method: "POST",
@@ -700,5 +852,12 @@
     refresh: refreshSummary,
   };
 
-  window.PokevaultDrawer = { open, close, clearCache };
+  const drawerApi = { open, close, clearCache };
+  if (window.__POKEVAULT_DRAWER_TESTS__) {
+    drawerApi._test = {
+      applyTcgCardToForm,
+      payloadFromFormData,
+    };
+  }
+  window.PokevaultDrawer = drawerApi;
 })();

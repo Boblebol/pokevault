@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Added
+
+- Drawer card creation can search the public Pokemon TCG API, select a result
+  and prefill set, number, rarity, official image URL and catalog id.
+- `GET /api/tcg/cards/search` exposes a small local search adapter with optional
+  `TRACKER_TCG_API_KEY` support.
+
 ## [1.0.2] — 2026-04-27
 
 ### Added

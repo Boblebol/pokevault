@@ -42,6 +42,8 @@ def _body(**overrides: object) -> dict:
         "qty": 1,
         "acquired_at": "2026-04-20",
         "note": "",
+        "image_url": "https://images.example/sv01-025_hires.png",
+        "tcg_api_id": "sv01-025",
     }
     base.update(overrides)
     return base
@@ -53,6 +55,8 @@ def test_create_card_promotes_caught(tmp_path: Path) -> None:
     assert r.status_code == 201
     card = r.json()
     assert card["pokemon_slug"] == "0025-pikachu"
+    assert card["image_url"] == "https://images.example/sv01-025_hires.png"
+    assert card["tcg_api_id"] == "sv01-025"
     progress = client.get("/api/progress").json()
     assert progress["statuses"]["0025-pikachu"]["state"] == "caught"
 
