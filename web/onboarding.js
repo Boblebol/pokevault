@@ -3,17 +3,18 @@
  *
  * Three-step intro dialog that:
  *   1. Positions Pokevault as a Pokédex-first tracker ;
- *   2. Asks the collector profile (dex / hybrid / card) ;
- *   3. Captures starting form scope + dim mode.
+ *   2. Captures the favorite region ;
+ *   3. Captures simple or advanced tracking mode.
  *
  * The result is persisted under `localStorage["pokevault.ui.profile"]`
  * with the shape :
  *   {
- *     version: 1,
+ *     version: 2,
  *     completed_at: ISO string | null,
- *     profile: "dex" | "hybrid" | "card",
- *     form_scope: "all" | "base_only" | "base_regional",
- *     dim_mode: "caught" | "missing",
+ *     goal: "complete_pokedex",
+ *     favorite_region: "all" | region id,
+ *     tracking_mode: "simple" | "advanced",
+ *     card_layer: "addon_later",
  *     skipped: boolean
  *   }
  *
@@ -23,26 +24,74 @@
 
 (function onboardingModule() {
   const STORAGE_KEY = "pokevault.ui.profile";
+  const PREFERRED_REGION_STORAGE_KEY = "pokedexPreferredRegion";
+  const FORM_FILTER_STORAGE_KEY = "pokedexFormFilter";
+  const DIM_STORAGE_KEY = "pokedexDimMode";
   const TOTAL_STEPS = 3;
 
-  const PROFILE_COPY = {
-    dex: "Pokédex pur",
-    hybrid: "Hybride (dex + cartes)",
-    card: "TCG physique",
+  const REGION_LABELS = {
+    all: "National",
+    kanto: "Kanto",
+    johto: "Johto",
+    hoenn: "Hoenn",
+    sinnoh: "Sinnoh",
+    unys: "Unys",
+    kalos: "Kalos",
+    alola: "Alola",
+    galar: "Galar",
+    hisui: "Hisui",
+    paldea: "Paldea",
   };
 
-  /** @returns {null | {profile: string; form_scope: string; dim_mode: string; completed_at: string | null; skipped: boolean}} */
+  function normalizeGoal(value) {
+    void value;
+    return "complete_pokedex";
+  }
+
+  function normalizeRegion(value) {
+    const id = typeof value === "string" && value.trim() ? value.trim() : "all";
+    return REGION_LABELS[id] ? id : "all";
+  }
+
+  function normalizeTrackingMode(value) {
+    return value === "advanced" ? "advanced" : "simple";
+  }
+
+  function trackingPreferences(mode) {
+    if (mode === "advanced") {
+      return { form_scope: "all", dim_mode: "caught" };
+    }
+    return { form_scope: "base_regional", dim_mode: "caught" };
+  }
+
+  function migrateLegacyProfile(data) {
+    const legacyProfile = typeof data.profile === "string" ? data.profile : "dex";
+    const trackingMode = legacyProfile === "dex" ? "simple" : "advanced";
+    return {
+      version: 2,
+      goal: "complete_pokedex",
+      favorite_region: "all",
+      tracking_mode: trackingMode,
+      card_layer: "addon_later",
+      completed_at: typeof data.completed_at === "string" ? data.completed_at : null,
+      skipped: Boolean(data.skipped),
+    };
+  }
+
+  /** @returns {null | {version: number; goal: string; favorite_region: string; tracking_mode: string; card_layer: string; completed_at: string | null; skipped: boolean}} */
   function readProfile() {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
       if (!raw) return null;
       const data = JSON.parse(raw);
       if (!data || typeof data !== "object") return null;
+      if (data.version !== 2) return migrateLegacyProfile(data);
       return {
-        version: data.version === 1 ? 1 : 1,
-        profile: typeof data.profile === "string" ? data.profile : "dex",
-        form_scope: typeof data.form_scope === "string" ? data.form_scope : "all",
-        dim_mode: data.dim_mode === "missing" ? "missing" : "caught",
+        version: 2,
+        goal: normalizeGoal(data.goal),
+        favorite_region: normalizeRegion(data.favorite_region),
+        tracking_mode: normalizeTrackingMode(data.tracking_mode),
+        card_layer: "addon_later",
         completed_at: typeof data.completed_at === "string" ? data.completed_at : null,
         skipped: Boolean(data.skipped),
       };
@@ -53,10 +102,11 @@
 
   function writeProfile(payload) {
     const body = {
-      version: 1,
-      profile: payload.profile,
-      form_scope: payload.form_scope,
-      dim_mode: payload.dim_mode,
+      version: 2,
+      goal: normalizeGoal(payload.goal),
+      favorite_region: normalizeRegion(payload.favorite_region),
+      tracking_mode: normalizeTrackingMode(payload.tracking_mode),
+      card_layer: "addon_later",
       completed_at: payload.skipped ? null : new Date().toISOString(),
       skipped: Boolean(payload.skipped),
     };
@@ -68,31 +118,95 @@
     return body;
   }
 
+  function listHashParts() {
+    const raw = location.hash || "#/liste";
+    const clean = raw.replace(/^#/, "");
+    const [path = "/liste", query = ""] = clean.split("?");
+    const route = path.replace(/^\//, "") || "liste";
+    return { route, query };
+  }
+
+  function writeListFiltersToHash(profile, formScope) {
+    const { route, query } = listHashParts();
+    if (route !== "liste") return;
+    const params = new URLSearchParams(query);
+    const hasExplicitRegion = params.has("region");
+    const hasExplicitForms = params.has("forms");
+    if (hasExplicitRegion && hasExplicitForms) return;
+
+    const filters = {
+      status: params.get("status") || "all",
+      region: hasExplicitRegion ? params.get("region") || "all" : profile.favorite_region,
+      forms: hasExplicitForms ? params.get("forms") || "all" : formScope,
+      type: params.get("type") || "all",
+      tags: params.get("tags") ? params.get("tags").split(",").filter(Boolean) : [],
+    };
+    const next = window.PokevaultFilters?.buildFilterHash?.(
+      location.hash || "#/liste",
+      filters,
+    ) || fallbackFilterHash(filters);
+    if (next && next !== location.hash) {
+      history.replaceState(null, "", next);
+    }
+  }
+
+  function fallbackFilterHash(filters) {
+    const params = new URLSearchParams();
+    if (filters.status && filters.status !== "all") params.set("status", filters.status);
+    if (filters.region && filters.region !== "all") params.set("region", filters.region);
+    if (filters.forms && filters.forms !== "all") params.set("forms", filters.forms);
+    if (filters.type && filters.type !== "all") params.set("type", filters.type);
+    if (filters.tags?.length) params.set("tags", filters.tags.join(","));
+    const qs = params.toString();
+    return `#/liste${qs ? `?${qs}` : ""}`;
+  }
+
   function applyPreferences(profile) {
     if (!profile) return;
-    if (profile.form_scope && profile.form_scope !== "all") {
+    const clean = {
+      goal: normalizeGoal(profile.goal),
+      favorite_region: normalizeRegion(profile.favorite_region),
+      tracking_mode: normalizeTrackingMode(profile.tracking_mode),
+      card_layer: "addon_later",
+    };
+    const preferences = trackingPreferences(clean.tracking_mode);
+    if (preferences.form_scope && preferences.form_scope !== "all") {
       try {
-        localStorage.setItem("pokedexFormFilter", profile.form_scope);
+        localStorage.setItem(FORM_FILTER_STORAGE_KEY, preferences.form_scope);
       } catch {
         /* ignore */
       }
     } else {
       try {
-        localStorage.removeItem("pokedexFormFilter");
+        localStorage.removeItem(FORM_FILTER_STORAGE_KEY);
+      } catch {
+        /* ignore */
+      }
+    }
+    if (clean.favorite_region !== "all") {
+      try {
+        localStorage.setItem(PREFERRED_REGION_STORAGE_KEY, clean.favorite_region);
+      } catch {
+        /* ignore */
+      }
+    } else {
+      try {
+        localStorage.removeItem(PREFERRED_REGION_STORAGE_KEY);
       } catch {
         /* ignore */
       }
     }
     const PC = window.PokedexCollection;
     if (PC && typeof PC.setDimMode === "function") {
-      PC.setDimMode(profile.dim_mode);
+      PC.setDimMode(preferences.dim_mode);
     } else {
       try {
-        localStorage.setItem("pokedexDimMode", profile.dim_mode);
+        localStorage.setItem(DIM_STORAGE_KEY, preferences.dim_mode);
       } catch {
         /* ignore */
       }
     }
+    writeListFiltersToHash(clean, preferences.form_scope);
   }
 
   function updateSettingsProfileLabel() {
@@ -103,15 +217,9 @@
       el.textContent = "Profil : non défini — rejoue l'onboarding pour personnaliser.";
       return;
     }
-    const label = PROFILE_COPY[p.profile] || "Inconnu";
-    const forms =
-      p.form_scope === "base_only"
-        ? "formes de base"
-        : p.form_scope === "base_regional"
-          ? "base + régionales"
-          : "tout le dex";
-    const dim = p.dim_mode === "missing" ? "atténue les manquants" : "atténue les attrapés";
-    el.textContent = `Profil : ${label} · ${forms} · ${dim}.`;
+    const region = REGION_LABELS[p.favorite_region] || "National";
+    const mode = p.tracking_mode === "advanced" ? "mode avancé" : "mode simple";
+    el.textContent = `Profil : Compléter mon Pokédex · ${region} · ${mode} · cartes en add-on.`;
   }
 
   class Wizard {
@@ -187,19 +295,19 @@
     }
 
     readSelections() {
-      const profileInput = /** @type {HTMLInputElement | null} */ (
-        this.form.querySelector('input[name="onboardingProfile"]:checked')
+      const goal = /** @type {HTMLInputElement | null} */ (
+        this.form.querySelector("#onboardingGoal")
       );
-      const forms = /** @type {HTMLSelectElement | null} */ (
-        this.form.querySelector("#onboardingForms")
+      const region = /** @type {HTMLSelectElement | null} */ (
+        this.form.querySelector("#onboardingFavoriteRegion")
       );
-      const dim = /** @type {HTMLSelectElement | null} */ (
-        this.form.querySelector("#onboardingDim")
+      const mode = /** @type {HTMLInputElement | null} */ (
+        this.form.querySelector('input[name="onboardingTrackingMode"]:checked')
       );
       return {
-        profile: profileInput?.value || "dex",
-        form_scope: forms?.value || "all",
-        dim_mode: dim?.value === "missing" ? "missing" : "caught",
+        goal: goal?.value || "complete_pokedex",
+        favorite_region: region?.value || "all",
+        tracking_mode: mode?.value || "simple",
       };
     }
 
@@ -222,6 +330,12 @@
     }
   }
 
+  function shouldOpen(profile) {
+    if (!profile) return true;
+    if (profile.skipped) return false;
+    return !profile.completed_at;
+  }
+
   /** @type {Wizard | null} */
   let instance = null;
 
@@ -235,7 +349,7 @@
 
   function openIfNeeded() {
     const profile = readProfile();
-    if (profile && profile.completed_at) return false;
+    if (!shouldOpen(profile)) return false;
     const w = ensure();
     if (!w) return false;
     w.open();
@@ -261,12 +375,25 @@
     readProfile,
     refreshSettings: updateSettingsProfileLabel,
   };
+  if (window.__POKEVAULT_ONBOARDING_TESTS__) {
+    window.PokevaultOnboarding._test = {
+      readProfile,
+      writeProfile,
+      applyPreferences,
+      shouldOpen,
+    };
+  }
 
   function bootstrap() {
+    const profile = readProfile();
+    if (profile && !profile.skipped) applyPreferences(profile);
     wireReplayButton();
     updateSettingsProfileLabel();
     openIfNeeded();
   }
+
+  const storedProfile = readProfile();
+  if (storedProfile && !storedProfile.skipped) applyPreferences(storedProfile);
 
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", bootstrap, { once: true });

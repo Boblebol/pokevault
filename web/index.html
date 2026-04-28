@@ -548,76 +548,67 @@
         </ol>
 
         <section class="onboarding__step is-active" data-step="1">
-          <p class="onboarding__kicker">Étape 1 · La promesse</p>
-          <h3 class="onboarding__step-title">Un Pokédex d'abord, tes cartes ensuite.</h3>
+          <input type="hidden" id="onboardingGoal" name="onboardingGoal" value="complete_pokedex" />
+          <p class="onboarding__kicker">Étape 1 · Objectif</p>
+          <h3 class="onboarding__step-title">Compléter mon Pokédex.</h3>
           <p class="onboarding__lede">
-            Pokevault est un Pokédex local, 100 % sous ton contrôle. Tu
-            suis ta progression, tu filtres par région, type ou catégorie
-            narrative, et tu ajoutes tes cartes physiques en option —
-            jamais imposées.
+            Pokevault démarre sur la progression Pokédex : non rencontrés,
+            vus, capturés, puis les bonus quand tu en as besoin.
           </p>
           <ul class="onboarding__bullets">
             <li>1025 Pokémon couverts, du Gen 1 au Gen 9.</li>
-            <li>États <em>aperçu</em>, <em>attrapé</em> et <em>shiny</em>.</li>
+            <li>États <em>non rencontré</em>, <em>vu</em> et <em>capturé</em>.</li>
             <li>Tes données restent dans <code>data/</code>, exportables à tout moment.</li>
           </ul>
         </section>
 
         <section class="onboarding__step" data-step="2" hidden>
-          <p class="onboarding__kicker">Étape 2 · Ton profil</p>
-          <h3 class="onboarding__step-title">Comment collectionnes-tu ?</h3>
+          <p class="onboarding__kicker">Étape 2 · Région favorite</p>
+          <h3 class="onboarding__step-title">Par où tu veux commencer ?</h3>
           <p class="onboarding__lede">
-            Ce choix oriente les réglages par défaut. Tu pourras toujours
-            les changer depuis les Réglages.
+            Ce choix oriente la première liste. Tu pourras toujours revenir au
+            National ou changer de région depuis les filtres.
           </p>
-          <div class="onboarding__choices" role="radiogroup" aria-label="Profil de collectionneur">
-            <label class="onboarding__choice">
-              <input type="radio" name="onboardingProfile" value="dex" checked />
-              <span class="onboarding__choice-title">Pokédex pur</span>
-              <span class="onboarding__choice-sub">Je veux compléter le dex, peu ou pas de cartes physiques.</span>
-            </label>
-            <label class="onboarding__choice">
-              <input type="radio" name="onboardingProfile" value="hybrid" />
-              <span class="onboarding__choice-title">Hybride</span>
-              <span class="onboarding__choice-sub">Je complète le dex <em>et</em> je garde un œil sur mes cartes.</span>
-            </label>
-            <label class="onboarding__choice">
-              <input type="radio" name="onboardingProfile" value="card" />
-              <span class="onboarding__choice-title">TCG physique</span>
-              <span class="onboarding__choice-sub">Ce sont mes cartes qui m'intéressent avant tout.</span>
-            </label>
-          </div>
+          <label class="onboarding__field onboarding__field--single">
+            <span class="onboarding__field-label">Région de départ</span>
+            <select id="onboardingFavoriteRegion" name="onboardingFavoriteRegion">
+              <option value="all">National</option>
+              <option value="kanto">Kanto</option>
+              <option value="johto">Johto</option>
+              <option value="hoenn">Hoenn</option>
+              <option value="sinnoh">Sinnoh</option>
+              <option value="unys">Unys</option>
+              <option value="kalos">Kalos</option>
+              <option value="alola">Alola</option>
+              <option value="galar">Galar</option>
+              <option value="hisui">Hisui</option>
+              <option value="paldea">Paldea</option>
+            </select>
+          </label>
         </section>
 
         <section class="onboarding__step" data-step="3" hidden>
-          <p class="onboarding__kicker">Étape 3 · Tes préférences</p>
-          <h3 class="onboarding__step-title">Réglages de démarrage</h3>
+          <p class="onboarding__kicker">Étape 3 · Mode de suivi</p>
+          <h3 class="onboarding__step-title">Simple ou avancé ?</h3>
           <p class="onboarding__lede">
-            Trois choix rapides pour que la liste ressemble tout de suite
-            à ce que tu attends.
+            Simple garde la liste concentrée sur les statuts Pokédex. Avancé
+            rend les formes, shiny, notes et cartes plus visibles.
           </p>
-          <div class="onboarding__grid">
-            <label class="onboarding__field">
-              <span class="onboarding__field-label">Formes à afficher</span>
-              <select name="onboardingForms" id="onboardingForms">
-                <option value="all">Tout le dex (recommandé)</option>
-                <option value="base_regional">Base + formes régionales</option>
-                <option value="base_only">Uniquement les formes de base</option>
-              </select>
+          <div class="onboarding__choices" role="radiogroup" aria-label="Mode de suivi Pokédex">
+            <label class="onboarding__choice">
+              <input type="radio" name="onboardingTrackingMode" value="simple" checked />
+              <span class="onboarding__choice-title">Simple</span>
+              <span class="onboarding__choice-sub">Non rencontré, vu, capturé. Les formes régionales restent disponibles.</span>
             </label>
-            <label class="onboarding__field">
-              <span class="onboarding__field-label">Mise en avant des cartes</span>
-              <select name="onboardingDim" id="onboardingDim">
-                <option value="caught">Atténuer les attrapés</option>
-                <option value="missing">Atténuer les manquants</option>
-              </select>
+            <label class="onboarding__choice">
+              <input type="radio" name="onboardingTrackingMode" value="advanced" />
+              <span class="onboarding__choice-title">Avancé</span>
+              <span class="onboarding__choice-sub">Shiny, formes spéciales, notes, hunts et cartes plus accessibles.</span>
             </label>
           </div>
           <p class="onboarding__hint">
-            💡 Astuce : tu peux aussi tenir plusieurs Pokédex en parallèle
-            (ex. « Hardcore », « Shiny only », « Vintage FR »).
-            Retrouve le switcher dans
-            <strong>Réglages → Pokédex multi-profils</strong>.
+            Les cartes TCG restent un add-on : tu peux les ajouter depuis une
+            fiche Pokémon ou les classeurs, sans changer ton objectif principal.
           </p>
         </section>
 

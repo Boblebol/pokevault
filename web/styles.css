@@ -1169,6 +1169,8 @@ body {
   padding: 0;
   max-width: 520px;
   width: min(94vw, 520px);
+  max-height: min(720px, 94dvh);
+  overflow: hidden;
 }
 
 .onboarding::backdrop {
@@ -1182,6 +1184,8 @@ body {
   flex-direction: column;
   gap: 16px;
   min-height: 420px;
+  max-height: min(720px, 94dvh);
+  overflow-y: auto;
 }
 
 .onboarding__header {
@@ -1204,6 +1208,8 @@ body {
   border: none;
   color: var(--muted, #aaa);
   cursor: pointer;
+  min-width: 40px;
+  min-height: 40px;
   padding: 4px;
   border-radius: 8px;
 }
@@ -1306,6 +1312,7 @@ body {
   column-gap: 12px;
   row-gap: 4px;
   padding: 12px 14px;
+  min-height: 54px;
   border: 1px solid var(--outline-soft, #2a2a2a);
   border-radius: 12px;
   cursor: pointer;
@@ -1373,6 +1380,10 @@ body {
   gap: 4px;
 }
 
+.onboarding__field--single {
+  margin-top: 2px;
+}
+
 .onboarding__field-label {
   font-size: 0.78rem;
   color: var(--muted, #aaa);
@@ -1381,6 +1392,7 @@ body {
 
 .onboarding__field select {
   padding: 8px 10px;
+  min-height: 44px;
   border-radius: 10px;
   border: 1px solid var(--outline-soft, #2a2a2a);
   background: rgba(255, 255, 255, 0.03);
@@ -1400,6 +1412,7 @@ body {
 
 .onboarding__btn {
   padding: 9px 18px;
+  min-height: 44px;
   border-radius: 999px;
   border: 1px solid transparent;
   font-family: inherit;
@@ -1428,6 +1441,45 @@ body {
 
 .onboarding__btn--primary:hover {
   background: color-mix(in oklab, var(--accent, #ff7d00) 85%, #fff);
+}
+
+@media (max-width: 480px) {
+  .onboarding {
+    width: min(100vw - 16px, 520px);
+    max-height: calc(100dvh - 16px);
+    border-radius: 14px;
+  }
+
+  .onboarding__form {
+    gap: 12px;
+    min-height: 0;
+    max-height: calc(100dvh - 16px);
+    padding: 16px;
+  }
+
+  .onboarding__title {
+    font-size: 1rem;
+  }
+
+  .onboarding__step-title {
+    font-size: 1.16rem;
+  }
+
+  .onboarding__lede,
+  .onboarding__bullets,
+  .onboarding__choice-sub,
+  .onboarding__hint {
+    font-size: 0.82rem;
+  }
+
+  .onboarding__footer {
+    position: sticky;
+    bottom: -16px;
+    margin: 0 -16px -16px;
+    padding: 10px 16px 16px;
+    background: var(--card, #111);
+    border-top: 1px solid var(--outline-soft, #2a2a2a);
+  }
 }
 
 .kb-hint-btn {
