@@ -24,6 +24,7 @@ your collection data in readable JSON files.
 - [Project site](https://boblebol.github.io/pokevault/)
 - [Release notes](CHANGELOG.md)
 - [Roadmap](docs/ROADMAP.md)
+- [V1.1 Pokédex-first tickets](docs/V1_1_POKEDEX_FIRST.md)
 - [Postponed ideas](docs/POSTPONED.md)
 - [Design system](DESIGN.md)
 - [Contributing](CONTRIBUTING.md)

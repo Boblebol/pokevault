@@ -59,14 +59,19 @@ tant que le produit n'a pas besoin de données marchandes.
 
 ## Données Pokédex
 
-### Descriptions Poképedia et chaînes d'évolution
+### Descriptions Poképedia
 
 Statut : repoussé.
 
 La fiche complète affiche déjà l'identité, les types, les faiblesses, les autres
-formes et les cartes possédées. Les descriptions et évolutions demandent une
-extension plus fragile du scraper Poképedia. Elles sont repoussées pour ne pas
-mettre en risque la stabilité du Pokédex de référence.
+formes et les cartes possédées. Les descriptions longues demandent une extension
+plus fragile du scraper Poképedia. Elles restent repoussées pour ne pas mettre
+en risque la stabilité du Pokédex de référence.
+
+Les chaînes d'évolution sont sorties du backlog repoussé uniquement sous forme
+d'audit et de metadata contrôlée dans
+[`V1_1_POKEDEX_FIRST.md`](V1_1_POKEDEX_FIRST.md). Elles ne doivent pas ajouter
+d'appel réseau au runtime.
 
 ## Profils
 
