@@ -60,7 +60,7 @@ works immediately after install. Optional artwork caches are generated locally.
 - Searches the public Pokemon TCG API to prefill card metadata.
 - Models binder pages, grids and card placements.
 - Maintains multiple local collection profiles.
-- Creates and imports optional Trainer Cards for local collector contacts.
+- Creates and imports optional Trainer Cards with a searchable local contact book.
 - Shows collection stats, badge progress and focus recommendations.
 - Exports/imports full local backups.
 - Prints binder or regional checklists.

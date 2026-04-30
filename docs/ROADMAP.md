@@ -86,7 +86,7 @@ tab.
 - v0.1: create "my Trainer Card", export it as a file and import a received
   card into `data/trainer-contacts.json`.
 - v0.2: update an existing contact by stable `trainer_id`, preserve private
-  notes and show the last received update time.
+  notes, search the local contact book and delete stale contacts.
 - v0.3: compare local wants and for-trade lists against the user's collection
   without mutating progress, cards or binders.
 

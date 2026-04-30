@@ -132,14 +132,19 @@ def test_trainer_contacts_are_documented_publicly() -> None:
     guide = DOCS / "TRAINER_CONTACTS.md"
     assert guide.is_file()
 
+    guide_text = guide.read_text(encoding="utf-8")
     readme = (ROOT / "README.md").read_text(encoding="utf-8")
     features = (DOCS / "features.html").read_text(encoding="utf-8")
     roadmap = (DOCS / "roadmap.html").read_text(encoding="utf-8")
     architecture = (DOCS / "architecture.html").read_text(encoding="utf-8")
 
+    assert "searchable local contact book" in guide_text
+    assert "private notes" in guide_text
     assert "Trainer Cards" in readme
     assert "data/trainer-contacts.json" in readme
     assert "/api/trainers" in readme
+    assert "searchable local contact book" in readme
     assert "Trainer Cards" in features
+    assert "searchable local contact book" in features
     assert "Dresseurs" in roadmap
     assert "trainer-contacts.json" in architecture
