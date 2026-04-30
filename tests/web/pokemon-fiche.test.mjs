@@ -130,6 +130,34 @@ test("buildStatusActionModel exposes direct B2 actions with shiny gated by caugh
   assert.equal(shinyActions[3].disabled, false);
 });
 
+test("buildOwnershipActionModel exposes compact trade-oriented actions", async () => {
+  const api = await loadModule();
+
+  const empty = api.buildOwnershipActionModel({ wanted: false, caught: false, duplicate: false });
+  assert.deepEqual(empty.map((action) => action.id), ["wanted", "owned", "duplicate"]);
+  assert.deepEqual(empty.map((action) => action.label), ["Cherche", "J'ai", "Double"]);
+  assert.deepEqual(empty.map((action) => action.active), [false, false, false]);
+
+  const wanted = api.buildOwnershipActionModel({ wanted: true, caught: false, duplicate: false });
+  assert.deepEqual(wanted.map((action) => action.active), [true, false, false]);
+
+  const owned = api.buildOwnershipActionModel({ wanted: false, caught: true, duplicate: false });
+  assert.deepEqual(owned.map((action) => action.active), [false, true, false]);
+
+  const duplicate = api.buildOwnershipActionModel({ wanted: false, caught: true, duplicate: true });
+  assert.deepEqual(duplicate.map((action) => action.active), [false, false, true]);
+});
+
+test("ownershipPatchForAction keeps Double as a tradeable owned state", async () => {
+  const api = await loadModule();
+
+  assert.equal(api.ownershipPatchForAction({ wanted: false, caught: false, duplicate: false }, "wanted"), "wanted");
+  assert.equal(api.ownershipPatchForAction({ wanted: true, caught: false, duplicate: false }, "wanted"), "none");
+  assert.equal(api.ownershipPatchForAction({ wanted: false, caught: true, duplicate: false }, "owned"), "none");
+  assert.equal(api.ownershipPatchForAction({ wanted: false, caught: true, duplicate: true }, "duplicate"), "owned");
+  assert.equal(api.ownershipPatchForAction({ wanted: true, caught: false, duplicate: false }, "duplicate"), "duplicate");
+});
+
 test("statusPatchForAction prevents shiny from surviving non-caught states", async () => {
   const api = await loadModule();
 
