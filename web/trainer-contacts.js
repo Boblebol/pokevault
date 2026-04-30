@@ -8,6 +8,9 @@
   let cachedBook = { version: 1, own_card: null, contacts: {} };
   let activeSearch = "";
   let started = false;
+  let hasLoaded = false;
+  let inflight = null;
+  const listeners = new Set();
 
   function normalizeList(raw) {
     if (!Array.isArray(raw)) return [];
@@ -104,7 +107,39 @@
     const res = await fetch(API_TRAINERS);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     cachedBook = normalizeBook(await res.json());
+    hasLoaded = true;
+    notify();
     return cachedBook;
+  }
+
+  async function ensureLoaded({ force = false } = {}) {
+    if (inflight) return inflight;
+    if (!force && hasLoaded) return cachedBook;
+    inflight = loadBook().finally(() => {
+      inflight = null;
+    });
+    return inflight;
+  }
+
+  function notify() {
+    for (const fn of listeners) {
+      try {
+        fn(cachedBook);
+      } catch (err) {
+        console.error("trainer contacts: listener failed", err);
+      }
+    }
+  }
+
+  function subscribe(fn) {
+    if (typeof fn !== "function") return () => {};
+    listeners.add(fn);
+    try {
+      fn(cachedBook);
+    } catch (err) {
+      console.error("trainer contacts: immediate listener failed", err);
+    }
+    return () => listeners.delete(fn);
   }
 
   async function saveOwnCard(card) {
@@ -118,6 +153,7 @@
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     await loadBook();
     render("Carte dresseur enregistrée.");
+    return cachedBook.own_card;
   }
 
   async function importCard(card) {
@@ -152,6 +188,84 @@
       return "L'identifiant stable doit faire 80 caractères maximum.";
     }
     return "";
+  }
+
+  function defaultOwnCard(idFactory = generateTrainerId) {
+    return {
+      schema_version: 1,
+      app: "pokevault",
+      kind: "trainer_card",
+      trainer_id: idFactory(),
+      display_name: "Dresseur local",
+      favorite_region: "",
+      favorite_pokemon_slug: "",
+      public_note: "",
+      contact_links: [],
+      wants: [],
+      for_trade: [],
+      updated_at: new Date().toISOString(),
+    };
+  }
+
+  function getOwnCard() {
+    return cachedBook.own_card;
+  }
+
+  function updateCardListMembership(card, listName, slug, enabled) {
+    const key = String(slug || "").trim();
+    if (!key || (listName !== "wants" && listName !== "for_trade")) return card;
+    const current = normalizeList(card?.[listName]);
+    const next = enabled
+      ? [...current.filter((item) => item !== key), key]
+      : current.filter((item) => item !== key);
+    return {
+      ...(card || defaultOwnCard()),
+      [listName]: next.slice(0, 40),
+      updated_at: new Date().toISOString(),
+    };
+  }
+
+  async function setOwnListMembership(slug, listName, enabled) {
+    await ensureLoaded();
+    const base = cachedBook.own_card || defaultOwnCard();
+    const card = updateCardListMembership(base, listName, slug, enabled);
+    return saveOwnCard(card);
+  }
+
+  function contactsTrading(bookOrSlug, maybeSlug) {
+    const book = typeof bookOrSlug === "string" ? cachedBook : normalizeBook(bookOrSlug);
+    const slug = typeof bookOrSlug === "string" ? bookOrSlug : maybeSlug;
+    const key = String(slug || "").trim();
+    if (!key) return [];
+    return Object.values(book.contacts || {})
+      .filter((contact) => (contact.card.for_trade || []).includes(key))
+      .sort((a, b) => a.card.display_name.localeCompare(b.card.display_name, "fr"));
+  }
+
+  function contactsWanting(bookOrSlug, maybeSlug) {
+    const book = typeof bookOrSlug === "string" ? cachedBook : normalizeBook(bookOrSlug);
+    const slug = typeof bookOrSlug === "string" ? bookOrSlug : maybeSlug;
+    const key = String(slug || "").trim();
+    if (!key) return [];
+    return Object.values(book.contacts || {})
+      .filter((contact) => (contact.card.wants || []).includes(key))
+      .sort((a, b) => a.card.display_name.localeCompare(b.card.display_name, "fr"));
+  }
+
+  function tradeSummary(bookOrSlug, maybeSlug) {
+    const book = typeof bookOrSlug === "string" ? cachedBook : normalizeBook(bookOrSlug);
+    const slug = typeof bookOrSlug === "string" ? bookOrSlug : maybeSlug;
+    const key = String(slug || "").trim();
+    const availableFrom = contactsTrading(book, key).map((contact) => contact.card.display_name);
+    const wantedBy = contactsWanting(book, key).map((contact) => contact.card.display_name);
+    const ownWants = new Set(book.own_card?.wants || []);
+    const ownTrades = new Set(book.own_card?.for_trade || []);
+    return {
+      availableFrom,
+      wantedBy,
+      matchCount: ownWants.has(key) ? availableFrom.length : 0,
+      canHelpCount: ownTrades.has(key) ? wantedBy.length : 0,
+    };
   }
 
   function contactSearchText(contact) {
@@ -453,7 +567,7 @@
     started = true;
     wireImportInput();
     try {
-      await loadBook();
+      await ensureLoaded({ force: true });
       render();
     } catch (err) {
       render(`Erreur API : ${err.message}`);
@@ -492,12 +606,29 @@
     return escapeText(value).replace(/"/g, "&quot;");
   }
 
-  const api = { start, normalizeBook, cardFromForm };
+  const api = {
+    start,
+    normalizeBook,
+    cardFromForm,
+    ensureLoaded,
+    subscribe,
+    getOwnCard,
+    setOwnListMembership,
+    contactsTrading,
+    contactsWanting,
+    tradeSummary,
+  };
   if (window.__POKEVAULT_TRAINERS_TESTS__) {
     api._test = {
+      normalizeCard,
       normalizeBook,
       cardFromForm,
       validateTrainerCard,
+      defaultOwnCard,
+      updateCardListMembership,
+      contactsTrading,
+      contactsWanting,
+      tradeSummary,
       filterContacts,
       renderContact,
       notePatchRequest,

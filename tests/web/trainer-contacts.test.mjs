@@ -258,3 +258,78 @@ test("validateTrainerCard accepts a complete local card", async () => {
 
   assert.equal(api.validateTrainerCard(card), "");
 });
+
+test("updateCardListMembership toggles wants and trades without duplicates", async () => {
+  const api = await loadModule();
+  const card = api.normalizeCard({
+    trainer_id: "trainer-123",
+    display_name: "Alex",
+    wants: ["0001-bulbasaur"],
+    for_trade: ["0004-charmander"],
+    updated_at: "2026-04-30T10:00:00+00:00",
+  });
+
+  const wanted = api.updateCardListMembership(card, "wants", "0001-bulbasaur", true);
+  assert.deepEqual(wanted.wants, ["0001-bulbasaur"]);
+
+  const removed = api.updateCardListMembership(wanted, "wants", "0001-bulbasaur", false);
+  assert.deepEqual(removed.wants, []);
+
+  const traded = api.updateCardListMembership(removed, "for_trade", "0007-squirtle", true);
+  assert.deepEqual(traded.for_trade, ["0004-charmander", "0007-squirtle"]);
+});
+
+test("defaultOwnCard creates a valid local card for low-friction chips", async () => {
+  const api = await loadModule();
+  const card = api.defaultOwnCard(() => "trainer-generated");
+
+  assert.equal(card.trainer_id, "trainer-generated");
+  assert.equal(card.display_name, "Dresseur local");
+  assert.equal(api.validateTrainerCard(card), "");
+});
+
+test("contactsTrading and tradeSummary find imported exchange opportunities", async () => {
+  const api = await loadModule();
+  const book = api.normalizeBook({
+    own_card: {
+      trainer_id: "trainer-me",
+      display_name: "Me",
+      wants: ["0130-gyarados"],
+      for_trade: ["0001-bulbasaur"],
+      updated_at: "2026-04-30T10:00:00+00:00",
+    },
+    contacts: {
+      misty: {
+        card: {
+          trainer_id: "misty",
+          display_name: "Misty",
+          wants: ["0001-bulbasaur"],
+          for_trade: ["0130-gyarados"],
+          updated_at: "2026-04-30T10:00:00+00:00",
+        },
+        first_received_at: "2026-04-30T11:00:00+00:00",
+        last_received_at: "2026-04-30T11:00:00+00:00",
+      },
+      brock: {
+        card: {
+          trainer_id: "brock",
+          display_name: "Brock",
+          wants: [],
+          for_trade: ["0095-onix"],
+          updated_at: "2026-04-30T10:00:00+00:00",
+        },
+        first_received_at: "2026-04-30T11:00:00+00:00",
+        last_received_at: "2026-04-30T11:00:00+00:00",
+      },
+    },
+  });
+
+  assert.deepEqual(api.contactsTrading(book, "0130-gyarados").map((c) => c.card.display_name), ["Misty"]);
+  assert.deepEqual(api.contactsWanting(book, "0001-bulbasaur").map((c) => c.card.display_name), ["Misty"]);
+  assert.deepEqual(api.tradeSummary(book, "0130-gyarados"), {
+    availableFrom: ["Misty"],
+    wantedBy: [],
+    matchCount: 1,
+    canHelpCount: 0,
+  });
+});
