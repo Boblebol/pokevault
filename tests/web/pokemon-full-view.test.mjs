@@ -38,6 +38,7 @@ class FakeElement {
 
 function installBrowserStubs(root) {
   const statusCalls = [];
+  const ownershipCalls = [];
   const noteCalls = [];
   globalThis.__POKEVAULT_FICHE_TESTS__ = true;
   globalThis.__POKEVAULT_FULLVIEW_TESTS__ = true;
@@ -65,6 +66,7 @@ function installBrowserStubs(root) {
   });
   globalThis.PokedexCollection = {
     statusCalls,
+    ownershipCalls,
     noteCalls,
     allPokemon: [
       {
@@ -129,6 +131,21 @@ function installBrowserStubs(root) {
     setStatus(slug, state, shiny) {
       statusCalls.push({ slug, state, shiny });
     },
+    ownershipStateForSlug() {
+      return { wanted: false, caught: true, duplicate: true };
+    },
+    setPokemonOwnershipState(slug, state) {
+      ownershipCalls.push({ slug, state });
+      return Promise.resolve();
+    },
+    tradeSummaryForSlug() {
+      return {
+        availableFrom: ["Misty"],
+        wantedBy: ["Brock"],
+        matchCount: 1,
+        canHelpCount: 1,
+      };
+    },
     getNote(slug) {
       return slug === "0001-bulbasaur" ? "À transférer depuis Vert Feuille." : "";
     },
@@ -180,30 +197,36 @@ test("renderInto lays out the B1 fiche sections before secondary cards", async (
   assert.equal(root.children.at(-2).children.at(-1).className, "pokemon-note-editor");
 });
 
-test("renderInto shows direct B2 status actions and clears shiny off seen", async () => {
+test("renderInto shows trade-oriented ownership actions and exchange context", async () => {
   const root = new FakeElement("div");
   const api = await loadModules(root);
 
   api.renderInto(root, "0001-bulbasaur");
 
   const statusSection = root.children.find((child) => child.dataset?.section === "pokedex_status");
-  const row = statusSection.children.find((child) => child.className === "pokemon-status-actions");
+  const label = statusSection.children.find((child) => child.className === "fullview-hero__status-label");
+  assert.equal(label.textContent, "Double");
+
+  const row = statusSection.children.find((child) => child.className === "pokemon-ownership-actions");
   const buttons = row.children;
   assert.deepEqual(buttons.map((button) => button.textContent), [
-    "Non rencontré",
-    "Vu",
-    "Capturé",
-    "Shiny",
+    "Cherche",
+    "J'ai",
+    "Double",
   ]);
   assert.equal(buttons[2].dataset.active, "true");
-  assert.equal(buttons[3].dataset.active, "true");
-  assert.equal(buttons[3].disabled, false);
 
-  buttons[1].events.click();
-  assert.deepEqual(globalThis.PokedexCollection.statusCalls.at(-1), {
+  const exchange = statusSection.children.find((child) => child.className === "pokemon-exchange-context");
+  assert.equal(exchange.children[0].textContent, "Match possible avec Misty.");
+  assert.equal(exchange.children[1].textContent, "Brock cherche ce Pokémon.");
+
+  buttons[2].events.click({
+    preventDefault() {},
+    stopPropagation() {},
+  });
+  assert.deepEqual(globalThis.PokedexCollection.ownershipCalls.at(-1), {
     slug: "0001-bulbasaur",
-    state: "seen",
-    shiny: false,
+    state: "owned",
   });
 });
 

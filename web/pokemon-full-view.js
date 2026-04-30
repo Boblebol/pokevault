@@ -111,6 +111,63 @@
       : status.state === "seen" ? "Aperçu" : "Non rencontré";
   }
 
+  function ownershipState(slug) {
+    const collection = window.PokedexCollection;
+    if (typeof collection?.ownershipStateForSlug === "function") {
+      return collection.ownershipStateForSlug(slug);
+    }
+    const helper = ficheHelpers();
+    if (typeof helper.ownershipStateFromSources === "function") {
+      return helper.ownershipStateFromSources(slug, {
+        status: collection?.getStatus?.(slug),
+        wanted: Boolean(window.PokevaultHunts?.isWanted?.(slug)),
+        ownCard: window.PokevaultTrainerContacts?.getOwnCard?.() || null,
+      });
+    }
+    const status = collection?.getStatus?.(slug) || { state: "not_met" };
+    return { wanted: false, caught: status.state === "caught", duplicate: false };
+  }
+
+  function tradeSummary(slug) {
+    try {
+      return window.PokedexCollection?.tradeSummaryForSlug?.(slug)
+        || window.PokevaultTrainerContacts?.tradeSummary?.(slug)
+        || { availableFrom: [], wantedBy: [], matchCount: 0, canHelpCount: 0 };
+    } catch {
+      return { availableFrom: [], wantedBy: [], matchCount: 0, canHelpCount: 0 };
+    }
+  }
+
+  function formatNameList(names) {
+    const clean = (Array.isArray(names) ? names : []).filter(Boolean);
+    if (!clean.length) return "";
+    if (clean.length === 1) return clean[0];
+    if (clean.length === 2) return `${clean[0]} et ${clean[1]}`;
+    return `${clean.slice(0, 2).join(", ")} +${clean.length - 2}`;
+  }
+
+  function buildExchangeContext(slug) {
+    const summary = tradeSummary(slug);
+    if (!summary.availableFrom.length && !summary.wantedBy.length) return null;
+    const box = document.createElement("div");
+    box.className = "pokemon-exchange-context";
+    if (summary.matchCount > 0) {
+      const line = document.createElement("p");
+      line.textContent = `Match possible avec ${formatNameList(summary.availableFrom)}.`;
+      box.append(line);
+    } else if (summary.availableFrom.length > 0) {
+      const line = document.createElement("p");
+      line.textContent = `Vu chez ${formatNameList(summary.availableFrom)}.`;
+      box.append(line);
+    }
+    if (summary.canHelpCount > 0) {
+      const line = document.createElement("p");
+      line.textContent = `${formatNameList(summary.wantedBy)} cherche ce Pokémon.`;
+      box.append(line);
+    }
+    return box;
+  }
+
   function listReturnHash() {
     const helper = ficheHelpers();
     if (typeof helper.listReturnHash === "function") {
@@ -202,19 +259,34 @@
       state: "not_met",
       shiny: false,
     };
+    const ownership = ownershipState(p.slug);
     const label = document.createElement("span");
     label.className = "fullview-hero__status-label";
-    label.textContent = statusLabel(status);
-    label.dataset.state = status.state;
+    label.textContent = ficheHelpers().ownershipLabel?.(ownership) || statusLabel(status);
+    label.dataset.state = ownership.duplicate
+      ? "duplicate"
+      : ownership.wanted
+        ? "wanted"
+        : ownership.caught
+          ? "owned"
+          : "none";
     section.append(label);
 
     const helper = ficheHelpers();
-    if (typeof helper.createStatusActions === "function") {
-      section.append(helper.createStatusActions(status, (patch) => {
-        window.PokedexCollection?.setStatus?.(p.slug, patch.state, patch.shiny);
+    if (typeof helper.createOwnershipActions === "function") {
+      section.append(helper.createOwnershipActions(ownership, async (next) => {
+        await window.PokedexCollection?.setPokemonOwnershipState?.(p.slug, next);
         renderInto(document.getElementById("viewPokemon"), p.slug);
       }));
     }
+    if (status.state === "seen") {
+      const legacy = document.createElement("p");
+      legacy.className = "pokemon-status-legacy";
+      legacy.textContent = "Vu manuel existant; les prochains statuts passent par Cherche, J'ai ou Double.";
+      section.append(legacy);
+    }
+    const exchange = buildExchangeContext(p.slug);
+    if (exchange) section.append(exchange);
 
     root.append(section);
   }
@@ -228,22 +300,9 @@
     huntLabel.className = "fullview-hero__status-label";
     huntLabel.textContent = hunt
       ? hunt.priority === "high" ? "Recherche prioritaire" : "Dans mes recherches"
-      : "Pas dans mes recherches";
+      : "Active Cherche pour l'ajouter au focus.";
     huntLabel.dataset.state = hunt ? "seen" : "not_met";
     huntBox.append(huntLabel);
-
-    const toggleHunt = document.createElement("button");
-    toggleHunt.type = "button";
-    toggleHunt.className = "fullview-status-btn";
-    toggleHunt.textContent = hunt ? "Retirer recherche" : "Rechercher";
-    toggleHunt.addEventListener("click", async () => {
-      await window.PokevaultHunts?.patch?.(
-        p.slug,
-        hunt ? { wanted: false } : { wanted: true, priority: "normal" },
-      );
-      renderInto(document.getElementById("viewPokemon"), p.slug);
-    });
-    huntBox.append(toggleHunt);
 
     const priorityHunt = document.createElement("button");
     priorityHunt.type = "button";
@@ -527,6 +586,7 @@
       await window.PokedexCollection.ensureLoaded();
     }
     await window.PokevaultHunts?.ensureLoaded?.();
+    await window.PokevaultTrainerContacts?.ensureLoaded?.();
     renderInto(root, slug);
     window.scrollTo({ top: 0, behavior: "instant" });
   }

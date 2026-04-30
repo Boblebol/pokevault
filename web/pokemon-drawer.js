@@ -39,6 +39,7 @@
   /** @type {{cards: number, sets: number} | null} */ let summaryCache = null;
   /** @type {Promise<object> | null} */ let summaryPromise = null;
   let huntsSubscribed = false;
+  let trainerContactsSubscribed = false;
 
   function ensureMarkup() {
     if (rootEl) return;
@@ -55,6 +56,12 @@
     if (!huntsSubscribed) {
       huntsSubscribed = true;
       window.PokevaultHunts?.subscribe?.(() => {
+        if (currentSlug) renderAll();
+      });
+    }
+    if (!trainerContactsSubscribed) {
+      trainerContactsSubscribed = true;
+      window.PokevaultTrainerContacts?.subscribe?.(() => {
         if (currentSlug) renderAll();
       });
     }
@@ -166,6 +173,63 @@
     return status.state === "caught"
       ? status.shiny ? "Attrapé shiny" : "Attrapé"
       : status.state === "seen" ? "Aperçu" : "Non rencontré";
+  }
+
+  function ownershipState(slug) {
+    const collection = window.PokedexCollection;
+    if (typeof collection?.ownershipStateForSlug === "function") {
+      return collection.ownershipStateForSlug(slug);
+    }
+    const helper = ficheHelpers();
+    if (typeof helper.ownershipStateFromSources === "function") {
+      return helper.ownershipStateFromSources(slug, {
+        status: collection?.getStatus?.(slug),
+        wanted: Boolean(window.PokevaultHunts?.isWanted?.(slug)),
+        ownCard: window.PokevaultTrainerContacts?.getOwnCard?.() || null,
+      });
+    }
+    const status = collection?.getStatus?.(slug) || { state: "not_met" };
+    return { wanted: false, caught: status.state === "caught", duplicate: false };
+  }
+
+  function tradeSummary(slug) {
+    try {
+      return window.PokedexCollection?.tradeSummaryForSlug?.(slug)
+        || window.PokevaultTrainerContacts?.tradeSummary?.(slug)
+        || { availableFrom: [], wantedBy: [], matchCount: 0, canHelpCount: 0 };
+    } catch {
+      return { availableFrom: [], wantedBy: [], matchCount: 0, canHelpCount: 0 };
+    }
+  }
+
+  function formatNameList(names) {
+    const clean = (Array.isArray(names) ? names : []).filter(Boolean);
+    if (!clean.length) return "";
+    if (clean.length === 1) return clean[0];
+    if (clean.length === 2) return `${clean[0]} et ${clean[1]}`;
+    return `${clean.slice(0, 2).join(", ")} +${clean.length - 2}`;
+  }
+
+  function buildExchangeContext(slug) {
+    const summary = tradeSummary(slug);
+    if (!summary.availableFrom.length && !summary.wantedBy.length) return null;
+    const box = document.createElement("div");
+    box.className = "pokemon-exchange-context";
+    if (summary.matchCount > 0) {
+      const line = document.createElement("p");
+      line.textContent = `Match possible avec ${formatNameList(summary.availableFrom)}.`;
+      box.append(line);
+    } else if (summary.availableFrom.length > 0) {
+      const line = document.createElement("p");
+      line.textContent = `Vu chez ${formatNameList(summary.availableFrom)}.`;
+      box.append(line);
+    }
+    if (summary.canHelpCount > 0) {
+      const line = document.createElement("p");
+      line.textContent = `${formatNameList(summary.wantedBy)} cherche ce Pokémon.`;
+      box.append(line);
+    }
+    return box;
   }
 
   function findForms(pokemon) {
@@ -656,18 +720,34 @@
     const section = createDrawerSection("pokedex_status", "Statut Pokédex");
     const status =
       window.PokedexCollection?.getStatus?.(slug) || { state: "not_met", shiny: false };
+    const ownership = ownershipState(slug);
     const label = document.createElement("span");
     label.className = "drawer-status-row__label";
-    label.textContent = statusLabel(status);
+    label.textContent = ficheHelpers().ownershipLabel?.(ownership) || statusLabel(status);
+    label.dataset.state = ownership.duplicate
+      ? "duplicate"
+      : ownership.wanted
+        ? "wanted"
+        : ownership.caught
+          ? "owned"
+          : "none";
     section.append(label);
 
     const helper = ficheHelpers();
-    if (typeof helper.createStatusActions === "function") {
-      section.append(helper.createStatusActions(status, (patch) => {
-        window.PokedexCollection?.setStatus?.(slug, patch.state, patch.shiny);
-        refreshStatus(slug);
+    if (typeof helper.createOwnershipActions === "function") {
+      section.append(helper.createOwnershipActions(ownership, async (next) => {
+        await window.PokedexCollection?.setPokemonOwnershipState?.(slug, next);
+        renderAll();
       }));
     }
+    if (status.state === "seen") {
+      const legacy = document.createElement("p");
+      legacy.className = "pokemon-status-legacy";
+      legacy.textContent = "Vu manuel existant; les prochains statuts passent par Cherche, J'ai ou Double.";
+      section.append(legacy);
+    }
+    const exchange = buildExchangeContext(slug);
+    if (exchange) section.append(exchange);
 
     return section;
   }
@@ -741,17 +821,8 @@
     label.className = "drawer-status-row__label";
     label.textContent = entry
       ? entry.priority === "high" ? "Priorite haute" : "Recherche active"
-      : "Pas dans tes recherches";
+      : "Active Cherche pour l'ajouter au focus.";
     row.append(label);
-
-    const toggle = document.createElement("button");
-    toggle.type = "button";
-    toggle.className = "drawer-status-row__btn";
-    toggle.textContent = entry ? "Retirer" : "Rechercher";
-    toggle.addEventListener("click", async () => {
-      await patchHunt(slug, entry ? { wanted: false } : { wanted: true, priority: "normal" });
-    });
-    row.append(toggle);
 
     const priority = document.createElement("button");
     priority.type = "button";
