@@ -81,6 +81,12 @@ def test_create_app_serves_static_and_api(tmp_path: Path) -> None:
     assert client.get("/api/binder/placements").status_code == 200
     assert client.get("/api/binder/placements").json() == {"version": 1, "by_binder": {}}
     assert client.get("/api/binder").json() == []
+    assert client.get("/api/trainers").status_code == 200
+    assert client.get("/api/trainers").json() == {
+        "version": 1,
+        "own_card": None,
+        "contacts": {},
+    }
     r_dex = client.get("/data/pokedex.json")
     assert r_dex.status_code == 200
     assert "max-age=86400" in r_dex.headers.get("cache-control", "").lower()

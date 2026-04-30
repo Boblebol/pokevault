@@ -16,6 +16,7 @@ from tracker.api.controllers import (
     profile_router,
     progress_router,
     tcg_router,
+    trainer_contact_router,
 )
 from tracker.config import TrackerSettings, get_settings
 from tracker.version import APP_VERSION
@@ -35,6 +36,7 @@ def create_app(settings: TrackerSettings | None = None) -> FastAPI:
     app.include_router(badge_router)
     app.include_router(profile_router)
     app.include_router(hunt_router)
+    app.include_router(trainer_contact_router)
     app.include_router(tcg_router)
     app.include_router(export_router)
     app.include_router(health_router)

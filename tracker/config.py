@@ -57,6 +57,11 @@ class TrackerSettings(BaseSettings):
         return self.data_dir / "collection-cards.json"
 
     @property
+    def trainer_contacts_path(self) -> Path:
+        """Cartes dresseur recues depuis des fichiers locaux."""
+        return self.data_dir / "trainer-contacts.json"
+
+    @property
     def profiles_registry_path(self) -> Path:
         """F15 — liste des profils Pokédex + profil actif."""
         return self.data_dir / "profiles.json"
