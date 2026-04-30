@@ -76,6 +76,20 @@ The v1.1 Pokédex-first home and richer Pokémon fiche work has shipped. The
 remaining active v1.1 track is carefully sourced Pokédex metadata, documented in
 [V1.1 Pokédex-First Backlog](V1_1_POKEDEX_FIRST.md).
 
+## Next Track — Dresseurs Local-First
+
+Trainer Cards add an optional local contact layer for collectors who want to
+exchange wishlists and trade lists without accounts, public profiles or server
+sync. The core Pokédex remains unchanged unless the user opens the Dresseurs
+tab.
+
+- v0.1: create "my Trainer Card", export it as a file and import a received
+  card into `data/trainer-contacts.json`.
+- v0.2: update an existing contact by stable `trainer_id`, preserve private
+  notes and show the last received update time.
+- v0.3: compare local wants and for-trade lists against the user's collection
+  without mutating progress, cards or binders.
+
 ---
 
 ## Critical dependencies

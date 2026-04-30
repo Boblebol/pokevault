@@ -126,3 +126,20 @@ def test_open_source_security_policy_exists() -> None:
     text = security.read_text(encoding="utf-8")
     assert "Security Policy" in text
     assert "GitHub Security Advisories" in text
+
+
+def test_trainer_contacts_are_documented_publicly() -> None:
+    guide = DOCS / "TRAINER_CONTACTS.md"
+    assert guide.is_file()
+
+    readme = (ROOT / "README.md").read_text(encoding="utf-8")
+    features = (DOCS / "features.html").read_text(encoding="utf-8")
+    roadmap = (DOCS / "roadmap.html").read_text(encoding="utf-8")
+    architecture = (DOCS / "architecture.html").read_text(encoding="utf-8")
+
+    assert "Trainer Cards" in readme
+    assert "data/trainer-contacts.json" in readme
+    assert "/api/trainers" in readme
+    assert "Trainer Cards" in features
+    assert "Dresseurs" in roadmap
+    assert "trainer-contacts.json" in architecture
