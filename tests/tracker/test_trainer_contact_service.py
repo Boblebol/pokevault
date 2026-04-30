@@ -7,7 +7,7 @@ from pathlib import Path
 import pytest
 from fastapi import HTTPException
 
-from tracker.models import TrainerCard, TrainerContactNotePatch
+from tracker.models import TrainerCard, TrainerContactLink, TrainerContactNotePatch
 from tracker.repository.json_trainer_contact_repository import JsonTrainerContactRepository
 from tracker.services.trainer_contact_service import TrainerContactService
 
@@ -36,6 +36,28 @@ def test_save_own_card_creates_stable_id_and_trims_fields(tmp_path: Path) -> Non
     assert service.export_own_card().trainer_id == "manual-id"
 
 
+def test_save_own_card_cleans_links_and_lists(tmp_path: Path) -> None:
+    service = TrainerContactService(JsonTrainerContactRepository(tmp_path / "trainers.json"))
+    card = _card().model_copy(
+        update={
+            "contact_links": [
+                TrainerContactLink(kind="discord", label="Discord", value="   "),
+                TrainerContactLink(kind="email", label=" Mail ", value=" alex@example.test "),
+            ],
+            "wants": [" 0001-bulbasaur ", "0001-bulbasaur", "", "0004-charmander"],
+            "for_trade": [" 0007-squirtle ", "0007-squirtle"],
+        },
+    )
+
+    saved = service.save_own_card(card)
+
+    assert len(saved.contact_links) == 1
+    assert saved.contact_links[0].label == "Mail"
+    assert saved.contact_links[0].value == "alex@example.test"
+    assert saved.wants == ["0001-bulbasaur", "0004-charmander"]
+    assert saved.for_trade == ["0007-squirtle"]
+
+
 def test_import_card_creates_then_updates_by_trainer_id(tmp_path: Path) -> None:
     service = TrainerContactService(JsonTrainerContactRepository(tmp_path / "trainers.json"))
 
@@ -62,6 +84,16 @@ def test_import_card_ignores_same_or_older_timestamp(tmp_path: Path) -> None:
     assert response.contact.card.display_name == "New"
 
 
+def test_import_card_rejects_blank_trainer_id_after_trim(tmp_path: Path) -> None:
+    service = TrainerContactService(JsonTrainerContactRepository(tmp_path / "trainers.json"))
+
+    with pytest.raises(HTTPException) as exc:
+        service.import_card(_card(trainer_id="        "))
+
+    assert exc.value.status_code == 400
+    assert exc.value.detail == "trainer_id is required"
+
+
 def test_private_note_is_local_and_survives_contact_update(tmp_path: Path) -> None:
     service = TrainerContactService(JsonTrainerContactRepository(tmp_path / "trainers.json"))
     service.import_card(_card())
@@ -73,6 +105,16 @@ def test_private_note_is_local_and_survives_contact_update(tmp_path: Path) -> No
 
     assert noted.private_note == "Vu au tournoi"
     assert service.get_book().contacts["trainer-123"].private_note == "Vu au tournoi"
+
+
+def test_patch_private_note_rejects_missing_contact(tmp_path: Path) -> None:
+    service = TrainerContactService(JsonTrainerContactRepository(tmp_path / "trainers.json"))
+
+    with pytest.raises(HTTPException) as exc:
+        service.patch_private_note("ghost", TrainerContactNotePatch(note="x"))
+
+    assert exc.value.status_code == 404
+    assert exc.value.detail == "trainer contact not found"
 
 
 def test_delete_contact_returns_count(tmp_path: Path) -> None:
@@ -93,6 +135,10 @@ def test_repository_tolerates_missing_malformed_and_invalid_files(tmp_path: Path
     invalid = tmp_path / "invalid.json"
     invalid.write_text('{"version": 1, "contacts": []}', encoding="utf-8")
     assert JsonTrainerContactRepository(invalid).load().contacts == {}
+
+    non_dict = tmp_path / "non-dict.json"
+    non_dict.write_text("[]", encoding="utf-8")
+    assert JsonTrainerContactRepository(non_dict).load().contacts == {}
 
 
 def test_export_own_card_requires_existing_card(tmp_path: Path) -> None:
