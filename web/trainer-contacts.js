@@ -108,6 +108,8 @@
   }
 
   async function saveOwnCard(card) {
+    const validationError = validateTrainerCard(card);
+    if (validationError) throw new Error(validationError);
     const res = await fetch(`${API_TRAINERS}/me`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
@@ -119,6 +121,8 @@
   }
 
   async function importCard(card) {
+    const validationError = validateTrainerCard(card);
+    if (validationError) throw new Error(validationError);
     const res = await fetch(`${API_TRAINERS}/import`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -134,6 +138,20 @@
     if (action === "created") return "créé";
     if (action === "updated") return "mis à jour";
     return "inchangé";
+  }
+
+  function validateTrainerCard(card) {
+    if (!String(card?.display_name || "").trim()) {
+      return "Ajoute un pseudo dresseur avant d'enregistrer.";
+    }
+    const trainerId = String(card?.trainer_id || "").trim();
+    if (trainerId.length < 8) {
+      return "Garde un identifiant stable d'au moins 8 caractères.";
+    }
+    if (trainerId.length > 80) {
+      return "L'identifiant stable doit faire 80 caractères maximum.";
+    }
+    return "";
   }
 
   function contactSearchText(contact) {
@@ -213,8 +231,8 @@
         </div>
       </div>
       <form class="trainer-card-form" data-trainer-form>
-        <input name="trainer_id" class="search-input" placeholder="Identifiant stable" value="${escapeAttr(cachedBook.own_card?.trainer_id || generateTrainerId())}">
-        <input name="display_name" class="search-input" placeholder="Pseudo dresseur" value="${escapeAttr(cachedBook.own_card?.display_name || "")}">
+        <input name="trainer_id" class="search-input" placeholder="Identifiant stable" minlength="8" maxlength="80" required value="${escapeAttr(cachedBook.own_card?.trainer_id || generateTrainerId())}">
+        <input name="display_name" class="search-input" placeholder="Pseudo dresseur" maxlength="64" required value="${escapeAttr(cachedBook.own_card?.display_name || "")}">
         <input name="favorite_region" class="search-input" placeholder="Région favorite" value="${escapeAttr(cachedBook.own_card?.favorite_region || "")}">
         <input name="favorite_pokemon_slug" class="search-input" placeholder="Pokémon favori (slug)" value="${escapeAttr(cachedBook.own_card?.favorite_pokemon_slug || "")}">
         <textarea name="public_note" class="search-input" placeholder="Note publique">${escapeText(cachedBook.own_card?.public_note || "")}</textarea>
@@ -420,7 +438,7 @@
         try {
           const card = normalizeCard(JSON.parse(reader.result));
           if (!card) throw new Error("Carte dresseur invalide");
-          void importCard(card);
+          void importCard(card).catch((err) => render(`Erreur : ${err.message}`));
         } catch (err) {
           render(`Fichier invalide : ${err.message}`);
         }
@@ -479,6 +497,7 @@
     api._test = {
       normalizeBook,
       cardFromForm,
+      validateTrainerCard,
       filterContacts,
       renderContact,
       notePatchRequest,

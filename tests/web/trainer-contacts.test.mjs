@@ -225,3 +225,36 @@ test("ensureOk reports failed API responses", async () => {
 
   await assert.rejects(api.ensureOk({ ok: false, status: 503 }), /HTTP 503/);
 });
+
+test("validateTrainerCard explains required display name before API calls", async () => {
+  const api = await loadModule();
+  const card = api.cardFromForm({
+    trainer_id: "trainer-123",
+    display_name: "   ",
+  });
+
+  assert.equal(api.validateTrainerCard(card), "Ajoute un pseudo dresseur avant d'enregistrer.");
+});
+
+test("validateTrainerCard explains stable id length before API calls", async () => {
+  const api = await loadModule();
+  const card = api.cardFromForm({
+    trainer_id: "abc",
+    display_name: "Alex",
+  });
+
+  assert.equal(
+    api.validateTrainerCard(card),
+    "Garde un identifiant stable d'au moins 8 caractères.",
+  );
+});
+
+test("validateTrainerCard accepts a complete local card", async () => {
+  const api = await loadModule();
+  const card = api.cardFromForm({
+    trainer_id: "trainer-123",
+    display_name: "Alex",
+  });
+
+  assert.equal(api.validateTrainerCard(card), "");
+});
