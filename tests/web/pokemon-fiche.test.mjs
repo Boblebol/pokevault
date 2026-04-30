@@ -158,6 +158,37 @@ test("ownershipPatchForAction keeps Double as a tradeable owned state", async ()
   assert.equal(api.ownershipPatchForAction({ wanted: true, caught: false, duplicate: false }, "duplicate"), "duplicate");
 });
 
+test("ownershipStateFromSources prioritizes Double and owned over searches", async () => {
+  const api = await loadModule();
+
+  assert.deepEqual(
+    api.ownershipStateFromSources("0130-gyarados", {
+      status: { state: "not_met", shiny: false },
+      wanted: true,
+      ownCard: { wants: ["0130-gyarados"], for_trade: [] },
+    }),
+    { wanted: true, caught: false, duplicate: false },
+  );
+
+  assert.deepEqual(
+    api.ownershipStateFromSources("0130-gyarados", {
+      status: { state: "caught", shiny: false },
+      wanted: true,
+      ownCard: { wants: ["0130-gyarados"], for_trade: [] },
+    }),
+    { wanted: false, caught: true, duplicate: false },
+  );
+
+  assert.deepEqual(
+    api.ownershipStateFromSources("0130-gyarados", {
+      status: { state: "seen", shiny: false },
+      wanted: true,
+      ownCard: { wants: ["0130-gyarados"], for_trade: ["0130-gyarados"] },
+    }),
+    { wanted: false, caught: true, duplicate: true },
+  );
+});
+
 test("statusPatchForAction prevents shiny from surviving non-caught states", async () => {
   const api = await loadModule();
 

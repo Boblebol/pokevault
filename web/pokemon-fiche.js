@@ -260,6 +260,26 @@
     return null;
   }
 
+  function listIncludesSlug(list, slug) {
+    const key = String(slug || "").trim();
+    if (!key || !Array.isArray(list)) return false;
+    return list.some((item) => String(item || "").trim() === key);
+  }
+
+  function ownershipStateFromSources(slug, options = {}) {
+    const key = String(slug || "").trim();
+    const status = normalizeStatus(options.status);
+    const ownCard = options.ownCard && typeof options.ownCard === "object"
+      ? options.ownCard
+      : {};
+    const duplicate = listIncludesSlug(ownCard.for_trade, key);
+    const caught = duplicate || status.state === "caught";
+    const wanted = !caught && !duplicate && (
+      Boolean(options.wanted) || listIncludesSlug(ownCard.wants, key)
+    );
+    return { wanted, caught, duplicate };
+  }
+
   function createOwnershipActions(state, onAction, options = {}) {
     const row = document.createElement("div");
     row.className = joinClasses("pokemon-ownership-actions", options.compact ? "is-compact" : "");
@@ -437,6 +457,7 @@
     normalizeNoteText,
     ownershipLabel,
     ownershipPatchForAction,
+    ownershipStateFromSources,
     parsePokemonRouteSlug,
     pokemonRouteHref,
     sectionDefinition,
