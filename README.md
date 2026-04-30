@@ -53,14 +53,16 @@ works immediately after install. Optional artwork caches are generated locally.
 ## What It Does
 
 - Scrapes and exports a National Pokédex reference from Pokepedia.
-- Tracks not-met, seen, caught and shiny status per Pokemon.
-- Opens Pokédex-first Pokémon fiches with direct status controls, linked forms,
+- Tracks Pokemon with simple `Cherche`, `J'ai` and `Double` actions, backed by
+  backward-compatible progress JSON.
+- Opens Pokédex-first Pokémon fiches with trade-oriented status controls, linked forms,
   personal notes and collapsible card details.
 - Attaches owned physical cards to Pokemon entries.
 - Searches the public Pokemon TCG API to prefill card metadata.
 - Models binder pages, grids and card placements.
 - Maintains multiple local collection profiles.
-- Creates and imports optional Trainer Cards with a searchable local contact book.
+- Creates and imports optional Trainer Cards with a searchable local contact book,
+  local `Vu chez` context and `Match` hints from exchanged `Double` lists.
 - Shows collection stats, badge progress and focus recommendations.
 - Exports/imports full local backups.
 - Prints binder or regional checklists.
@@ -134,8 +136,11 @@ The TCG catalog lookup uses the public [Pokemon TCG API](https://docs.pokemontcg
 Set `TRACKER_TCG_API_KEY` if you have an API key; the local card inventory stays
 in `data/collection-cards.json`.
 
-Trainer Cards are separate from full backups and never sync automatically. See
-[Trainer Cards](docs/TRAINER_CONTACTS.md) for the portable file format.
+Trainer Cards are separate from full backups and never sync automatically.
+`Double` marks a Pokemon as available in your exported Trainer Card, while
+`Cherche` feeds the local focus list. Imported cards can show `Vu chez` and
+`Match` context without a cloud account. See [Trainer Cards](docs/TRAINER_CONTACTS.md)
+for the portable file format.
 
 ## Docker
 

@@ -127,11 +127,14 @@
                 <button type="button" class="filter-btn" data-filter="missing" aria-pressed="false">
                   Manquants
                 </button>
+                <button type="button" class="filter-btn" data-filter="hunts" aria-pressed="false">
+                  Cherche
+                </button>
                 <button type="button" class="filter-btn" data-filter="seen" aria-pressed="false">
                   Vus
                 </button>
                 <button type="button" class="filter-btn" data-filter="caught" aria-pressed="false">
-                  Capturés
+                  J'ai
                 </button>
                 <button type="button" class="filter-btn filter-btn--bonus" data-filter="shiny" aria-pressed="false">
                   Shiny
@@ -562,12 +565,12 @@
           <p class="onboarding__kicker">Étape 1 · Objectif</p>
           <h3 class="onboarding__step-title">Compléter mon Pokédex.</h3>
           <p class="onboarding__lede">
-            Pokevault démarre sur la progression Pokédex : non rencontrés,
-            vus, capturés, puis les notes, formes et cartes quand tu en as besoin.
+            Pokevault démarre sur trois actions simples : Cherche, J'ai et
+            Double, puis les notes, formes et cartes quand tu en as besoin.
           </p>
           <ul class="onboarding__bullets">
             <li>1457 entrées Pokédex locales, formes incluses.</li>
-            <li>États <em>non rencontré</em>, <em>vu</em>, <em>capturé</em> et bonus shiny.</li>
+            <li><em>Cherche</em> alimente le focus, <em>Double</em> signale un échange possible.</li>
             <li>Tes données restent dans <code>data/</code>, exportables à tout moment.</li>
           </ul>
         </section>
@@ -601,14 +604,14 @@
           <p class="onboarding__kicker">Étape 3 · Mode de suivi</p>
           <h3 class="onboarding__step-title">Simple ou avancé ?</h3>
           <p class="onboarding__lede">
-            Simple garde la liste concentrée sur les statuts Pokédex. Avancé
-            rend les formes, shiny, notes, recherches et cartes plus visibles.
+            Simple garde la liste concentrée sur Cherche, J'ai et Double.
+            Avancé rend les formes, shiny, notes, Dresseurs et cartes plus visibles.
           </p>
           <div class="onboarding__choices" role="radiogroup" aria-label="Mode de suivi Pokédex">
             <label class="onboarding__choice">
               <input type="radio" name="onboardingTrackingMode" value="simple" checked />
               <span class="onboarding__choice-title">Simple</span>
-              <span class="onboarding__choice-sub">Non rencontré, vu, capturé. Les formes régionales restent disponibles.</span>
+              <span class="onboarding__choice-sub">Cherche, J'ai, Double. Les formes régionales restent disponibles.</span>
             </label>
             <label class="onboarding__choice">
               <input type="radio" name="onboardingTrackingMode" value="advanced" />
@@ -645,9 +648,8 @@
           <li><kbd>/</kbd><span>Focus la barre de recherche</span></li>
           <li><kbd>Esc</kbd><span>Vide / quitte la recherche ou la sélection</span></li>
           <li><kbd>j</kbd> / <kbd>k</kbd><span>Pokémon suivant / précédent</span></li>
-          <li><kbd>c</kbd><span>Cycle : non vu → aperçu → attrapé → non vu</span></li>
-          <li><kbd>Shift</kbd>+<kbd>C</kbd><span>Active / désactive le shiny (attrape si besoin)</span></li>
-          <li><kbd>Shift</kbd>+clic<span>Raccourci shiny à la souris</span></li>
+          <li><kbd>c</kbd><span>Marque J'ai, ou retire J'ai si déjà actif</span></li>
+          <li><kbd>Shift</kbd>+<kbd>C</kbd><span>Marque Double, ou repasse à J'ai</span></li>
           <li><kbd>i</kbd><span>Ouvre la fiche complète (drawer « Mes cartes »)</span></li>
           <li><kbd>?</kbd><span>Ouvre cette aide</span></li>
         </ul>

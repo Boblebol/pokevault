@@ -80,15 +80,16 @@ remaining active v1.1 track is carefully sourced Pokédex metadata, documented i
 
 Trainer Cards add an optional local contact layer for collectors who want to
 exchange wishlists and trade lists without accounts, public profiles or server
-sync. The core Pokédex remains unchanged unless the user opens the Dresseurs
-tab.
+sync. The base Pokédex stays simple: `Cherche`, `J'ai` and `Double` are the
+visible actions, and imported contacts only add derived `Vu chez` / `Match`
+context.
 
 - v0.1: create "my Trainer Card", export it as a file and import a received
   card into `data/trainer-contacts.json`.
 - v0.2: update an existing contact by stable `trainer_id`, preserve private
   notes, search the local contact book and delete stale contacts.
-- v0.3: compare local wants and for-trade lists against the user's collection
-  without mutating progress, cards or binders.
+- v0.3: compare local `Cherche` and `Double` lists against received cards,
+  showing `Vu chez` and `Match` hints without mutating progress, cards or binders.
 
 ---
 
@@ -242,6 +243,10 @@ Optional: F13 (themes) to make step 3 richer.
 
 > As a collector, I want to distinguish « seen », « caught » and « shiny »
 > instead of a simple on/off toggle.
+
+Current product note: the stored contract remains backward-compatible, but the
+main UI now exposes `Cherche`, `J'ai` and `Double`. Manual `seen` is legacy;
+`Vu chez` is derived from imported Trainer Cards.
 
 ### Acceptance
 - Click cycles: not-met → seen → caught → not-met.

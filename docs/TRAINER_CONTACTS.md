@@ -3,6 +3,17 @@
 Trainer Cards are optional local contact files for collectors who want to trade
 or compare wishlists without creating an account.
 
+The Pokédex UI uses three small Pokemon-oriented actions:
+
+- `Cherche`: this Pokemon is wanted and goes into the local focus list.
+- `J'ai`: this Pokemon is owned.
+- `Double`: this Pokemon is owned and can be offered for trade.
+
+`Double` is the only action that adds a Pokemon to the exported trade list.
+Imported cards never mutate collection progress automatically. They only add
+context such as `Vu chez` when another trainer has a Pokemon in `for_trade`,
+or `Match` when that Pokemon is also in the local `Cherche` list.
+
 The app stores received cards in `data/trainer-contacts.json` for the default
 profile, or `data/profiles/<id>/trainer-contacts.json` for additional profiles.
 The file is user state and is not versioned by Git.

@@ -148,3 +148,16 @@ def test_trainer_contacts_are_documented_publicly() -> None:
     assert "searchable local contact book" in features
     assert "Dresseurs" in roadmap
     assert "trainer-contacts.json" in architecture
+
+
+def test_trade_state_model_is_documented_publicly() -> None:
+    guide_text = (DOCS / "TRAINER_CONTACTS.md").read_text(encoding="utf-8")
+    readme = (ROOT / "README.md").read_text(encoding="utf-8")
+    features = (DOCS / "features.html").read_text(encoding="utf-8")
+    roadmap = (DOCS / "roadmap.html").read_text(encoding="utf-8")
+
+    for text in [guide_text, readme, features, roadmap]:
+        assert "Cherche" in text
+        assert "Double" in text
+    assert "Vu chez" in guide_text
+    assert "Match" in guide_text
