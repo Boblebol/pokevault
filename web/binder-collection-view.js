@@ -16,6 +16,7 @@ let shellInited = false;
 /** @type {(() => void) | null} */
 let unsubCaught = null;
 let shellDimSubbed = false;
+let shellTrainerContactsSubbed = false;
 
 function regionDefLabelBinder(defs, id) {
   const d = defs.find((r) => r && r.id === id);
@@ -417,6 +418,14 @@ function initBinderShell() {
   if (!shellDimSubbed) {
     shellDimSubbed = true;
     window.PokedexCollection?.subscribeDimMode?.(() => {
+      const cfg = shellState.cfg;
+      const empty = !cfg || !Array.isArray(cfg.binders) || !cfg.binders.length;
+      if (!empty) renderBinderPageGrid();
+    });
+  }
+  if (!shellTrainerContactsSubbed) {
+    shellTrainerContactsSubbed = true;
+    window.PokevaultTrainerContacts?.subscribe?.(() => {
       const cfg = shellState.cfg;
       const empty = !cfg || !Array.isArray(cfg.binders) || !cfg.binders.length;
       if (!empty) renderBinderPageGrid();

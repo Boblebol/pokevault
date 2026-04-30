@@ -345,27 +345,15 @@ function setStatus(slug, state, shiny = false) {
 }
 
 /**
- * F03 cycle : not_met → seen → caught → not_met.
- * `shiftPressed` shortcuts to/toggles the shiny flag.
+ * Backward-compatible shortcut entry point.
+ * Plain `c` toggles `J'ai`; Shift+C toggles `Double`.
  *
  * @param {string} slug
  * @param {{ shift?: boolean }} [opts]
  */
 function cycleStatusBySlug(slug, opts) {
   if (!slug) return;
-  const shift = Boolean(opts?.shift);
-  const current = getStatus(slug);
-  if (shift) {
-    if (current.state === "caught") {
-      setStatus(slug, "caught", !current.shiny);
-    } else {
-      setStatus(slug, "caught", true);
-    }
-    return;
-  }
-  if (current.state === "not_met") setStatus(slug, "seen");
-  else if (current.state === "seen") setStatus(slug, "caught");
-  else setStatus(slug, "not_met");
+  cycleOwnershipBySlug(slug, opts);
 }
 
 /** Legacy helper kept for binder/stats: toggles the `caught` bit only. */
@@ -377,6 +365,107 @@ function toggleCaughtBySlug(slug) {
   } else {
     setStatus(slug, "caught", current.shiny);
   }
+}
+
+function emptyTradeSummary() {
+  return { availableFrom: [], wantedBy: [], matchCount: 0, canHelpCount: 0 };
+}
+
+function tradeSummaryForSlug(slug) {
+  try {
+    return window.PokevaultTrainerContacts?.tradeSummary?.(slug) || emptyTradeSummary();
+  } catch {
+    return emptyTradeSummary();
+  }
+}
+
+function ownershipStateForSlug(slug) {
+  const key = String(slug || "").trim();
+  const fiche = window.PokevaultPokemonFiche;
+  if (fiche?.ownershipStateFromSources) {
+    return fiche.ownershipStateFromSources(key, {
+      status: getStatus(key),
+      wanted: Boolean(window.PokevaultHunts?.isWanted?.(key)),
+      ownCard: window.PokevaultTrainerContacts?.getOwnCard?.() || null,
+    });
+  }
+  const status = getStatus(key);
+  return { wanted: false, caught: status.state === "caught", duplicate: false };
+}
+
+async function setHuntWanted(slug, wanted) {
+  if (!window.PokevaultHunts?.patch) return;
+  const existing = window.PokevaultHunts.entry?.(slug);
+  await window.PokevaultHunts.patch(slug, {
+    wanted: Boolean(wanted),
+    priority: wanted ? existing?.priority || "normal" : "normal",
+    note: wanted ? existing?.note || "" : "",
+  });
+}
+
+async function setTrainerListMembership(slug, listName, enabled) {
+  if (!window.PokevaultTrainerContacts?.setOwnListMembership) return;
+  await window.PokevaultTrainerContacts.setOwnListMembership(slug, listName, enabled);
+}
+
+function showOwnershipSyncError(err) {
+  const hint = document.getElementById("syncHint");
+  if (hint) {
+    hint.textContent = `Action d'échange non synchronisée : ${err?.message || err || "erreur inconnue"}.`;
+    hint.hidden = false;
+  }
+}
+
+async function setPokemonOwnershipState(slug, nextState) {
+  const key = String(slug || "").trim();
+  if (!key) return;
+  const next = nextState === "wanted" || nextState === "owned" || nextState === "duplicate"
+    ? nextState
+    : "none";
+  const current = getStatus(key);
+  const tasks = [];
+
+  if (next === "wanted") {
+    setStatus(key, "not_met", false);
+    tasks.push(setHuntWanted(key, true));
+    tasks.push(setTrainerListMembership(key, "wants", true));
+    tasks.push(setTrainerListMembership(key, "for_trade", false));
+  } else if (next === "owned") {
+    setStatus(key, "caught", current.shiny);
+    tasks.push(setHuntWanted(key, false));
+    tasks.push(setTrainerListMembership(key, "wants", false));
+    tasks.push(setTrainerListMembership(key, "for_trade", false));
+  } else if (next === "duplicate") {
+    setStatus(key, "caught", current.shiny);
+    tasks.push(setHuntWanted(key, false));
+    tasks.push(setTrainerListMembership(key, "wants", false));
+    tasks.push(setTrainerListMembership(key, "for_trade", true));
+  } else {
+    setStatus(key, "not_met", false);
+    tasks.push(setHuntWanted(key, false));
+    tasks.push(setTrainerListMembership(key, "wants", false));
+    tasks.push(setTrainerListMembership(key, "for_trade", false));
+  }
+
+  try {
+    await Promise.all(tasks);
+  } catch (err) {
+    console.error("ownership update failed", err);
+    showOwnershipSyncError(err);
+  } finally {
+    resetDisplayedCount();
+    render();
+  }
+}
+
+function cycleOwnershipBySlug(slug, opts) {
+  if (!slug) return;
+  const current = ownershipStateForSlug(slug);
+  const shift = Boolean(opts?.shift);
+  const next = shift
+    ? current.duplicate ? "owned" : "duplicate"
+    : current.caught && !current.duplicate && !current.wanted ? "none" : "owned";
+  void setPokemonOwnershipState(slug, next);
 }
 
 /**
@@ -506,6 +595,10 @@ window.PokedexCollection = {
   getNote,
   setNote,
   cycleStatusBySlug,
+  cycleOwnershipBySlug,
+  ownershipStateForSlug,
+  setPokemonOwnershipState,
+  tradeSummaryForSlug,
   get statusMap() {
     return statusMap;
   },
@@ -1421,13 +1514,16 @@ function createPokemonCard(p, opts) {
   const caught = status.state === "caught";
   const seen = status.state === "seen";
   const shiny = caught && status.shiny;
+  const ownership = ownershipStateForSlug(key);
+  const tradeSummary = tradeSummaryForSlug(key);
+  const networkSeen = !caught && tradeSummary.availableFrom.length > 0;
+  const visualSeen = seen || networkSeen;
   const dim = getDimMode();
 
-  const card = document.createElement("button");
-  card.type = "button";
+  const card = document.createElement("article");
   const classParts = ["card"];
   if (caught) classParts.push("is-caught");
-  if (seen) classParts.push("is-seen");
+  if (visualSeen) classParts.push("is-seen");
   if (shiny) classParts.push("is-shiny");
   card.className = classParts.join(" ");
   if ((dim === "caught" && caught) || (dim === "missing" && !caught)) {
@@ -1435,14 +1531,20 @@ function createPokemonCard(p, opts) {
   }
   card.dataset.slug = key;
   card.dataset.status = status.state;
+  card.dataset.ownership = window.PokevaultPokemonFiche?.ownershipLabel?.(ownership) || "";
   if (shiny) card.dataset.shiny = "1";
-  card.setAttribute("aria-pressed", caught ? "true" : "false");
+  card.setAttribute("role", "group");
   const stateLabel = caught
     ? shiny ? ", attrapé shiny" : ", attrapé"
-    : seen ? ", aperçu" : ", non rencontré";
+    : visualSeen ? ", vu chez un dresseur" : ", recherché ou manquant";
+  const exchangeLabel = tradeSummary.matchCount > 0
+    ? `, ${tradeSummary.matchCount} match échange`
+    : tradeSummary.availableFrom.length > 0
+      ? `, vu chez ${tradeSummary.availableFrom.length} contact`
+      : "";
   card.setAttribute(
     "aria-label",
-    `${displayName(p)} ${displayNumber(p.number)}${stateLabel}`,
+    `${displayName(p)} ${displayNumber(p.number)}${stateLabel}${exchangeLabel}`,
   );
 
   const top = document.createElement("div");
@@ -1451,11 +1553,11 @@ function createPokemonCard(p, opts) {
   numEl.className = "card-num";
   numEl.textContent = displayNumber(p.number);
   const statusIcon = document.createElement("span");
-  const statusClass = caught ? "is-caught" : seen ? "is-seen" : "is-missing";
+  const statusClass = caught ? "is-caught" : visualSeen ? "is-seen" : "is-missing";
   statusIcon.className = `card-status-icon ${statusClass}`;
   statusIcon.textContent = caught
     ? (shiny ? "auto_awesome" : "check_circle")
-    : seen
+    : visualSeen
       ? "visibility"
       : "radio_button_unchecked";
   statusIcon.setAttribute("aria-hidden", "true");
@@ -1528,19 +1630,38 @@ function createPokemonCard(p, opts) {
 
   const action = document.createElement("div");
   action.className = "card-action";
-  const actionLabel = caught
-    ? shiny ? "Shiny — clic pour retirer" : "Attrapé — clic pour retirer"
-    : seen
-      ? "Aperçu — clic pour marquer attrapé"
-      : "Clic pour marquer aperçu";
-  action.textContent = actionLabel;
+  const ownershipActions = window.PokevaultPokemonFiche?.createOwnershipActions?.(
+    ownership,
+    (next) => {
+      void setPokemonOwnershipState(key, next);
+    },
+    { compact: true },
+  );
+  if (ownershipActions) action.append(ownershipActions);
+  else action.textContent = caught ? "J'ai" : "Je cherche";
   card.append(action);
 
-  const details = document.createElement("span");
+  const exchange = document.createElement("div");
+  exchange.className = "pokemon-network-row";
+  if (tradeSummary.matchCount > 0 || tradeSummary.availableFrom.length > 0) {
+    const badge = document.createElement("span");
+    badge.className = "pokemon-network-badge";
+    if (tradeSummary.matchCount > 0) {
+      badge.classList.add("is-match");
+      badge.textContent = `Match ${tradeSummary.matchCount}`;
+      badge.title = `Disponible chez ${tradeSummary.availableFrom.join(", ")}`;
+    } else {
+      badge.textContent = `Vu chez ${tradeSummary.availableFrom.length}`;
+      badge.title = tradeSummary.availableFrom.join(", ");
+    }
+    exchange.append(badge);
+  }
+  card.append(exchange);
+
+  const details = document.createElement("button");
+  details.type = "button";
   details.className = "card-details";
   details.textContent = "Fiche & cartes";
-  details.setAttribute("role", "button");
-  details.setAttribute("tabindex", "-1");
   details.setAttribute("aria-label", `Ouvrir la fiche de ${displayName(p)}`);
   details.addEventListener("click", (event) => {
     event.preventDefault();
@@ -1548,10 +1669,6 @@ function createPokemonCard(p, opts) {
     window.PokevaultDrawer?.open(key, card);
   });
   card.append(details);
-
-  card.addEventListener("click", (event) => {
-    cycleStatusBySlug(key, { shift: event.shiftKey });
-  });
 
   return card;
 }
@@ -1739,6 +1856,7 @@ let listDimSubscribed = false;
 let listHuntsSubscribed = false;
 let listCardsSubscribed = false;
 let listBadgesSubscribed = false;
+let listTrainerContactsSubscribed = false;
 
 function readStoredFormFilterMode() {
   try {
@@ -1783,6 +1901,11 @@ async function startTracker() {
   } catch {
     /* hunts are optional local state */
   }
+  try {
+    await window.PokevaultTrainerContacts?.ensureLoaded?.();
+  } catch {
+    /* trainer contacts are optional local state */
+  }
   applyFilterState(readFiltersFromHash());
   renderRegionChips();
   syncFilterControlsFromState();
@@ -1797,6 +1920,13 @@ async function startTracker() {
   if (!listHuntsSubscribed) {
     listHuntsSubscribed = true;
     window.PokevaultHunts?.subscribe?.(() => {
+      resetDisplayedCount();
+      render();
+    });
+  }
+  if (!listTrainerContactsSubscribed) {
+    listTrainerContactsSubscribed = true;
+    window.PokevaultTrainerContacts?.subscribe?.(() => {
       resetDisplayedCount();
       render();
     });

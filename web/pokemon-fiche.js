@@ -21,6 +21,11 @@
     { id: "caught", label: "Capturé", state: "caught" },
     { id: "shiny", label: "Shiny" },
   ];
+  const OWNERSHIP_ACTIONS = [
+    { id: "wanted", label: "Cherche" },
+    { id: "owned", label: "J'ai" },
+    { id: "duplicate", label: "Double" },
+  ];
 
   function buildFicheSectionPlan() {
     return SECTION_DEFINITIONS.map((section) => ({ ...section }));
@@ -218,6 +223,86 @@
     return null;
   }
 
+  function normalizeOwnershipState(state) {
+    return {
+      wanted: Boolean(state?.wanted),
+      caught: Boolean(state?.caught),
+      duplicate: Boolean(state?.duplicate),
+    };
+  }
+
+  function ownershipLabel(state) {
+    const clean = normalizeOwnershipState(state);
+    if (clean.duplicate) return "Double";
+    if (clean.wanted) return "Cherche";
+    if (clean.caught) return "J'ai";
+    return "Je n'ai pas";
+  }
+
+  function buildOwnershipActionModel(state) {
+    const clean = normalizeOwnershipState(state);
+    return OWNERSHIP_ACTIONS.map((action) => ({
+      ...action,
+      active: action.id === "duplicate"
+        ? clean.duplicate
+        : action.id === "wanted"
+          ? clean.wanted && !clean.duplicate
+          : clean.caught && !clean.wanted && !clean.duplicate,
+      disabled: false,
+    }));
+  }
+
+  function ownershipPatchForAction(state, actionId) {
+    const clean = normalizeOwnershipState(state);
+    if (actionId === "wanted") return clean.wanted && !clean.duplicate ? "none" : "wanted";
+    if (actionId === "owned") return clean.caught && !clean.wanted && !clean.duplicate ? "none" : "owned";
+    if (actionId === "duplicate") return clean.duplicate ? "owned" : "duplicate";
+    return null;
+  }
+
+  function listIncludesSlug(list, slug) {
+    const key = String(slug || "").trim();
+    if (!key || !Array.isArray(list)) return false;
+    return list.some((item) => String(item || "").trim() === key);
+  }
+
+  function ownershipStateFromSources(slug, options = {}) {
+    const key = String(slug || "").trim();
+    const status = normalizeStatus(options.status);
+    const ownCard = options.ownCard && typeof options.ownCard === "object"
+      ? options.ownCard
+      : {};
+    const duplicate = listIncludesSlug(ownCard.for_trade, key);
+    const caught = duplicate || status.state === "caught";
+    const wanted = !caught && !duplicate && (
+      Boolean(options.wanted) || listIncludesSlug(ownCard.wants, key)
+    );
+    return { wanted, caught, duplicate };
+  }
+
+  function createOwnershipActions(state, onAction, options = {}) {
+    const row = document.createElement("div");
+    row.className = joinClasses("pokemon-ownership-actions", options.compact ? "is-compact" : "");
+    for (const action of buildOwnershipActionModel(state)) {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "pokemon-trade-chip";
+      button.dataset.action = action.id;
+      button.dataset.active = action.active ? "true" : "false";
+      button.setAttribute("aria-pressed", action.active ? "true" : "false");
+      button.textContent = action.label;
+      button.addEventListener("click", (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        const next = ownershipPatchForAction(state, action.id);
+        if (!next) return;
+        if (typeof onAction === "function") onAction(next, action);
+      });
+      row.append(button);
+    }
+    return row;
+  }
+
   function createStatusActions(status, onAction) {
     const row = document.createElement("div");
     row.className = "pokemon-status-actions";
@@ -356,7 +441,9 @@
   const api = {
     buildFormEntries,
     buildFicheSectionPlan,
+    buildOwnershipActionModel,
     buildStatusActionModel,
+    createOwnershipActions,
     createStatusActions,
     createFicheSection,
     createCollapsibleBody,
@@ -368,6 +455,9 @@
     listReturnHash,
     normalizeImgPath,
     normalizeNoteText,
+    ownershipLabel,
+    ownershipPatchForAction,
+    ownershipStateFromSources,
     parsePokemonRouteSlug,
     pokemonRouteHref,
     sectionDefinition,

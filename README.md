@@ -53,14 +53,16 @@ works immediately after install. Optional artwork caches are generated locally.
 ## What It Does
 
 - Scrapes and exports a National Pokédex reference from Pokepedia.
-- Tracks not-met, seen, caught and shiny status per Pokemon.
-- Opens Pokédex-first Pokémon fiches with direct status controls, linked forms,
+- Tracks Pokemon with simple `Cherche`, `J'ai` and `Double` actions, backed by
+  backward-compatible progress JSON.
+- Opens Pokédex-first Pokémon fiches with trade-oriented status controls, linked forms,
   personal notes and collapsible card details.
 - Attaches owned physical cards to Pokemon entries.
 - Searches the public Pokemon TCG API to prefill card metadata.
 - Models binder pages, grids and card placements.
 - Maintains multiple local collection profiles.
-- Creates and imports optional Trainer Cards for local collector contacts.
+- Creates and imports optional Trainer Cards with a searchable local contact book,
+  local `Vu chez` context and `Match` hints from exchanged `Double` lists.
 - Shows collection stats, badge progress and focus recommendations.
 - Exports/imports full local backups.
 - Prints binder or regional checklists.
@@ -68,6 +70,23 @@ works immediately after install. Optional artwork caches are generated locally.
 
 Pokevault is an unofficial fan project. It is not affiliated with Nintendo,
 The Pokémon Company, Game Freak, Creatures, Poképédia or the Pokémon brand.
+
+## Local Trainer Card Exchange
+
+Trainer Cards are a manual file exchange, not a social network. You create your
+own card from the `Dresseurs` tab, export it, and send that file through any
+channel you already use. Another collector can do the same, and you import their
+file into your searchable local contact book.
+
+The exchange model stays close to the Pokedex:
+
+- `Cherche` marks Pokemon you want and feeds the focus list.
+- `Double` marks Pokemon you own twice and can offer for trade.
+- Imported cards can add `Vu chez` when another trainer has a duplicate, and
+  `Match` when that duplicate is also on your `Cherche` list.
+
+Trainer Cards never sync automatically and never overwrite collection progress.
+The full guide lives in [Trainer Cards](docs/TRAINER_CONTACTS.md).
 
 ## Screenshots
 
@@ -134,8 +153,11 @@ The TCG catalog lookup uses the public [Pokemon TCG API](https://docs.pokemontcg
 Set `TRACKER_TCG_API_KEY` if you have an API key; the local card inventory stays
 in `data/collection-cards.json`.
 
-Trainer Cards are separate from full backups and never sync automatically. See
-[Trainer Cards](docs/TRAINER_CONTACTS.md) for the portable file format.
+Trainer Cards are separate from full backups and never sync automatically.
+`Double` marks a Pokemon as available in your exported Trainer Card, while
+`Cherche` feeds the local focus list. Imported cards can show `Vu chez` and
+`Match` context without a cloud account. See [Trainer Cards](docs/TRAINER_CONTACTS.md)
+for the local exchange guide.
 
 ## Docker
 

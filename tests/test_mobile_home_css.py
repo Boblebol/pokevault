@@ -72,5 +72,38 @@ def test_trainer_contacts_are_optional_and_isolated() -> None:
     assert 'href="#/dresseurs"' in HTML
     assert 'id="viewDresseurs"' in HTML
     assert "trainer-shell" in CSS
+    assert "trainer-search" in CSS
+    assert "trainer-note-form" in CSS
+    assert "trainer-danger-btn" in CSS
+    assert "trainer-list-groups" in CSS
     dresseurs_view = HTML.split('id="viewDresseurs"', 1)[1].split('id="viewPrint"', 1)[0]
     assert "onboarding" not in dresseurs_view.lower()
+
+
+def test_trade_chips_have_dedicated_compact_styles() -> None:
+    expected_tokens = [
+        "pokemon-ownership-actions",
+        "pokemon-trade-chip",
+        "pokemon-network-row",
+        "pokemon-network-badge",
+        "pokemon-exchange-context",
+        "#viewClasseur .binder-page-grid--cards .pokemon-trade-chip",
+    ]
+    for token in expected_tokens:
+        assert token in CSS
+
+
+def test_onboarding_product_tour_covers_local_trade_workflow() -> None:
+    block = HTML.split('id="onboardingWizard"', 1)[1].split("</dialog>", 1)[0]
+
+    assert len(re.findall(r'<section class="onboarding__step\b', block)) == 5
+    for text in [
+        "Cherche",
+        "J'ai",
+        "Double",
+        "Vu chez",
+        "Match",
+        "Dresseurs",
+        "sans compte",
+    ]:
+        assert text in block

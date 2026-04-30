@@ -132,14 +132,46 @@ def test_trainer_contacts_are_documented_publicly() -> None:
     guide = DOCS / "TRAINER_CONTACTS.md"
     assert guide.is_file()
 
+    guide_text = guide.read_text(encoding="utf-8")
     readme = (ROOT / "README.md").read_text(encoding="utf-8")
     features = (DOCS / "features.html").read_text(encoding="utf-8")
     roadmap = (DOCS / "roadmap.html").read_text(encoding="utf-8")
     architecture = (DOCS / "architecture.html").read_text(encoding="utf-8")
 
+    assert "searchable local contact book" in guide_text
+    assert "private notes" in guide_text
     assert "Trainer Cards" in readme
     assert "data/trainer-contacts.json" in readme
     assert "/api/trainers" in readme
+    assert "searchable local contact book" in readme
     assert "Trainer Cards" in features
+    assert "searchable local contact book" in features
     assert "Dresseurs" in roadmap
     assert "trainer-contacts.json" in architecture
+
+
+def test_trade_state_model_is_documented_publicly() -> None:
+    guide_text = (DOCS / "TRAINER_CONTACTS.md").read_text(encoding="utf-8")
+    readme = (ROOT / "README.md").read_text(encoding="utf-8")
+    features = (DOCS / "features.html").read_text(encoding="utf-8")
+    roadmap = (DOCS / "roadmap.html").read_text(encoding="utf-8")
+
+    for text in [guide_text, readme, features, roadmap]:
+        assert "Cherche" in text
+        assert "Double" in text
+    assert "Vu chez" in guide_text
+    assert "Match" in guide_text
+
+
+def test_trainer_contacts_document_local_trade_workflow() -> None:
+    guide_text = (DOCS / "TRAINER_CONTACTS.md").read_text(encoding="utf-8")
+    for text in [
+        "Create your Trainer Card",
+        "Import a received card",
+        "Update a contact",
+        "Find a trade",
+        "without an account",
+        "`Vu chez`",
+        "`Match`",
+    ]:
+        assert text in guide_text
