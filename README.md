@@ -71,6 +71,23 @@ works immediately after install. Optional artwork caches are generated locally.
 Pokevault is an unofficial fan project. It is not affiliated with Nintendo,
 The Pokémon Company, Game Freak, Creatures, Poképédia or the Pokémon brand.
 
+## Local Trainer Card Exchange
+
+Trainer Cards are a manual file exchange, not a social network. You create your
+own card from the `Dresseurs` tab, export it, and send that file through any
+channel you already use. Another collector can do the same, and you import their
+file into your searchable local contact book.
+
+The exchange model stays close to the Pokedex:
+
+- `Cherche` marks Pokemon you want and feeds the focus list.
+- `Double` marks Pokemon you own twice and can offer for trade.
+- Imported cards can add `Vu chez` when another trainer has a duplicate, and
+  `Match` when that duplicate is also on your `Cherche` list.
+
+Trainer Cards never sync automatically and never overwrite collection progress.
+The full guide lives in [Trainer Cards](docs/TRAINER_CONTACTS.md).
+
 ## Screenshots
 
 <table>
@@ -140,7 +157,7 @@ Trainer Cards are separate from full backups and never sync automatically.
 `Double` marks a Pokemon as available in your exported Trainer Card, while
 `Cherche` feeds the local focus list. Imported cards can show `Vu chez` and
 `Match` context without a cloud account. See [Trainer Cards](docs/TRAINER_CONTACTS.md)
-for the portable file format.
+for the local exchange guide.
 
 ## Docker
 

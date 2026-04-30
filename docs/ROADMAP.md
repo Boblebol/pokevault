@@ -82,7 +82,8 @@ Trainer Cards add an optional local contact layer for collectors who want to
 exchange wishlists and trade lists without accounts, public profiles or server
 sync. The base Pokédex stays simple: `Cherche`, `J'ai` and `Double` are the
 visible actions, and imported contacts only add derived `Vu chez` / `Match`
-context.
+context. The first-run product tour introduces that model as a manual file
+exchange, so the feature stays visible without becoming required.
 
 - v0.1: create "my Trainer Card", export it as a file and import a received
   card into `data/trainer-contacts.json`.

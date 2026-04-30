@@ -161,3 +161,17 @@ def test_trade_state_model_is_documented_publicly() -> None:
         assert "Double" in text
     assert "Vu chez" in guide_text
     assert "Match" in guide_text
+
+
+def test_trainer_contacts_document_local_trade_workflow() -> None:
+    guide_text = (DOCS / "TRAINER_CONTACTS.md").read_text(encoding="utf-8")
+    for text in [
+        "Create your Trainer Card",
+        "Import a received card",
+        "Update a contact",
+        "Find a trade",
+        "without an account",
+        "`Vu chez`",
+        "`Match`",
+    ]:
+        assert text in guide_text
