@@ -6,6 +6,7 @@
 
   const API_TRAINERS = "/api/trainers";
   let cachedBook = { version: 1, own_card: null, contacts: {} };
+  let activeSearch = "";
   let started = false;
 
   function normalizeList(raw) {
@@ -135,6 +136,58 @@
     return "inchangé";
   }
 
+  function contactSearchText(contact) {
+    const card = contact?.card || {};
+    return [
+      card.display_name,
+      card.favorite_region,
+      card.favorite_pokemon_slug,
+      card.public_note,
+      contact?.private_note,
+      ...(card.contact_links || []).flatMap((link) => [link.label, link.value]),
+      ...(card.wants || []),
+      ...(card.for_trade || []),
+    ].join(" ").toLowerCase();
+  }
+
+  function filterContacts(contacts, query) {
+    const needle = String(query || "").trim().toLowerCase();
+    return Object.values(contacts || {})
+      .filter((contact) => !needle || contactSearchText(contact).includes(needle))
+      .sort((a, b) => a.card.display_name.localeCompare(b.card.display_name, "fr"));
+  }
+
+  function notePatchPayload(value) {
+    return { note: String(value || "").trim() };
+  }
+
+  function notePatchRequest(trainerId, note) {
+    return {
+      url: `${API_TRAINERS}/${encodeURIComponent(trainerId)}/note`,
+      init: {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(notePatchPayload(note)),
+      },
+    };
+  }
+
+  function deleteContactRequest(trainerId) {
+    return {
+      url: `${API_TRAINERS}/${encodeURIComponent(trainerId)}`,
+      init: { method: "DELETE" },
+    };
+  }
+
+  async function ensureOk(res) {
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return res;
+  }
+
+  function shouldDeleteContact(name, confirmFn = window.confirm) {
+    return confirmFn(`Supprimer ${name} du carnet local ?`);
+  }
+
   function render(message = "") {
     const root = document.getElementById("trainerContactsRoot");
     if (!root) return;
@@ -192,6 +245,8 @@
   function renderContactList() {
     const section = document.createElement("section");
     section.className = "trainer-panel";
+    const contacts = filterContacts(cachedBook.contacts, activeSearch);
+    const hasContacts = Object.keys(cachedBook.contacts || {}).length > 0;
     section.innerHTML = `
       <div class="trainer-panel-head">
         <div>
@@ -199,16 +254,19 @@
           <p class="stats-kpi-sub">Les fiches reçues restent dans ce profil local.</p>
         </div>
       </div>
+      <label class="trainer-search">
+        <span>Rechercher</span>
+        <input name="trainer_search" class="search-input" placeholder="Pseudo, région, note, Pokémon..." value="${escapeAttr(activeSearch)}" data-trainer-search>
+      </label>
     `;
     const list = document.createElement("div");
     list.className = "trainer-contact-list";
-    const contacts = Object.values(cachedBook.contacts).sort((a, b) =>
-      a.card.display_name.localeCompare(b.card.display_name, "fr"),
-    );
     if (!contacts.length) {
       const empty = document.createElement("p");
-      empty.className = "stats-kpi-sub";
-      empty.textContent = "Aucune carte reçue pour le moment.";
+      empty.className = "trainer-empty";
+      empty.textContent = hasContacts
+        ? "Aucun contact ne correspond à cette recherche."
+        : "Aucune carte reçue pour le moment.";
       list.append(empty);
     }
     for (const contact of contacts) list.append(renderContact(contact));
@@ -219,17 +277,79 @@
   function renderContact(contact) {
     const article = document.createElement("article");
     article.className = "trainer-contact-card";
+    const wants = renderTagGroup("Cherche", contact.card.wants);
+    const trades = renderTagGroup("Echange", contact.card.for_trade);
+    const links = renderContactLinks(contact.card.contact_links);
     article.innerHTML = `
-      <h2>${escapeText(contact.card.display_name)}</h2>
-      <p>${escapeText(contact.card.public_note || "Carte dresseur locale")}</p>
+      <div class="trainer-contact-card-head">
+        <div>
+          <h2>${escapeText(contact.card.display_name)}</h2>
+          <p>${escapeText(contact.card.public_note || "Carte dresseur locale")}</p>
+        </div>
+        <button type="button" class="trainer-danger-btn" data-trainer-delete data-trainer-id="${escapeAttr(contact.card.trainer_id)}" data-trainer-name="${escapeAttr(contact.card.display_name)}">
+          <span class="material-symbols-outlined" aria-hidden="true">delete</span>
+          Supprimer
+        </button>
+      </div>
       <p class="stats-kpi-sub">MAJ reçue : ${escapeText(formatDate(contact.last_received_at))}</p>
       <dl class="trainer-contact-meta">
-        <div><dt>Région</dt><dd>${escapeText(contact.card.favorite_region || "—")}</dd></div>
-        <div><dt>Favori</dt><dd>${escapeText(contact.card.favorite_pokemon_slug || "—")}</dd></div>
+        <div><dt>Région</dt><dd>${escapeText(contact.card.favorite_region || "-")}</dd></div>
+        <div><dt>Favori</dt><dd>${escapeText(contact.card.favorite_pokemon_slug || "-")}</dd></div>
       </dl>
-      <p class="trainer-tags">${escapeText((contact.card.wants || []).join(" · "))}</p>
+      ${links}
+      <div class="trainer-list-groups">
+        ${wants}
+        ${trades}
+      </div>
+      <form class="trainer-note-form" data-trainer-note-form data-trainer-id="${escapeAttr(contact.card.trainer_id)}">
+        <label>
+          <span>Note privée</span>
+          <textarea class="search-input" name="private_note" placeholder="Visible seulement dans ce carnet local.">${escapeText(contact.private_note || "")}</textarea>
+        </label>
+        <button type="submit" class="settings-action-btn">
+          <span class="material-symbols-outlined" aria-hidden="true">save</span>
+          Enregistrer la note
+        </button>
+      </form>
     `;
     return article;
+  }
+
+  function renderTagGroup(title, items) {
+    const clean = normalizeList(items);
+    if (!clean.length) {
+      return `<div class="trainer-tag-group"><h3>${title}</h3><p class="stats-kpi-sub">Rien indiqué.</p></div>`;
+    }
+    return `
+      <div class="trainer-tag-group">
+        <h3>${title}</h3>
+        <ul>${clean.map((item) => `<li>${escapeText(item)}</li>`).join("")}</ul>
+      </div>
+    `;
+  }
+
+  function renderContactLinks(links) {
+    const clean = Array.isArray(links) ? links.filter((link) => link.value) : [];
+    if (!clean.length) return "";
+    return `
+      <ul class="trainer-contact-links">
+        ${clean.map((link) => `<li><span>${escapeText(link.label || link.kind || "Contact")}</span>${escapeText(link.value)}</li>`).join("")}
+      </ul>
+    `;
+  }
+
+  async function savePrivateNote(trainerId, note) {
+    const request = notePatchRequest(trainerId, note);
+    await ensureOk(await fetch(request.url, request.init));
+    await loadBook();
+    render("Note privée enregistrée.");
+  }
+
+  async function deleteTrainerContact(trainerId) {
+    const request = deleteContactRequest(trainerId);
+    await ensureOk(await fetch(request.url, request.init));
+    await loadBook();
+    render("Contact supprimé.");
   }
 
   function wire(root) {
@@ -243,6 +363,31 @@
     root.querySelector("[data-trainer-import]")?.addEventListener("click", () => {
       document.getElementById("trainerImportFileInput")?.click();
     });
+    root.querySelector("[data-trainer-search]")?.addEventListener("input", (event) => {
+      activeSearch = event.target.value;
+      render();
+      requestAnimationFrame(() => {
+        const input = document.querySelector?.("[data-trainer-search]");
+        input?.focus?.();
+        input?.setSelectionRange?.(activeSearch.length, activeSearch.length);
+      });
+    });
+    for (const noteForm of root.querySelectorAll("[data-trainer-note-form]")) {
+      noteForm.addEventListener("submit", (event) => {
+        event.preventDefault();
+        const trainerId = noteForm.dataset.trainerId || "";
+        const note = new FormData(noteForm).get("private_note");
+        void savePrivateNote(trainerId, note).catch((err) => render(`Erreur : ${err.message}`));
+      });
+    }
+    for (const button of root.querySelectorAll("[data-trainer-delete]")) {
+      button.addEventListener("click", () => {
+        const trainerId = button.dataset.trainerId || "";
+        const name = button.dataset.trainerName || "ce contact";
+        if (!shouldDeleteContact(name)) return;
+        void deleteTrainerContact(trainerId).catch((err) => render(`Erreur : ${err.message}`));
+      });
+    }
   }
 
   function exportFile() {
@@ -330,6 +475,17 @@
   }
 
   const api = { start, normalizeBook, cardFromForm };
-  if (window.__POKEVAULT_TRAINERS_TESTS__) api._test = { normalizeBook, cardFromForm };
+  if (window.__POKEVAULT_TRAINERS_TESTS__) {
+    api._test = {
+      normalizeBook,
+      cardFromForm,
+      filterContacts,
+      renderContact,
+      notePatchRequest,
+      deleteContactRequest,
+      shouldDeleteContact,
+      ensureOk,
+    };
+  }
   window.PokevaultTrainerContacts = api;
 })();
