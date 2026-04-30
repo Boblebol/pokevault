@@ -91,3 +91,19 @@ def test_trade_chips_have_dedicated_compact_styles() -> None:
     ]
     for token in expected_tokens:
         assert token in CSS
+
+
+def test_onboarding_product_tour_covers_local_trade_workflow() -> None:
+    block = HTML.split('id="onboardingWizard"', 1)[1].split("</dialog>", 1)[0]
+
+    assert len(re.findall(r'<section class="onboarding__step\b', block)) == 5
+    for text in [
+        "Cherche",
+        "J'ai",
+        "Double",
+        "Vu chez",
+        "Match",
+        "Dresseurs",
+        "sans compte",
+    ]:
+        assert text in block

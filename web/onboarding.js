@@ -1,10 +1,12 @@
 /**
  * Onboarding wizard (F00).
  *
- * Three-step intro dialog that:
+ * Five-step intro dialog that:
  *   1. Positions Pokevault as a Pokédex-first tracker ;
- *   2. Captures the favorite region ;
- *   3. Captures simple or advanced tracking mode.
+ *   2. Explains optional local Trainer Card trade matching ;
+ *   3. Captures the favorite region ;
+ *   4. Captures simple or advanced tracking mode ;
+ *   5. Clarifies the local-first file workflow.
  *
  * The result is persisted under `localStorage["pokevault.ui.profile"]`
  * with the shape :
@@ -27,7 +29,7 @@
   const PREFERRED_REGION_STORAGE_KEY = "pokedexPreferredRegion";
   const FORM_FILTER_STORAGE_KEY = "pokedexFormFilter";
   const DIM_STORAGE_KEY = "pokedexDimMode";
-  const TOTAL_STEPS = 3;
+  const TOTAL_STEPS = 5;
 
   const REGION_LABELS = {
     all: "National",

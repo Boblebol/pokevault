@@ -558,25 +558,41 @@
           <li class="onboarding__dot is-active" data-step-dot="1"></li>
           <li class="onboarding__dot" data-step-dot="2"></li>
           <li class="onboarding__dot" data-step-dot="3"></li>
+          <li class="onboarding__dot" data-step-dot="4"></li>
+          <li class="onboarding__dot" data-step-dot="5"></li>
         </ol>
 
         <section class="onboarding__step is-active" data-step="1">
           <input type="hidden" id="onboardingGoal" name="onboardingGoal" value="complete_pokedex" />
-          <p class="onboarding__kicker">Étape 1 · Objectif</p>
-          <h3 class="onboarding__step-title">Compléter mon Pokédex.</h3>
+          <p class="onboarding__kicker">Étape 1 · Pokédex</p>
+          <h3 class="onboarding__step-title">Suivre mes Pokémon.</h3>
           <p class="onboarding__lede">
-            Pokevault démarre sur trois actions simples : Cherche, J'ai et
-            Double, puis les notes, formes et cartes quand tu en as besoin.
+            Pokevault démarre sur trois actions simples et lisibles dans la
+            liste, les fiches et les classeurs.
           </p>
           <ul class="onboarding__bullets">
-            <li>1457 entrées Pokédex locales, formes incluses.</li>
-            <li><em>Cherche</em> alimente le focus, <em>Double</em> signale un échange possible.</li>
-            <li>Tes données restent dans <code>data/</code>, exportables à tout moment.</li>
+            <li><em>Cherche</em> marque ce qu'il te manque et alimente le focus.</li>
+            <li><em>J'ai</em> confirme ta progression Pokédex.</li>
+            <li><em>Double</em> dit que tu peux proposer ce Pokémon en échange.</li>
           </ul>
         </section>
 
         <section class="onboarding__step" data-step="2" hidden>
-          <p class="onboarding__kicker">Étape 2 · Région favorite</p>
+          <p class="onboarding__kicker">Étape 2 · Échanges locaux</p>
+          <h3 class="onboarding__step-title">Voir les opportunités.</h3>
+          <p class="onboarding__lede">
+            Les Dresseurs sont optionnels : tu importes une carte reçue, et
+            Pokevault compare son Pokédex au tien sans rien modifier tout seul.
+          </p>
+          <ul class="onboarding__bullets">
+            <li><em>Vu chez</em> apparaît quand un Dresseur a ce Pokémon en double.</li>
+            <li><em>Match</em> apparaît si ce double correspond à ton <em>Cherche</em>.</li>
+            <li>Les contacts restent dans ton classeur local de Dresseurs.</li>
+          </ul>
+        </section>
+
+        <section class="onboarding__step" data-step="3" hidden>
+          <p class="onboarding__kicker">Étape 3 · Région favorite</p>
           <h3 class="onboarding__step-title">Par où tu veux commencer ?</h3>
           <p class="onboarding__lede">
             Ce choix oriente la première liste. Tu pourras toujours revenir au
@@ -600,8 +616,8 @@
           </label>
         </section>
 
-        <section class="onboarding__step" data-step="3" hidden>
-          <p class="onboarding__kicker">Étape 3 · Mode de suivi</p>
+        <section class="onboarding__step" data-step="4" hidden>
+          <p class="onboarding__kicker">Étape 4 · Mode de suivi</p>
           <h3 class="onboarding__step-title">Simple ou avancé ?</h3>
           <p class="onboarding__lede">
             Simple garde la liste concentrée sur Cherche, J'ai et Double.
@@ -623,6 +639,21 @@
             Les cartes TCG restent un add-on : la fiche garde statut, formes et
             notes en premier, puis replie les cartes longues.
           </p>
+        </section>
+
+        <section class="onboarding__step" data-step="5" hidden>
+          <p class="onboarding__kicker">Étape 5 · Données locales</p>
+          <h3 class="onboarding__step-title">Garder chacun son fichier.</h3>
+          <p class="onboarding__lede">
+            Pokevault reste utilisable sans compte, sans cloud et sans serveur
+            de synchronisation. Tu choisis quand exporter, importer ou mettre à
+            jour une carte de Dresseur.
+          </p>
+          <ul class="onboarding__bullets">
+            <li>Ton Pokédex reste dans <code>data/</code> et peut être sauvegardé.</li>
+            <li>Une carte envoyée ne contient que ce que tu as décidé de partager.</li>
+            <li>Une nouvelle carte reçue met à jour le contact local si elle est plus récente.</li>
+          </ul>
         </section>
 
         <footer class="onboarding__footer">
