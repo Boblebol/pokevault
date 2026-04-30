@@ -30,6 +30,7 @@ Thumbs.db
 # IDE / AI tooling (may contain API keys)
 .cursor/mcp.json
 .claude/
+.superpowers/
 .worktrees/
 .idea/
 .vscode/
