@@ -254,6 +254,80 @@ class HuntPatch(BaseModel):
     note: str = Field(default="", max_length=280)
 
 
+TrainerContactMethod = Literal["email", "phone", "discord", "website", "other"]
+
+
+class TrainerContactLink(BaseModel):
+    """Optional public contact line included in a portable Trainer Card."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    kind: TrainerContactMethod = "other"
+    label: str = Field(default="", max_length=32)
+    value: str = Field(default="", max_length=160)
+
+
+class TrainerCard(BaseModel):
+    """Portable local-first card shared manually between collectors."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    schema_version: Literal[1] = 1
+    app: Literal["pokevault"] = "pokevault"
+    kind: Literal["trainer_card"] = "trainer_card"
+    trainer_id: str = Field(min_length=8, max_length=80)
+    display_name: str = Field(min_length=1, max_length=64)
+    favorite_region: str = Field(default="", max_length=32)
+    favorite_pokemon_slug: str = Field(default="", max_length=80)
+    public_note: str = Field(default="", max_length=280)
+    contact_links: list[TrainerContactLink] = Field(default_factory=list, max_length=6)
+    wants: list[str] = Field(default_factory=list, max_length=40)
+    for_trade: list[str] = Field(default_factory=list, max_length=40)
+    updated_at: str
+
+
+class TrainerContact(BaseModel):
+    """A received Trainer Card plus local-only metadata."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    card: TrainerCard
+    private_note: str = Field(default="", max_length=500)
+    first_received_at: str
+    last_received_at: str
+
+
+class TrainerContactBook(BaseModel):
+    """Persisted shape of local trainer contacts."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    version: Literal[1] = 1
+    own_card: TrainerCard | None = None
+    contacts: dict[str, TrainerContact] = Field(default_factory=dict)
+
+
+class TrainerContactImportResponse(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    ok: bool = True
+    action: Literal["created", "updated", "unchanged"]
+    contact: TrainerContact
+
+
+class TrainerContactNotePatch(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    note: str = Field(default="", max_length=500)
+
+
+class DeleteResponse(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    ok: bool = True
+    deleted: int = Field(ge=0)
+
+
 class ExportPayload(BaseModel):
     """Full collection export — wraps progress + binder config + placements + cards."""
 

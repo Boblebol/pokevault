@@ -7,6 +7,7 @@ from .hunt_controller import router as hunt_router
 from .profile_controller import router as profile_router
 from .progress_controller import router as progress_router
 from .tcg_controller import router as tcg_router
+from .trainer_contact_controller import router as trainer_contact_router
 
 __all__ = [
     "badge_router",
@@ -18,4 +19,5 @@ __all__ = [
     "profile_router",
     "progress_router",
     "tcg_router",
+    "trainer_contact_router",
 ]

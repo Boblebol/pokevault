@@ -26,6 +26,7 @@
         <nav class="stitch-topnav">
           <a href="#/liste" class="app-switch-link is-active" data-view="liste" aria-current="page">Collection</a>
           <a href="#/classeur" class="app-switch-link" data-view="classeur">Classeurs</a>
+          <a href="#/dresseurs" class="app-switch-link" data-view="dresseurs">Dresseurs</a>
           <a href="#/print" class="app-switch-link" data-view="print">Impression</a>
           <a href="#/stats" class="app-switch-link" data-view="stats">Statistiques</a>
           <a href="#/settings" class="app-switch-link" data-view="settings">Réglages</a>
@@ -310,6 +311,15 @@
             </div>
           </div>
         </section>
+      </div>
+
+      <div id="viewDresseurs" class="app-view" hidden>
+        <header class="header binder-header app-collection-header">
+          <h1 class="title title-binder">Dresseurs</h1>
+          <p class="collection-subtitle">Cartes dresseur locales, importées par fichier, sans compte ni serveur.</p>
+        </header>
+        <section class="trainer-shell" id="trainerContactsRoot" aria-label="Contacts dresseurs"></section>
+        <input type="file" id="trainerImportFileInput" accept=".json,.pokevault.json,.pokevault-trainer.json" hidden />
       </div>
 
       <div id="viewPrint" class="app-view" hidden>
@@ -694,6 +704,7 @@
     <script src="/recommendations.js" defer></script>
     <script src="/pokedex-next-actions.js" defer></script>
     <script src="/pokedex-dashboard.js" defer></script>
+    <script src="/trainer-contacts.js" defer></script>
     <script src="/app.js" defer></script>
     <script src="/focus-session.js" defer></script>
     <script src="/binder-collection-view.js" defer></script>

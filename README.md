@@ -60,6 +60,7 @@ works immediately after install. Optional artwork caches are generated locally.
 - Searches the public Pokemon TCG API to prefill card metadata.
 - Models binder pages, grids and card placements.
 - Maintains multiple local collection profiles.
+- Creates and imports optional Trainer Cards for local collector contacts.
 - Shows collection stats, badge progress and focus recommendations.
 - Exports/imports full local backups.
 - Prints binder or regional checklists.
@@ -107,6 +108,7 @@ User state is local and ignored by Git:
 - `data/hunts.json`
 - `data/binder-config.json`
 - `data/binder-placements.json`
+- `data/trainer-contacts.json`
 - `data/profiles.json`
 - `data/profiles/<id>/...`
 
@@ -122,6 +124,7 @@ The local API is mounted next to the web UI:
 | `/api/hunts` | Active search targets |
 | `/api/badges` | Badge catalog and progress |
 | `/api/profiles` | Local collection profiles |
+| `/api/trainers` | Optional local Trainer Cards and received contacts |
 | `/api/binder/*` | Binder configuration and placements |
 | `/api/tcg/cards/search` | Pokemon TCG catalog search for card prefill |
 | `/api/export` | Full backup export |
@@ -130,6 +133,9 @@ The local API is mounted next to the web UI:
 The TCG catalog lookup uses the public [Pokemon TCG API](https://docs.pokemontcg.io/).
 Set `TRACKER_TCG_API_KEY` if you have an API key; the local card inventory stays
 in `data/collection-cards.json`.
+
+Trainer Cards are separate from full backups and never sync automatically. See
+[Trainer Cards](docs/TRAINER_CONTACTS.md) for the portable file format.
 
 ## Docker
 

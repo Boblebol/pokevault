@@ -66,3 +66,11 @@ def test_mobile_home_keeps_touch_targets_usable() -> None:
 
     min_heights = re.findall(r"min-height:\s*(\d+)px", block)
     assert any(int(value) >= 44 for value in min_heights)
+
+
+def test_trainer_contacts_are_optional_and_isolated() -> None:
+    assert 'href="#/dresseurs"' in HTML
+    assert 'id="viewDresseurs"' in HTML
+    assert "trainer-shell" in CSS
+    dresseurs_view = HTML.split('id="viewDresseurs"', 1)[1].split('id="viewPrint"', 1)[0]
+    assert "onboarding" not in dresseurs_view.lower()

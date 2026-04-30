@@ -104,6 +104,9 @@ class ProfileService:
     def hunts_path(self, profile_id: str | None = None) -> Path:
         return self._path_for(profile_id, "hunts.json")
 
+    def trainer_contacts_path(self, profile_id: str | None = None) -> Path:
+        return self._path_for(profile_id, "trainer-contacts.json")
+
     def _path_for(self, profile_id: str | None, filename: str) -> Path:
         pid = profile_id or self.active_id()
         if pid == DEFAULT_ID:

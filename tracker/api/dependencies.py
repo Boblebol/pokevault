@@ -13,12 +13,14 @@ from tracker.repository.base import (
     CardRepository,
     HuntRepository,
     ProgressRepository,
+    TrainerContactRepository,
 )
 from tracker.repository.json_binder_config_repository import JsonBinderConfigRepository
 from tracker.repository.json_binder_placements_repository import JsonBinderPlacementsRepository
 from tracker.repository.json_card_repository import JsonCardRepository
 from tracker.repository.json_hunt_repository import JsonHuntRepository
 from tracker.repository.json_progress_repository import JsonProgressRepository
+from tracker.repository.json_trainer_contact_repository import JsonTrainerContactRepository
 from tracker.services.badge_service import BadgeService
 from tracker.services.binder_config_service import BinderConfigService
 from tracker.services.binder_placements_service import BinderPlacementsService
@@ -29,6 +31,7 @@ from tracker.services.hunt_service import HuntService
 from tracker.services.profile_service import ProfileService
 from tracker.services.progress_service import ProgressService
 from tracker.services.tcg_catalog_service import TcgCatalogService
+from tracker.services.trainer_contact_service import TrainerContactService
 
 
 def get_profile_service(
@@ -107,6 +110,19 @@ def get_hunt_service(
     repository: Annotated[HuntRepository, Depends(get_hunt_repository)],
 ) -> HuntService:
     return HuntService(repository)
+
+
+def get_trainer_contact_repository(
+    settings: Annotated[TrackerSettings, Depends(get_settings)],
+    profiles: Annotated[ProfileService, Depends(get_profile_service)],
+) -> TrainerContactRepository:
+    return JsonTrainerContactRepository(profiles.trainer_contacts_path())
+
+
+def get_trainer_contact_service(
+    repository: Annotated[TrainerContactRepository, Depends(get_trainer_contact_repository)],
+) -> TrainerContactService:
+    return TrainerContactService(repository)
 
 
 def get_card_service(
