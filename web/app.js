@@ -1822,6 +1822,7 @@ function currentViewFromHash() {
   const raw = rawFull.split("?")[0];
   if (raw === "stats") return "stats";
   if (raw === "classeur") return "classeur";
+  if (raw === "dresseurs") return "dresseurs";
   if (raw === "settings") return "settings";
   if (raw === "print") return "print";
   if (raw.startsWith("pokemon/")) return "pokemon";
@@ -1854,12 +1855,14 @@ function applyAppRoute() {
   const view = currentViewFromHash();
   const elListe = document.getElementById("viewListe");
   const elClasseur = document.getElementById("viewClasseur");
+  const elDresseurs = document.getElementById("viewDresseurs");
   const elStats = document.getElementById("viewStats");
   const elSettings = document.getElementById("viewSettings");
   const elPrint = document.getElementById("viewPrint");
   const elPokemon = document.getElementById("viewPokemon");
   if (elListe) elListe.hidden = view !== "liste";
   if (elClasseur) elClasseur.hidden = view !== "classeur";
+  if (elDresseurs) elDresseurs.hidden = view !== "dresseurs";
   if (elStats) elStats.hidden = view !== "stats";
   if (elSettings) elSettings.hidden = view !== "settings";
   if (elPrint) elPrint.hidden = view !== "print";
@@ -1871,6 +1874,7 @@ function applyAppRoute() {
     settings: "pokevault — Réglages",
     print: "pokevault — Impression",
     classeur: "pokevault — Classeurs",
+    dresseurs: "pokevault — Dresseurs",
     pokemon: "pokevault — Fiche Pokédex",
   };
   document.title = titles[view] || "pokevault";
@@ -1885,6 +1889,9 @@ function applyAppRoute() {
   }
   if (view === "classeur" && typeof window.startBinderV2IfNeeded === "function") {
     window.startBinderV2IfNeeded();
+  }
+  if (view === "dresseurs" && typeof window.PokevaultTrainerContacts?.start === "function") {
+    window.PokevaultTrainerContacts.start();
   }
   if (view === "stats" && typeof window.PokedexStats?.start === "function") {
     window.PokedexStats.start();
