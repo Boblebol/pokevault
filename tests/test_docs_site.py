@@ -73,6 +73,12 @@ def test_public_site_navigation_is_complete() -> None:
         assert label in text
 
 
+def test_public_site_footers_link_to_portfolio() -> None:
+    for page in PAGES:
+        links = {value for _, value in _parse(DOCS / page).links}
+        assert "https://alexandre-enouf.fr" in links, page
+
+
 def test_brand_assets_exist() -> None:
     for asset in [
         DOCS / "assets" / "logo.svg",
