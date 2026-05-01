@@ -241,6 +241,7 @@
           <p class="collection-subtitle">Gère tes classeurs, tes pages et les placements de tes cartes.</p>
           <div class="binder-header-actions">
             <button type="button" class="binder-refresh" id="binderV2Refresh">Rafraîchir</button>
+            <button type="button" class="binder-refresh binder-refresh--ghost" id="binderWizardSettings" hidden>Réglages</button>
           </div>
           <p class="sync-hint" id="binderV2Hint" hidden></p>
           <div id="binderAdvancedPanel" class="stitch-hidden" hidden>
@@ -254,6 +255,24 @@
         </header>
 
         <section class="binder-main binder-main--v2">
+          <div id="binderWizardWrap" class="wizard-wrap binder-wizard-wrap" hidden>
+            <section class="wizard-card binder-wizard binder-wizard--scrollable" aria-labelledby="binderWizardTitle">
+              <p class="wizard-kicker">Réglages classeur</p>
+              <h2 id="binderWizardTitle" class="wizard-title">Adapter le format physique.</h2>
+              <div id="binderWizardDots" class="wizard-dots" aria-hidden="true"></div>
+              <p id="binderWizardStepMeta" class="wizard-step-meta binder-wizard-meta"></p>
+              <div id="binderWizardBinderBar" class="binder-wizard-binder-bar" hidden></div>
+              <div id="binderWizardBody" class="binder-wizard-body"></div>
+              <footer class="binder-wizard-footer">
+                <button id="binderWizardSkip" class="binder-wizard-secondary" type="button">Annuler</button>
+                <div class="binder-wizard-nav">
+                  <button id="binderWizardBack" class="binder-wizard-back" type="button">Retour</button>
+                  <button id="binderWizardNext" class="binder-wizard-next" type="button">Continuer</button>
+                </div>
+              </footer>
+            </section>
+          </div>
+
           <div id="binderContentWrap">
             <div id="binderCollectionShell" class="binder-collection-shell" hidden>
               <div class="binder-shell-layout">
@@ -289,7 +308,7 @@
 
             <div id="binderEmptyPlaceholder" class="binder-empty-placeholder" hidden>
               <p class="binder-empty-placeholder__title">Tes classeurs se préparent.</p>
-              <p class="binder-empty-placeholder__text">Initialisation des classeurs 3×3 par région… Si rien ne bouge, vérifie que l'API est bien joignable.</p>
+              <p class="binder-empty-placeholder__text">Initialisation des classeurs 3×3 · 10 feuillets par région… Si rien ne bouge, vérifie que l'API est bien joignable.</p>
             </div>
 
             <div id="binderExtrasWrap" class="binder-extras-wrap stitch-hidden" hidden>

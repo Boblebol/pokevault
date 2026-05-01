@@ -79,6 +79,14 @@ function slotsPerFace(binder) {
   return Math.max(1, r * c);
 }
 
+function binderFormatText(binder) {
+  const rows = Math.max(1, Number(binder.rows) || 3);
+  const cols = Math.max(1, Number(binder.cols) || 3);
+  const sheets = Math.max(1, Number(binder.sheet_count) || 10);
+  const capacity = rows * cols * sheets * 2;
+  return `Format ${rows}×${cols} · ${sheets} feuillets · ${capacity} emplacements.`;
+}
+
 function maxGlobalFaceIndex(binder) {
   const sheets = Math.max(1, Number(binder.sheet_count) || 1);
   return sheets * 2 - 1;
@@ -348,7 +356,7 @@ function renderBinderPageGrid() {
     const firstSlot = pageStart * perFace;
     const lastIdx =
       total > 0 ? Math.min(total - 1, pageStart * perFace + nShow * perFace - 1) : -1;
-    const modeText = "Classeurs régionaux en format 3×3.";
+    const modeText = binderFormatText(binder);
     hint.textContent =
       total === 0
         ? `${modeText} Charge le Pokédex (make web) pour remplir les cases.`

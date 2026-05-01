@@ -64,7 +64,9 @@ works immediately after install. Optional artwork caches are generated locally.
   personal notes and collapsible card details.
 - Attaches owned physical cards to Pokemon entries.
 - Searches the public Pokemon TCG API to prefill card metadata.
-- Models binder pages, grids and card placements.
+- Models binder pages, grids and card placements, with an optional 3×3 ·
+  10 feuillets default that can split oversized regions into Kanto 1, Kanto 2,
+  etc.
 - Maintains multiple local collection profiles.
 - Creates and imports optional Trainer Cards with a searchable local contact book,
   local `Vu chez` context and `Match` hints from exchanged `Double` lists.
@@ -103,6 +105,20 @@ The exchange model stays close to the Pokedex:
 
 Trainer Cards never sync automatically and never overwrite collection progress.
 The full guide lives in [Trainer Cards](docs/TRAINER_CONTACTS.md).
+
+## Physical Binder Layouts
+
+The binder tab keeps the base workflow automatic: without any settings, it
+creates regional binders in the classic 3×3 · 10 feuillets format. A feuillet is
+treated like a real plastic sheet with recto and verso, so capacity is:
+
+`rows × columns × feuillets × 2`
+
+Collectors who use smaller or larger binders can open `Réglages`, choose a
+preset or custom grid, and regenerate the local binder view. If a region is too
+large for the selected format, Pokevault keeps every Pokemon visible by splitting
+that region into numbered binders such as Kanto 1 and Kanto 2 instead of hiding
+entries.
 
 ## Screenshots
 

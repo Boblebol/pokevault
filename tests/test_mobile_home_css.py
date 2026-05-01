@@ -93,6 +93,16 @@ def test_trade_chips_have_dedicated_compact_styles() -> None:
         assert token in CSS
 
 
+def test_binder_layout_settings_are_optional_and_use_sheet_language() -> None:
+    classeur_view = HTML.split('id="viewClasseur"', 1)[1].split('id="viewDresseurs"', 1)[0]
+
+    assert 'id="binderWizardSettings"' in classeur_view
+    assert 'id="binderWizardWrap"' in classeur_view
+    assert "Réglages" in classeur_view
+    assert "10 feuillets" in classeur_view
+    assert "3×3" in classeur_view
+
+
 def test_onboarding_product_tour_covers_local_trade_workflow() -> None:
     block = HTML.split('id="onboardingWizard"', 1)[1].split("</dialog>", 1)[0]
 
