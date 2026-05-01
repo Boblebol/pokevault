@@ -9,6 +9,8 @@
   <img src="docs/assets/logo.svg" alt="pokevault logo" width="140">
 </p>
 
+**Le Pokédex des collectionneurs qui préfèrent les vrais échanges au cloud.**
+
 **pokevault** is a local-first Pokemon collection tracker for exploring a
 Pokedex, meeting other Trainers through exchanged local cards, and organizing
 physical cards, binders, badges and printable checklists.

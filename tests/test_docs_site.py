@@ -184,6 +184,11 @@ def test_public_story_centers_exploration_trainers_and_pokedex_completion() -> N
     landing = (DOCS / "index.html").read_text(encoding="utf-8").lower()
     readme = (ROOT / "README.md").read_text(encoding="utf-8").lower()
 
+    assert '<html lang="fr">' in landing
+    assert "le pokédex des collectionneurs qui préfèrent les vrais échanges au cloud" in landing
+    assert "le pokédex des collectionneurs qui préfèrent les vrais échanges au cloud" in readme
+    assert "comme avant" in landing
+
     for text in [
         "explore",
         "meet other trainers",
