@@ -9,11 +9,16 @@
   <img src="docs/assets/logo.svg" alt="pokevault logo" width="140">
 </p>
 
-**pokevault** is a local-first Pokemon collection tracker for Pokédex progress,
+**pokevault** is a local-first Pokemon collection tracker for exploring a
+Pokedex, meeting other Trainers through exchanged local cards, and organizing
 physical cards, binders, badges and printable checklists.
 
 No account. No cloud database. No hosted live demo yet. Run it locally and keep
 your collection data in readable JSON files.
+
+Think of it as a private field notebook for the old Pokemon loop: explore route
+after route, note what you found, meet other Trainers, and complete your Pokedex
+without giving the journey to a hosted tracker.
 
 <p align="center">
   <img src="docs/screenshots/list-view.png" alt="Pokevault collection view" width="100%">
@@ -70,6 +75,17 @@ works immediately after install. Optional artwork caches are generated locally.
 
 Pokevault is an unofficial fan project. It is not affiliated with Nintendo,
 The Pokémon Company, Game Freak, Creatures, Poképédia or the Pokémon brand.
+
+## Why Pokevault Exists
+
+Pokevault tries to keep the nostalgic rhythm of older Pokemon versions without
+copying their constraints: you explore your own collection, mark what is missing,
+meet other Trainers through files they chose to send, and complete your Pokedex
+at your pace.
+
+The modern part is deliberately quiet. Your data stays local-first, the Dresseurs
+layer is optional, and exchanges remain manual instead of becoming a hosted
+social feed.
 
 ## Local Trainer Card Exchange
 
