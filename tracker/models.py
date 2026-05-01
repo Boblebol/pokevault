@@ -254,7 +254,15 @@ class HuntPatch(BaseModel):
     note: str = Field(default="", max_length=280)
 
 
-TrainerContactMethod = Literal["email", "phone", "discord", "website", "other"]
+TrainerContactMethod = Literal[
+    "email",
+    "phone",
+    "discord",
+    "instagram",
+    "facebook",
+    "website",
+    "other",
+]
 
 
 class TrainerContactLink(BaseModel):

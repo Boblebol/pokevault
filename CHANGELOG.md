@@ -15,6 +15,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 - `make fetch-evolutions` / `python main.py fetch-evolutions` regenerates the
   family layout data from PokéAPI, with `data/evolution-family-overrides.json`
   reserved for manual layout corrections.
+- Trainer Cards now support up to three shareable contact lines, including
+  Instagram, Facebook and phone presets rendered as contact actions on imported
+  cards.
 
 ## [1.1.0] — 2026-04-28
 

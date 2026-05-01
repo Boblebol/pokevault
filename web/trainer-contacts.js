@@ -5,6 +5,16 @@
   "use strict";
 
   const API_TRAINERS = "/api/trainers";
+  const CONTACT_KIND_OPTIONS = [
+    ["instagram", "Instagram"],
+    ["facebook", "Facebook"],
+    ["phone", "Téléphone"],
+    ["discord", "Discord"],
+    ["email", "Email"],
+    ["website", "Site"],
+    ["other", "Autre"],
+  ];
+  const DEFAULT_CONTACT_KINDS = ["instagram", "facebook", "phone"];
   let cachedBook = { version: 1, own_card: null, contacts: {} };
   let activeSearch = "";
   let started = false;
@@ -33,11 +43,14 @@
       favorite_pokemon_slug: String(raw.favorite_pokemon_slug || "").trim(),
       public_note: String(raw.public_note || "").trim(),
       contact_links: contactLinks
-        .map((link) => ({
-          kind: isContactKind(link?.kind) ? link.kind : "other",
-          label: String(link?.label || "").trim(),
-          value: String(link?.value || "").trim(),
-        }))
+        .map((link) => {
+          const kind = isContactKind(link?.kind) ? link.kind : "other";
+          return {
+            kind,
+            label: String(link?.label || contactLabelForKind(kind)).trim(),
+            value: String(link?.value || "").trim(),
+          };
+        })
         .filter((link) => link.value)
         .slice(0, 6),
       wants: normalizeList(raw.wants),
@@ -76,7 +89,6 @@
   }
 
   function cardFromForm(values) {
-    const linkValue = String(values.contact_value || "").trim();
     return {
       schema_version: 1,
       app: "pokevault",
@@ -86,21 +98,42 @@
       favorite_region: String(values.favorite_region || "").trim(),
       favorite_pokemon_slug: String(values.favorite_pokemon_slug || "").trim(),
       public_note: String(values.public_note || "").trim(),
-      contact_links: linkValue
-        ? [{
-            kind: isContactKind(values.contact_kind) ? values.contact_kind : "other",
-            label: String(values.contact_label || "").trim(),
-            value: linkValue,
-          }]
-        : [],
+      contact_links: contactLinksFromForm(values),
       wants: splitLines(values.wants),
       for_trade: splitLines(values.for_trade),
       updated_at: new Date().toISOString(),
     };
   }
 
+  function contactLinksFromForm(values) {
+    const links = [];
+    for (let i = 0; i < 3; i += 1) {
+      const value = String(values[`contact_value_${i}`] || "").trim();
+      if (!value) continue;
+      const kind = isContactKind(values[`contact_kind_${i}`])
+        ? values[`contact_kind_${i}`]
+        : "other";
+      links.push({ kind, label: contactLabelForKind(kind), value });
+    }
+    if (links.length) return links;
+
+    const legacyValue = String(values.contact_value || "").trim();
+    if (!legacyValue) return [];
+    const legacyKind = isContactKind(values.contact_kind) ? values.contact_kind : "other";
+    return [{
+      kind: legacyKind,
+      label: String(values.contact_label || contactLabelForKind(legacyKind)).trim(),
+      value: legacyValue,
+    }];
+  }
+
   function isContactKind(value) {
-    return ["email", "phone", "discord", "website", "other"].includes(value);
+    return CONTACT_KIND_OPTIONS.some(([kind]) => kind === value);
+  }
+
+  function contactLabelForKind(kind) {
+    const found = CONTACT_KIND_OPTIONS.find(([value]) => value === kind);
+    return found ? found[1] : "Contact";
   }
 
   async function loadBook() {
@@ -326,7 +359,9 @@
     root.replaceChildren();
     const own = document.createElement("section");
     own.className = "trainer-panel";
-    const firstLink = cachedBook.own_card?.contact_links?.[0] || {};
+    const contactLinks = Array.isArray(cachedBook.own_card?.contact_links)
+      ? cachedBook.own_card.contact_links.slice(0, 3)
+      : [];
     own.innerHTML = `
       <div class="trainer-panel-head">
         <div>
@@ -350,15 +385,7 @@
         <input name="favorite_region" class="search-input" placeholder="Région favorite" value="${escapeAttr(cachedBook.own_card?.favorite_region || "")}">
         <input name="favorite_pokemon_slug" class="search-input" placeholder="Pokémon favori (slug)" value="${escapeAttr(cachedBook.own_card?.favorite_pokemon_slug || "")}">
         <textarea name="public_note" class="search-input" placeholder="Note publique">${escapeText(cachedBook.own_card?.public_note || "")}</textarea>
-        <select name="contact_kind" class="region-filter" aria-label="Type de contact">
-          <option value="discord">Discord</option>
-          <option value="email">Email</option>
-          <option value="phone">Téléphone</option>
-          <option value="website">Site</option>
-          <option value="other">Autre</option>
-        </select>
-        <input name="contact_label" class="search-input" placeholder="Libellé contact" value="${escapeAttr(firstLink.label || "")}">
-        <input name="contact_value" class="search-input" placeholder="Valeur contact" value="${escapeAttr(firstLink.value || "")}">
+        ${renderOwnContactFields(contactLinks)}
         <textarea name="wants" class="search-input" placeholder="Je cherche (un slug par ligne)">${escapeText((cachedBook.own_card?.wants || []).join("\n"))}</textarea>
         <textarea name="for_trade" class="search-input" placeholder="Je peux échanger (un slug par ligne)">${escapeText((cachedBook.own_card?.for_trade || []).join("\n"))}</textarea>
         <button type="submit" class="settings-action-btn settings-action-btn--confirm">
@@ -368,10 +395,37 @@
       </form>
       <p class="sync-hint" ${message ? "" : "hidden"}>${escapeText(message)}</p>
     `;
-    const kindSelect = own.querySelector('select[name="contact_kind"]');
-    if (kindSelect) kindSelect.value = isContactKind(firstLink.kind) ? firstLink.kind : "discord";
     root.append(own, renderContactList());
     wire(root);
+  }
+
+  function renderOwnContactFields(contactLinks) {
+    const rows = Array.from({ length: 3 }, (_, index) => {
+      const link = contactLinks[index] || {};
+      const kind = isContactKind(link.kind) ? link.kind : DEFAULT_CONTACT_KINDS[index];
+      return `
+        <div class="trainer-contact-edit-row">
+          <select name="contact_kind_${index}" class="region-filter" aria-label="Type de contact ${index + 1}">
+            ${renderContactKindOptions(kind)}
+          </select>
+          <input name="contact_value_${index}" class="search-input" placeholder="Lien, @pseudo, téléphone..." value="${escapeAttr(link.value || "")}">
+        </div>
+      `;
+    }).join("");
+    return `
+      <fieldset class="trainer-contact-editor">
+        <legend>Contact partageable</legend>
+        ${rows}
+      </fieldset>
+    `;
+  }
+
+  function renderContactKindOptions(selected) {
+    return CONTACT_KIND_OPTIONS
+      .map(([value, label]) => (
+        `<option value="${escapeAttr(value)}" ${value === selected ? "selected" : ""}>${escapeText(label)}</option>`
+      ))
+      .join("");
   }
 
   function renderContactList() {
@@ -465,9 +519,54 @@
     if (!clean.length) return "";
     return `
       <ul class="trainer-contact-links">
-        ${clean.map((link) => `<li><span>${escapeText(link.label || link.kind || "Contact")}</span>${escapeText(link.value)}</li>`).join("")}
+        ${clean.map(renderContactLink).join("")}
       </ul>
     `;
+  }
+
+  function renderContactLink(link) {
+    const kind = isContactKind(link.kind) ? link.kind : "other";
+    const label = String(link.label || contactLabelForKind(kind));
+    const value = String(link.value || "").trim();
+    const href = contactHref({ kind, value });
+    const renderedValue = href
+      ? `<a href="${escapeAttr(href)}" ${href.startsWith("http") ? 'target="_blank" rel="noopener noreferrer"' : ""}>${escapeText(value)}</a>`
+      : escapeText(value);
+    return `<li><span>${escapeText(label)}</span>${renderedValue}</li>`;
+  }
+
+  function contactHref(link) {
+    const value = String(link?.value || "").trim();
+    if (!value) return "";
+    if (/^https?:\/\//i.test(value)) return value;
+    if (link.kind === "email" && value.includes("@")) return `mailto:${value}`;
+    if (link.kind === "phone") {
+      const phone = value.replace(/[^\d+]/g, "").replace(/(?!^)\+/g, "");
+      return phone ? `tel:${phone}` : "";
+    }
+    if (link.kind === "instagram") {
+      const handle = socialHandle(value);
+      return handle ? `https://instagram.com/${handle}` : "";
+    }
+    if (link.kind === "facebook") {
+      const handle = socialHandle(value);
+      return handle ? `https://facebook.com/${handle}` : "";
+    }
+    if (link.kind === "website" || looksLikeWebUrl(value)) return `https://${value}`;
+    return "";
+  }
+
+  function socialHandle(value) {
+    return String(value || "")
+      .trim()
+      .replace(/^@/, "")
+      .replace(/^(?:https?:\/\/)?(?:www\.)?(?:instagram|facebook)\.com\//i, "")
+      .split(/[/?#]/)[0]
+      .trim();
+  }
+
+  function looksLikeWebUrl(value) {
+    return /^(?:www\.)?[a-z0-9-]+(?:\.[a-z0-9-]+)+/i.test(value);
   }
 
   async function savePrivateNote(trainerId, note) {
