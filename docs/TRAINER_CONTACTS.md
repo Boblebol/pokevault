@@ -26,7 +26,8 @@ Open the `Dresseurs` tab and fill only the public fields you want to share:
 - favorite region;
 - favorite Pokemon;
 - public note;
-- optional contact line;
+- up to three optional contact lines, such as Instagram, Facebook, Téléphone,
+  Email, Discord or a personal site;
 - Pokemon you are looking for;
 - Pokemon you marked as `Double` and can trade.
 
@@ -37,7 +38,7 @@ trade Leviator", mark that Pokemon as `Double` and leave the rest simple.
 
 Exporting a Trainer Card does not export the full collection. It only includes
 the fields placed on the card: display name, favorite region, favorite Pokemon,
-public note, optional contact link, wishlist, and trade list.
+public note, optional contact links, wishlist, and trade list.
 
 The exported file is meant to be sent manually by any channel you already use.
 Pokevault does not upload it and does not create a public profile.
@@ -46,8 +47,8 @@ Pokevault does not upload it and does not create a public profile.
 
 When someone sends you a Trainer Card file, import it from the `Dresseurs` tab.
 Pokevault stores the received card in the current local profile and makes it
-searchable by trainer name, region, favorite Pokemon, contact lines, wishlist,
-trade list, and private notes.
+searchable by trainer name, region, favorite Pokemon, contact lines such as
+Instagram, Facebook or Téléphone, wishlist, trade list, and private notes.
 
 Private notes are attached to your local contact copy. They are never included
 when you export your own Trainer Card.

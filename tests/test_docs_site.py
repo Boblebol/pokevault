@@ -140,6 +140,9 @@ def test_trainer_contacts_are_documented_publicly() -> None:
 
     assert "searchable local contact book" in guide_text
     assert "private notes" in guide_text
+    assert "Instagram" in guide_text
+    assert "Facebook" in guide_text
+    assert "Téléphone" in guide_text
     assert "Trainer Cards" in readme
     assert "data/trainer-contacts.json" in readme
     assert "/api/trainers" in readme

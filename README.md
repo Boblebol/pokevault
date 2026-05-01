@@ -68,8 +68,9 @@ works immediately after install. Optional artwork caches are generated locally.
   10 feuillets default, regional splits such as Kanto 1 / Kanto 2 and
   evolution-family layouts with intentional empty slots.
 - Maintains multiple local collection profiles.
-- Creates and imports optional Trainer Cards with a searchable local contact book,
-  local `Vu chez` context and `Match` hints from exchanged `Double` lists.
+- Creates and imports optional Trainer Cards with shareable contact links,
+  a searchable local contact book, local `Vu chez` context and `Match` hints
+  from exchanged `Double` lists.
 - Shows collection stats, badge progress and focus recommendations.
 - Exports/imports full local backups.
 - Prints binder or regional checklists.
@@ -100,6 +101,8 @@ The exchange model stays close to the Pokedex:
 
 - `Cherche` marks Pokemon you want and feeds the focus list.
 - `Double` marks Pokemon you own twice and can offer for trade.
+- Contact lines can share Instagram, Facebook, phone, email, Discord or site
+  details inside the exported card file.
 - Imported cards can add `Vu chez` when another trainer has a duplicate, and
   `Match` when that duplicate is also on your `Cherche` list.
 

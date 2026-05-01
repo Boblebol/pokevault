@@ -111,6 +111,26 @@ test("cardFromForm trims optional lists and contact link values", async () => {
   assert.equal(card.contact_links[0].value, "alex#0001");
 });
 
+test("cardFromForm keeps multiple shareable contact links", async () => {
+  const api = await loadModule();
+  const card = api.cardFromForm({
+    trainer_id: "trainer-123",
+    display_name: "Alex",
+    contact_kind_0: "instagram",
+    contact_value_0: " @alex_cards ",
+    contact_kind_1: "facebook",
+    contact_value_1: "alex.cards",
+    contact_kind_2: "phone",
+    contact_value_2: " +33 6 12 34 56 78 ",
+  });
+
+  assert.deepEqual(card.contact_links, [
+    { kind: "instagram", label: "Instagram", value: "@alex_cards" },
+    { kind: "facebook", label: "Facebook", value: "alex.cards" },
+    { kind: "phone", label: "Téléphone", value: "+33 6 12 34 56 78" },
+  ]);
+});
+
 test("filterContacts matches local book fields and keeps display-name order", async () => {
   const api = await loadModule();
   const contacts = {
@@ -188,6 +208,29 @@ test("renderContact exposes trade lists, private note controls, and delete actio
   assert.match(article.innerHTML, /data-trainer-note-form/);
   assert.match(article.innerHTML, /Bring sleeves/);
   assert.match(article.innerHTML, /data-trainer-delete/);
+});
+
+test("renderContact exposes social contact links as clickable actions", async () => {
+  const api = await loadModule();
+  const article = api.renderContact({
+    card: {
+      trainer_id: "misty-123",
+      display_name: "Misty",
+      contact_links: [
+        { kind: "instagram", label: "Instagram", value: "@misty_cards" },
+        { kind: "phone", label: "Téléphone", value: "+33 6 12 34 56 78" },
+      ],
+      wants: [],
+      for_trade: [],
+      updated_at: "2026-04-30T10:00:00+00:00",
+    },
+    private_note: "",
+    first_received_at: "2026-04-30T11:00:00+00:00",
+    last_received_at: "2026-04-30T11:00:00+00:00",
+  });
+
+  assert.match(article.innerHTML, /href="https:\/\/instagram\.com\/misty_cards"/);
+  assert.match(article.innerHTML, /href="tel:\+33612345678"/);
 });
 
 test("note requests trim private notes and target the trainer note endpoint", async () => {

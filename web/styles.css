@@ -6663,8 +6663,30 @@ html[data-theme="paldea"] {
 }
 
 .trainer-card-form textarea,
-.trainer-card-form button {
+.trainer-card-form button,
+.trainer-contact-editor {
   grid-column: 1 / -1;
+}
+
+.trainer-contact-editor {
+  display: grid;
+  gap: 0.55rem;
+  padding: 0;
+  border: 0;
+  margin: 0;
+}
+
+.trainer-contact-editor legend {
+  margin-bottom: 0.15rem;
+  color: var(--muted);
+  font-size: 0.75rem;
+  font-weight: 650;
+}
+
+.trainer-contact-edit-row {
+  display: grid;
+  grid-template-columns: minmax(120px, 0.4fr) minmax(0, 1fr);
+  gap: 0.5rem;
 }
 
 .trainer-contact-list {
@@ -6779,6 +6801,12 @@ html[data-theme="paldea"] {
   color: var(--muted);
 }
 
+.trainer-contact-links a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 0.12em;
+}
+
 .trainer-list-groups {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -6827,6 +6855,10 @@ html[data-theme="paldea"] {
   }
 
   .trainer-card-form {
+    grid-template-columns: 1fr;
+  }
+
+  .trainer-contact-edit-row {
     grid-template-columns: 1fr;
   }
 }

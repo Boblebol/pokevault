@@ -85,8 +85,8 @@ visible actions, and imported contacts only add derived `Vu chez` / `Match`
 context. The first-run product tour introduces that model as a manual file
 exchange, so the feature stays visible without becoming required.
 
-- v0.1: create "my Trainer Card", export it as a file and import a received
-  card into `data/trainer-contacts.json`.
+- v0.1: create "my Trainer Card" with optional public contact links, export it
+  as a file and import a received card into `data/trainer-contacts.json`.
 - v0.2: update an existing contact by stable `trainer_id`, preserve private
   notes, search the local contact book and delete stale contacts.
 - v0.3: compare local `Cherche` and `Double` lists against received cards,

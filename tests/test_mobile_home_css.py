@@ -114,6 +114,7 @@ def test_onboarding_product_tour_covers_local_trade_workflow() -> None:
         "Vu chez",
         "Match",
         "Dresseurs",
+        "Instagram",
         "sans compte",
     ]:
         assert text in block

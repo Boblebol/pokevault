@@ -59,6 +59,25 @@ def test_put_and_export_own_card(tmp_path: Path) -> None:
     assert exported["trainer_id"] == "trainer-123"
 
 
+def test_put_own_card_accepts_social_contact_links(tmp_path: Path) -> None:
+    client = _client(tmp_path)
+    payload = _payload()
+    payload["contact_links"] = [
+        {"kind": "instagram", "label": "Instagram", "value": "@alex_cards"},
+        {"kind": "facebook", "label": "Facebook", "value": "alex.cards"},
+        {"kind": "phone", "label": "Téléphone", "value": "+33 6 12 34 56 78"},
+    ]
+
+    response = client.put("/api/trainers/me", json=payload)
+
+    assert response.status_code == 200
+    assert [link["kind"] for link in response.json()["contact_links"]] == [
+        "instagram",
+        "facebook",
+        "phone",
+    ]
+
+
 def test_import_card_creates_contact_then_updates(tmp_path: Path) -> None:
     client = _client(tmp_path)
 
