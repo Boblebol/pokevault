@@ -17,7 +17,7 @@ AWK ?= awk
 
 .DEFAULT_GOAL := help
 
-.PHONY: help vars install dev open fetch fetch-test fetch-shiny test test-cov lint fmt check clean \
+.PHONY: help vars install dev open fetch fetch-test fetch-shiny fetch-evolutions test test-cov lint fmt check clean \
 	build docker-build docker-up docker-up-local docker-down docker-logs
 
 ##@ General
@@ -74,6 +74,9 @@ fetch-test: ## Scrape rapide (10 entrees, sans images)
 
 fetch-shiny: ## Telecharger les artworks shiny (PokeAPI CDN) dans data/images_shiny/
 	$(UV) run $(PYTHON) main.py fetch-shiny
+
+fetch-evolutions: ## Generer data/evolution-families.json depuis PokeAPI
+	$(UV) run $(PYTHON) main.py fetch-evolutions
 
 ##@ Quality
 

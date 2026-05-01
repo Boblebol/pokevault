@@ -65,8 +65,8 @@ works immediately after install. Optional artwork caches are generated locally.
 - Attaches owned physical cards to Pokemon entries.
 - Searches the public Pokemon TCG API to prefill card metadata.
 - Models binder pages, grids and card placements, with an optional 3×3 ·
-  10 feuillets default that can split oversized regions into Kanto 1, Kanto 2,
-  etc.
+  10 feuillets default, regional splits such as Kanto 1 / Kanto 2 and
+  evolution-family layouts with intentional empty slots.
 - Maintains multiple local collection profiles.
 - Creates and imports optional Trainer Cards with a searchable local contact book,
   local `Vu chez` context and `Match` hints from exchanged `Double` lists.
@@ -120,6 +120,13 @@ large for the selected format, Pokevault keeps every Pokemon visible by splittin
 that region into numbered binders such as Kanto 1 and Kanto 2 instead of hiding
 entries.
 
+The optional `Familles` organization uses `data/evolution-families.json` to keep
+evolution stages on the same line when the binder has enough columns. Branching
+families deliberately leave empty slots, for example Wurmple / Silcoon /
+Beautifly on one line and an empty first slot before Cascoon / Dustox on the
+next. Manual corrections stay in `data/evolution-family-overrides.json`, so the
+app UI does not expose expert-only layout controls.
+
 ## Screenshots
 
 <table>
@@ -139,6 +146,7 @@ make open         # Open local web UI
 make fetch        # Full Pokepedia scrape
 make fetch-test   # Small scrape for development
 make fetch-shiny  # Download shiny artworks locally
+make fetch-evolutions # Generate evolution-family binder layout data
 make check        # Lint + tests + tracker coverage
 make docker-up    # Pull and start the published Docker image
 make docker-up-local # Build this checkout and start it

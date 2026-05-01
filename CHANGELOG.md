@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Added
+
+- Optional evolution-family binder layouts now use generated
+  `data/evolution-families.json` data to align family stages on the same row
+  with intentional empty slots for branching evolutions.
+- `make fetch-evolutions` / `python main.py fetch-evolutions` regenerates the
+  family layout data from PokéAPI, with `data/evolution-family-overrides.json`
+  reserved for manual layout corrections.
+
 ## [1.1.0] — 2026-04-28
 
 ### Added

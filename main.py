@@ -22,6 +22,7 @@ console = Console()
 
 DEFAULT_DATA = Path("data/pokedex.json")
 DEFAULT_IMAGES = Path("data/images")
+DEFAULT_EVOLUTION_OVERRIDES = Path("data/evolution-family-overrides.json")
 
 
 class OutputFormat(str, Enum):  # noqa: UP042
@@ -183,6 +184,52 @@ def fetch_shiny(
     )
     if fail:
         console.print(f"[yellow]Slugs en échec : {', '.join(fail[:10])}…[/yellow]")
+
+
+# ── fetch-evolutions ──────────────────────────────────────────────────────────
+
+@app.command("fetch-evolutions")
+def fetch_evolutions(
+    input_path: Path = typer.Option(
+        DEFAULT_DATA, "--input", "-i",
+        help="Fichier Pokédex JSON de référence (défaut : data/pokedex.json)",
+    ),
+    output_path: Path = typer.Option(
+        Path("data/evolution-families.json"),
+        "--output",
+        "-o",
+        help="Fichier de sortie des familles d'évolution.",
+    ),
+    overrides_path: Path = typer.Option(
+        DEFAULT_EVOLUTION_OVERRIDES,
+        "--overrides",
+        help="Fichier optionnel d'overrides manuels de layout.",
+    ),
+) -> None:
+    """🧬 Génère les familles d'évolution pour les layouts classeur."""
+
+    import json
+
+    from pokedex.evolution_families import generate_family_payload_from_files
+
+    if not input_path.exists():
+        console.print(f"[red]Fichier introuvable : {input_path}[/red]")
+        raise typer.Exit(1)  # noqa: B904
+
+    try:
+        payload = generate_family_payload_from_files(input_path, overrides_path=overrides_path)
+    except Exception as e:
+        console.print(f"[red]❌ Erreur lors de la génération des familles : {e}[/red]")
+        raise typer.Exit(1)  # noqa: B904
+
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    output_path.write_text(
+        json.dumps(payload, ensure_ascii=False, indent=2) + "\n",
+        encoding="utf-8",
+    )
+    console.print(
+        f"\n[green]🧬 {payload.get('family_count', 0)} familles → {output_path}[/green]"
+    )
 
 
 # ── view ───────────────────────────────────────────────────────────────────────

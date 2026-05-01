@@ -156,3 +156,86 @@ test("default workspace is only created for empty configs", async () => {
     false,
   );
 });
+
+test("family binder ordering pads evolution rows with intentional holes", async () => {
+  const api = await loadModule();
+  api.setEvolutionFamilyData({
+    families: [
+      {
+        id: "0133-eevee",
+        layout_rows: [
+          ["0133-eevee", "0134-vaporeon"],
+          [null, "0135-jolteon"],
+        ],
+      },
+    ],
+  });
+  const pokemon = [
+    { slug: "0133-eevee", number: "0133", names: { fr: "Evoli" } },
+    { slug: "0134-vaporeon", number: "0134", names: { fr: "Aquali" } },
+    { slug: "0135-jolteon", number: "0135", names: { fr: "Voltali" } },
+  ];
+
+  const ordered = api.orderPokemonForBinder(
+    {
+      organization: "family",
+      cols: 3,
+      rows: 1,
+      sheet_count: 10,
+    },
+    pokemon,
+    [],
+  );
+
+  assert.deepEqual(
+    ordered.map((p) => p?.slug || null),
+    ["0133-eevee", "0134-vaporeon", null, null, "0135-jolteon", null],
+  );
+});
+
+test("family binder workspace splits on family blocks without dropping holes", async () => {
+  const api = await loadModule();
+  const families = {
+    families: [
+      { id: "f1", layout_rows: [["0001-a", "0002-b", "0003-c"]] },
+      { id: "f2", layout_rows: [["0004-d", "0005-e", "0006-f"]] },
+      { id: "f3", layout_rows: [["0007-g", "0008-h", "0009-i"]] },
+    ],
+  };
+  const pokemon = [
+    "0001-a",
+    "0002-b",
+    "0003-c",
+    "0004-d",
+    "0005-e",
+    "0006-f",
+    "0007-g",
+    "0008-h",
+    "0009-i",
+  ].map((slug, idx) => ({
+    slug,
+    number: String(idx + 1).padStart(4, "0"),
+  }));
+
+  const result = api.buildFamilyBinderWorkspace(
+    {
+      name: "Familles",
+      organization: "family",
+      formScope: "base_only",
+      rows: 1,
+      cols: 3,
+      sheetCount: 1,
+    },
+    pokemon,
+    families,
+    "test",
+  );
+
+  assert.deepEqual(
+    result.configBody.binders.map((binder) => [binder.name, binder.range_start, binder.range_limit]),
+    [
+      ["Familles 1", 0, 6],
+      ["Familles 2", 6, 3],
+    ],
+  );
+});

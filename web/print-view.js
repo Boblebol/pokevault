@@ -20,6 +20,10 @@ async function startPrintView() {
     await window.startBinderV2IfNeeded();
   }
   await fetchBinderConfigIfNeeded();
+  const cfg = getBinderConfig();
+  if (cfg?.binders?.some((b) => b?.organization === "family")) {
+    await window.PokedexBinder?.ensureEvolutionFamiliesLoaded?.();
+  }
 
   wirePrintControls();
   renderPrintVaultsNav();
@@ -95,8 +99,9 @@ function renderPrintVaultsNav() {
       ? B.selectBinderPokemonPool(allPokemon, B.getFormRuleForBinder?.(cfg, b))
       : allPokemon;
     const ordered = B?.orderPokemonForBinder ? B.orderPokemonForBinder(b, pool, defs) : pool;
-    const total = ordered.length;
-    const got = ordered.filter((p) => p && caught[String(p.slug || "")]).length;
+    const realEntries = ordered.filter(Boolean);
+    const total = realEntries.length;
+    const got = realEntries.filter((p) => p && caught[String(p.slug || "")]).length;
     allGot += got;
     allTotal += total;
     perBinder.push({ binder: b, total, got });
@@ -310,8 +315,9 @@ function buildBinderSection(binder, allPokemon, caughtMap, defs, cfg, filterMode
     });
   }
 
-  const total = ordered.length;
-  const caughtCount = ordered.filter((p) => p && caughtMap[String(p.slug || "")]).length;
+  const realEntries = ordered.filter(Boolean);
+  const total = realEntries.length;
+  const caughtCount = realEntries.filter((p) => p && caughtMap[String(p.slug || "")]).length;
 
   return {
     title: String(binder.name || binder.id),

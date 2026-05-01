@@ -199,3 +199,4 @@ def test_configurable_binder_layouts_are_documented() -> None:
         assert "10 feuillets" in text
         assert "3×3" in text
         assert "Kanto 1" in text
+        assert "Familles" in text
