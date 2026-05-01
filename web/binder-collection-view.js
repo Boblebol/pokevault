@@ -79,6 +79,14 @@ function slotsPerFace(binder) {
   return Math.max(1, r * c);
 }
 
+function binderFormatText(binder) {
+  const rows = Math.max(1, Number(binder.rows) || 3);
+  const cols = Math.max(1, Number(binder.cols) || 3);
+  const sheets = Math.max(1, Number(binder.sheet_count) || 10);
+  const capacity = rows * cols * sheets * 2;
+  return `Format ${rows}×${cols} · ${sheets} feuillets · ${capacity} emplacements.`;
+}
+
 function maxGlobalFaceIndex(binder) {
   const sheets = Math.max(1, Number(binder.sheet_count) || 1);
   return sheets * 2 - 1;
@@ -86,6 +94,10 @@ function maxGlobalFaceIndex(binder) {
 
 function totalLogicalPages(binder) {
   return maxGlobalFaceIndex(binder) + 1;
+}
+
+function realOrderedEntries(ordered) {
+  return Array.isArray(ordered) ? ordered.filter(Boolean) : [];
 }
 
 /**
@@ -195,8 +207,9 @@ function renderVaultsNav(cfg, activeBinderId, ordered) {
       : window.PokedexBinder?.orderPokemonForBinder
         ? window.PokedexBinder.orderPokemonForBinder(b, pool, defs)
         : [];
-    const total = ord.length;
-    const got = ord.filter((p) => p && caught[String(p.slug || "")]).length;
+    const entries = realOrderedEntries(ord);
+    const total = entries.length;
+    const got = entries.filter((p) => p && caught[String(p.slug || "")]).length;
     const pct = total ? Math.round((got / total) * 100) : 0;
     const top = document.createElement("div");
     top.className = "binder-vault-item-top";
@@ -320,8 +333,9 @@ function renderBinderPageGrid() {
 
   if (metricsHost) {
     metricsHost.replaceChildren();
-    const totalEntries = shellState.ordered.length;
-    const totalCaught = shellState.ordered.filter((p) => p && PC?.caughtMap?.[String(p.slug || "")]).length;
+    const entries = realOrderedEntries(shellState.ordered);
+    const totalEntries = entries.length;
+    const totalCaught = entries.filter((p) => p && PC?.caughtMap?.[String(p.slug || "")]).length;
     const pct = totalEntries ? Math.round((totalCaught / totalEntries) * 100) : 0;
 
     const makeMetric = (label, value, sub) => {
@@ -344,15 +358,16 @@ function renderBinderPageGrid() {
   }
 
   if (hint) {
-    const total = shellState.ordered.length;
+    const slotTotal = shellState.ordered.length;
+    const entryTotal = realOrderedEntries(shellState.ordered).length;
     const firstSlot = pageStart * perFace;
     const lastIdx =
-      total > 0 ? Math.min(total - 1, pageStart * perFace + nShow * perFace - 1) : -1;
-    const modeText = "Classeurs régionaux en format 3×3.";
+      slotTotal > 0 ? Math.min(slotTotal - 1, pageStart * perFace + nShow * perFace - 1) : -1;
+    const modeText = binderFormatText(binder);
     hint.textContent =
-      total === 0
+      slotTotal === 0
         ? `${modeText} Charge le Pokédex (make web) pour remplir les cases.`
-        : `${modeText} Emplacements ${firstSlot + 1}–${lastIdx + 1} sur ${total} entrées (même coches que la liste).`;
+        : `${modeText} Emplacements ${firstSlot + 1}–${lastIdx + 1} sur ${slotTotal} cases, ${entryTotal} Pokémon.`;
   }
 
   updateFaceLabel(binder, pageStart, nShow);

@@ -9,11 +9,16 @@
   <img src="docs/assets/logo.svg" alt="pokevault logo" width="140">
 </p>
 
-**pokevault** is a local-first Pokemon collection tracker for Pokédex progress,
+**pokevault** is a local-first Pokemon collection tracker for exploring a
+Pokedex, meeting other Trainers through exchanged local cards, and organizing
 physical cards, binders, badges and printable checklists.
 
 No account. No cloud database. No hosted live demo yet. Run it locally and keep
 your collection data in readable JSON files.
+
+Think of it as a private field notebook for the old Pokemon loop: explore route
+after route, note what you found, meet other Trainers, and complete your Pokedex
+without giving the journey to a hosted tracker.
 
 <p align="center">
   <img src="docs/screenshots/list-view.png" alt="Pokevault collection view" width="100%">
@@ -59,7 +64,9 @@ works immediately after install. Optional artwork caches are generated locally.
   personal notes and collapsible card details.
 - Attaches owned physical cards to Pokemon entries.
 - Searches the public Pokemon TCG API to prefill card metadata.
-- Models binder pages, grids and card placements.
+- Models binder pages, grids and card placements, with an optional 3×3 ·
+  10 feuillets default, regional splits such as Kanto 1 / Kanto 2 and
+  evolution-family layouts with intentional empty slots.
 - Maintains multiple local collection profiles.
 - Creates and imports optional Trainer Cards with a searchable local contact book,
   local `Vu chez` context and `Match` hints from exchanged `Double` lists.
@@ -70,6 +77,17 @@ works immediately after install. Optional artwork caches are generated locally.
 
 Pokevault is an unofficial fan project. It is not affiliated with Nintendo,
 The Pokémon Company, Game Freak, Creatures, Poképédia or the Pokémon brand.
+
+## Why Pokevault Exists
+
+Pokevault tries to keep the nostalgic rhythm of older Pokemon versions without
+copying their constraints: you explore your own collection, mark what is missing,
+meet other Trainers through files they chose to send, and complete your Pokedex
+at your pace.
+
+The modern part is deliberately quiet. Your data stays local-first, the Dresseurs
+layer is optional, and exchanges remain manual instead of becoming a hosted
+social feed.
 
 ## Local Trainer Card Exchange
 
@@ -87,6 +105,27 @@ The exchange model stays close to the Pokedex:
 
 Trainer Cards never sync automatically and never overwrite collection progress.
 The full guide lives in [Trainer Cards](docs/TRAINER_CONTACTS.md).
+
+## Physical Binder Layouts
+
+The binder tab keeps the base workflow automatic: without any settings, it
+creates regional binders in the classic 3×3 · 10 feuillets format. A feuillet is
+treated like a real plastic sheet with recto and verso, so capacity is:
+
+`rows × columns × feuillets × 2`
+
+Collectors who use smaller or larger binders can open `Réglages`, choose a
+preset or custom grid, and regenerate the local binder view. If a region is too
+large for the selected format, Pokevault keeps every Pokemon visible by splitting
+that region into numbered binders such as Kanto 1 and Kanto 2 instead of hiding
+entries.
+
+The optional `Familles` organization uses `data/evolution-families.json` to keep
+evolution stages on the same line when the binder has enough columns. Branching
+families deliberately leave empty slots, for example Wurmple / Silcoon /
+Beautifly on one line and an empty first slot before Cascoon / Dustox on the
+next. Manual corrections stay in `data/evolution-family-overrides.json`, so the
+app UI does not expose expert-only layout controls.
 
 ## Screenshots
 
@@ -107,6 +146,7 @@ make open         # Open local web UI
 make fetch        # Full Pokepedia scrape
 make fetch-test   # Small scrape for development
 make fetch-shiny  # Download shiny artworks locally
+make fetch-evolutions # Generate evolution-family binder layout data
 make check        # Lint + tests + tracker coverage
 make docker-up    # Pull and start the published Docker image
 make docker-up-local # Build this checkout and start it

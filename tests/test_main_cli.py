@@ -88,6 +88,36 @@ def test_fetch_limit_zero_means_no_limit(
     assert limits == [None]
 
 
+def test_fetch_evolutions_writes_family_layouts(
+    runner: CliRunner,
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    from main import app
+
+    pokedex_path = tmp_path / "pokedex.json"
+    output_path = tmp_path / "evolution-families.json"
+    pokedex_path.write_text('{"pokemon": []}', encoding="utf-8")
+
+    monkeypatch.setattr(
+        "pokedex.evolution_families.generate_family_payload_from_files",
+        lambda path, **kwargs: {
+            "version": 1,
+            "family_count": 1,
+            "pokemon_count": 1,
+            "families": [{"id": "0001-bulbasaur", "layout_rows": [["0001-bulbasaur"]]}],
+        },
+    )
+
+    r = runner.invoke(
+        app,
+        ["fetch-evolutions", "--input", str(pokedex_path), "--output", str(output_path)],
+    )
+
+    assert r.exit_code == 0
+    assert "0001-bulbasaur" in output_path.read_text(encoding="utf-8")
+
+
 def test_view_by_number_shows_pokemon(
     tmp_path: Path,
     runner: CliRunner,

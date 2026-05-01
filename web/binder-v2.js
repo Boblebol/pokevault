@@ -50,6 +50,8 @@ let binderPreviewSortedFull = [];
 /** @type {{ id: string; label_fr: string; low: number; high: number }[]} */
 let binderPreviewDefs = [];
 let binderRegionFilterId = "all";
+/** @type {{ families?: unknown[] } | null} */
+let binderEvolutionFamilies = null;
 
 function setBinderHint(el, text, hidden) {
   if (!el) return;
@@ -59,6 +61,37 @@ function setBinderHint(el, text, hidden) {
 
 function isBinderConfigEmpty(cfg) {
   return !cfg || !Array.isArray(cfg.binders) || cfg.binders.length === 0;
+}
+
+function shouldEnsureDefaultWorkspace(cfg) {
+  return isBinderConfigEmpty(cfg);
+}
+
+function safeBinderIdPart(value) {
+  return String(value || "classeur").replace(/[^a-z0-9_-]/gi, "-");
+}
+
+function normalizeFormScope(scope) {
+  return scope === "base_only" || scope === "base_regional" || scope === "full"
+    ? scope
+    : DEFAULT_FORM_SCOPE;
+}
+
+function positiveInt(value, fallback) {
+  const n = Number.parseInt(String(value), 10);
+  return Number.isFinite(n) && n > 0 ? n : fallback;
+}
+
+function normalizedBinderLayout(draft) {
+  const rows = positiveInt(draft?.rows, 3);
+  const cols = positiveInt(draft?.cols, 3);
+  const sheetCount = positiveInt(draft?.sheetCount ?? draft?.sheet_count, 10);
+  return { rows, cols, sheetCount };
+}
+
+function binderCapacity(layoutLike) {
+  const layout = normalizedBinderLayout(layoutLike);
+  return layout.rows * layout.cols * layout.sheetCount * 2;
 }
 
 function wizardSkipped() {
@@ -167,35 +200,21 @@ async function onRegionPresetClick() {
 }
 
 async function ensureRegionDefaultWorkspace() {
-  const defs = await fetchPokedexRegionDefs();
+  const { defs, pokemon } = await fetchPokedexBinderData();
   if (!defs.length) return false;
-  const t = Date.now().toString(36);
-  const formRule = formRuleFromScope("base_regional");
-  const binders = [];
-  const byBinder = {};
-  for (const reg of defs) {
-    if (!reg?.id) continue;
-    const id = `classeur-${t}-${String(reg.id).replace(/[^a-z0-9_-]/gi, "-")}`;
-    binders.push({
-      id,
-      name: String(reg.label_fr || reg.id),
-      cols: 3,
+  const { configBody, placementsBody } = buildRegionalBinderWorkspace(
+    {
+      name: "Principal",
+      organization: "by_region",
+      formScope: "base_regional",
       rows: 3,
-      sheet_count: 10,
-      form_rule_id: formRule.id,
-      organization: "national",
-      region_scope: String(reg.id),
-    });
-    byBinder[id] = {};
-  }
-  if (!binders.length) return false;
-  const configBody = {
-    version: 1,
-    convention: "sheet_recto_verso",
-    binders,
-    form_rules: [formRule],
-  };
-  const placementsBody = { version: 1, by_binder: byBinder };
+      cols: 3,
+      sheetCount: 10,
+    },
+    defs,
+    pokemon,
+  );
+  if (!configBody.binders.length) return false;
   const cfgRes = await fetch(API_BINDER_CONFIG, {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
@@ -208,19 +227,6 @@ async function ensureRegionDefaultWorkspace() {
     body: JSON.stringify(placementsBody),
   });
   return plRes.ok;
-}
-
-function isStrictRegionDefaultConfig(cfg) {
-  const binders = Array.isArray(cfg?.binders) ? cfg.binders : [];
-  if (!binders.length) return false;
-  return binders.every(
-    (b) =>
-      b &&
-      b.region_scope &&
-      Number(b.rows) === 3 &&
-      Number(b.cols) === 3 &&
-      Number(b.sheet_count) === 10,
-  );
 }
 
 function wireRegionPresetOnce() {
@@ -296,7 +302,9 @@ function clearEl(el) {
 function readOrgSelectionFromDom() {
   const sel = document.querySelector(".wizard-org-card.is-selected");
   if (!sel) return null;
-  return sel.dataset.org === "by_region" ? "by_region" : "national";
+  const org = sel.dataset.org || "";
+  if (org === "by_region" || org === "family") return org;
+  return "national";
 }
 
 function readFormScopeFromDom() {
@@ -573,9 +581,16 @@ function prefillWizardDraftFromConfig(cfg, binderIdOpt) {
   const cols = Number(b.cols) || 3;
   const sheetCount = Number(b.sheet_count) || 10;
   const hasScope = Boolean(b.region_scope || b.region_id);
+  const org = b.organization === "family"
+    ? "family"
+    : hasScope
+      ? "national"
+      : b.organization === "by_region"
+        ? "by_region"
+        : "national";
   wizardDraft = {
     name: String(b.name || "Principal"),
-    organization: hasScope ? "national" : b.organization === "by_region" ? "by_region" : "national",
+    organization: org,
     formScope: inferFormScopeFromRule(rule),
     formatPreset: inferFormatPreset(rows, cols, sheetCount),
     rows,
@@ -583,6 +598,20 @@ function prefillWizardDraftFromConfig(cfg, binderIdOpt) {
     sheetCount,
     editBinderId: String(b.id),
   };
+}
+
+function configUsesRegionalBinders(cfg) {
+  const binders = Array.isArray(cfg?.binders) ? cfg.binders : [];
+  return binders.some((b) => b && (b.region_scope || b.region_id));
+}
+
+function prefillWizardDraftForRebuild(cfg, binderIdOpt) {
+  prefillWizardDraftFromConfig(cfg, binderIdOpt);
+  wizardDraft.editBinderId = null;
+  wizardDraft.name = "Principal";
+  if (configUsesRegionalBinders(cfg)) {
+    wizardDraft.organization = "by_region";
+  }
 }
 
 /**
@@ -658,6 +687,91 @@ function sortBinderNationalOrder(pokemon) {
   });
 }
 
+function setEvolutionFamilyData(data) {
+  binderEvolutionFamilies = data && typeof data === "object" ? data : null;
+}
+
+async function ensureEvolutionFamiliesLoaded() {
+  if (binderEvolutionFamilies) return binderEvolutionFamilies;
+  try {
+    const r = await fetch("/data/evolution-families.json");
+    if (!r.ok) return null;
+    const data = await r.json();
+    setEvolutionFamilyData(data);
+    return binderEvolutionFamilies;
+  } catch {
+    return null;
+  }
+}
+
+function familyLayoutBlocks(pokemon, familyData, cols) {
+  const bySlug = new Map();
+  for (const p of pokemon) {
+    const slug = String(p?.slug || "");
+    if (slug) bySlug.set(slug, p);
+  }
+  const emitted = new Set();
+  const columns = Math.max(1, Number(cols) || 3);
+  const families = Array.isArray(familyData?.families) ? familyData.families : [];
+  const blocks = [];
+
+  for (const family of families) {
+    const rows = Array.isArray(family?.layout_rows) ? family.layout_rows : [];
+    const block = [];
+    for (const rawRow of rows) {
+      if (!Array.isArray(rawRow)) continue;
+      const line = [];
+      let hasPokemon = false;
+      for (const slugRaw of rawRow) {
+        if (!slugRaw) {
+          line.push(null);
+          continue;
+        }
+        const slug = String(slugRaw);
+        const p = bySlug.get(slug);
+        if (!p || emitted.has(slug)) {
+          line.push(null);
+          continue;
+        }
+        line.push(p);
+        emitted.add(slug);
+        hasPokemon = true;
+      }
+      if (!hasPokemon) continue;
+      while (line.length % columns !== 0) line.push(null);
+      block.push(...line);
+    }
+    if (block.length) blocks.push(block);
+  }
+
+  const leftovers = sortBinderNationalOrder(
+    pokemon.filter((p) => p?.slug && !emitted.has(String(p.slug))),
+  );
+  for (const p of leftovers) {
+    const block = [p];
+    while (block.length % columns !== 0) block.push(null);
+    blocks.push(block);
+  }
+  return blocks;
+}
+
+function sortBinderFamilyOrder(pokemon, binder, familyData = binderEvolutionFamilies) {
+  if (!familyData || !Array.isArray(familyData.families)) {
+    return sortBinderNationalOrder(pokemon);
+  }
+  return familyLayoutBlocks(pokemon, familyData, binder?.cols || 3).flat();
+}
+
+function applyBinderRange(sorted, binder) {
+  const startRaw = Number(binder?.range_start);
+  const limitRaw = Number(binder?.range_limit);
+  const start = Number.isFinite(startRaw) && startRaw > 0 ? Math.floor(startRaw) : 0;
+  const hasLimit = Number.isFinite(limitRaw) && limitRaw > 0;
+  if (start === 0 && !hasLimit) return sorted;
+  const limit = hasLimit ? Math.floor(limitRaw) : sorted.length;
+  return sorted.slice(start, start + limit);
+}
+
 /**
  * Ordre d’affichage pour un classeur : national ou par région (meta.regions).
  * Si le classeur a `region_scope` / `region_id`, seuls les Pokémon de cette région d’affichage sont inclus
@@ -669,9 +783,17 @@ function orderPokemonForBinder(binder, pokemon, defs) {
   const pool = scope
     ? pokemon.filter((p) => effectiveRegionId(p, defs) === scope)
     : pokemon;
-  const org = binder.organization === "by_region" ? "by_region" : "national";
-  if (org === "by_region" && defs.length) return sortBinderRegionOrder(pool, defs);
-  return sortBinderNationalOrder(pool);
+  const org =
+    binder.organization === "by_region" || binder.organization === "family"
+      ? binder.organization
+      : "national";
+  const sorted =
+    org === "family"
+      ? sortBinderFamilyOrder(pool, binder)
+      : org === "by_region" && defs.length
+        ? sortBinderRegionOrder(pool, defs)
+        : sortBinderNationalOrder(pool);
+  return applyBinderRange(sorted, binder);
 }
 
 /**
@@ -847,7 +969,7 @@ function renderWizardStep() {
     body.append(lead);
 
     const grid = document.createElement("div");
-    grid.className = "wizard-choice-grid wizard-choice-grid--2";
+    grid.className = "wizard-choice-grid wizard-choice-grid--3";
 
     const mkOrg = (org, title, desc) => {
       const btn = document.createElement("button");
@@ -880,6 +1002,11 @@ function renderWizardStep() {
         "by_region",
         "Par région",
         "Blocs par région : espèces natives d’abord, puis formes « importées » en fin de section.",
+      ),
+      mkOrg(
+        "family",
+        "Familles",
+        "Lignes par famille d’évolution, avec des cases vides volontaires pour garder les stades alignés.",
       ),
     );
     body.append(grid);
@@ -1026,7 +1153,9 @@ function renderWizardStep() {
     const pages = 2 * wizardDraft.sheetCount;
     const totalSlots = slots * pages;
     const orgLabel =
-      wizardDraft.organization === "by_region"
+      wizardDraft.organization === "family"
+        ? "Familles d'évolution (stades alignés avec trous volontaires)"
+        : wizardDraft.organization === "by_region"
         ? "Par région (natives puis formes importées en fin de bloc)"
         : "National (ordre du Pokédex)";
     const presetLabel =
@@ -1058,8 +1187,10 @@ function renderWizardStep() {
       `${wizardDraft.sheetCount} feuillets → ${pages} pages, ${totalSlots} emplacements au total`,
     );
     const nameRecap =
-      wizardDraft.organization === "by_region" && !wizardDraft.editBinderId
-        ? `Un album par région (libellés issus du Pokédex), grille identique — le nom « ${wizardDraft.name} » sert de référence interne seulement si tu exportes la config.`
+      wizardDraft.organization === "family" && !wizardDraft.editBinderId
+        ? "Un ou plusieurs classeurs Familles : les grandes familles gardent leurs lignes, les trous restent visibles."
+        : wizardDraft.organization === "by_region" && !wizardDraft.editBinderId
+        ? `Un ou plusieurs classeurs par région : si le format est trop petit, les sections sont nommées Kanto 1, Kanto 2, etc.`
         : `${wizardDraft.name} (modifiable plus tard dans le fichier JSON)`;
     appendRecapLine(div, "Nom du classeur", nameRecap);
     const note = document.createElement("p");
@@ -1075,14 +1206,17 @@ function renderWizardStep() {
   syncWizardBinderBar();
 }
 
-async function fetchPokedexRegionDefs() {
+async function fetchPokedexBinderData() {
   try {
     const r = await fetch("/data/pokedex.json");
-    if (!r.ok) return [];
+    if (!r.ok) return { defs: [], pokemon: [] };
     const dex = await r.json();
-    return Array.isArray(dex.meta?.regions) ? dex.meta.regions : [];
+    return {
+      defs: Array.isArray(dex.meta?.regions) ? dex.meta.regions : [],
+      pokemon: Array.isArray(dex) ? dex : dex.pokemon || [],
+    };
   } catch {
-    return [];
+    return { defs: [], pokemon: [] };
   }
 }
 
@@ -1092,14 +1226,13 @@ async function fetchPokedexRegionDefs() {
  */
 function buildPersistNewPayloads(draft) {
   const binderId = `classeur-${Date.now().toString(36)}`;
-  const scope =
-    draft.formScope === "base_only" ||
-    draft.formScope === "base_regional" ||
-    draft.formScope === "full"
-      ? draft.formScope
-      : DEFAULT_FORM_SCOPE;
+  const scope = normalizeFormScope(draft.formScope);
+  const layout = normalizedBinderLayout(draft);
   const formRule = formRuleFromScope(scope);
-  const org = draft.organization === "by_region" ? "by_region" : "national";
+  const org =
+    draft.organization === "by_region" || draft.organization === "family"
+      ? draft.organization
+      : "national";
   const configBody = {
     version: 1,
     convention: "sheet_recto_verso",
@@ -1107,9 +1240,9 @@ function buildPersistNewPayloads(draft) {
       {
         id: binderId,
         name: draft.name,
-        cols: draft.cols,
-        rows: draft.rows,
-        sheet_count: draft.sheetCount,
+        cols: layout.cols,
+        rows: layout.rows,
+        sheet_count: layout.sheetCount,
         form_rule_id: formRule.id,
         organization: org,
       },
@@ -1126,45 +1259,49 @@ function buildPersistNewPayloads(draft) {
 }
 
 /**
- * Un classeur par entrée de meta.regions (même grille / feuillets), chacun filtré sur sa région.
+ * Classeurs régionaux découpés selon la capacité physique choisie.
+ * Si une région dépasse rows × cols × feuillets × 2, elle devient Kanto 1, Kanto 2, etc.
  * @param {{ name: string; organization: string; formScope: string; rows: number; cols: number; sheetCount: number }} draft
+ * @param {{ id: string; label_fr?: string; low?: number; high?: number }[]} defs
+ * @param {Record<string, unknown>[]} pokemon
+ * @param {string} [seed]
  */
-async function buildPersistNewPayloadsMultiRegion(draft) {
-  const defs = await fetchPokedexRegionDefs();
-  if (!defs.length) {
-    return buildPersistNewPayloads(draft);
-  }
-
-  const scope =
-    draft.formScope === "base_only" ||
-    draft.formScope === "base_regional" ||
-    draft.formScope === "full"
-      ? draft.formScope
-      : DEFAULT_FORM_SCOPE;
+function buildRegionalBinderWorkspace(draft, defs, pokemon, seed = Date.now().toString(36)) {
+  const scope = normalizeFormScope(draft.formScope);
   const formRule = formRuleFromScope(scope);
-  const t = Date.now().toString(36);
+  const layout = normalizedBinderLayout(draft);
+  const capacity = binderCapacity(layout);
   const binders = [];
   const byBinder = {};
+  const selectedPokemon = selectBinderPokemonPool(Array.isArray(pokemon) ? pokemon : [], formRule);
 
-  for (const reg of defs) {
+  for (const reg of Array.isArray(defs) ? defs : []) {
     if (!reg || !reg.id) continue;
-    const id = `classeur-${t}-${String(reg.id).replace(/[^a-z0-9_-]/gi, "-")}`;
-    const label = reg.label_fr || reg.id;
-    binders.push({
-      id,
-      name: String(label),
-      cols: draft.cols,
-      rows: draft.rows,
-      sheet_count: draft.sheetCount,
-      form_rule_id: formRule.id,
-      organization: "national",
-      region_scope: String(reg.id),
-    });
-    byBinder[id] = {};
-  }
-
-  if (!binders.length) {
-    return buildPersistNewPayloads(draft);
+    const regionId = String(reg.id);
+    const label = String(reg.label_fr || reg.id);
+    const regionPokemon = orderPokemonForBinder(
+      { organization: "national", region_scope: regionId },
+      selectedPokemon,
+      defs,
+    );
+    const chunkCount = Math.max(1, Math.ceil(regionPokemon.length / capacity));
+    for (let i = 0; i < chunkCount; i++) {
+      const idSuffix = chunkCount > 1 ? `${safeBinderIdPart(regionId)}-${i + 1}` : safeBinderIdPart(regionId);
+      const id = `classeur-${seed}-${idSuffix}`;
+      binders.push({
+        id,
+        name: chunkCount > 1 ? `${label} ${i + 1}` : label,
+        cols: layout.cols,
+        rows: layout.rows,
+        sheet_count: layout.sheetCount,
+        form_rule_id: formRule.id,
+        organization: "national",
+        region_scope: regionId,
+        range_start: i * capacity,
+        range_limit: capacity,
+      });
+      byBinder[id] = {};
+    }
   }
 
   return {
@@ -1181,12 +1318,104 @@ async function buildPersistNewPayloadsMultiRegion(draft) {
   };
 }
 
+function buildFamilyBinderWorkspace(draft, pokemon, familyData, seed = Date.now().toString(36)) {
+  const scope = normalizeFormScope(draft.formScope);
+  const formRule = formRuleFromScope(scope);
+  const layout = normalizedBinderLayout(draft);
+  const capacity = binderCapacity(layout);
+  const selectedPokemon = selectBinderPokemonPool(Array.isArray(pokemon) ? pokemon : [], formRule);
+  const blocks = familyLayoutBlocks(selectedPokemon, familyData, layout.cols);
+  const binders = [];
+  const byBinder = {};
+  let currentStart = 0;
+  let currentLength = 0;
+
+  const closeChunk = () => {
+    if (currentLength <= 0) return;
+    const idx = binders.length + 1;
+    const id = `classeur-${seed}-familles-${idx}`;
+    binders.push({
+      id,
+      name: `Familles ${idx}`,
+      cols: layout.cols,
+      rows: layout.rows,
+      sheet_count: layout.sheetCount,
+      form_rule_id: formRule.id,
+      organization: "family",
+      range_start: currentStart,
+      range_limit: currentLength,
+    });
+    byBinder[id] = {};
+    currentStart += currentLength;
+    currentLength = 0;
+  };
+
+  for (const block of blocks) {
+    const blockLength = Array.isArray(block) ? block.length : 0;
+    if (!blockLength) continue;
+    if (blockLength > capacity) {
+      if (currentLength > 0) closeChunk();
+      let remaining = blockLength;
+      while (remaining > 0) {
+        const chunkLength = Math.min(capacity, remaining);
+        currentLength = chunkLength;
+        closeChunk();
+        remaining -= chunkLength;
+      }
+      continue;
+    }
+    if (currentLength > 0 && currentLength + blockLength > capacity) {
+      closeChunk();
+    }
+    currentLength += blockLength;
+  }
+  closeChunk();
+
+  if (binders.length === 1) binders[0].name = "Familles";
+
+  return {
+    configBody: {
+      version: 1,
+      convention: "sheet_recto_verso",
+      binders,
+      form_rules: [formRule],
+    },
+    placementsBody: {
+      version: 1,
+      by_binder: byBinder,
+    },
+  };
+}
+
+/**
+ * Un classeur par entrée de meta.regions (même grille / feuillets), chacun filtré sur sa région.
+ * @param {{ name: string; organization: string; formScope: string; rows: number; cols: number; sheetCount: number }} draft
+ */
+async function buildPersistNewPayloadsMultiRegion(draft) {
+  const { defs, pokemon } = await fetchPokedexBinderData();
+  if (!defs.length) {
+    return buildPersistNewPayloads(draft);
+  }
+
+  const workspace = buildRegionalBinderWorkspace(draft, defs, pokemon);
+  if (!workspace.configBody.binders.length) {
+    return buildPersistNewPayloads(draft);
+  }
+  return workspace;
+}
+
 /**
  * @param {{ name: string; organization: string; formScope: string; rows: number; cols: number; sheetCount: number }} draft
  */
 async function buildPersistNewPayloadsFromDraft(draft) {
   if (draft.organization === "by_region") {
     return buildPersistNewPayloadsMultiRegion(draft);
+  }
+  if (draft.organization === "family") {
+    const { pokemon } = await fetchPokedexBinderData();
+    const familyData = await ensureEvolutionFamiliesLoaded();
+    const workspace = buildFamilyBinderWorkspace(draft, pokemon, familyData);
+    if (workspace.configBody.binders.length) return workspace;
   }
   return buildPersistNewPayloads(draft);
 }
@@ -1198,14 +1427,13 @@ async function buildPersistNewPayloadsFromDraft(draft) {
  */
 function buildPersistEditPayloads(draft, cfg, placementsPayload) {
   const binderId = draft.editBinderId;
-  const scope =
-    draft.formScope === "base_only" ||
-    draft.formScope === "base_regional" ||
-    draft.formScope === "full"
-      ? draft.formScope
-      : DEFAULT_FORM_SCOPE;
+  const scope = normalizeFormScope(draft.formScope);
+  const layout = normalizedBinderLayout(draft);
   const formRule = formRuleFromScope(scope);
-  const org = draft.organization === "by_region" ? "by_region" : "national";
+  const org =
+    draft.organization === "by_region" || draft.organization === "family"
+      ? draft.organization
+      : "national";
   const oldBinder = (cfg.binders || []).find((x) => x && x.id === binderId);
   const oldRuleId = oldBinder && oldBinder.form_rule_id;
   const dropIds = new Set([formRule.id]);
@@ -1217,9 +1445,9 @@ function buildPersistEditPayloads(draft, cfg, placementsPayload) {
     return {
       ...b,
       name: draft.name,
-      cols: draft.cols,
-      rows: draft.rows,
-      sheet_count: draft.sheetCount,
+      cols: layout.cols,
+      rows: layout.rows,
+      sheet_count: layout.sheetCount,
       organization: org,
       form_rule_id: formRule.id,
     };
@@ -1395,7 +1623,7 @@ async function refreshBinderV2() {
     let ws = await fetchBinderWorkspaceMerged();
     let cfg = ws.config;
     let pl = ws.placements;
-    if (!isStrictRegionDefaultConfig(cfg)) {
+    if (shouldEnsureDefaultWorkspace(cfg)) {
       const ok = await ensureRegionDefaultWorkspace();
       if (ok) {
         ws = await fetchBinderWorkspaceMerged();
@@ -1406,6 +1634,9 @@ async function refreshBinderV2() {
     setConfigCache(cfg);
     lastPlacementsPayload = pl;
     trackerUiCache.file_exists = !isBinderConfigEmpty(cfg);
+    if (Array.isArray(cfg.binders) && cfg.binders.some((b) => b?.organization === "family")) {
+      await ensureEvolutionFamiliesLoaded();
+    }
     preConfig.textContent = JSON.stringify(cfg, null, 2);
     prePlacements.textContent = JSON.stringify(pl, null, 2);
     toggleBinderViews(false);
@@ -1449,7 +1680,15 @@ function wireWizardOnce() {
     settings.dataset.wired = "1";
     settings.addEventListener("click", () => {
       const id = document.getElementById("binderIdSelect")?.value || null;
-      openWizard({ edit: true, binderId: id || undefined });
+      if (lastConfigJson && !isBinderConfigEmpty(lastConfigJson)) {
+        wizardStep = 0;
+        prefillWizardDraftForRebuild(lastConfigJson, id || undefined);
+        void setWizardSkipped(false);
+        renderWizardStep();
+        toggleBinderViews(true);
+        return;
+      }
+      openWizard();
     });
   }
 }
@@ -1471,7 +1710,7 @@ function startBinderV2IfNeeded() {
       return;
     }
     binderV2Started = true;
-    // Wizard supprimé : mode unique classeur 3x3 par région.
+    wireWizardOnce();
     wireBinderRegionFilterOnce();
     const btn = document.getElementById("binderV2Refresh");
     if (btn) btn.addEventListener("click", () => void refreshBinderV2());
@@ -1483,13 +1722,16 @@ function startBinderV2IfNeeded() {
 window.startBinderV2IfNeeded = startBinderV2IfNeeded;
 
 window.PokedexBinder = {
-  persistWizardDraft: async () => ensureRegionDefaultWorkspace(),
+  persistWizardDraft: (draft = wizardDraft, opts) => persistWizardDraft(draft, opts),
   refreshBinderV2,
   isBinderConfigEmpty,
+  shouldEnsureDefaultWorkspace,
   setWizardSkipped,
   setConfigCache,
   DEFAULT_FORM_SCOPE,
   orderPokemonForBinder,
+  ensureEvolutionFamiliesLoaded,
+  setEvolutionFamilyData,
   formRuleFromScope,
   pokemonMatchesFormRule,
   pokemonMatchesBinderRule,
@@ -1498,5 +1740,14 @@ window.PokedexBinder = {
   getEffectiveFormRuleForCollection,
   get cachedConfig() {
     return lastConfigJson;
+  },
+  _test: {
+    binderCapacity,
+    buildFamilyBinderWorkspace,
+    buildRegionalBinderWorkspace,
+    orderPokemonForBinder,
+    setEvolutionFamilyData,
+    shouldEnsureDefaultWorkspace,
+    formRuleFromScope,
   },
 };

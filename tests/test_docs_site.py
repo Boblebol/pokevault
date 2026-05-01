@@ -175,3 +175,28 @@ def test_trainer_contacts_document_local_trade_workflow() -> None:
         "`Match`",
     ]:
         assert text in guide_text
+
+
+def test_public_story_centers_exploration_trainers_and_pokedex_completion() -> None:
+    landing = (DOCS / "index.html").read_text(encoding="utf-8").lower()
+    readme = (ROOT / "README.md").read_text(encoding="utf-8").lower()
+
+    for text in [
+        "explore",
+        "meet other trainers",
+        "complete your pokedex",
+        "local-first",
+    ]:
+        assert text in landing
+        assert text in readme
+
+
+def test_configurable_binder_layouts_are_documented() -> None:
+    readme = (ROOT / "README.md").read_text(encoding="utf-8")
+    features = (DOCS / "features.html").read_text(encoding="utf-8")
+
+    for text in [readme, features]:
+        assert "10 feuillets" in text
+        assert "3×3" in text
+        assert "Kanto 1" in text
+        assert "Familles" in text
