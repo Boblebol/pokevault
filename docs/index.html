@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="fr">
+<html lang="fr" data-i18n-document="landing">
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -7,19 +7,24 @@
     <meta name="description" content="Pokevault est le Pokédex local-first des collectionneurs qui préfèrent les vrais échanges au cloud.">
     <link rel="stylesheet" href="assets/site.css">
     <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+    <script src="assets/i18n.js" defer></script>
     <script src="assets/site.js" defer></script>
   </head>
   <body>
     <header class="site-header">
-      <nav class="nav" aria-label="Main navigation">
+      <nav class="nav" aria-label="Navigation principale" data-i18n-aria-label="nav.main">
         <a class="brand" href="index.html" data-nav><span class="brand-mark" aria-hidden="true"><img src="assets/logo-mark.svg" alt=""></span><span>pokevault</span></a>
         <div class="nav-links">
-          <a href="features.html" data-nav>Features</a>
-          <a href="install.html" data-nav>Install</a>
-          <a href="architecture.html" data-nav>Architecture</a>
-          <a href="roadmap.html" data-nav>Roadmap</a>
-          <a href="contributing.html" data-nav>Contribute</a>
+          <a href="features.html" data-nav data-i18n="nav.features">Fonctions</a>
+          <a href="install.html" data-nav data-i18n="nav.install">Installer</a>
+          <a href="architecture.html" data-nav data-i18n="nav.architecture">Architecture</a>
+          <a href="roadmap.html" data-nav data-i18n="nav.roadmap">Roadmap</a>
+          <a href="contributing.html" data-nav data-i18n="nav.contribute">Contribuer</a>
           <a href="https://github.com/Boblebol/pokevault">GitHub</a>
+          <div class="language-switch" role="group" aria-label="Langue" data-i18n-aria-label="nav.language">
+            <button type="button" data-i18n-locale="fr" aria-pressed="true">FR</button>
+            <button type="button" data-i18n-locale="en" aria-pressed="false">EN</button>
+          </div>
         </div>
       </nav>
     </header>
@@ -27,22 +32,22 @@
     <main class="page">
       <section class="hero">
         <div class="hero-inner">
-          <figure class="hero-shot" aria-label="Pokevault collection view screenshot">
-            <img src="screenshots/list-view.png" alt="Pokevault collection grid with progress rail and Pokemon cards">
+          <figure class="hero-shot" aria-label="Capture de la vue collection Pokevault" data-i18n-aria-label="landing.hero.shot_label">
+            <img src="screenshots/list-view.png" alt="Grille de collection Pokevault avec progression et cartes Pokemon" data-i18n-alt="landing.hero.shot_alt">
           </figure>
           <div class="hero-copy">
-            <p class="eyebrow">pokevault</p>
-            <h1>Le Pokédex des collectionneurs qui préfèrent les vrais échanges au cloud.</h1>
-            <p class="lead">
+            <p class="eyebrow" data-i18n="landing.hero.kicker">pokevault</p>
+            <h1 data-i18n="landing.hero.title">Le Pokédex des collectionneurs qui préfèrent les vrais échanges au cloud.</h1>
+            <p class="lead" data-i18n="landing.hero.lead">
               Complète ton Pokédex, organise tes classeurs et échange des
               cartes Dresseur à l’ancienne : par fichier, sans compte, sans
               serveur, chacun avec son carnet local. Comme avant : on complète,
               on compare, on échange. Sauf que cette fois, tout reste chez toi.
             </p>
             <div class="actions">
-              <a class="btn btn-primary" href="install.html">Start locally</a>
-              <a class="btn" href="features.html">Explore features</a>
-              <a class="btn" href="https://github.com/Boblebol/pokevault">View source</a>
+              <a class="btn btn-primary" href="install.html" data-i18n="landing.hero.primary">Lancer en local</a>
+              <a class="btn" href="features.html" data-i18n="landing.hero.features">Voir les fonctions</a>
+              <a class="btn" href="https://github.com/Boblebol/pokevault" data-i18n="landing.hero.source">Voir le code</a>
             </div>
           </div>
         </div>
@@ -50,82 +55,82 @@
 
       <section class="section">
         <div class="grid grid-3">
-          <div class="metric"><strong>1457</strong><span>reference Pokedex entries including forms</span></div>
-          <div class="metric"><strong>100%</strong><span>required tracker backend line coverage</span></div>
-          <div class="metric"><strong>0</strong><span>accounts or hosted databases required</span></div>
+          <div class="metric"><strong>1457</strong><span data-i18n="landing.metric.entries">entrées Pokédex de référence, formes incluses</span></div>
+          <div class="metric"><strong>100%</strong><span data-i18n="landing.metric.coverage">couverture de lignes requise côté tracker</span></div>
+          <div class="metric"><strong>0</strong><span data-i18n="landing.metric.accounts">compte ou base hébergée requis</span></div>
         </div>
       </section>
 
       <section class="section">
         <div class="section-head">
-          <p class="eyebrow">Why it exists</p>
-          <h2>A local notebook for the old adventure loop.</h2>
-          <p>
-            Pokevault is built for the feeling of filling a Pokedex route after
-            route: mark what you found, keep notes, compare with Dresseurs you
-            meet, and keep every file on your machine.
+          <p class="eyebrow" data-i18n="landing.why.kicker">Pourquoi ça existe</p>
+          <h2 data-i18n="landing.why.title">Un carnet local pour l’ancienne boucle d’aventure.</h2>
+          <p data-i18n="landing.why.text">
+            Pokevault garde le plaisir de remplir un Pokédex route après route :
+            marquer ce que tu as trouvé, garder tes notes, comparer avec les
+            Dresseurs rencontrés et conserver chaque fichier sur ta machine.
           </p>
         </div>
         <div class="grid grid-3">
           <article class="feature">
-            <h3>Pokedex-first</h3>
-            <p>Cherche, J'ai and Double stay centered on each Pokemon entry so the main goal stays simple: complete your Pokedex.</p>
+            <h3 data-i18n="landing.feature.pokedex.title">Pokédex d’abord</h3>
+            <p data-i18n="landing.feature.pokedex.text">Cherche, J’ai et Double restent centrés sur chaque Pokémon pour garder l’objectif simple : compléter ton Pokédex.</p>
           </article>
           <article class="feature">
-            <h3>Trainer encounters</h3>
-            <p>Meet other Trainers by importing their local card, then let Vu chez and Match reveal possible exchanges.</p>
+            <h3 data-i18n="landing.feature.trainers.title">Rencontres Dresseur</h3>
+            <p data-i18n="landing.feature.trainers.text">Importe la carte locale d’un autre Dresseur, puis laisse Vu chez et Match révéler les échanges possibles.</p>
           </article>
           <article class="feature">
-            <h3>Binder-aware</h3>
-            <p>Model physical binders, 3×3 · 10 feuillets defaults, family layouts, custom grids and printable checklists.</p>
+            <h3 data-i18n="landing.feature.binders.title">Pensé classeurs</h3>
+            <p data-i18n="landing.feature.binders.text">Modélise tes classeurs physiques, le défaut 3×3 · 10 feuillets, les familles d’évolution, les grilles custom et les checklists imprimables.</p>
           </article>
           <article class="feature">
-            <h3>Local exchanges</h3>
-            <p>Export Trainer Cards manually with optional contact links, import received cards into a searchable contact book and keep every file local-first.</p>
+            <h3 data-i18n="landing.feature.local.title">Échanges locaux</h3>
+            <p data-i18n="landing.feature.local.text">Exporte tes Cartes Dresseur à la main avec liens de contact optionnels, importe celles qu’on t’envoie dans un carnet consultable et garde tout en local-first.</p>
           </article>
         </div>
       </section>
 
       <section class="section">
         <div class="section-head">
-          <p class="eyebrow">Screenshots</p>
-          <h2>One workspace for browsing, organizing and measuring progress.</h2>
+          <p class="eyebrow" data-i18n="landing.screens.kicker">Captures</p>
+          <h2 data-i18n="landing.screens.title">Un espace pour parcourir, ranger et mesurer ta progression.</h2>
         </div>
         <div class="grid grid-2">
           <figure class="screenshot">
-            <img src="screenshots/binder-view.png" alt="Binder view with vault navigation and binder grid">
-            <figcaption>Binder view for page-by-page physical collection planning.</figcaption>
+            <img src="screenshots/binder-view.png" alt="Vue classeur avec navigation de coffres et grille de cartes" data-i18n-alt="landing.screens.binder_alt">
+            <figcaption data-i18n="landing.screens.binder_caption">Vue classeur pour planifier ta collection physique page par page.</figcaption>
           </figure>
           <figure class="screenshot">
-            <img src="screenshots/stats-view.png" alt="Statistics view with completion metrics and progress cards">
-            <figcaption>Statistics view with regional progress, badges and next actions.</figcaption>
+            <img src="screenshots/stats-view.png" alt="Vue statistiques avec métriques de complétion et cartes de progression" data-i18n-alt="landing.screens.stats_alt">
+            <figcaption data-i18n="landing.screens.stats_caption">Vue statistiques avec progression régionale, badges et prochaines actions.</figcaption>
           </figure>
         </div>
       </section>
 
       <section class="section">
         <div class="section-head">
-          <p class="eyebrow">Quick start</p>
-          <h2>Run it locally in a few commands.</h2>
+          <p class="eyebrow" data-i18n="landing.quick.kicker">Démarrage rapide</p>
+          <h2 data-i18n="landing.quick.title">Lance-le en local en quelques commandes.</h2>
         </div>
         <div class="code-card">
-          <button class="copy-btn" type="button" data-copy="#quick-start">Copy</button>
+          <button class="copy-btn" type="button" data-copy="#quick-start" data-i18n="landing.quick.copy">Copier</button>
           <pre id="quick-start"><code>git clone https://github.com/Boblebol/pokevault.git
 cd pokevault
 make install
 make dev</code></pre>
         </div>
         <div class="actions">
-          <a class="btn btn-primary" href="install.html">Read install guide</a>
-          <a class="btn" href="../README.md">Open README</a>
+          <a class="btn btn-primary" href="install.html" data-i18n="landing.quick.install">Lire le guide d’installation</a>
+          <a class="btn" href="../README.md" data-i18n="landing.quick.readme">Ouvrir le README</a>
         </div>
       </section>
     </main>
 
     <footer class="site-footer">
       <div class="footer-inner">
-        <span>Pokevault v1.1.0 · MIT licensed. Local-first by design.</span>
-        <span><a href="contributing.html">Contribute</a> · <a href="../SECURITY.md">Security</a> · <a href="../CHANGELOG.md">Changelog</a> · <a href="https://alexandre-enouf.fr">Portfolio</a></span>
+        <span data-i18n="landing.footer.status">Pokevault v1.1.0 · MIT. Local-first par design.</span>
+        <span><a href="contributing.html" data-i18n="landing.footer.contribute">Contribuer</a> · <a href="../SECURITY.md" data-i18n="landing.footer.security">Sécurité</a> · <a href="../CHANGELOG.md" data-i18n="landing.footer.changelog">Changelog</a> · <a href="https://alexandre-enouf.fr" data-i18n="landing.footer.portfolio">Portfolio</a></span>
       </div>
     </footer>
   </body>

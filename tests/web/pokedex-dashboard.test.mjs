@@ -179,3 +179,50 @@ test("renderDashboard puts core Pokedex cards before secondary add-ons", async (
   assert.match(regionsHost.children[0].textContent, /Kanto/);
   assert.match(regionsHost.children[0].textContent, /1 \/ 2/);
 });
+
+test("renderDashboard follows English i18n labels when available", async () => {
+  const api = await loadModule();
+  globalThis.PokevaultI18n = {
+    t(key, params = {}) {
+      const messages = {
+        "dashboard.card.not_met": "Not met",
+        "dashboard.card.not_met_detail": "To discover",
+        "dashboard.card.seen": "Seen",
+        "dashboard.card.seen_detail": "To catch",
+        "dashboard.card.caught": "Caught",
+        "dashboard.card.caught_detail": "{pct}% of the dex",
+        "dashboard.card.shiny": "Shiny",
+        "dashboard.card.shiny_detail": "Bonus",
+        "dashboard.card.cards": "Cards",
+        "dashboard.card.cards_detail": "{sets} set(s)",
+        "dashboard.region.aria": "{region}: {caught} of {total}",
+      };
+      return (messages[key] || key).replace(/\{([a-zA-Z0-9_]+)\}/g, (_, name) => String(params[name]));
+    },
+  };
+  const cardsHost = new FakeElement("div");
+  const regionsHost = new FakeElement("div");
+
+  api.renderDashboard({
+    cardsHost,
+    regionsHost,
+    metrics: {
+      total: 4,
+      notMet: 1,
+      seen: 1,
+      caught: 2,
+      shiny: 1,
+      percentCaught: 50,
+      cardStats: { cards: 3, sets: 2 },
+      regions: [
+        { id: "kanto", label: "Kanto", caught: 1, seen: 0, total: 2, percentCaught: 50 },
+      ],
+    },
+  });
+
+  assert.equal(cardsHost.children[0].children[0].textContent, "Not met");
+  assert.equal(cardsHost.children[1].children[2].textContent, "To catch");
+  assert.equal(cardsHost.children[2].children[2].textContent, "50% of the dex");
+  assert.equal(cardsHost.children[4].children[2].textContent, "2 set(s)");
+  assert.equal(regionsHost.children[0].attributes["aria-label"], "Kanto: 1 of 2");
+});

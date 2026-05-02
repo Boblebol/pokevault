@@ -108,6 +108,37 @@ img {
   background: var(--surface-high);
 }
 
+.language-switch {
+  display: inline-grid;
+  grid-template-columns: repeat(2, minmax(36px, auto));
+  gap: 2px;
+  padding: 2px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--bg-low);
+}
+
+.language-switch button {
+  min-height: 32px;
+  border: 0;
+  border-radius: 4px;
+  padding: 6px 8px;
+  background: transparent;
+  color: var(--muted);
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0;
+  cursor: pointer;
+}
+
+.language-switch button:hover,
+.language-switch button.is-active,
+.language-switch button[aria-pressed="true"] {
+  background: var(--surface-high);
+  color: var(--text);
+}
+
 .page {
   width: min(var(--max), calc(100% - 32px));
   margin: 0 auto;

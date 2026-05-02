@@ -17,6 +17,33 @@ let shellInited = false;
 let unsubCaught = null;
 let shellDimSubbed = false;
 let shellTrainerContactsSubbed = false;
+let shellLocaleSubbed = false;
+
+const BINDER_SHELL_FALLBACK_I18N = {
+  "binder_shell.other_name": "Sans nom",
+  "binder_shell.generic": "Classeur",
+  "binder_shell.active": "ACTIF",
+  "binder_shell.completed": "{pct}% COMPLÉTÉ",
+  "binder_shell.format": "Format {rows}×{cols} · {sheets} feuillets · {capacity} emplacements.",
+  "binder_shell.face.recto": "Recto",
+  "binder_shell.face.verso": "Verso",
+  "binder_shell.page_label": "Page {page} (f.{sheet}/{sheets} {face})",
+  "binder_shell.page_title": "Page {page} — Feuillet {sheet}/{sheets} · {face}",
+  "binder_shell.metric.completion": "Complétion",
+  "binder_shell.metric.page_spread": "Page spread",
+  "binder_shell.metric.pages": "{count} pages",
+  "binder_shell.hint.empty": "{format} Charge le Pokédex (make web) pour remplir les cases.",
+  "binder_shell.hint.slots": "{format} Emplacements {first}-{last} sur {slots} cases, {entries} Pokémon.",
+};
+
+function tBinderShell(key, params = {}) {
+  const runtime = window.PokevaultI18n;
+  if (runtime?.t) return runtime.t(key, params);
+  const template = BINDER_SHELL_FALLBACK_I18N[key] || key;
+  return String(template).replace(/\{([a-zA-Z0-9_]+)\}/g, (_, name) =>
+    Object.prototype.hasOwnProperty.call(params, name) ? String(params[name]) : `{${name}}`,
+  );
+}
 
 function regionDefLabelBinder(defs, id) {
   const d = defs.find((r) => r && r.id === id);
@@ -84,7 +111,7 @@ function binderFormatText(binder) {
   const cols = Math.max(1, Number(binder.cols) || 3);
   const sheets = Math.max(1, Number(binder.sheet_count) || 10);
   const capacity = rows * cols * sheets * 2;
-  return `Format ${rows}×${cols} · ${sheets} feuillets · ${capacity} emplacements.`;
+  return tBinderShell("binder_shell.format", { rows, cols, sheets, capacity });
 }
 
 function maxGlobalFaceIndex(binder) {
@@ -139,17 +166,28 @@ function setGlobalFaceIndex(binder, idx) {
   shellState.face = clamped % 2;
 }
 
-function updateFaceLabel(binder, start, nShow) {
-  const el = document.getElementById("binderFaceLabel");
-  if (!el || !binder) return;
+function faceLabels(binder, start, nShow) {
+  if (!binder) return [];
   const sheets = Math.max(1, Number(binder.sheet_count) || 1);
   const bits = [];
   for (let j = 0; j < nShow; j++) {
     const pi = start + j;
     const sheetNum = Math.floor(pi / 2) + 1;
-    const faceLab = pi % 2 === 0 ? "Recto" : "Verso";
-    bits.push(`Page ${pi + 1} (f.${sheetNum}/${sheets} ${faceLab})`);
+    const face = pi % 2 === 0 ? tBinderShell("binder_shell.face.recto") : tBinderShell("binder_shell.face.verso");
+    bits.push(tBinderShell("binder_shell.page_label", {
+      page: pi + 1,
+      sheet: sheetNum,
+      sheets,
+      face,
+    }));
   }
+  return bits;
+}
+
+function updateFaceLabel(binder, start, nShow) {
+  const el = document.getElementById("binderFaceLabel");
+  if (!el || !binder) return;
+  const bits = faceLabels(binder, start, nShow);
   el.textContent = bits.join(" · ");
 }
 
@@ -171,10 +209,10 @@ function fillBinderSelect(cfg) {
       const ord = ordinalBinderScope(binders, idx);
       label = nSame > 1 ? `${base} (${ord})` : base;
     } else if (binders.length > 1) {
-      const nm = b.name && String(b.name).trim() ? String(b.name) : "Sans nom";
-      label = `Classeur ${idx + 1} — ${nm}`;
+      const nm = b.name && String(b.name).trim() ? String(b.name) : tBinderShell("binder_shell.other_name");
+      label = `${tBinderShell("binder_shell.generic")} ${idx + 1} — ${nm}`;
     } else {
-      label = b.name ? String(b.name) : "Classeur";
+      label = b.name ? String(b.name) : tBinderShell("binder_shell.generic");
     }
     o.textContent = label;
     sel.append(o);
@@ -215,12 +253,12 @@ function renderVaultsNav(cfg, activeBinderId, ordered) {
     top.className = "binder-vault-item-top";
     const nm = document.createElement("span");
     nm.className = "binder-vault-item-name";
-    nm.textContent = String(b.name || "Binder");
+    nm.textContent = String(b.name || tBinderShell("binder_shell.generic"));
     top.append(nm);
     if (String(b.id) === String(activeBinderId)) {
       const pill = document.createElement("span");
       pill.className = "binder-vault-item-pill";
-      pill.textContent = "ACTIF";
+      pill.textContent = tBinderShell("binder_shell.active");
       top.append(pill);
     }
     const progress = document.createElement("div");
@@ -232,7 +270,7 @@ function renderVaultsNav(cfg, activeBinderId, ordered) {
     const meta = document.createElement("p");
     meta.className = "binder-vault-meta";
     const left = document.createElement("span");
-    left.textContent = `${pct}% COMPLÉTÉ`;
+    left.textContent = tBinderShell("binder_shell.completed", { pct });
     const right = document.createElement("span");
     right.textContent = `${got} / ${total}`;
     meta.append(left, right);
@@ -301,8 +339,13 @@ function renderBinderPageGrid() {
     title.className = "binder-page-panel-title";
     const sheets = Math.max(1, Number(binder.sheet_count) || 1);
     const sheetNum = Math.floor(pageIdx / 2) + 1;
-    const faceLab = pageIdx % 2 === 0 ? "Recto" : "Verso";
-    title.textContent = `Page ${pageIdx + 1} — Feuillet ${sheetNum}/${sheets} · ${faceLab}`;
+    const face = pageIdx % 2 === 0 ? tBinderShell("binder_shell.face.recto") : tBinderShell("binder_shell.face.verso");
+    title.textContent = tBinderShell("binder_shell.page_title", {
+      page: pageIdx + 1,
+      sheet: sheetNum,
+      sheets,
+      face,
+    });
     const grid = document.createElement("div");
     grid.className = "binder-page-grid binder-page-grid--cards";
     grid.setAttribute("role", "grid");
@@ -352,8 +395,12 @@ function renderBinderPageGrid() {
     };
 
     metricsHost.append(
-      makeMetric("Complétion", `${pct}%`, `${totalCaught} / ${totalEntries}`),
-      makeMetric("Page spread", `${pageStart + 1}-${pageStart + nShow}`, `${totalPages} pages`),
+      makeMetric(tBinderShell("binder_shell.metric.completion"), `${pct}%`, `${totalCaught} / ${totalEntries}`),
+      makeMetric(
+        tBinderShell("binder_shell.metric.page_spread"),
+        `${pageStart + 1}-${pageStart + nShow}`,
+        tBinderShell("binder_shell.metric.pages", { count: totalPages }),
+      ),
     );
   }
 
@@ -366,8 +413,14 @@ function renderBinderPageGrid() {
     const modeText = binderFormatText(binder);
     hint.textContent =
       slotTotal === 0
-        ? `${modeText} Charge le Pokédex (make web) pour remplir les cases.`
-        : `${modeText} Emplacements ${firstSlot + 1}–${lastIdx + 1} sur ${slotTotal} cases, ${entryTotal} Pokémon.`;
+        ? tBinderShell("binder_shell.hint.empty", { format: modeText })
+        : tBinderShell("binder_shell.hint.slots", {
+            format: modeText,
+            first: firstSlot + 1,
+            last: lastIdx + 1,
+            slots: slotTotal,
+            entries: entryTotal,
+          });
   }
 
   updateFaceLabel(binder, pageStart, nShow);
@@ -446,6 +499,15 @@ function initBinderShell() {
       if (!empty) renderBinderPageGrid();
     });
   }
+  if (!shellLocaleSubbed) {
+    shellLocaleSubbed = true;
+    window.PokevaultI18n?.subscribeLocale?.(() => {
+      fillBinderSelect(shellState.cfg);
+      const cfg = shellState.cfg;
+      const empty = !cfg || !Array.isArray(cfg.binders) || !cfg.binders.length;
+      if (!empty) renderBinderPageGrid();
+    });
+  }
   wirePager();
   wireBinderSelect();
   unsubCaught = window.PokedexCollection?.subscribeCaught?.(() => {
@@ -463,3 +525,10 @@ window.PokedexBinderShell = {
     syncFromConfig(cfg);
   },
 };
+
+if (window.__POKEVAULT_BINDER_SHELL_TESTS__) {
+  window.PokedexBinderShell._test = {
+    binderFormatText,
+    faceLabels,
+  };
+}

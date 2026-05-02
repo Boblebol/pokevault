@@ -239,3 +239,20 @@ test("family binder workspace splits on family blocks without dropping holes", a
     ],
   );
 });
+
+test("binder wizard form rule labels follow English i18n when available", async () => {
+  const api = await loadModule();
+  globalThis.PokevaultI18n = {
+    t(key) {
+      return {
+        "binder_wizard.form.base_only.title": "Main base only",
+        "binder_wizard.form.base_regional.title": "Base + regional forms",
+        "binder_wizard.form.full.title": "Complete named forms",
+      }[key] || key;
+    },
+  };
+
+  assert.equal(api.formRuleFromScope("base_only").label, "Main base only");
+  assert.equal(api.formRuleFromScope("base_regional").label, "Base + regional forms");
+  assert.equal(api.formRuleFromScope("full").label, "Complete named forms");
+});

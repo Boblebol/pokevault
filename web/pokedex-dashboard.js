@@ -4,6 +4,30 @@
 (function initPokedexDashboard() {
   "use strict";
 
+  const FALLBACK_I18N = {
+    "dashboard.region.other": "Autre",
+    "dashboard.region.aria": "{region}: {caught} sur {total}",
+    "dashboard.card.not_met": "Non rencontrés",
+    "dashboard.card.not_met_detail": "À découvrir",
+    "dashboard.card.seen": "Vus",
+    "dashboard.card.seen_detail": "À capturer",
+    "dashboard.card.caught": "Capturés",
+    "dashboard.card.caught_detail": "{pct}% du dex",
+    "dashboard.card.shiny": "Shiny",
+    "dashboard.card.shiny_detail": "Bonus",
+    "dashboard.card.cards": "Cartes",
+    "dashboard.card.cards_detail": "{sets} set(s)",
+  };
+
+  function t(key, params = {}) {
+    const runtime = window.PokevaultI18n;
+    if (runtime?.t) return runtime.t(key, params);
+    const template = FALLBACK_I18N[key] || key;
+    return String(template).replace(/\{([a-zA-Z0-9_]+)\}/g, (_, name) =>
+      Object.prototype.hasOwnProperty.call(params, name) ? String(params[name]) : `{${name}}`,
+    );
+  }
+
   function pokemonKey(pokemon) {
     return String(pokemon?.slug || "");
   }
@@ -83,7 +107,7 @@
         if (!otherRegion) {
           otherRegion = {
             id: "_other",
-            label: "Autre",
+            label: t("dashboard.region.other"),
             low: 0,
             high: 0,
             caught: 0,
@@ -143,7 +167,11 @@
     const row = document.createElement("div");
     row.className = "pokedex-dashboard-region";
     row.textContent = `${region.label} · ${region.caught} / ${region.total}`;
-    row.setAttribute("aria-label", `${region.label}: ${region.caught} sur ${region.total}`);
+    row.setAttribute("aria-label", t("dashboard.region.aria", {
+      region: region.label,
+      caught: region.caught,
+      total: region.total,
+    }));
 
     const bar = document.createElement("span");
     bar.className = "pokedex-dashboard-region__bar";
@@ -160,34 +188,34 @@
     const cardSummary = metrics.cardStats || { cards: 0, sets: 0 };
     cardsHost.replaceChildren(
       renderMetricCard({
-        label: "Non rencontrés",
+        label: t("dashboard.card.not_met"),
         value: metrics.notMet,
-        detail: "À découvrir",
+        detail: t("dashboard.card.not_met_detail"),
         metric: "missing",
       }),
       renderMetricCard({
-        label: "Vus",
+        label: t("dashboard.card.seen"),
         value: metrics.seen,
-        detail: "À capturer",
+        detail: t("dashboard.card.seen_detail"),
         metric: "seen",
       }),
       renderMetricCard({
-        label: "Capturés",
+        label: t("dashboard.card.caught"),
         value: metrics.caught,
-        detail: `${metrics.percentCaught}% du dex`,
+        detail: t("dashboard.card.caught_detail", { pct: metrics.percentCaught }),
         metric: "caught",
       }),
       renderMetricCard({
-        label: "Shiny",
+        label: t("dashboard.card.shiny"),
         value: metrics.shiny,
-        detail: "Bonus",
+        detail: t("dashboard.card.shiny_detail"),
         metric: "shiny",
         secondary: true,
       }),
       renderMetricCard({
-        label: "Cartes",
+        label: t("dashboard.card.cards"),
         value: cardSummary.cards,
-        detail: `${cardSummary.sets} set(s)`,
+        detail: t("dashboard.card.cards_detail", { sets: cardSummary.sets }),
         metric: "cards",
         secondary: true,
       }),

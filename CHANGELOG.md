@@ -18,11 +18,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 - Trainer Cards now support up to three shareable contact lines, including
   Instagram, Facebook and phone presets rendered as contact actions on imported
   cards.
+- The app and public landing now include a lightweight FR/EN switch with French
+  as the default language and no external i18n dependency.
 
 ### Changed
 
 - The public landing hero now leads with the French nostalgic exchange tagline:
   "Le Pokédex des collectionneurs qui préfèrent les vrais échanges au cloud."
+- Public docs now expose the same language switch in their shared navigation,
+  while long-form docs stay readable as static project documentation.
 
 ## [1.1.0] — 2026-04-28
 

@@ -7,19 +7,24 @@
     <meta name="description" content="How to contribute to Pokevault: setup, checks, coverage, issues, pull requests and security.">
     <link rel="stylesheet" href="assets/site.css">
     <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+    <script src="assets/i18n.js" defer></script>
     <script src="assets/site.js" defer></script>
   </head>
   <body>
     <header class="site-header">
-      <nav class="nav" aria-label="Main navigation">
+      <nav class="nav" aria-label="Main navigation" data-i18n-aria-label="nav.main">
         <a class="brand" href="index.html" data-nav><span class="brand-mark" aria-hidden="true"><img src="assets/logo-mark.svg" alt=""></span><span>pokevault</span></a>
         <div class="nav-links">
-          <a href="features.html" data-nav>Features</a>
-          <a href="install.html" data-nav>Install</a>
-          <a href="architecture.html" data-nav>Architecture</a>
-          <a href="roadmap.html" data-nav>Roadmap</a>
-          <a href="contributing.html" data-nav>Contribute</a>
+          <a href="features.html" data-nav data-i18n="nav.features">Features</a>
+          <a href="install.html" data-nav data-i18n="nav.install">Install</a>
+          <a href="architecture.html" data-nav data-i18n="nav.architecture">Architecture</a>
+          <a href="roadmap.html" data-nav data-i18n="nav.roadmap">Roadmap</a>
+          <a href="contributing.html" data-nav data-i18n="nav.contribute">Contribute</a>
           <a href="https://github.com/Boblebol/pokevault">GitHub</a>
+          <div class="language-switch" role="group" aria-label="Language" data-i18n-aria-label="nav.language">
+            <button type="button" data-i18n-locale="fr" aria-pressed="true">FR</button>
+            <button type="button" data-i18n-locale="en" aria-pressed="false">EN</button>
+          </div>
         </div>
       </nav>
     </header>

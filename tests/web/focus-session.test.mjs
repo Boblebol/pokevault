@@ -112,3 +112,30 @@ test("syncSessionCompletion keeps only caught targets as completed", async () =>
   assert.equal(next.done, 1);
   assert.equal(next.total, 3);
 });
+
+test("buildSessionPlan follows English i18n fallback reasons", async () => {
+  const api = await loadModule();
+  globalThis.PokevaultI18n = {
+    t(key, params = {}) {
+      const messages = {
+        "focus.reason.region_close": "{region} is close to completion.",
+        "focus.reason.badge_near": "Near badge: {title} ({current}/{target}).",
+        "focus.reason.keep_thread": "Short session to keep momentum.",
+      };
+      return (messages[key] || key).replace(/\{([a-zA-Z0-9_]+)\}/g, (_, name) => String(params[name]));
+    },
+  };
+  globalThis.PokevaultBadges = {
+    nearest() {
+      return { title: "Century", current: 97, target: 100, unlocked: false };
+    },
+  };
+
+  const plan = api.buildSessionPlan(
+    [{ slug: "001-a", number: "#001", region: "kanto", names: { fr: "A" } }],
+    {},
+    [{ id: "kanto", label_fr: "Kanto", low: 1, high: 151 }],
+  );
+
+  assert.equal(plan.reason, "Kanto is close to completion. Near badge: Century (97/100).");
+});

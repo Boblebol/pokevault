@@ -19,7 +19,7 @@ PAGES = [
     "contributing.html",
 ]
 
-NAV_LABELS = ["Features", "Install", "Architecture", "Roadmap", "Contribute", "GitHub"]
+NAV_LABELS = ["Fonctions", "Installer", "Architecture", "Roadmap", "Contribuer", "GitHub"]
 
 
 class LinkParser(HTMLParser):
@@ -72,6 +72,22 @@ def test_public_site_navigation_is_complete() -> None:
     for label in NAV_LABELS:
         assert label in text
 
+    i18n = (DOCS / "assets" / "i18n.js").read_text(encoding="utf-8")
+    for label in ["Features", "Install", "Contribute", "Language"]:
+        assert label in i18n
+
+
+def test_public_docs_share_language_switch() -> None:
+    for page in PAGES:
+        text = (DOCS / page).read_text(encoding="utf-8")
+        assert '<script src="assets/i18n.js" defer></script>' in text, page
+        assert 'data-i18n-locale="fr"' in text, page
+        assert 'data-i18n-locale="en"' in text, page
+        assert 'data-i18n="nav.features"' in text, page
+    assert 'data-i18n-document="landing"' in (DOCS / "index.html").read_text(encoding="utf-8")
+    features = (DOCS / "features.html").read_text(encoding="utf-8")
+    assert 'data-i18n-document="landing"' not in features
+
 
 def test_public_site_footers_link_to_portfolio() -> None:
     for page in PAGES:
@@ -95,6 +111,28 @@ def test_web_app_references_runtime_brand_assets() -> None:
 
     assert ("href", "/assets/favicon.svg") in links
     assert ("src", "/assets/logo-mark.svg") in links
+
+
+def test_web_app_supports_fr_en_switch_on_main_surfaces() -> None:
+    index = (WEB / "index.html").read_text(encoding="utf-8")
+    i18n = (WEB / "i18n.js").read_text(encoding="utf-8")
+
+    assert '<script src="/i18n.js" defer></script>' in index
+    assert 'data-i18n-locale="fr"' in index
+    assert 'data-i18n-locale="en"' in index
+    for key in [
+        "app.collection.title",
+        "app.stats.title",
+        "app.binders.title",
+        "app.trainers.title",
+        "app.print.title",
+        "app.settings.title",
+        "app.onboarding.title",
+        "app.shortcuts.title",
+        "app.drawer.kicker",
+    ]:
+        assert f'data-i18n="{key}"' in index
+        assert key in i18n
 
 
 def test_readme_links_changelog_without_hosted_demo() -> None:
@@ -182,9 +220,11 @@ def test_trainer_contacts_document_local_trade_workflow() -> None:
 
 def test_public_story_centers_exploration_trainers_and_pokedex_completion() -> None:
     landing = (DOCS / "index.html").read_text(encoding="utf-8").lower()
+    docs_i18n = (DOCS / "assets" / "i18n.js").read_text(encoding="utf-8").lower()
+    landing_bundle = f"{landing}\n{docs_i18n}"
     readme = (ROOT / "README.md").read_text(encoding="utf-8").lower()
 
-    assert '<html lang="fr">' in landing
+    assert '<html lang="fr"' in landing
     assert "le pokédex des collectionneurs qui préfèrent les vrais échanges au cloud" in landing
     assert "le pokédex des collectionneurs qui préfèrent les vrais échanges au cloud" in readme
     assert "comme avant" in landing
@@ -195,8 +235,28 @@ def test_public_story_centers_exploration_trainers_and_pokedex_completion() -> N
         "complete your pokedex",
         "local-first",
     ]:
-        assert text in landing
+        assert text in landing_bundle
         assert text in readme
+
+
+def test_public_landing_supports_fr_en_switch() -> None:
+    landing = (DOCS / "index.html").read_text(encoding="utf-8")
+    i18n = (DOCS / "assets" / "i18n.js").read_text(encoding="utf-8")
+
+    assert '<script src="assets/i18n.js" defer></script>' in landing
+    assert 'data-i18n-locale="fr"' in landing
+    assert 'data-i18n-locale="en"' in landing
+    assert 'data-i18n="landing.hero.title"' in landing
+    assert "Le Pokédex des collectionneurs qui préfèrent les vrais échanges au cloud." in landing
+    assert "The collector Pokédex for people who prefer real trades to the cloud." in i18n
+    assert "pokevault_locale" in i18n
+
+
+def test_readme_documents_language_switch() -> None:
+    text = (ROOT / "README.md").read_text(encoding="utf-8")
+
+    assert "French by default" in text
+    assert "FR/EN" in text
 
 
 def test_configurable_binder_layouts_are_documented() -> None:

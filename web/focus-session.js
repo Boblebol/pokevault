@@ -9,6 +9,34 @@
 
   const STORAGE_KEY = "pokevault_focus_session_v1";
   const SESSION_SIZE = 6;
+  const FALLBACK_I18N = {
+    "focus.region.other": "Autre",
+    "focus.region.national": "National",
+    "focus.reason.region_close": "{region} est proche d'etre completee.",
+    "focus.reason.badge_near": "Badge proche : {title} ({current}/{target}).",
+    "focus.reason.keep_thread": "Session courte pour garder le fil.",
+    "focus.toast.title": "Session focus",
+    "focus.toast.body": "{count} cible{plural} dans {region}",
+    "focus.title": "Session focus",
+    "focus.done_title": "Session terminée",
+    "focus.idle_body": "Six cibles, pas plus. Le but est de finir une petite boucle sans perdre le fil.",
+    "focus.why": "Pourquoi ? {reason}",
+    "focus.launch": "Lancer",
+    "focus.all_caught": "Pokédex complet sur ce périmètre.",
+    "focus.done_body": "Boucle terminée. Tu peux relancer une session courte.",
+    "focus.new_session": "Nouvelle session",
+    "focus.restart": "Repartir",
+    "focus.loading": "Chargement du Pokédex.",
+  };
+
+  function t(key, params = {}) {
+    const runtime = window.PokevaultI18n;
+    if (runtime?.t) return runtime.t(key, params);
+    const template = FALLBACK_I18N[key] || key;
+    return String(template).replace(/\{([a-zA-Z0-9_]+)\}/g, (_, name) =>
+      Object.prototype.hasOwnProperty.call(params, name) ? String(params[name]) : `{${name}}`,
+    );
+  }
 
   function slugOf(p) {
     return String(p?.slug || "");
@@ -42,7 +70,7 @@
 
   function regionLabel(id, defs) {
     const found = (defs || []).find((d) => String(d.id) === String(id));
-    return found?.label_fr || (id === "unknown" ? "Autre" : String(id || "National"));
+    return found?.label_fr || (id === "unknown" ? t("focus.region.other") : String(id || t("focus.region.national")));
   }
 
   function fallbackRankTargets(pool, caughtMap, statusMap, regionDefinitions, limit) {
@@ -58,7 +86,7 @@
     return {
       targetRegionId: rid,
       targetLabel: label,
-      reason: `${label} est proche d'etre completee.`,
+      reason: t("focus.reason.region_close", { region: label }),
       rows: target,
     };
   }
@@ -70,13 +98,13 @@
     const target = Number.isFinite(Number(badge.target)) ? Number(badge.target) : 1;
     const title = String(badge.title || "").trim();
     if (!title) return "";
-    return `Badge proche : ${title} (${current}/${target}).`;
+    return t("focus.reason.badge_near", { title, current, target });
   }
 
   function appendBadgeReason(reason) {
     const badgeReason = nearestBadgeReason();
     if (!badgeReason) return reason;
-    return `${reason || "Session courte pour garder le fil."} ${badgeReason}`;
+    return `${reason || t("focus.reason.keep_thread")} ${badgeReason}`;
   }
 
   function buildSessionPlan(pool, caughtMap, regionDefinitions, statusMap = {}) {
@@ -212,7 +240,11 @@
     const saved = writeSession(plan);
     const T = window.PokevaultToast;
     if (T?.show) {
-      T.show("Session focus", `${saved.slugs.length} cible${saved.slugs.length > 1 ? "s" : ""} dans ${saved.targetLabel}`, {
+      T.show(t("focus.toast.title"), t("focus.toast.body", {
+        count: saved.slugs.length,
+        plural: saved.slugs.length > 1 ? "s" : "",
+        region: saved.targetLabel,
+      }), {
         icon: "flag",
         tone: "ok",
       });
@@ -274,29 +306,29 @@
   }
 
   function renderIdle(host, plan) {
-    renderShell(host, "Session focus", "");
-    host.append(el("p", "focus-panel__body", "Six cibles, pas plus. Le but est de finir une petite boucle sans perdre le fil."));
-    if (plan?.reason) host.append(el("p", "focus-panel__why", `Pourquoi ? ${plan.reason}`));
+    renderShell(host, t("focus.title"), "");
+    host.append(el("p", "focus-panel__body", t("focus.idle_body")));
+    if (plan?.reason) host.append(el("p", "focus-panel__why", t("focus.why", { reason: plan.reason })));
     const actions = el("div", "focus-panel__actions");
-    actions.append(button("focus-panel__btn", "Lancer", () => startSession()));
+    actions.append(button("focus-panel__btn", t("focus.launch"), () => startSession()));
     if (plan) actions.append(el("span", "focus-panel__hint", plan.targetLabel));
     host.append(actions);
   }
 
   function renderAllCaught(host) {
-    renderShell(host, "Session focus", "");
-    host.append(el("p", "focus-panel__body", "Pokédex complet sur ce périmètre."));
+    renderShell(host, t("focus.title"), "");
+    host.append(el("p", "focus-panel__body", t("focus.all_caught")));
   }
 
   function renderActive(host, session, state) {
     const complete = session.done >= session.total;
-    renderShell(host, complete ? "Session terminée" : "Session focus", `${session.done} / ${session.total}`);
+    renderShell(host, complete ? t("focus.done_title") : t("focus.title"), `${session.done} / ${session.total}`);
     const meter = el("div", "focus-panel__meter");
     const bar = el("div", "focus-panel__bar");
     bar.style.width = `${session.total ? Math.round((session.done / session.total) * 100) : 0}%`;
     meter.append(bar);
     host.append(meter);
-    host.append(el("p", "focus-panel__body", complete ? "Boucle terminée. Tu peux relancer une session courte." : `Pourquoi ? ${session.reason}`));
+    host.append(el("p", "focus-panel__body", complete ? t("focus.done_body") : t("focus.why", { reason: session.reason })));
 
     const list = el("div", "focus-panel__targets");
     for (const slug of session.slugs) {
@@ -312,7 +344,7 @@
     host.append(list);
 
     const actions = el("div", "focus-panel__actions");
-    actions.append(button("focus-panel__btn focus-panel__btn--ghost", complete ? "Nouvelle session" : "Repartir", () => {
+    actions.append(button("focus-panel__btn focus-panel__btn--ghost", complete ? t("focus.new_session") : t("focus.restart"), () => {
       resetSession();
       if (complete) startSession();
     }));
@@ -322,13 +354,13 @@
   function renderPanel(host, state, session, plan) {
     if (!host) return;
     if (!state) {
-      renderShell(host, "Session focus", "");
-      host.append(el("p", "focus-panel__body", "Chargement du Pokédex."));
+      renderShell(host, t("focus.title"), "");
+      host.append(el("p", "focus-panel__body", t("focus.loading")));
       return;
     }
     if (!state.pool.length) {
-      renderShell(host, "Session focus", "");
-      host.append(el("p", "focus-panel__body", "Chargement du Pokédex."));
+      renderShell(host, t("focus.title"), "");
+      host.append(el("p", "focus-panel__body", t("focus.loading")));
       return;
     }
     if (session) {
@@ -388,6 +420,7 @@
     refresh();
     window.PokedexCollection?.subscribeCaught?.(() => refresh());
     window.PokevaultHunts?.subscribe?.(() => refresh());
+    window.PokevaultI18n?.subscribeLocale?.(() => refresh());
   }
 
   const api = {

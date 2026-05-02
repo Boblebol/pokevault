@@ -23,14 +23,18 @@
           <div class="stitch-brand">pokevault</div>
           <span class="app-version-badge" id="appVersionBadge">v--</span>
         </div>
-        <nav class="stitch-topnav">
-          <a href="#/liste" class="app-switch-link is-active" data-view="liste" aria-current="page">Collection</a>
-          <a href="#/classeur" class="app-switch-link" data-view="classeur">Classeurs</a>
-          <a href="#/dresseurs" class="app-switch-link" data-view="dresseurs">Dresseurs</a>
-          <a href="#/print" class="app-switch-link" data-view="print">Impression</a>
-          <a href="#/stats" class="app-switch-link" data-view="stats">Statistiques</a>
-          <a href="#/settings" class="app-switch-link" data-view="settings">Réglages</a>
+        <nav class="stitch-topnav" aria-label="Navigation principale" data-i18n-aria-label="app.nav.main">
+          <a href="#/liste" class="app-switch-link is-active" data-view="liste" aria-current="page" data-i18n="app.nav.collection">Collection</a>
+          <a href="#/classeur" class="app-switch-link" data-view="classeur" data-i18n="app.nav.binders">Classeurs</a>
+          <a href="#/dresseurs" class="app-switch-link" data-view="dresseurs" data-i18n="app.nav.trainers">Dresseurs</a>
+          <a href="#/print" class="app-switch-link" data-view="print" data-i18n="app.nav.print">Impression</a>
+          <a href="#/stats" class="app-switch-link" data-view="stats" data-i18n="app.nav.stats">Statistiques</a>
+          <a href="#/settings" class="app-switch-link" data-view="settings" data-i18n="app.nav.settings">Réglages</a>
         </nav>
+        <div class="app-language-switch" role="group" aria-label="Langue" data-i18n-aria-label="app.language">
+          <button type="button" data-i18n-locale="fr" aria-pressed="true">FR</button>
+          <button type="button" data-i18n-locale="en" aria-pressed="false">EN</button>
+        </div>
       </div>
     </header>
 
@@ -40,8 +44,8 @@
           <header class="header app-collection-header binder-header">
             <div class="page-header-top">
               <div>
-                <h1 class="title">Collection</h1>
-                <p class="collection-subtitle">
+                <h1 class="title" data-i18n="app.collection.title">Collection</h1>
+                <p class="collection-subtitle" data-i18n="app.collection.subtitle">
                   Ta progression Pokédex, synchronisée avec tes classeurs.
                 </p>
               </div>
@@ -49,11 +53,11 @@
             </div>
           </header>
 
-          <section class="collection-shell" aria-label="Collection Pokédex">
-            <aside class="collection-rail" aria-label="Filtres de collection">
+          <section class="collection-shell" aria-label="Collection Pokédex" data-i18n-aria-label="app.collection.shell">
+            <aside class="collection-rail" aria-label="Filtres de collection" data-i18n-aria-label="app.collection.filters">
               <div class="list-hero">
                 <div class="list-hero-left">
-                  <p class="list-kicker">Centre Pokédex</p>
+                  <p class="list-kicker" data-i18n="app.collection.center">Centre Pokédex</p>
                 </div>
                 <div class="list-hero-right">
                   <span id="listHeroPct" class="list-hero-pct">0%</span>
@@ -66,14 +70,14 @@
                 </div>
               </div>
 
-              <section class="pokedex-dashboard" aria-label="Tableau de bord Pokédex">
+              <section class="pokedex-dashboard" aria-label="Tableau de bord Pokédex" data-i18n-aria-label="app.collection.dashboard">
                 <div
                   id="pokedexDashboardCards"
                   class="pokedex-dashboard-cards"
                   aria-live="polite"
                 ></div>
                 <div class="pokedex-dashboard-regions-wrap">
-                  <p class="pokedex-dashboard-title">Progression par région</p>
+                  <p class="pokedex-dashboard-title" data-i18n="app.collection.region_progress">Progression par région</p>
                   <div
                     id="pokedexDashboardRegions"
                     class="pokedex-dashboard-regions"
@@ -85,10 +89,11 @@
                 class="pokedex-next-actions"
                 id="pokedexNextActions"
                 aria-label="Prochains Pokémon à compléter"
+                data-i18n-aria-label="app.collection.next_actions"
               ></section>
 
               <div class="progress-row">
-                <div class="progress-bar" role="progressbar" aria-label="Progression de la collection" aria-valuemin="0" aria-valuemax="100">
+                <div class="progress-bar" role="progressbar" aria-label="Progression de la collection" data-i18n-aria-label="app.collection.progress" aria-valuemin="0" aria-valuemax="100">
                   <div class="progress-bar-fill" id="progressFill"></div>
                 </div>
                 <span class="counter" id="counter">0 / 0</span>
@@ -115,32 +120,34 @@
                   class="search-input"
                   placeholder="Rechercher par nom ou numéro..."
                   aria-label="Rechercher par nom ou numéro"
+                  data-i18n-placeholder="app.search.placeholder"
+                  data-i18n-aria-label="app.search.aria"
                   autocomplete="off"
                   spellcheck="false"
                 />
               </label>
 
-              <div class="filters" role="group" aria-label="Filtrer par statut">
+              <div class="filters" role="group" aria-label="Filtrer par statut" data-i18n-aria-label="app.filters.status">
                 <button type="button" class="filter-btn is-active" data-filter="all" aria-pressed="true">
-                  Tous
+                  <span data-i18n="app.filters.all">Tous</span>
                 </button>
                 <button type="button" class="filter-btn" data-filter="missing" aria-pressed="false">
-                  Manquants
+                  <span data-i18n="app.filters.missing">Manquants</span>
                 </button>
                 <button type="button" class="filter-btn" data-filter="hunts" aria-pressed="false">
-                  Cherche
+                  <span data-i18n="app.filters.hunts">Cherche</span>
                 </button>
                 <button type="button" class="filter-btn" data-filter="seen" aria-pressed="false">
-                  Vus
+                  <span data-i18n="app.filters.seen">Vus</span>
                 </button>
                 <button type="button" class="filter-btn" data-filter="caught" aria-pressed="false">
-                  J'ai
+                  <span data-i18n="app.filters.caught">J'ai</span>
                 </button>
                 <button type="button" class="filter-btn filter-btn--bonus" data-filter="shiny" aria-pressed="false">
-                  Shiny
+                  <span data-i18n="app.filters.shiny">Shiny</span>
                 </button>
                 <button type="button" class="filter-btn" data-form-filter="regional_only" aria-pressed="false">
-                  Formes régionales
+                  <span data-i18n="app.filters.regional">Formes régionales</span>
                 </button>
               </div>
 
@@ -161,35 +168,35 @@
 
               <div class="advanced-filters" id="advancedFiltersPanel">
                 <label class="region-filter-wrap">
-                  <span class="region-filter-label">Région</span>
+                  <span class="region-filter-label" data-i18n="app.filters.region">Région</span>
                   <select id="regionFilter" class="region-filter" aria-label="Filtrer par région du Pokédex">
-                    <option value="all">Toutes les régions</option>
+                    <option value="all" data-i18n="app.filters.all_regions">Toutes les régions</option>
                   </select>
                 </label>
                 <label class="region-filter-wrap">
-                  <span class="region-filter-label">Formes</span>
+                  <span class="region-filter-label" data-i18n="app.filters.forms">Formes</span>
                   <select id="formFilter" class="region-filter" aria-label="Filtrer les formes dans la liste uniquement">
-                    <option value="all">Tout le dex</option>
-                    <option value="base_only">Base uniquement</option>
-                    <option value="base_regional">Base + régional</option>
-                    <option value="regional_only">Formes régionales seules</option>
+                    <option value="all" data-i18n="app.filters.all_dex">Tout le dex</option>
+                    <option value="base_only" data-i18n="app.filters.base_only">Base uniquement</option>
+                    <option value="base_regional" data-i18n="app.filters.base_regional">Base + régional</option>
+                    <option value="regional_only" data-i18n="app.filters.regional_only">Formes régionales seules</option>
                   </select>
                 </label>
                 <label class="region-filter-wrap">
-                  <span class="region-filter-label">Type</span>
+                  <span class="region-filter-label" data-i18n="app.filters.type">Type</span>
                   <select id="typeFilter" class="region-filter" aria-label="Filtrer par type Pokémon">
-                    <option value="all">Tous les types</option>
+                    <option value="all" data-i18n="app.filters.all_types">Tous les types</option>
                   </select>
                 </label>
                 <label class="region-filter-wrap collection-dim-wrap">
-                  <span class="region-filter-label">Mise en avant</span>
+                  <span class="region-filter-label" data-i18n="app.filters.dim">Mise en avant</span>
                   <select
                     id="collectionDimSelect"
                     class="region-filter"
                     aria-label="Choisir quelles cartes atténuer dans la grille"
                   >
-                    <option value="caught">Atténuer attrapés</option>
-                    <option value="missing">Atténuer manquants</option>
+                    <option value="caught" data-i18n="app.dim.caught">Atténuer attrapés</option>
+                    <option value="missing" data-i18n="app.dim.missing">Atténuer manquants</option>
                   </select>
                 </label>
               </div>
@@ -207,18 +214,18 @@
 
       <div id="viewStats" class="app-view" hidden>
         <header class="header app-collection-header binder-header stats-header">
-          <h1 class="title">Statistiques</h1>
-          <p class="collection-subtitle">Vue d'ensemble de ta progression, par région et par type.</p>
+          <h1 class="title" data-i18n="app.stats.title">Statistiques</h1>
+          <p class="collection-subtitle" data-i18n="app.stats.subtitle">Vue d'ensemble de ta progression, par région et par type.</p>
         </header>
-        <section class="stats-shell" aria-label="Tableau de bord statistiques">
-          <aside class="stats-rail" aria-label="Résumé statistiques">
-            <p class="stats-rail-kicker">Synthèse</p>
+        <section class="stats-shell" aria-label="Tableau de bord statistiques" data-i18n-aria-label="app.stats.shell">
+          <aside class="stats-rail" aria-label="Résumé statistiques" data-i18n-aria-label="app.stats.summary">
+            <p class="stats-rail-kicker" data-i18n="app.stats.summary_title">Synthèse</p>
             <div class="stats-rail-summary">
               <span class="stats-rail-value" id="statsRailPct">0%</span>
               <span class="stats-rail-label" id="statsRailCount">0 / 0 attrapés</span>
               <span class="stats-rail-label" id="statsRailMissing">0 manquants</span>
             </div>
-            <div class="stats-rail-note">
+            <div class="stats-rail-note" data-i18n="app.stats.scope_note">
               Les statistiques suivent le même périmètre de formes que la collection.
             </div>
             <div class="stats-rail-badge" id="statsRailBadge" hidden></div>
@@ -237,18 +244,18 @@
 
       <div id="viewClasseur" class="app-view" hidden>
         <header class="header binder-header app-collection-header">
-          <h1 class="title title-binder">Classeurs</h1>
-          <p class="collection-subtitle">Gère tes classeurs, tes pages et les placements de tes cartes.</p>
+          <h1 class="title title-binder" data-i18n="app.binders.title">Classeurs</h1>
+          <p class="collection-subtitle" data-i18n="app.binders.subtitle">Gère tes classeurs, tes pages et les placements de tes cartes.</p>
           <div class="binder-header-actions">
-            <button type="button" class="binder-refresh" id="binderV2Refresh">Rafraîchir</button>
-            <button type="button" class="binder-refresh binder-refresh--ghost" id="binderWizardSettings" hidden>Réglages</button>
+            <button type="button" class="binder-refresh" id="binderV2Refresh" data-i18n="app.binders.refresh">Rafraîchir</button>
+            <button type="button" class="binder-refresh binder-refresh--ghost" id="binderWizardSettings" hidden data-i18n="app.binders.settings">Réglages</button>
           </div>
           <p class="sync-hint" id="binderV2Hint" hidden></p>
           <div id="binderAdvancedPanel" class="stitch-hidden" hidden>
             <label class="region-filter-wrap binder-v2-region-wrap">
-              <span class="region-filter-label">Région (aperçu ordre)</span>
+              <span class="region-filter-label" data-i18n="app.binders.preview_region">Région (aperçu ordre)</span>
               <select id="binderRegionFilter" class="region-filter" disabled aria-label="Filtrer l'aperçu ordre par région">
-                <option value="all">Toutes</option>
+                <option value="all" data-i18n="app.binders.all">Toutes</option>
               </select>
             </label>
           </div>
@@ -257,17 +264,17 @@
         <section class="binder-main binder-main--v2">
           <div id="binderWizardWrap" class="wizard-wrap binder-wizard-wrap" hidden>
             <section class="wizard-card binder-wizard binder-wizard--scrollable" aria-labelledby="binderWizardTitle">
-              <p class="wizard-kicker">Réglages classeur</p>
-              <h2 id="binderWizardTitle" class="wizard-title">Adapter le format physique.</h2>
+              <p class="wizard-kicker" data-i18n="app.binders.wizard.kicker">Réglages classeur</p>
+              <h2 id="binderWizardTitle" class="wizard-title" data-i18n="app.binders.wizard.title">Adapter le format physique.</h2>
               <div id="binderWizardDots" class="wizard-dots" aria-hidden="true"></div>
               <p id="binderWizardStepMeta" class="wizard-step-meta binder-wizard-meta"></p>
               <div id="binderWizardBinderBar" class="binder-wizard-binder-bar" hidden></div>
               <div id="binderWizardBody" class="binder-wizard-body"></div>
               <footer class="binder-wizard-footer">
-                <button id="binderWizardSkip" class="binder-wizard-secondary" type="button">Annuler</button>
+                <button id="binderWizardSkip" class="binder-wizard-secondary" type="button" data-i18n="app.actions.cancel">Annuler</button>
                 <div class="binder-wizard-nav">
-                  <button id="binderWizardBack" class="binder-wizard-back" type="button">Retour</button>
-                  <button id="binderWizardNext" class="binder-wizard-next" type="button">Continuer</button>
+                  <button id="binderWizardBack" class="binder-wizard-back" type="button" data-i18n="app.actions.back">Retour</button>
+                  <button id="binderWizardNext" class="binder-wizard-next" type="button" data-i18n="app.actions.continue">Continuer</button>
                 </div>
               </footer>
             </section>
@@ -277,55 +284,55 @@
             <div id="binderCollectionShell" class="binder-collection-shell" hidden>
               <div class="binder-shell-layout">
                 <aside class="binder-vaults-nav">
-                  <h2 class="binder-vaults-title">Tes classeurs</h2>
-                  <div id="binderVaultsNav" class="binder-vaults-list" aria-label="Liste des classeurs"></div>
+                  <h2 class="binder-vaults-title" data-i18n="app.binders.mine">Tes classeurs</h2>
+                  <div id="binderVaultsNav" class="binder-vaults-list" aria-label="Liste des classeurs" data-i18n-aria-label="app.binders.list"></div>
                 </aside>
                 <section class="binder-shell-main">
                   <div class="binder-shell-toolbar">
                     <label class="binder-shell-select-wrap">
-                      <span class="binder-shell-select-label">Classeur</span>
-                      <select id="binderIdSelect" class="region-filter binder-shell-select" aria-label="Classeur actif"></select>
+                      <span class="binder-shell-select-label" data-i18n="app.binders.active">Classeur</span>
+                      <select id="binderIdSelect" class="region-filter binder-shell-select" aria-label="Classeur actif" data-i18n-aria-label="app.binders.active_aria"></select>
                     </label>
                     <label class="binder-shell-select-wrap binder-dim-wrap">
-                      <span class="binder-shell-select-label">Mise en avant</span>
-                      <select id="binderDimSelect" class="region-filter binder-shell-select" aria-label="Choisir quelles cartes atténuer dans le classeur">
-                        <option value="caught">Atténuer attrapés</option>
-                        <option value="missing">Atténuer manquants</option>
+                      <span class="binder-shell-select-label" data-i18n="app.filters.dim">Mise en avant</span>
+                      <select id="binderDimSelect" class="region-filter binder-shell-select" aria-label="Choisir quelles cartes atténuer dans le classeur" data-i18n-aria-label="app.binders.dim_aria">
+                        <option value="caught" data-i18n="app.dim.caught">Atténuer attrapés</option>
+                        <option value="missing" data-i18n="app.dim.missing">Atténuer manquants</option>
                       </select>
                     </label>
-                    <div class="binder-pager" role="navigation" aria-label="Pages du classeur">
-                      <button type="button" class="binder-pager-btn" id="binderFacePrev" aria-label="Pages précédentes">◀</button>
+                    <div class="binder-pager" role="navigation" aria-label="Pages du classeur" data-i18n-aria-label="app.binders.pages">
+                      <button type="button" class="binder-pager-btn" id="binderFacePrev" aria-label="Pages précédentes" data-i18n-aria-label="app.binders.prev">◀</button>
                       <span class="binder-pager-label" id="binderFaceLabel"></span>
-                      <button type="button" class="binder-pager-btn" id="binderFaceNext" aria-label="Pages suivantes">▶</button>
+                      <button type="button" class="binder-pager-btn" id="binderFaceNext" aria-label="Pages suivantes" data-i18n-aria-label="app.binders.next">▶</button>
                     </div>
                   </div>
-                  <div id="binderPagesHost" class="binder-pages-host" aria-label="Pages du classeur"></div>
-                  <section class="binder-metrics" id="binderMetrics" aria-label="Indicateurs du classeur"></section>
+                  <div id="binderPagesHost" class="binder-pages-host" aria-label="Pages du classeur" data-i18n-aria-label="app.binders.pages"></div>
+                  <section class="binder-metrics" id="binderMetrics" aria-label="Indicateurs du classeur" data-i18n-aria-label="app.binders.metrics"></section>
                   <p class="binder-shell-hint" id="binderShellHint"></p>
                 </section>
               </div>
             </div>
 
             <div id="binderEmptyPlaceholder" class="binder-empty-placeholder" hidden>
-              <p class="binder-empty-placeholder__title">Tes classeurs se préparent.</p>
-              <p class="binder-empty-placeholder__text">Initialisation des classeurs 3×3 · 10 feuillets par région… Si rien ne bouge, vérifie que l'API est bien joignable.</p>
+              <p class="binder-empty-placeholder__title" data-i18n="app.binders.empty.title">Tes classeurs se préparent.</p>
+              <p class="binder-empty-placeholder__text" data-i18n="app.binders.empty.text">Initialisation des classeurs 3×3 · 10 feuillets par région… Si rien ne bouge, vérifie que l'API est bien joignable.</p>
             </div>
 
             <div id="binderExtrasWrap" class="binder-extras-wrap stitch-hidden" hidden>
               <section id="binderRegionPreviewWrap" class="binder-panel binder-panel--full" hidden>
-                <h2 class="binder-panel-title">Aperçu ordre « par région »</h2>
+                <h2 class="binder-panel-title" data-i18n="app.binders.region_preview">Aperçu ordre « par région »</h2>
                 <p class="binder-region-preview-hint" id="binderRegionPreviewHint"></p>
                 <ol class="binder-region-preview-list" id="binderRegionPreviewList"></ol>
               </section>
               <details class="binder-json-details">
-                <summary class="binder-json-details-summary">Données JSON (debug)</summary>
+                <summary class="binder-json-details-summary" data-i18n="app.binders.debug">Données JSON (debug)</summary>
                 <div class="binder-panels-wrap binder-panels-wrap--json">
                   <section class="binder-panel" aria-labelledby="lbl-config">
-                    <h2 id="lbl-config" class="binder-panel-title">Config classeurs (agrégée via REST)</h2>
+                    <h2 id="lbl-config" class="binder-panel-title" data-i18n="app.binders.config">Config classeurs (agrégée via REST)</h2>
                     <pre class="binder-pre" id="binderConfigPreview"></pre>
                   </section>
                   <section class="binder-panel" aria-labelledby="lbl-pl">
-                    <h2 id="lbl-pl" class="binder-panel-title">Placements (agrégés via REST)</h2>
+                    <h2 id="lbl-pl" class="binder-panel-title" data-i18n="app.binders.placements">Placements (agrégés via REST)</h2>
                     <pre class="binder-pre" id="binderPlacementsPreview"></pre>
                   </section>
                 </div>
@@ -337,25 +344,25 @@
 
       <div id="viewDresseurs" class="app-view" hidden>
         <header class="header binder-header app-collection-header">
-          <h1 class="title title-binder">Dresseurs</h1>
-          <p class="collection-subtitle">Cartes dresseur locales, importées par fichier, sans compte ni serveur.</p>
+          <h1 class="title title-binder" data-i18n="app.trainers.title">Dresseurs</h1>
+          <p class="collection-subtitle" data-i18n="app.trainers.subtitle">Cartes dresseur locales, importées par fichier, sans compte ni serveur.</p>
         </header>
-        <section class="trainer-shell" id="trainerContactsRoot" aria-label="Contacts dresseurs"></section>
+        <section class="trainer-shell" id="trainerContactsRoot" aria-label="Contacts dresseurs" data-i18n-aria-label="app.trainers.contacts"></section>
         <input type="file" id="trainerImportFileInput" accept=".json,.pokevault.json,.pokevault-trainer.json" hidden />
       </div>
 
       <div id="viewPrint" class="app-view" hidden>
         <header class="header binder-header app-collection-header">
-          <h1 class="title title-binder">Impression</h1>
-          <p class="collection-subtitle">Checklist imprimable, alignée sur la liste et les classeurs.</p>
+          <h1 class="title title-binder" data-i18n="app.print.title">Impression</h1>
+          <p class="collection-subtitle" data-i18n="app.print.subtitle">Checklist imprimable, alignée sur la liste et les classeurs.</p>
         </header>
 
         <section class="binder-main binder-main--v2">
           <div class="binder-collection-shell print-shell">
             <div class="binder-shell-layout">
               <aside class="binder-vaults-nav">
-                <h2 class="binder-vaults-title">Tes classeurs</h2>
-                <div id="printVaultsNav" class="binder-vaults-list" aria-label="Choisir un classeur à imprimer"></div>
+                <h2 class="binder-vaults-title" data-i18n="app.binders.mine">Tes classeurs</h2>
+                <div id="printVaultsNav" class="binder-vaults-list" aria-label="Choisir un classeur à imprimer" data-i18n-aria-label="app.print.choose_binder"></div>
               </aside>
               <section class="binder-shell-main">
                 <div class="print-toolbar">
@@ -367,31 +374,33 @@
                       class="search-input"
                       placeholder="Rechercher par nom ou numéro..."
                       aria-label="Rechercher dans la checklist"
+                      data-i18n-placeholder="app.search.placeholder"
+                      data-i18n-aria-label="app.print.search_aria"
                       autocomplete="off"
                       spellcheck="false"
                     />
                   </label>
                   <div class="print-controls">
                     <div class="print-control-group">
-                      <label for="printFilterSelect">Filtre</label>
+                      <label for="printFilterSelect" data-i18n="app.print.filter">Filtre</label>
                       <select id="printFilterSelect" class="region-filter">
-                        <option value="all">Tous</option>
-                        <option value="caught">Attrapés</option>
-                        <option value="missing">Manquants</option>
+                        <option value="all" data-i18n="app.filters.all">Tous</option>
+                        <option value="caught" data-i18n="app.print.caught">Attrapés</option>
+                        <option value="missing" data-i18n="app.filters.missing">Manquants</option>
                       </select>
                     </div>
                     <div class="print-control-group">
-                      <label for="printGroupSelect">Regrouper par</label>
+                      <label for="printGroupSelect" data-i18n="app.print.group">Regrouper par</label>
                       <select id="printGroupSelect" class="region-filter">
-                        <option value="binder">Pages de classeur</option>
-                        <option value="region">Région</option>
-                        <option value="pocket">Pocket A5 (par région)</option>
+                        <option value="binder" data-i18n="app.print.binder_pages">Pages de classeur</option>
+                        <option value="region" data-i18n="app.print.region">Région</option>
+                        <option value="pocket" data-i18n="app.print.pocket">Pocket A5 (par région)</option>
                       </select>
                     </div>
                     <span class="print-summary" id="printSummary"></span>
                     <button type="button" class="print-action-btn" id="printBtn">
                       <span class="material-symbols-outlined" aria-hidden="true">print</span>
-                      Imprimer
+                      <span data-i18n="app.print.action">Imprimer</span>
                     </button>
                   </div>
                 </div>
@@ -404,44 +413,44 @@
 
       <div id="viewSettings" class="app-view" hidden>
         <header class="header app-collection-header binder-header">
-          <h1 class="title">Réglages</h1>
-          <p class="collection-subtitle">Préférences d'affichage, export et import de tes données.</p>
+          <h1 class="title" data-i18n="app.settings.title">Réglages</h1>
+          <p class="collection-subtitle" data-i18n="app.settings.subtitle">Préférences d'affichage, export et import de tes données.</p>
         </header>
         <section class="stats-main">
           <div class="stats-kpi-card">
-            <h2 class="stats-kpi-label">Affichage</h2>
-            <p class="stats-kpi-sub">Le contraste des cartes est partagé entre liste et classeur.</p>
+            <h2 class="stats-kpi-label" data-i18n="app.settings.display">Affichage</h2>
+            <p class="stats-kpi-sub" data-i18n="app.settings.display_help">Le contraste des cartes est partagé entre liste et classeur.</p>
             <label class="region-filter-wrap settings-dim-label">
-              <span class="region-filter-label">Mise en avant</span>
+              <span class="region-filter-label" data-i18n="app.filters.dim">Mise en avant</span>
               <select id="settingsDimSelect" class="region-filter" aria-label="Mode global de mise en avant">
-                <option value="caught">Atténuer attrapés</option>
-                <option value="missing">Atténuer manquants</option>
+                <option value="caught" data-i18n="app.dim.caught">Atténuer attrapés</option>
+                <option value="missing" data-i18n="app.dim.missing">Atténuer manquants</option>
               </select>
             </label>
             <label class="region-filter-wrap settings-dim-label theme-choice-row">
-              <span class="region-filter-label">Thème</span>
+              <span class="region-filter-label" data-i18n="app.settings.theme">Thème</span>
               <select id="settingsThemeSelect" class="region-filter" aria-label="Thème de région"></select>
             </label>
             <label class="region-filter-wrap settings-dim-label theme-choice-row">
-              <span class="region-filter-label">Artwork</span>
+              <span class="region-filter-label" data-i18n="app.settings.artwork">Artwork</span>
               <select id="settingsArtworkSelect" class="region-filter" aria-label="Source d'artwork par défaut"></select>
             </label>
           </div>
           <div class="stats-kpi-card">
-            <h2 class="stats-kpi-label">Données</h2>
-            <p class="stats-kpi-sub">Exporter ou importer toute la collection (attrapés + classeurs).</p>
+            <h2 class="stats-kpi-label" data-i18n="app.settings.data">Données</h2>
+            <p class="stats-kpi-sub" data-i18n="app.settings.data_help">Exporter ou importer toute la collection (attrapés + classeurs).</p>
             <div class="settings-data-actions">
               <button type="button" class="settings-action-btn" id="exportBtn">
                 <span class="material-symbols-outlined" aria-hidden="true">download</span>
-                Exporter JSON
+                <span data-i18n="app.settings.export">Exporter JSON</span>
               </button>
               <button type="button" class="settings-action-btn" id="importBtn">
                 <span class="material-symbols-outlined" aria-hidden="true">upload</span>
-                Importer JSON
+                <span data-i18n="app.settings.import">Importer JSON</span>
               </button>
               <a href="#/print" class="settings-action-btn" id="printFromSettingsBtn">
                 <span class="material-symbols-outlined" aria-hidden="true">print</span>
-                Checklist impression
+                <span data-i18n="app.settings.print">Checklist impression</span>
               </a>
               <input type="file" id="importFileInput" accept=".json" hidden />
             </div>
@@ -449,34 +458,34 @@
               <p id="importPreviewText"></p>
               <div class="import-preview-actions">
                 <button type="button" class="settings-action-btn settings-action-btn--confirm" id="importConfirmBtn">
-                  Confirmer import
+                  <span data-i18n="app.settings.confirm_import">Confirmer import</span>
                 </button>
                 <button type="button" class="settings-action-btn settings-action-btn--cancel" id="importCancelBtn">
-                  Annuler
+                  <span data-i18n="app.actions.cancel">Annuler</span>
                 </button>
               </div>
             </div>
             <p id="exportImportHint" class="sync-hint" hidden></p>
           </div>
           <div class="stats-kpi-card">
-            <h2 class="stats-kpi-label">Profil</h2>
-            <p class="stats-kpi-sub" id="settingsProfileLabel">Profil : —</p>
+            <h2 class="stats-kpi-label" data-i18n="app.settings.profile">Profil</h2>
+            <p class="stats-kpi-sub" id="settingsProfileLabel" data-i18n="app.settings.profile_label">Profil : —</p>
             <div class="settings-data-actions">
               <button type="button" class="settings-action-btn" id="replayOnboardingBtn">
                 <span class="material-symbols-outlined" aria-hidden="true">play_circle</span>
-                Rejouer l'onboarding
+                <span data-i18n="app.settings.replay">Rejouer l'onboarding</span>
               </button>
             </div>
           </div>
           <div class="stats-kpi-card">
-            <h2 class="stats-kpi-label">Pokédex multi-profils</h2>
-            <p class="stats-kpi-sub">
+            <h2 class="stats-kpi-label" data-i18n="app.settings.multi_profiles">Pokédex multi-profils</h2>
+            <p class="stats-kpi-sub" data-i18n="app.settings.multi_profiles_help">
               Chaque profil garde sa propre progression, ses cartes et ses
               classeurs (par ex. « Hardcore », « Casual », « Shiny only »).
             </p>
             <label class="region-filter-wrap settings-dim-label theme-choice-row">
-              <span class="region-filter-label">Profil actif</span>
-              <select id="settingsProfileSelect" class="region-filter" aria-label="Profil Pokédex actif"></select>
+              <span class="region-filter-label" data-i18n="app.settings.active_profile">Profil actif</span>
+              <select id="settingsProfileSelect" class="region-filter" aria-label="Profil Pokédex actif" data-i18n-aria-label="app.settings.active_profile_aria"></select>
             </label>
             <div class="settings-data-actions profiles-actions">
               <input
@@ -485,23 +494,25 @@
                 class="search-input profiles-name-input"
                 placeholder="Nom du nouveau profil"
                 aria-label="Nom du nouveau profil Pokédex"
+                data-i18n-placeholder="app.settings.new_profile"
+                data-i18n-aria-label="app.settings.new_profile_aria"
                 maxlength="64"
               />
               <button type="button" class="settings-action-btn" id="settingsProfileCreateBtn">
                 <span class="material-symbols-outlined" aria-hidden="true">person_add</span>
-                Créer
+                <span data-i18n="app.settings.create">Créer</span>
               </button>
               <button type="button" class="settings-action-btn settings-action-btn--cancel" id="settingsProfileDeleteBtn">
                 <span class="material-symbols-outlined" aria-hidden="true">delete</span>
-                Supprimer
+                <span data-i18n="app.settings.delete">Supprimer</span>
               </button>
             </div>
             <p id="settingsProfileHint" class="sync-hint" hidden></p>
           </div>
           <div class="stats-kpi-card">
-            <h2 class="stats-kpi-label">Version</h2>
-            <p class="stats-kpi-sub" id="settingsVersionLabel">Application v-- · API --</p>
-            <p class="stats-kpi-sub" id="settingsHealthLabel">État API : vérification...</p>
+            <h2 class="stats-kpi-label" data-i18n="app.settings.version">Version</h2>
+            <p class="stats-kpi-sub" id="settingsVersionLabel" data-i18n="app.settings.version_label">Application v-- · API --</p>
+            <p class="stats-kpi-sub" id="settingsHealthLabel" data-i18n="app.settings.health">État API : vérification...</p>
           </div>
         </section>
       </div>
@@ -513,7 +524,7 @@
           <span class="stitch-footer-logo">pokevault</span>
           <span class="stitch-footer-sep" aria-hidden="true">·</span>
           <span class="stitch-footer-credit">
-            conçu par
+            <span data-i18n="app.footer.credit">conçu par</span>
             <a
               class="stitch-footer-link stitch-footer-link--name"
               href="https://alexandre-enouf.fr"
@@ -524,13 +535,14 @@
           <span class="stitch-footer-sep" aria-hidden="true">·</span>
           <span class="stitch-footer-version" id="footerVersionLabel">v--</span>
         </div>
-        <nav class="stitch-footer-links" aria-label="Liens développeur">
+        <nav class="stitch-footer-links" aria-label="Liens développeur" data-i18n-aria-label="app.footer.dev_links">
           <a
             class="stitch-footer-link"
             href="https://alexandre-enouf.fr"
             target="_blank"
             rel="noopener noreferrer"
             aria-label="Portfolio d'Alexandre"
+            data-i18n-aria-label="app.footer.portfolio_aria"
           >
             <span class="material-symbols-outlined" aria-hidden="true">public</span>
             Portfolio
@@ -562,12 +574,13 @@
     <dialog id="onboardingWizard" class="onboarding" aria-labelledby="onboardingTitle">
       <form method="dialog" class="onboarding__form" id="onboardingForm">
         <header class="onboarding__header">
-          <h2 id="onboardingTitle" class="onboarding__title">Bienvenue sur Pokevault</h2>
+          <h2 id="onboardingTitle" class="onboarding__title" data-i18n="app.onboarding.title">Bienvenue sur Pokevault</h2>
           <button
             type="button"
             class="onboarding__close"
             id="onboardingSkip"
             aria-label="Passer l'onboarding"
+            data-i18n-aria-label="app.onboarding.skip"
           >
             <span class="material-symbols-outlined" aria-hidden="true">close</span>
           </button>
@@ -583,43 +596,43 @@
 
         <section class="onboarding__step is-active" data-step="1">
           <input type="hidden" id="onboardingGoal" name="onboardingGoal" value="complete_pokedex" />
-          <p class="onboarding__kicker">Étape 1 · Pokédex</p>
-          <h3 class="onboarding__step-title">Suivre mes Pokémon.</h3>
-          <p class="onboarding__lede">
+          <p class="onboarding__kicker" data-i18n="app.onboarding.step1.kicker">Étape 1 · Pokédex</p>
+          <h3 class="onboarding__step-title" data-i18n="app.onboarding.step1.title">Suivre mes Pokémon.</h3>
+          <p class="onboarding__lede" data-i18n="app.onboarding.step1.lede">
             Pokevault démarre sur trois actions simples et lisibles dans la
             liste, les fiches et les classeurs.
           </p>
           <ul class="onboarding__bullets">
-            <li><em>Cherche</em> marque ce qu'il te manque et alimente le focus.</li>
-            <li><em>J'ai</em> confirme ta progression Pokédex.</li>
-            <li><em>Double</em> dit que tu peux proposer ce Pokémon en échange.</li>
+            <li data-i18n="app.onboarding.step1.b1"><em>Cherche</em> marque ce qu'il te manque et alimente le focus.</li>
+            <li data-i18n="app.onboarding.step1.b2"><em>J'ai</em> confirme ta progression Pokédex.</li>
+            <li data-i18n="app.onboarding.step1.b3"><em>Double</em> dit que tu peux proposer ce Pokémon en échange.</li>
           </ul>
         </section>
 
         <section class="onboarding__step" data-step="2" hidden>
-          <p class="onboarding__kicker">Étape 2 · Échanges locaux</p>
-          <h3 class="onboarding__step-title">Voir les opportunités.</h3>
-          <p class="onboarding__lede">
+          <p class="onboarding__kicker" data-i18n="app.onboarding.step2.kicker">Étape 2 · Échanges locaux</p>
+          <h3 class="onboarding__step-title" data-i18n="app.onboarding.step2.title">Voir les opportunités.</h3>
+          <p class="onboarding__lede" data-i18n="app.onboarding.step2.lede">
             Les Dresseurs sont optionnels : tu importes une carte reçue, et
             Pokevault compare son Pokédex au tien sans rien modifier tout seul.
           </p>
           <ul class="onboarding__bullets">
-            <li><em>Vu chez</em> apparaît quand un Dresseur a ce Pokémon en double.</li>
-            <li><em>Match</em> apparaît si ce double correspond à ton <em>Cherche</em>.</li>
-            <li>Sa carte peut contenir Instagram, Facebook, téléphone ou un autre lien choisi.</li>
-            <li>Les contacts restent dans ton classeur local de Dresseurs.</li>
+            <li data-i18n="app.onboarding.step2.b1"><em>Vu chez</em> apparaît quand un Dresseur a ce Pokémon en double.</li>
+            <li data-i18n="app.onboarding.step2.b2"><em>Match</em> apparaît si ce double correspond à ton <em>Cherche</em>.</li>
+            <li data-i18n="app.onboarding.step2.b3">Sa carte peut contenir Instagram, Facebook, téléphone ou un autre lien choisi.</li>
+            <li data-i18n="app.onboarding.step2.b4">Les contacts restent dans ton classeur local de Dresseurs.</li>
           </ul>
         </section>
 
         <section class="onboarding__step" data-step="3" hidden>
-          <p class="onboarding__kicker">Étape 3 · Région favorite</p>
-          <h3 class="onboarding__step-title">Par où tu veux commencer ?</h3>
-          <p class="onboarding__lede">
+          <p class="onboarding__kicker" data-i18n="app.onboarding.step3.kicker">Étape 3 · Région favorite</p>
+          <h3 class="onboarding__step-title" data-i18n="app.onboarding.step3.title">Par où tu veux commencer ?</h3>
+          <p class="onboarding__lede" data-i18n="app.onboarding.step3.lede">
             Ce choix oriente la première liste. Tu pourras toujours revenir au
             National ou changer de région depuis les filtres.
           </p>
           <label class="onboarding__field onboarding__field--single">
-            <span class="onboarding__field-label">Région de départ</span>
+            <span class="onboarding__field-label" data-i18n="app.onboarding.start_region">Région de départ</span>
             <select id="onboardingFavoriteRegion" name="onboardingFavoriteRegion">
               <option value="all">National</option>
               <option value="kanto">Kanto</option>
@@ -637,50 +650,50 @@
         </section>
 
         <section class="onboarding__step" data-step="4" hidden>
-          <p class="onboarding__kicker">Étape 4 · Mode de suivi</p>
-          <h3 class="onboarding__step-title">Simple ou avancé ?</h3>
-          <p class="onboarding__lede">
+          <p class="onboarding__kicker" data-i18n="app.onboarding.step4.kicker">Étape 4 · Mode de suivi</p>
+          <h3 class="onboarding__step-title" data-i18n="app.onboarding.step4.title">Simple ou avancé ?</h3>
+          <p class="onboarding__lede" data-i18n="app.onboarding.step4.lede">
             Simple garde la liste concentrée sur Cherche, J'ai et Double.
             Avancé rend les formes, shiny, notes, Dresseurs et cartes plus visibles.
           </p>
-          <div class="onboarding__choices" role="radiogroup" aria-label="Mode de suivi Pokédex">
+          <div class="onboarding__choices" role="radiogroup" aria-label="Mode de suivi Pokédex" data-i18n-aria-label="app.onboarding.mode">
             <label class="onboarding__choice">
               <input type="radio" name="onboardingTrackingMode" value="simple" checked />
-              <span class="onboarding__choice-title">Simple</span>
-              <span class="onboarding__choice-sub">Cherche, J'ai, Double. Les formes régionales restent disponibles.</span>
+              <span class="onboarding__choice-title" data-i18n="app.onboarding.simple">Simple</span>
+              <span class="onboarding__choice-sub" data-i18n="app.onboarding.simple_sub">Cherche, J'ai, Double. Les formes régionales restent disponibles.</span>
             </label>
             <label class="onboarding__choice">
               <input type="radio" name="onboardingTrackingMode" value="advanced" />
-              <span class="onboarding__choice-title">Avancé</span>
-              <span class="onboarding__choice-sub">Shiny, formes spéciales, notes, recherches, TCG et cartes plus accessibles.</span>
+              <span class="onboarding__choice-title" data-i18n="app.onboarding.advanced">Avancé</span>
+              <span class="onboarding__choice-sub" data-i18n="app.onboarding.advanced_sub">Shiny, formes spéciales, notes, recherches, TCG et cartes plus accessibles.</span>
             </label>
           </div>
-          <p class="onboarding__hint">
+          <p class="onboarding__hint" data-i18n="app.onboarding.hint">
             Les cartes TCG restent un add-on : la fiche garde statut, formes et
             notes en premier, puis replie les cartes longues.
           </p>
         </section>
 
         <section class="onboarding__step" data-step="5" hidden>
-          <p class="onboarding__kicker">Étape 5 · Données locales</p>
-          <h3 class="onboarding__step-title">Garder chacun son fichier.</h3>
-          <p class="onboarding__lede">
+          <p class="onboarding__kicker" data-i18n="app.onboarding.step5.kicker">Étape 5 · Données locales</p>
+          <h3 class="onboarding__step-title" data-i18n="app.onboarding.step5.title">Garder chacun son fichier.</h3>
+          <p class="onboarding__lede" data-i18n="app.onboarding.step5.lede">
             Pokevault reste utilisable sans compte, sans cloud et sans serveur
             de synchronisation. Tu choisis quand exporter, importer ou mettre à
             jour une carte de Dresseur.
           </p>
           <ul class="onboarding__bullets">
-            <li>Ton Pokédex reste dans <code>data/</code> et peut être sauvegardé.</li>
-            <li>Une carte envoyée ne contient que ce que tu as décidé de partager.</li>
-            <li>Une nouvelle carte reçue met à jour le contact local si elle est plus récente.</li>
+            <li data-i18n="app.onboarding.step5.b1">Ton Pokédex reste dans <code>data/</code> et peut être sauvegardé.</li>
+            <li data-i18n="app.onboarding.step5.b2">Une carte envoyée ne contient que ce que tu as décidé de partager.</li>
+            <li data-i18n="app.onboarding.step5.b3">Une nouvelle carte reçue met à jour le contact local si elle est plus récente.</li>
           </ul>
         </section>
 
         <footer class="onboarding__footer">
-          <button type="button" class="onboarding__btn onboarding__btn--ghost" id="onboardingBack">
+          <button type="button" class="onboarding__btn onboarding__btn--ghost" id="onboardingBack" data-i18n="app.actions.back">
             Retour
           </button>
-          <button type="button" class="onboarding__btn onboarding__btn--primary" id="onboardingNext">
+          <button type="button" class="onboarding__btn onboarding__btn--primary" id="onboardingNext" data-i18n="app.actions.continue">
             Continuer
           </button>
         </footer>
@@ -690,24 +703,24 @@
     <dialog id="shortcutsHelp" class="kb-help" aria-labelledby="shortcutsHelpTitle">
       <form method="dialog" class="kb-help__form">
         <header class="kb-help__header">
-          <h2 id="shortcutsHelpTitle" class="kb-help__title">Raccourcis clavier</h2>
-          <button type="button" class="kb-help__close" data-kb-close aria-label="Fermer l'aide">
+          <h2 id="shortcutsHelpTitle" class="kb-help__title" data-i18n="app.shortcuts.title">Raccourcis clavier</h2>
+          <button type="button" class="kb-help__close" data-kb-close aria-label="Fermer l'aide" data-i18n-aria-label="app.shortcuts.close">
             <span class="material-symbols-outlined" aria-hidden="true">close</span>
           </button>
         </header>
         <ul class="kb-help__list">
-          <li><kbd>/</kbd><span>Focus la barre de recherche</span></li>
-          <li><kbd>Esc</kbd><span>Vide / quitte la recherche ou la sélection</span></li>
-          <li><kbd>j</kbd> / <kbd>k</kbd><span>Pokémon suivant / précédent</span></li>
-          <li><kbd>c</kbd><span>Marque J'ai, ou retire J'ai si déjà actif</span></li>
-          <li><kbd>Shift</kbd>+<kbd>C</kbd><span>Marque Double, ou repasse à J'ai</span></li>
-          <li><kbd>i</kbd><span>Ouvre la fiche complète (drawer « Mes cartes »)</span></li>
-          <li><kbd>?</kbd><span>Ouvre cette aide</span></li>
+          <li><kbd>/</kbd><span data-i18n="app.shortcuts.search">Focus la barre de recherche</span></li>
+          <li><kbd>Esc</kbd><span data-i18n="app.shortcuts.clear">Vide / quitte la recherche ou la sélection</span></li>
+          <li><kbd>j</kbd> / <kbd>k</kbd><span data-i18n="app.shortcuts.next">Pokémon suivant / précédent</span></li>
+          <li><kbd>c</kbd><span data-i18n="app.shortcuts.caught">Marque J'ai, ou retire J'ai si déjà actif</span></li>
+          <li><kbd>Shift</kbd>+<kbd>C</kbd><span data-i18n="app.shortcuts.double">Marque Double, ou repasse à J'ai</span></li>
+          <li><kbd>i</kbd><span data-i18n="app.shortcuts.open">Ouvre la fiche complète (drawer « Mes cartes »)</span></li>
+          <li><kbd>?</kbd><span data-i18n="app.shortcuts.help">Ouvre cette aide</span></li>
         </ul>
-        <p class="kb-help__hint">
+        <p class="kb-help__hint" data-i18n="app.shortcuts.hint">
           Astuce : la recherche tolère les accents et les coquilles (ex. « dracau » trouve Dracaufeu).
         </p>
-        <button type="submit" class="kb-help__submit">Compris</button>
+        <button type="submit" class="kb-help__submit" data-i18n="app.shortcuts.ok">Compris</button>
       </form>
     </dialog>
 
@@ -722,12 +735,13 @@
       <div class="drawer__scrim" aria-hidden="true"></div>
       <aside class="drawer__panel" tabindex="-1">
         <header class="drawer__topbar">
-          <span class="drawer__kicker">Fiche Pokédex</span>
+          <span class="drawer__kicker" data-i18n="app.drawer.kicker">Fiche Pokédex</span>
           <button
             type="button"
             class="drawer__close"
             id="pokemonDrawerClose"
             aria-label="Fermer la fiche"
+            data-i18n-aria-label="app.drawer.close"
           >×</button>
         </header>
         <div class="drawer__content" id="pokemonDrawerContent"></div>
@@ -740,6 +754,7 @@
     </div>
 
     <script src="/themes.js"></script>
+    <script src="/i18n.js" defer></script>
     <script src="/profiles.js" defer></script>
     <script src="/empty-states.js" defer></script>
     <script src="/keyboard.js" defer></script>

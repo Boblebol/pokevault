@@ -10,22 +10,105 @@ const API_BINDER_PLACEMENTS = "/api/binder/placements";
 const LS_WIZARD_DISMISSED = "pokedexBinderWizardDismissed";
 
 let binderV2Started = false;
+let binderV2LocaleSubbed = false;
 let wizardStep = 0;
 const wizardLastStep = 3;
 
 const WIZARD_STEP_LABELS = [
-  "Organisation",
-  "Formes à suivre",
-  "Format du classeur",
-  "Récapitulatif",
+  "binder_wizard.step.organization",
+  "binder_wizard.step.forms",
+  "binder_wizard.step.format",
+  "binder_wizard.step.summary",
 ];
+
+const BINDER_WIZARD_FALLBACK_I18N = {
+  "binder_wizard.step.organization": "Organisation",
+  "binder_wizard.step.forms": "Formes à suivre",
+  "binder_wizard.step.format": "Format du classeur",
+  "binder_wizard.step.summary": "Récapitulatif",
+  "binder_wizard.save": "Enregistrer",
+  "binder_wizard.continue": "Continuer",
+  "binder_wizard.choose_binder": "Classeur à régler (liste défilante)",
+  "binder_wizard.choose_binder_aria": "Choisir le classeur à modifier",
+  "binder_wizard.default_name": "Principal",
+  "binder_wizard.form.base_only.title": "Base principale seule",
+  "binder_wizard.form.base_regional.title": "Base + formes régionales (sans Méga / Gigamax)",
+  "binder_wizard.form.full.title": "Complet — Méga, Gigamax, formes nommées",
+  "binder_wizard.filter.all_regions": "Toutes les régions",
+  "binder_wizard.filter.all": "Toutes",
+  "binder_wizard.preview.hint": "Tri : régions (ordre national), natives puis formes importées en fin de bloc. Filtre : {filter} — {shown} / {filtered} entrées affichées ({total} au total).",
+  "binder_wizard.preview.filter_all": "toutes",
+  "binder_wizard.preview.regional_form": "forme régionale",
+  "binder_wizard.org.lead": "Choisis comment les entrées seront ordonnées dans le classeur. Tu pourras ajuster la grille juste après.",
+  "binder_wizard.org.national.title": "Tous à la suite",
+  "binder_wizard.org.national.desc": "Ordre national du Pokédex, du premier au dernier numéro.",
+  "binder_wizard.org.by_region.title": "Par région",
+  "binder_wizard.org.by_region.desc": "Blocs par région : espèces natives d’abord, puis formes « importées » en fin de section.",
+  "binder_wizard.org.family.title": "Familles",
+  "binder_wizard.org.family.desc": "Lignes par famille d’évolution, avec des cases vides volontaires pour garder les stades alignés.",
+  "binder_wizard.form.lead": "Les séries de cartes ne couvrent pas tout (Méga, Gigamax, Pikachu déguisé…). Choisis un périmètre réaliste pour ton suivi ; tu pourras l’éditer dans le JSON plus tard.",
+  "binder_wizard.form.base_only.choice_title": "Base seule",
+  "binder_wizard.form.base_only.desc": "Une entrée par forme « principale » du Pokédex, sans variantes régionales.",
+  "binder_wizard.form.base_regional.choice_title": "Base + régionales",
+  "binder_wizard.form.base_regional.desc": "Inclut Alola, Galar, Hisui, etc. — sans Méga, sans Gigamax, sans formes annexes type costumes.",
+  "binder_wizard.form.full.choice_title": "Complet",
+  "binder_wizard.form.full.desc": "Méga, Gigamax et autres formes nommées : plus de lignes, beaucoup de cartes n’existent pas pour tout le monde.",
+  "binder_wizard.format.lead": "Même nombre de pochettes sur chaque face (recto / verso). Presets 3×3 ou 2×2 avec 10 feuillets, ou grille personnalisée.",
+  "binder_wizard.format.3x3.title": "3 × 3",
+  "binder_wizard.format.3x3.desc": "9 cases par page · 10 feuillets (recto + verso).",
+  "binder_wizard.format.2x2.title": "2 × 2",
+  "binder_wizard.format.2x2.desc": "4 cases par page · 10 feuillets.",
+  "binder_wizard.format.custom.title": "Personnalisé",
+  "binder_wizard.format.custom.desc": "Lignes, colonnes (1–12) et feuillets (1–200) au choix.",
+  "binder_wizard.format.rows": "Lignes par page",
+  "binder_wizard.format.cols": "Colonnes par page",
+  "binder_wizard.format.sheets": "Nombre de feuillets",
+  "binder_wizard.format.hint": "Un feuillet = une feuille plastique recto-verso. Emplacements totaux = cases par page × 2 × feuillets.",
+  "binder_wizard.summary.org": "Organisation",
+  "binder_wizard.summary.forms": "Formes",
+  "binder_wizard.summary.format": "Format",
+  "binder_wizard.summary.grid": "Grille",
+  "binder_wizard.summary.capacity": "Capacité",
+  "binder_wizard.summary.name": "Nom du classeur",
+  "binder_wizard.summary.org_family": "Familles d'évolution (stades alignés avec trous volontaires)",
+  "binder_wizard.summary.org_region": "Par région (natives puis formes importées en fin de bloc)",
+  "binder_wizard.summary.org_national": "National (ordre du Pokédex)",
+  "binder_wizard.summary.preset_3x3": "Preset 3 × 3 · 10 feuillets",
+  "binder_wizard.summary.preset_2x2": "Preset 2 × 2 · 10 feuillets",
+  "binder_wizard.summary.preset_custom": "Grille et feuillets personnalisés",
+  "binder_wizard.summary.scope_base": "Base seule",
+  "binder_wizard.summary.scope_full": "Complet (Méga, Gigamax, formes nommées)",
+  "binder_wizard.summary.scope_regional": "Base + formes régionales",
+  "binder_wizard.summary.grid_value": "{rows} × {cols} — {slots} cases par page",
+  "binder_wizard.summary.capacity_value": "{sheets} feuillets → {pages} pages, {slots} emplacements au total",
+  "binder_wizard.summary.family_name": "Un ou plusieurs classeurs Familles : les grandes familles gardent leurs lignes, les trous restent visibles.",
+  "binder_wizard.summary.region_name": "Un ou plusieurs classeurs par région : si le format est trop petit, les sections sont nommées Kanto 1, Kanto 2, etc.",
+  "binder_wizard.summary.default_name": "{name} (modifiable plus tard dans le fichier JSON)",
+  "binder_wizard.summary.edit_note": "Enregistrement : le classeur existant et la règle de formes associée sont mis à jour dans binder-config.json.",
+  "binder_wizard.summary.new_note": "Les placements restent vides jusqu’à l’UI de rangement. Le périmètre des formes est enregistré dans la config classeur.",
+  "binder_wizard.error.config": "Enregistrement config refusé ({status}).",
+  "binder_wizard.error.placements": "Config OK mais placements refusés ({status}).",
+  "binder_wizard.error.choose_org": "Choisis une organisation : national ou par région.",
+  "binder_wizard.error.choose_format": "Choisis un format de grille (preset ou personnalisé).",
+  "binder_wizard.error.choose_forms": "Choisis un périmètre de formes (base, base + région, ou complet).",
+  "binder_wizard.error.api": "Impossible de joindre l’API classeurs (réseau ou CORS).",
+};
+
+function tBinderWizard(key, params = {}) {
+  const runtime = window.PokevaultI18n;
+  if (runtime?.t) return runtime.t(key, params);
+  const template = BINDER_WIZARD_FALLBACK_I18N[key] || key;
+  return String(template).replace(/\{([a-zA-Z0-9_]+)\}/g, (_, name) =>
+    Object.prototype.hasOwnProperty.call(params, name) ? String(params[name]) : `{${name}}`,
+  );
+}
 
 /** @type {"base_only" | "base_regional" | "full"} */
 const DEFAULT_FORM_SCOPE = "base_only";
 
 /** @type {{ name: string; organization: string; formScope: string; formatPreset: string; rows: number; cols: number; sheetCount: number; editBinderId: string | null }} */
 let wizardDraft = {
-  name: "Principal",
+  name: tBinderWizard("binder_wizard.default_name"),
   organization: "national",
   formScope: DEFAULT_FORM_SCOPE,
   formatPreset: "3x3-10",
@@ -289,10 +372,12 @@ function syncWizardChrome() {
   const back = document.getElementById("binderWizardBack");
   const next = document.getElementById("binderWizardNext");
   if (meta) {
-    meta.textContent = `${WIZARD_STEP_LABELS[wizardStep]} — ${wizardStep + 1} / ${wizardLastStep + 1}`;
+    meta.textContent = `${tBinderWizard(WIZARD_STEP_LABELS[wizardStep])} — ${wizardStep + 1} / ${wizardLastStep + 1}`;
   }
   if (back) back.disabled = wizardStep === 0;
-  if (next) next.textContent = wizardStep === wizardLastStep ? "Enregistrer" : "Continuer";
+  if (next) next.textContent = wizardStep === wizardLastStep
+    ? tBinderWizard("binder_wizard.save")
+    : tBinderWizard("binder_wizard.continue");
 }
 
 function clearEl(el) {
@@ -323,9 +408,9 @@ function formRuleFromScope(scope) {
   const baseOnly = scope === "base_only";
   const id = `wizard-forms-${scope}`;
   const labels = {
-    base_only: "Base principale seule",
-    base_regional: "Base + formes régionales (sans Méga / Gigamax)",
-    full: "Complet — Méga, Gigamax, formes nommées",
+    base_only: tBinderWizard("binder_wizard.form.base_only.title"),
+    base_regional: tBinderWizard("binder_wizard.form.base_regional.title"),
+    full: tBinderWizard("binder_wizard.form.full.title"),
   };
   return {
     id,
@@ -532,10 +617,10 @@ function syncWizardBinderBar() {
   bar.hidden = false;
   const lab = document.createElement("span");
   lab.className = "binder-wizard-binder-bar-label";
-  lab.textContent = "Classeur à régler (liste défilante)";
+  lab.textContent = tBinderWizard("binder_wizard.choose_binder");
   const sel = document.createElement("select");
   sel.className = "binder-wizard-binder-select";
-  sel.setAttribute("aria-label", "Choisir le classeur à modifier");
+  sel.setAttribute("aria-label", tBinderWizard("binder_wizard.choose_binder_aria"));
   const n = real.length;
   sel.size = Math.min(12, Math.max(3, n));
   for (const b of real) {
@@ -589,7 +674,7 @@ function prefillWizardDraftFromConfig(cfg, binderIdOpt) {
         ? "by_region"
         : "national";
   wizardDraft = {
-    name: String(b.name || "Principal"),
+    name: String(b.name || tBinderWizard("binder_wizard.default_name")),
     organization: org,
     formScope: inferFormScopeFromRule(rule),
     formatPreset: inferFormatPreset(rows, cols, sheetCount),
@@ -608,7 +693,7 @@ function configUsesRegionalBinders(cfg) {
 function prefillWizardDraftForRebuild(cfg, binderIdOpt) {
   prefillWizardDraftFromConfig(cfg, binderIdOpt);
   wizardDraft.editBinderId = null;
-  wizardDraft.name = "Principal";
+  wizardDraft.name = tBinderWizard("binder_wizard.default_name");
   if (configUsesRegionalBinders(cfg)) {
     wizardDraft.organization = "by_region";
   }
@@ -842,7 +927,7 @@ function fillBinderRegionFilterOptions(defs) {
   sel.replaceChildren();
   const o0 = document.createElement("option");
   o0.value = "all";
-  o0.textContent = "Toutes les régions";
+  o0.textContent = tBinderWizard("binder_wizard.filter.all_regions");
   sel.append(o0);
   for (const r of defs) {
     const o = document.createElement("option");
@@ -865,9 +950,12 @@ function renderBinderPreviewListContents() {
       ? sorted
       : sorted.filter((p) => effectiveRegionId(p, defs) === binderRegionFilterId);
   const shown = Math.min(filtered.length, 100);
-  hintEl.textContent =
-    "Tri : régions (ordre national), natives puis formes importées en fin de bloc. " +
-    `Filtre : ${binderRegionFilterId === "all" ? "toutes" : binderRegionFilterId} — ${shown} / ${filtered.length} entrées affichées (${sorted.length} au total).`;
+  hintEl.textContent = tBinderWizard("binder_wizard.preview.hint", {
+    filter: binderRegionFilterId === "all" ? tBinderWizard("binder_wizard.preview.filter_all") : binderRegionFilterId,
+    shown,
+    filtered: filtered.length,
+    total: sorted.length,
+  });
   listEl.replaceChildren();
   let i = 0;
   for (const p of filtered) {
@@ -875,7 +963,7 @@ function renderBinderPreviewListContents() {
     const li = document.createElement("li");
     const foreign = p.region_native === false;
     const reg = p.region_label_fr || p.region || "?";
-    li.textContent = `${displayNumBinder(p)} ${nameBinder(p)} — ${reg}${foreign ? " (forme régionale)" : ""}`;
+    li.textContent = `${displayNumBinder(p)} ${nameBinder(p)} — ${reg}${foreign ? ` (${tBinderWizard("binder_wizard.preview.regional_form")})` : ""}`;
     listEl.append(li);
   }
 }
@@ -912,7 +1000,7 @@ async function updateRegionPreview(cfg) {
       sel.replaceChildren();
       const o = document.createElement("option");
       o.value = "all";
-      o.textContent = "Toutes";
+      o.textContent = tBinderWizard("binder_wizard.filter.all");
       sel.append(o);
     }
     return;
@@ -964,8 +1052,7 @@ function renderWizardStep() {
   if (wizardStep === 0) {
     const lead = document.createElement("p");
     lead.className = "wizard-lead";
-    lead.textContent =
-      "Choisis comment les entrées seront ordonnées dans le classeur. Tu pourras ajuster la grille juste après.";
+    lead.textContent = tBinderWizard("binder_wizard.org.lead");
     body.append(lead);
 
     const grid = document.createElement("div");
@@ -995,18 +1082,18 @@ function renderWizardStep() {
     grid.append(
       mkOrg(
         "national",
-        "Tous à la suite",
-        "Ordre national du Pokédex, du premier au dernier numéro.",
+        tBinderWizard("binder_wizard.org.national.title"),
+        tBinderWizard("binder_wizard.org.national.desc"),
       ),
       mkOrg(
         "by_region",
-        "Par région",
-        "Blocs par région : espèces natives d’abord, puis formes « importées » en fin de section.",
+        tBinderWizard("binder_wizard.org.by_region.title"),
+        tBinderWizard("binder_wizard.org.by_region.desc"),
       ),
       mkOrg(
         "family",
-        "Familles",
-        "Lignes par famille d’évolution, avec des cases vides volontaires pour garder les stades alignés.",
+        tBinderWizard("binder_wizard.org.family.title"),
+        tBinderWizard("binder_wizard.org.family.desc"),
       ),
     );
     body.append(grid);
@@ -1015,8 +1102,7 @@ function renderWizardStep() {
   if (wizardStep === 1) {
     const lead = document.createElement("p");
     lead.className = "wizard-lead";
-    lead.textContent =
-      "Les séries de cartes ne couvrent pas tout (Méga, Gigamax, Pikachu déguisé…). Choisis un périmètre réaliste pour ton suivi ; tu pourras l’éditer dans le JSON plus tard.";
+    lead.textContent = tBinderWizard("binder_wizard.form.lead");
     body.append(lead);
 
     const grid = document.createElement("div");
@@ -1046,18 +1132,18 @@ function renderWizardStep() {
     grid.append(
       mkForm(
         "base_only",
-        "Base seule",
-        "Une entrée par forme « principale » du Pokédex, sans variantes régionales.",
+        tBinderWizard("binder_wizard.form.base_only.choice_title"),
+        tBinderWizard("binder_wizard.form.base_only.desc"),
       ),
       mkForm(
         "base_regional",
-        "Base + régionales",
-        "Inclut Alola, Galar, Hisui, etc. — sans Méga, sans Gigamax, sans formes annexes type costumes.",
+        tBinderWizard("binder_wizard.form.base_regional.choice_title"),
+        tBinderWizard("binder_wizard.form.base_regional.desc"),
       ),
       mkForm(
         "full",
-        "Complet",
-        "Méga, Gigamax et autres formes nommées : plus de lignes, beaucoup de cartes n’existent pas pour tout le monde.",
+        tBinderWizard("binder_wizard.form.full.choice_title"),
+        tBinderWizard("binder_wizard.form.full.desc"),
       ),
     );
     body.append(grid);
@@ -1066,8 +1152,7 @@ function renderWizardStep() {
   if (wizardStep === 2) {
     const lead = document.createElement("p");
     lead.className = "wizard-lead";
-    lead.textContent =
-      "Même nombre de pochettes sur chaque face (recto / verso). Presets 3×3 ou 2×2 avec 10 feuillets, ou grille personnalisée.";
+    lead.textContent = tBinderWizard("binder_wizard.format.lead");
     body.append(lead);
 
     const fmtGrid = document.createElement("div");
@@ -1105,9 +1190,9 @@ function renderWizardStep() {
     };
 
     fmtGrid.append(
-      mkFmt("3x3-10", "3 × 3", "9 cases par page · 10 feuillets (recto + verso)."),
-      mkFmt("2x2-10", "2 × 2", "4 cases par page · 10 feuillets."),
-      mkFmt("custom", "Personnalisé", "Lignes, colonnes (1–12) et feuillets (1–200) au choix."),
+      mkFmt("3x3-10", tBinderWizard("binder_wizard.format.3x3.title"), tBinderWizard("binder_wizard.format.3x3.desc")),
+      mkFmt("2x2-10", tBinderWizard("binder_wizard.format.2x2.title"), tBinderWizard("binder_wizard.format.2x2.desc")),
+      mkFmt("custom", tBinderWizard("binder_wizard.format.custom.title"), tBinderWizard("binder_wizard.format.custom.desc")),
     );
     body.append(fmtGrid);
 
@@ -1135,14 +1220,13 @@ function renderWizardStep() {
     };
 
     rowcols.append(
-      mkNumField("wizardRows", "Lignes par page", 1, 12, wizardDraft.rows),
-      mkNumField("wizardCols", "Colonnes par page", 1, 12, wizardDraft.cols),
-      mkNumField("wizardSheets", "Nombre de feuillets", 1, 200, wizardDraft.sheetCount),
+      mkNumField("wizardRows", tBinderWizard("binder_wizard.format.rows"), 1, 12, wizardDraft.rows),
+      mkNumField("wizardCols", tBinderWizard("binder_wizard.format.cols"), 1, 12, wizardDraft.cols),
+      mkNumField("wizardSheets", tBinderWizard("binder_wizard.format.sheets"), 1, 200, wizardDraft.sheetCount),
     );
     const hint = document.createElement("p");
     hint.className = "wizard-custom-hint";
-    hint.textContent =
-      "Un feuillet = une feuille plastique recto-verso. Emplacements totaux = cases par page × 2 × feuillets.";
+    hint.textContent = tBinderWizard("binder_wizard.format.hint");
     panel.append(rowcols, hint);
     body.append(panel);
     syncCustomPanelVisibility(body);
@@ -1154,50 +1238,58 @@ function renderWizardStep() {
     const totalSlots = slots * pages;
     const orgLabel =
       wizardDraft.organization === "family"
-        ? "Familles d'évolution (stades alignés avec trous volontaires)"
+        ? tBinderWizard("binder_wizard.summary.org_family")
         : wizardDraft.organization === "by_region"
-        ? "Par région (natives puis formes importées en fin de bloc)"
-        : "National (ordre du Pokédex)";
+        ? tBinderWizard("binder_wizard.summary.org_region")
+        : tBinderWizard("binder_wizard.summary.org_national");
     const presetLabel =
       wizardDraft.formatPreset === "3x3-10"
-        ? "Preset 3 × 3 · 10 feuillets"
+        ? tBinderWizard("binder_wizard.summary.preset_3x3")
         : wizardDraft.formatPreset === "2x2-10"
-          ? "Preset 2 × 2 · 10 feuillets"
-          : "Grille et feuillets personnalisés";
+          ? tBinderWizard("binder_wizard.summary.preset_2x2")
+          : tBinderWizard("binder_wizard.summary.preset_custom");
     const scopeLabel =
       wizardDraft.formScope === "base_only"
-        ? "Base seule"
+        ? tBinderWizard("binder_wizard.summary.scope_base")
         : wizardDraft.formScope === "full"
-          ? "Complet (Méga, Gigamax, formes nommées)"
-          : "Base + formes régionales";
+          ? tBinderWizard("binder_wizard.summary.scope_full")
+          : tBinderWizard("binder_wizard.summary.scope_regional");
 
     const div = document.createElement("div");
     div.className = "wizard-recap";
-    appendRecapLine(div, "Organisation", orgLabel);
-    appendRecapLine(div, "Formes", scopeLabel);
-    appendRecapLine(div, "Format", presetLabel);
+    appendRecapLine(div, tBinderWizard("binder_wizard.summary.org"), orgLabel);
+    appendRecapLine(div, tBinderWizard("binder_wizard.summary.forms"), scopeLabel);
+    appendRecapLine(div, tBinderWizard("binder_wizard.summary.format"), presetLabel);
     appendRecapLine(
       div,
-      "Grille",
-      `${wizardDraft.rows} × ${wizardDraft.cols} — ${slots} cases par page`,
+      tBinderWizard("binder_wizard.summary.grid"),
+      tBinderWizard("binder_wizard.summary.grid_value", {
+        rows: wizardDraft.rows,
+        cols: wizardDraft.cols,
+        slots,
+      }),
     );
     appendRecapLine(
       div,
-      "Capacité",
-      `${wizardDraft.sheetCount} feuillets → ${pages} pages, ${totalSlots} emplacements au total`,
+      tBinderWizard("binder_wizard.summary.capacity"),
+      tBinderWizard("binder_wizard.summary.capacity_value", {
+        sheets: wizardDraft.sheetCount,
+        pages,
+        slots: totalSlots,
+      }),
     );
     const nameRecap =
       wizardDraft.organization === "family" && !wizardDraft.editBinderId
-        ? "Un ou plusieurs classeurs Familles : les grandes familles gardent leurs lignes, les trous restent visibles."
+        ? tBinderWizard("binder_wizard.summary.family_name")
         : wizardDraft.organization === "by_region" && !wizardDraft.editBinderId
-        ? `Un ou plusieurs classeurs par région : si le format est trop petit, les sections sont nommées Kanto 1, Kanto 2, etc.`
-        : `${wizardDraft.name} (modifiable plus tard dans le fichier JSON)`;
-    appendRecapLine(div, "Nom du classeur", nameRecap);
+        ? tBinderWizard("binder_wizard.summary.region_name")
+        : tBinderWizard("binder_wizard.summary.default_name", { name: wizardDraft.name });
+    appendRecapLine(div, tBinderWizard("binder_wizard.summary.name"), nameRecap);
     const note = document.createElement("p");
     note.className = "wizard-recap-note";
     note.textContent = wizardDraft.editBinderId
-      ? "Enregistrement : le classeur existant et la règle de formes associée sont mis à jour dans binder-config.json."
-      : "Les placements restent vides jusqu’à l’UI de rangement. Le périmètre des formes est enregistré dans la config classeur.";
+      ? tBinderWizard("binder_wizard.summary.edit_note")
+      : tBinderWizard("binder_wizard.summary.new_note");
     div.append(note);
     body.append(div);
   }
@@ -1488,7 +1580,7 @@ async function persistWizardDraft(draft, opts = {}) {
     body: JSON.stringify(configBody),
   });
   if (!cfgRes.ok) {
-    if (!silent) setBinderHint(hint, `Enregistrement config refusé (${cfgRes.status}).`, false);
+    if (!silent) setBinderHint(hint, tBinderWizard("binder_wizard.error.config", { status: cfgRes.status }), false);
     return false;
   }
   const plRes = await fetch(API_BINDER_PLACEMENTS, {
@@ -1497,7 +1589,7 @@ async function persistWizardDraft(draft, opts = {}) {
     body: JSON.stringify(placementsBody),
   });
   if (!plRes.ok) {
-    if (!silent) setBinderHint(hint, `Config OK mais placements refusés (${plRes.status}).`, false);
+    if (!silent) setBinderHint(hint, tBinderWizard("binder_wizard.error.placements", { status: plRes.status }), false);
     return false;
   }
   await setWizardSkipped(false);
@@ -1512,7 +1604,7 @@ function validateWizardOrgStep() {
   const v = readOrgSelectionFromDom();
   const hint = document.getElementById("binderV2Hint");
   if (!v) {
-    setBinderHint(hint, "Choisis une organisation : national ou par région.", false);
+    setBinderHint(hint, tBinderWizard("binder_wizard.error.choose_org"), false);
     return false;
   }
   wizardDraft.organization = v;
@@ -1523,7 +1615,7 @@ function validateWizardOrgStep() {
 function validateWizardFormatStep() {
   const hint = document.getElementById("binderV2Hint");
   if (!readFormatSelectionFromDom()) {
-    setBinderHint(hint, "Choisis un format de grille (preset ou personnalisé).", false);
+    setBinderHint(hint, tBinderWizard("binder_wizard.error.choose_format"), false);
     return false;
   }
   setBinderHint(hint, "", true);
@@ -1534,7 +1626,7 @@ function validateWizardFormStep() {
   const v = readFormScopeFromDom();
   const hint = document.getElementById("binderV2Hint");
   if (!v) {
-    setBinderHint(hint, "Choisis un périmètre de formes (base, base + région, ou complet).", false);
+    setBinderHint(hint, tBinderWizard("binder_wizard.error.choose_forms"), false);
     return false;
   }
   wizardDraft.formScope = v;
@@ -1587,7 +1679,7 @@ function openWizard(options) {
     prefillWizardDraftFromConfig(lastConfigJson, chosen);
   } else {
     wizardDraft = {
-      name: "Principal",
+      name: tBinderWizard("binder_wizard.default_name"),
       organization: "national",
       formScope: DEFAULT_FORM_SCOPE,
       formatPreset: "3x3-10",
@@ -1648,7 +1740,7 @@ async function refreshBinderV2() {
   } catch {
     setBinderHint(
       hint,
-      "Impossible de joindre l’API classeurs (réseau ou CORS).",
+      tBinderWizard("binder_wizard.error.api"),
       false,
     );
   }
@@ -1714,6 +1806,13 @@ function startBinderV2IfNeeded() {
     wireBinderRegionFilterOnce();
     const btn = document.getElementById("binderV2Refresh");
     if (btn) btn.addEventListener("click", () => void refreshBinderV2());
+    if (!binderV2LocaleSubbed) {
+      binderV2LocaleSubbed = true;
+      window.PokevaultI18n?.subscribeLocale?.(() => {
+        renderWizardStep();
+        void refreshBinderV2();
+      });
+    }
     window.PokedexBinderShell?.init?.();
     await refreshBinderV2();
   })();

@@ -44,6 +44,23 @@
     hisui: "Hisui",
     paldea: "Paldea",
   };
+  const FALLBACK_I18N = {
+    "onboarding.profile.undefined": "Profil : non défini — rejoue l'onboarding pour personnaliser.",
+    "onboarding.profile.summary": "Profil : Compléter mon Pokédex · {region} · {mode} · cartes en add-on.",
+    "onboarding.mode.simple": "mode simple",
+    "onboarding.mode.advanced": "mode avancé",
+    "onboarding.done": "Terminer",
+    "onboarding.continue": "Continuer",
+  };
+
+  function t(key, params = {}) {
+    const runtime = window.PokevaultI18n;
+    if (runtime?.t) return runtime.t(key, params);
+    const template = FALLBACK_I18N[key] || key;
+    return String(template).replace(/\{([a-zA-Z0-9_]+)\}/g, (_, name) =>
+      Object.prototype.hasOwnProperty.call(params, name) ? String(params[name]) : `{${name}}`,
+    );
+  }
 
   function normalizeGoal(value) {
     void value;
@@ -211,17 +228,19 @@
     writeListFiltersToHash(clean, preferences.form_scope);
   }
 
+  function formatSettingsProfileLabel(p) {
+    if (!p || p.skipped) {
+      return t("onboarding.profile.undefined");
+    }
+    const region = REGION_LABELS[p.favorite_region] || "National";
+    const mode = p.tracking_mode === "advanced" ? t("onboarding.mode.advanced") : t("onboarding.mode.simple");
+    return t("onboarding.profile.summary", { region, mode });
+  }
+
   function updateSettingsProfileLabel() {
     const el = document.getElementById("settingsProfileLabel");
     if (!el) return;
-    const p = readProfile();
-    if (!p || p.skipped) {
-      el.textContent = "Profil : non défini — rejoue l'onboarding pour personnaliser.";
-      return;
-    }
-    const region = REGION_LABELS[p.favorite_region] || "National";
-    const mode = p.tracking_mode === "advanced" ? "mode avancé" : "mode simple";
-    el.textContent = `Profil : Compléter mon Pokédex · ${region} · ${mode} · cartes en add-on.`;
+    el.textContent = formatSettingsProfileLabel(readProfile());
   }
 
   class Wizard {
@@ -278,7 +297,7 @@
       }
       this.backBtn.disabled = this.step === 1;
       this.backBtn.style.visibility = this.step === 1 ? "hidden" : "visible";
-      this.nextBtn.textContent = this.step >= TOTAL_STEPS ? "Terminer" : "Continuer";
+      this.nextBtn.textContent = this.step >= TOTAL_STEPS ? t("onboarding.done") : t("onboarding.continue");
     }
 
     advance() {
@@ -383,6 +402,7 @@
       writeProfile,
       applyPreferences,
       shouldOpen,
+      formatSettingsProfileLabel,
     };
   }
 
@@ -391,6 +411,10 @@
     if (profile && !profile.skipped) applyPreferences(profile);
     wireReplayButton();
     updateSettingsProfileLabel();
+    window.PokevaultI18n?.subscribeLocale?.(() => {
+      updateSettingsProfileLabel();
+      instance?.paint?.();
+    });
     openIfNeeded();
   }
 

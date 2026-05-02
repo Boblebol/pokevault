@@ -4,8 +4,47 @@
  */
 
 let printStarted = false;
+let printLocaleSubbed = false;
 let printSelectedBinder = "all";
 let printSearchQuery = "";
+
+const PRINT_FALLBACK_I18N = {
+  "print.pill.selection": "SÉLECTION",
+  "print.pill.active": "ACTIF",
+  "print.progress.completed": "{pct}% COMPLÉTÉ",
+  "print.all_binders": "Tous les classeurs",
+  "print.summary.entries": "{count} entrées",
+  "print.subtitle.caught": "{caught}/{total} attrapés ({pct}%)",
+  "print.footer": "pokevault · {date} · ☑ = attrapé · ☐ = manquant",
+  "print.footer_pocket": "pokevault pocket · {date} · ☑ = attrapé · ☐ = manquant",
+  "print.col.name": "Nom",
+  "print.col.binder": "Classeur",
+  "print.col.page": "Page",
+  "print.col.slot": "Case",
+  "print.col.note": "Carte / note",
+};
+
+function tPrint(key, params = {}) {
+  const runtime = window.PokevaultI18n;
+  if (runtime?.t) return runtime.t(key, params);
+  const template = PRINT_FALLBACK_I18N[key] || key;
+  return String(template).replace(/\{([a-zA-Z0-9_]+)\}/g, (_, name) =>
+    Object.prototype.hasOwnProperty.call(params, name) ? String(params[name]) : `{${name}}`,
+  );
+}
+
+function formatEntrySummary(count) {
+  return tPrint("print.summary.entries", { count });
+}
+
+function formatPrintSubtitle(caught, total) {
+  const pct = total ? Math.round((caught / total) * 100) : 0;
+  return tPrint("print.subtitle.caught", { caught, total, pct });
+}
+
+function formatPrintFooter(date, pocket) {
+  return tPrint(pocket ? "print.footer_pocket" : "print.footer", { date });
+}
 
 async function startPrintView() {
   if (printStarted) {
@@ -28,6 +67,14 @@ async function startPrintView() {
   wirePrintControls();
   renderPrintVaultsNav();
   renderPrintView();
+
+  if (!printLocaleSubbed) {
+    printLocaleSubbed = true;
+    window.PokevaultI18n?.subscribeLocale?.(() => {
+      renderPrintVaultsNav();
+      renderPrintView();
+    });
+  }
 
   window.PokedexCollection?.subscribeCaught?.(() => {
     renderPrintVaultsNav();
@@ -63,7 +110,7 @@ function renderPrintVaultsNav() {
     if (String(id) === String(printSelectedBinder)) {
       const pill = document.createElement("span");
       pill.className = "binder-vault-item-pill";
-      pill.textContent = isAll ? "SÉLECTION" : "ACTIF";
+      pill.textContent = isAll ? tPrint("print.pill.selection") : tPrint("print.pill.active");
       top.append(pill);
     }
 
@@ -77,7 +124,7 @@ function renderPrintVaultsNav() {
     const meta = document.createElement("p");
     meta.className = "binder-vault-meta";
     const left = document.createElement("span");
-    left.textContent = `${pct}% COMPLÉTÉ`;
+    left.textContent = tPrint("print.progress.completed", { pct });
     const right = document.createElement("span");
     right.textContent = `${got} / ${total}`;
     meta.append(left, right);
@@ -111,7 +158,7 @@ function renderPrintVaultsNav() {
   host.append(
     makeItem({
       id: "all",
-      name: "Tous les classeurs",
+      name: tPrint("print.all_binders"),
       pct: allPct,
       got: allGot,
       total: allTotal,
@@ -218,7 +265,7 @@ function renderPrintView() {
   const groupMode = getSelectedGroup();
   const selectedBinder = getSelectedBinder();
 
-  const date = new Date().toLocaleDateString();
+  const date = new Date().toLocaleDateString(window.PokevaultI18n?.getLocale?.() === "en" ? "en-US" : "fr-FR");
   let totalEntries = 0;
 
   let sectionIdx = 0;
@@ -266,7 +313,7 @@ function renderPrintView() {
   }
 
   if (summary) {
-    summary.textContent = `${totalEntries} entrées`;
+    summary.textContent = formatEntrySummary(totalEntries);
   }
 
   if (totalEntries === 0) {
@@ -321,7 +368,7 @@ function buildBinderSection(binder, allPokemon, caughtMap, defs, cfg, filterMode
 
   return {
     title: String(binder.name || binder.id),
-    subtitle: `${caughtCount}/${total} attrapés (${total ? Math.round((caughtCount / total) * 100) : 0}%)`,
+    subtitle: formatPrintSubtitle(caughtCount, total),
     rows,
     showBinderCol: false,
   };
@@ -365,7 +412,7 @@ function buildRegionSections(allPokemon, binders, caughtMap, defs, cfg, filterMo
     const caughtCount = rows.filter((r) => r.caught).length;
     sections.push({
       title: `${region.label_fr} (${region.low}–${region.high})`,
-    subtitle: `${caughtCount}/${rows.length} attrapés (${rows.length ? Math.round((caughtCount / rows.length) * 100) : 0}%)`,
+      subtitle: formatPrintSubtitle(caughtCount, rows.length),
       rows,
       showBinderCol: true,
     });
@@ -429,9 +476,9 @@ function buildSectionElement(section, date, showBinderCol, pageBreakBefore) {
 
   const thead = document.createElement("thead");
   const headRow = document.createElement("tr");
-  const cols = ["#", "Nom"];
-  if (section.showBinderCol) cols.push("Classeur");
-  cols.push("Page", "Case", "✓");
+  const cols = ["#", tPrint("print.col.name")];
+  if (section.showBinderCol) cols.push(tPrint("print.col.binder"));
+  cols.push(tPrint("print.col.page"), tPrint("print.col.slot"), "✓");
   for (const col of cols) {
     const th = document.createElement("th");
     th.textContent = col;
@@ -480,7 +527,7 @@ function buildSectionElement(section, date, showBinderCol, pageBreakBefore) {
 
   const footer = document.createElement("div");
   footer.className = "print-footer";
-  footer.textContent = `pokevault · ${date} · ☑ = attrapé · ☐ = manquant`;
+  footer.textContent = formatPrintFooter(date, false);
   wrapper.append(footer);
 
   frag.append(wrapper);
@@ -503,7 +550,7 @@ function buildPocketSectionElement(section, date, pageBreakBefore) {
 
   const thead = document.createElement("thead");
   const headRow = document.createElement("tr");
-  for (const col of ["#", "Nom", "✓", "Carte / note"]) {
+  for (const col of ["#", tPrint("print.col.name"), "✓", tPrint("print.col.note")]) {
     const th = document.createElement("th");
     th.textContent = col;
     if (col === "✓") th.className = "print-check";
@@ -543,7 +590,7 @@ function buildPocketSectionElement(section, date, pageBreakBefore) {
 
   const footer = document.createElement("div");
   footer.className = "print-footer";
-  footer.textContent = `pokevault pocket · ${date} · ☑ = attrapé · ☐ = manquant`;
+  footer.textContent = formatPrintFooter(date, true);
   wrapper.append(footer);
 
   frag.append(wrapper);
@@ -577,3 +624,11 @@ window.PokedexPrint = {
     void startPrintView();
   },
 };
+
+if (window.__POKEVAULT_PRINT_TESTS__) {
+  window.PokedexPrint._test = {
+    formatEntrySummary,
+    formatPrintSubtitle,
+    formatPrintFooter,
+  };
+}

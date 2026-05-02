@@ -52,6 +52,49 @@ const COPY = {
         "ne bouge, vérifie que l'API est joignable.",
     },
   },
+  en: {
+    dexError: {
+      title: "The Professor misplaced your Pokedex.",
+      body: "Reference data (data/pokedex.json) could not be loaded.",
+      hint: "Restart the server from the project root with make dev.",
+    },
+    listNoMatch: {
+      title: "No Pokemon answers that call.",
+      body:
+        "Try another number, another name or wider filters — " +
+        "there is always a specimen waiting somewhere.",
+    },
+    listCollectionEmpty: {
+      title: "Your Pokedex is empty.",
+      body:
+        "The Professor is waiting in Pallet Town. Catch your first " +
+        "Pokemon to start the adventure.",
+    },
+    listAllCaught: {
+      title: "You caught everything in these filters.",
+      body:
+        "Remove the missing filter to admire your collection, " +
+        "or go hunt another region.",
+    },
+    printEmpty: {
+      title: "Nothing to print in this scope.",
+      body:
+        "Adjust the caught / missing filter or select another binder — " +
+        "the field notebook needs at least one entry.",
+    },
+    statsEmpty: {
+      title: "Your stats are waiting for a first capture.",
+      body:
+        "Mark at least one Pokemon as caught so the Professor can " +
+        "track your progress.",
+    },
+    binderInit: {
+      title: "Your binders are getting ready.",
+      body:
+        "3×3 pages by region are being initialized. If nothing changes, " +
+        "check that the API is reachable.",
+    },
+  },
 };
 
 /**
@@ -67,12 +110,12 @@ const COPY = {
  * @returns {EmptyCopy}
  */
 function getEmptyCopy(variant, _vars) {
-  const copy = COPY.fr[variant];
+  const locale = window.PokevaultI18n?.getLocale?.() === "en" ? "en" : "fr";
+  const copy = COPY[locale]?.[variant] || COPY.fr[variant];
   if (!copy) {
-    return {
-      title: "Rien à afficher ici.",
-      body: "Ajuste tes filtres ou recharge la page.",
-    };
+    return locale === "en"
+      ? { title: "Nothing to show here.", body: "Adjust your filters or reload the page." }
+      : { title: "Rien à afficher ici.", body: "Ajuste tes filtres ou recharge la page." };
   }
   return copy;
 }

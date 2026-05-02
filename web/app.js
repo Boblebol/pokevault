@@ -10,6 +10,72 @@ const PROGRESS_QUEUE_KEY = "pokedex_progress_queue";
 const FORM_FILTER_STORAGE_KEY = "pokedexFormFilter";
 const TYPE_FILTER_STORAGE_KEY = "pokedexTypeFilter";
 
+const APP_FALLBACK_I18N = {
+  "app.sync.progress_unavailable": "Progression fichier indisponible — lance « make web » depuis la racine du projet.",
+  "app.sync.pending": "{count} modification(s) en attente de synchro…",
+  "app.sync.offline": "Hors ligne ou serveur indisponible — synchro différée.",
+  "app.sync.exchange_failed": "Action d'échange non synchronisée : {message}.",
+  "app.card_summary.one": "1 carte",
+  "app.card_summary.many": "{count} cartes",
+  "app.card_summary.set_one": "1 set",
+  "app.card_summary.set_many": "{count} sets",
+  "app.card_summary.full": "{cards} dans {sets}",
+  "app.filters.all_regions": "Toutes les régions",
+  "app.filters.all_types": "Tous les types",
+  "app.narrative.clear": "Tout réinitialiser",
+  "app.profile.default": "{name} (défaut)",
+  "app.profile.label": "Profil : {name}",
+  "app.profile.switching": "Bascule de profil…",
+  "app.profile.active_reload": "Profil actif. Rechargement…",
+  "app.profile.name_required": "Donne un nom au nouveau profil.",
+  "app.profile.created": "Profil « {name} » créé.",
+  "app.profile.create_error": "Erreur création : {message}",
+  "app.profile.delete_confirm": "Supprimer le profil « {id} » ? Les fichiers JSON associés resteront sur disque (data/profiles/{id}/), tu peux les effacer à la main si besoin.",
+  "app.profile.deleted": "Profil « {id} » supprimé. Bascule sur défaut…",
+  "app.profile.delete_error": "Erreur suppression : {message}",
+  "app.health.checking": "Application {version} · API vérification...",
+  "app.health.status_checking": "État API : vérification...",
+  "app.health.version_ok": "Application {version} · {apiStatus}",
+  "app.health.status_ok": "État API : ok",
+  "app.health.version_unavailable": "Application {version} · API indisponible",
+  "app.health.status_error": "État API : erreur de connexion",
+  "app.export.success": "Export : {caught} attrapés, {binders} classeurs.",
+  "app.export.failed": "Échec export : {message}",
+  "app.import.required": "Champs requis manquants",
+  "app.import.unsupported": "Version de schéma non supportée",
+  "app.import.preview": "{caught} attrapés, {binders} classeurs — export du {date}. Cela remplacera les données actuelles.",
+  "app.import.invalid": "Fichier invalide: {message}",
+  "app.import.success": "Import : {caught} attrapés, {binders} classeurs. Rechargement…",
+  "app.import.failed": "Échec import : {message}",
+  "app.date.unknown": "inconnue",
+  "app.list.silent": "Le Pokédex reste silencieux sur ce périmètre.",
+  "app.list.display": "Affichage : 1-{end} sur {total} entrées filtrées · {pct}% capturées dans cette vue.",
+  "app.list.end": "Fin de la liste — {total} entrées affichées.",
+  "app.list.no_filter": "Aucun Pokémon ne correspond à ce filtre.",
+  "app.card.unknown": "Inconnu",
+  "app.card.region_form": "{region} · forme",
+  "app.card.state_caught": ", attrapé",
+  "app.card.state_shiny": ", attrapé shiny",
+  "app.card.state_seen": ", vu chez un dresseur",
+  "app.card.state_missing": ", recherché ou manquant",
+  "app.card.match": ", {count} match échange",
+  "app.card.seen_contact": ", vu chez {count} contact",
+  "app.card.action_caught": "J'ai",
+  "app.card.action_wanted": "Je cherche",
+  "app.card.match_badge": "Match {count}",
+  "app.card.seen_badge": "Vu chez {count}",
+  "app.card.details": "Fiche & cartes",
+  "app.card.open": "Ouvrir la fiche de {name}",
+  "app.title.settings": "pokevault — Réglages",
+};
+
+function t(key, params = {}) {
+  const raw = window.PokevaultI18n?.t?.(key, params) || APP_FALLBACK_I18N[key] || key;
+  return String(raw).replace(/\{([a-zA-Z0-9_]+)\}/g, (_, name) => (
+    Object.prototype.hasOwnProperty.call(params, name) ? String(params[name]) : `{${name}}`
+  ));
+}
+
 let allPokemon = [];
 /**
  * Source of truth for the enriched Pokédex status (F03).
@@ -108,8 +174,7 @@ async function getCollectionBootstrap() {
     } catch {
       const hint = document.getElementById("syncHint");
       if (hint) {
-        hint.textContent =
-          "Progression fichier indisponible — lance « make web » depuis la racine du projet.";
+        hint.textContent = t("app.sync.progress_unavailable");
         hint.hidden = false;
       }
     }
@@ -132,7 +197,7 @@ async function getCollectionBootstrap() {
     if (pending.length > 0) {
       const hint = document.getElementById("syncHint");
       if (hint) {
-        hint.textContent = `${pending.length} modification(s) en attente de synchro…`;
+        hint.textContent = t("app.sync.pending", { count: pending.length });
         hint.hidden = false;
       }
     }
@@ -178,7 +243,7 @@ async function flushOfflineProgressQueue() {
       saveProgressQueue(rest);
     } catch {
       if (hint && rest.length > 0) {
-        hint.textContent = `${rest.length} modification(s) en attente de synchro…`;
+        hint.textContent = t("app.sync.pending", { count: rest.length });
         hint.hidden = false;
       }
       return;
@@ -219,7 +284,7 @@ async function persistStatusPatch(slug, state, shiny) {
     q.push({ kind: "status", slug, state, shiny: Boolean(shiny), ts: Date.now() });
     saveProgressQueue(q);
     if (hint) {
-      hint.textContent = "Hors ligne ou serveur indisponible — synchro différée.";
+      hint.textContent = t("app.sync.offline");
       hint.hidden = false;
     }
   }
@@ -242,7 +307,7 @@ async function persistNotePatch(slug, note) {
     q.push({ kind: "note", slug, note: text, ts: Date.now() });
     saveProgressQueue(q);
     if (hint) {
-      hint.textContent = "Hors ligne ou serveur indisponible — synchro différée.";
+      hint.textContent = t("app.sync.offline");
       hint.hidden = false;
     }
   }
@@ -411,7 +476,7 @@ async function setTrainerListMembership(slug, listName, enabled) {
 function showOwnershipSyncError(err) {
   const hint = document.getElementById("syncHint");
   if (hint) {
-    hint.textContent = `Action d'échange non synchronisée : ${err?.message || err || "erreur inconnue"}.`;
+    hint.textContent = t("app.sync.exchange_failed", { message: err?.message || err || "erreur inconnue" });
     hint.hidden = false;
   }
 }
@@ -499,9 +564,9 @@ function computeCardStats() {
 }
 
 function formatCardSummary({ cards, sets }) {
-  const c = cards === 1 ? "1 carte" : `${cards} cartes`;
-  const s = sets === 1 ? "1 set" : `${sets} sets`;
-  return `${c} dans ${s}`;
+  const c = cards === 1 ? t("app.card_summary.one") : t("app.card_summary.many", { count: cards });
+  const s = sets === 1 ? t("app.card_summary.set_one") : t("app.card_summary.set_many", { count: sets });
+  return t("app.card_summary.full", { cards: c, sets: s });
 }
 
 function availableTypeIds() {
@@ -912,8 +977,7 @@ function showDexError(grid) {
   }
   const p = document.createElement("p");
   p.className = "empty-state";
-  p.textContent =
-    "pokedex.json introuvable. Lance le serveur à la racine du dépôt (make web).";
+  p.textContent = t("app.sync.progress_unavailable");
   grid.append(p);
 }
 
@@ -924,7 +988,7 @@ function fillRegionSelect() {
   sel.replaceChildren();
   const opt0 = document.createElement("option");
   opt0.value = "all";
-  opt0.textContent = "Toutes les régions";
+  opt0.textContent = t("app.filters.all_regions");
   sel.append(opt0);
   for (const r of regionDefinitions) {
     const o = document.createElement("option");
@@ -1021,7 +1085,7 @@ function renderNarrativeChips() {
     const clear = document.createElement("button");
     clear.type = "button";
     clear.className = "narrative-chip narrative-chip--clear";
-    clear.textContent = "Tout réinitialiser";
+    clear.textContent = t("app.narrative.clear");
     clear.addEventListener("click", () => clearNarrativeTags());
     host.append(clear);
   }
@@ -1078,7 +1142,7 @@ function fillTypeSelect() {
   sel.replaceChildren();
   const o0 = document.createElement("option");
   o0.value = "all";
-  o0.textContent = "Tous les types";
+  o0.textContent = t("app.filters.all_types");
   sel.append(o0);
   const types = new Set();
   for (const p of allPokemon) {
@@ -1233,27 +1297,27 @@ function setupProfileSwitcher() {
     for (const p of profiles) {
       const opt = document.createElement("option");
       opt.value = p.id;
-      opt.textContent = p.id === "default" ? `${p.name} (défaut)` : p.name;
+      opt.textContent = p.id === "default" ? t("app.profile.default", { name: p.name }) : p.name;
       sel.append(opt);
     }
     sel.value = state?.active_id || "default";
     if (deleteBtn) deleteBtn.disabled = sel.value === "default";
     if (label) {
       const active = profiles.find((p) => p.id === state?.active_id);
-      label.textContent = `Profil : ${active ? active.name : "—"}`;
+      label.textContent = t("app.profile.label", { name: active ? active.name : "—" });
     }
   }
 
   P.subscribe(paint);
 
   sel.addEventListener("change", async () => {
-    showHint("Bascule de profil…");
+    showHint(t("app.profile.switching"));
     try {
       await P.setActive(sel.value);
-      showHint("Profil actif. Rechargement…");
+      showHint(t("app.profile.active_reload"));
       setTimeout(() => window.location.reload(), 350);
     } catch (err) {
-      showHint(`Erreur : ${err && err.message ? err.message : err}`, "err");
+      showHint(t("trainers.error", { message: err && err.message ? err.message : err }), "err");
     }
   });
 
@@ -1261,15 +1325,15 @@ function setupProfileSwitcher() {
     createBtn.addEventListener("click", async () => {
       const name = nameInput.value.trim();
       if (!name) {
-        showHint("Donne un nom au nouveau profil.", "err");
+        showHint(t("app.profile.name_required"), "err");
         return;
       }
       try {
         const created = await P.create(name);
         nameInput.value = "";
-        showHint(`Profil « ${created.name} » créé.`);
+        showHint(t("app.profile.created", { name: created.name }));
       } catch (err) {
-        showHint(`Erreur création : ${err && err.message ? err.message : err}`, "err");
+        showHint(t("app.profile.create_error", { message: err && err.message ? err.message : err }), "err");
       }
     });
   }
@@ -1279,15 +1343,15 @@ function setupProfileSwitcher() {
       const id = sel.value;
       if (id === "default") return;
       const confirmation = window.confirm(
-        `Supprimer le profil « ${id} » ? Les fichiers JSON associés resteront sur disque (data/profiles/${id}/), tu peux les effacer à la main si besoin.`,
+        t("app.profile.delete_confirm", { id }),
       );
       if (!confirmation) return;
       try {
         await P.remove(id);
-        showHint(`Profil « ${id} » supprimé. Bascule sur défaut…`);
+        showHint(t("app.profile.deleted", { id }));
         setTimeout(() => window.location.reload(), 350);
       } catch (err) {
-        showHint(`Erreur suppression : ${err && err.message ? err.message : err}`, "err");
+        showHint(t("app.profile.delete_error", { message: err && err.message ? err.message : err }), "err");
       }
     });
   }
@@ -1308,8 +1372,8 @@ function setupSettingsView() {
   paintVersionLabels();
   const versionEl = document.getElementById("settingsVersionLabel");
   const healthEl = document.getElementById("settingsHealthLabel");
-  if (versionEl) versionEl.textContent = `Application ${appVersionLabel()} · API vérification...`;
-  if (healthEl) healthEl.textContent = "État API : vérification...";
+  if (versionEl) versionEl.textContent = t("app.health.checking", { version: appVersionLabel() });
+  if (healthEl) healthEl.textContent = t("app.health.status_checking");
   void (async () => {
     try {
       const res = await fetch(API_HEALTH);
@@ -1317,11 +1381,11 @@ function setupSettingsView() {
       const data = await res.json();
       const apiVer = String(data?.api_version || "n/a");
       const apiStatus = apiVer === APP_VERSION ? "API ok" : `API ${apiVer}`;
-      if (versionEl) versionEl.textContent = `Application ${appVersionLabel()} · ${apiStatus}`;
-      if (healthEl) healthEl.textContent = "État API : ok";
+      if (versionEl) versionEl.textContent = t("app.health.version_ok", { version: appVersionLabel(), apiStatus });
+      if (healthEl) healthEl.textContent = t("app.health.status_ok");
     } catch {
-      if (versionEl) versionEl.textContent = `Application ${appVersionLabel()} · API indisponible`;
-      if (healthEl) healthEl.textContent = "État API : erreur de connexion";
+      if (versionEl) versionEl.textContent = t("app.health.version_unavailable", { version: appVersionLabel() });
+      if (healthEl) healthEl.textContent = t("app.health.status_error");
     }
   })();
   setupExportImport();
@@ -1409,9 +1473,12 @@ function setupExportImport() {
       a.click();
       a.remove();
       URL.revokeObjectURL(url);
-      showHint(`Export : ${Object.keys(data.progress?.caught || {}).length} attrapés, ${(data.binder_config?.binders || []).length} classeurs.`, false);
+      showHint(t("app.export.success", {
+        caught: Object.keys(data.progress?.caught || {}).length,
+        binders: (data.binder_config?.binders || []).length,
+      }), false);
     } catch (err) {
-      showHint(`Échec export : ${err.message}`, true);
+      showHint(t("app.export.failed", { message: err.message }), true);
     }
   });
 
@@ -1424,18 +1491,18 @@ function setupExportImport() {
     reader.onload = () => {
       try {
         const data = JSON.parse(reader.result);
-        if (data.schema_version !== 1) throw new Error("Version de schéma non supportée");
+        if (data.schema_version !== 1) throw new Error(t("app.import.unsupported"));
         if (!data.progress || !data.binder_config || !data.binder_placements) {
-          throw new Error("Champs requis manquants");
+          throw new Error(t("app.import.required"));
         }
         pendingImportPayload = sanitizeBackupPayloadToCollectionScope(data);
         const caught = Object.keys(pendingImportPayload.progress?.caught || {}).length;
         const binders = (pendingImportPayload.binder_config?.binders || []).length;
-        const date = data.exported_at ? new Date(data.exported_at).toLocaleDateString() : "inconnue";
-        previewText.textContent = `${caught} attrapés, ${binders} classeurs — export du ${date}. Cela remplacera les données actuelles.`;
+        const date = data.exported_at ? new Date(data.exported_at).toLocaleDateString() : t("app.date.unknown");
+        previewText.textContent = t("app.import.preview", { caught, binders, date });
         preview.hidden = false;
       } catch (err) {
-        showHint(`Fichier invalide: ${err.message}`, true);
+        showHint(t("app.import.invalid", { message: err.message }), true);
         pendingImportPayload = null;
         preview.hidden = true;
       }
@@ -1454,12 +1521,12 @@ function setupExportImport() {
       });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const body = await res.json();
-      showHint(`Import : ${body.caught_count} attrapés, ${body.binder_count} classeurs. Rechargement…`, false);
+      showHint(t("app.import.success", { caught: body.caught_count, binders: body.binder_count }), false);
       pendingImportPayload = null;
       preview.hidden = true;
       setTimeout(() => location.reload(), 1200);
     } catch (err) {
-      showHint(`Échec import : ${err.message}`, true);
+      showHint(t("app.import.failed", { message: err.message }), true);
     }
   });
 
@@ -1474,17 +1541,17 @@ function updateListDisplayInfo({ full, end, total }) {
   const endBanner = document.getElementById("listScrollEnd");
   if (info) {
     if (!total) {
-      info.textContent = "Le Pokédex reste silencieux sur ce périmètre.";
+      info.textContent = t("app.list.silent");
     } else {
       const caughtVisible = (full || []).filter((p) => Boolean(caughtMap[pokemonKey(p)])).length;
       const pctVisible = total ? Math.round((caughtVisible / total) * 100) : 0;
-      info.textContent = `Affichage : 1-${end} sur ${total} entrées filtrées · ${pctVisible}% capturées dans cette vue.`;
+      info.textContent = t("app.list.display", { end, total, pct: pctVisible });
     }
   }
   if (endBanner) {
     const done = total > 0 && end >= total;
     endBanner.hidden = !done;
-    if (done) endBanner.textContent = `Fin de la liste — ${total} entrées affichées.`;
+    if (done) endBanner.textContent = t("app.list.end", { total });
   }
 }
 
@@ -1535,12 +1602,12 @@ function createPokemonCard(p, opts) {
   if (shiny) card.dataset.shiny = "1";
   card.setAttribute("role", "group");
   const stateLabel = caught
-    ? shiny ? ", attrapé shiny" : ", attrapé"
-    : visualSeen ? ", vu chez un dresseur" : ", recherché ou manquant";
+    ? shiny ? t("app.card.state_shiny") : t("app.card.state_caught")
+    : visualSeen ? t("app.card.state_seen") : t("app.card.state_missing");
   const exchangeLabel = tradeSummary.matchCount > 0
-    ? `, ${tradeSummary.matchCount} match échange`
+    ? t("app.card.match", { count: tradeSummary.matchCount })
     : tradeSummary.availableFrom.length > 0
-      ? `, vu chez ${tradeSummary.availableFrom.length} contact`
+      ? t("app.card.seen_contact", { count: tradeSummary.availableFrom.length })
       : "";
   card.setAttribute(
     "aria-label",
@@ -1609,7 +1676,7 @@ function createPokemonCard(p, opts) {
   if (!typeList.length) {
     const unknown = document.createElement("span");
     unknown.className = "card-type-badge";
-    unknown.textContent = "Inconnu";
+    unknown.textContent = t("app.card.unknown");
     types.append(unknown);
   } else {
     for (const t of typeList) {
@@ -1625,7 +1692,7 @@ function createPokemonCard(p, opts) {
   const lbl = p.region_label_fr || regionDefinitions.find((x) => x.id === reg)?.label_fr || reg;
   const tag = document.createElement("div");
   tag.className = "card-region";
-  tag.textContent = p.region_native === false ? `${lbl} · forme` : lbl;
+  tag.textContent = p.region_native === false ? t("app.card.region_form", { region: lbl }) : lbl;
   card.append(tag);
 
   const action = document.createElement("div");
@@ -1638,7 +1705,7 @@ function createPokemonCard(p, opts) {
     { compact: true },
   );
   if (ownershipActions) action.append(ownershipActions);
-  else action.textContent = caught ? "J'ai" : "Je cherche";
+  else action.textContent = caught ? t("app.card.action_caught") : t("app.card.action_wanted");
   card.append(action);
 
   const exchange = document.createElement("div");
@@ -1648,10 +1715,10 @@ function createPokemonCard(p, opts) {
     badge.className = "pokemon-network-badge";
     if (tradeSummary.matchCount > 0) {
       badge.classList.add("is-match");
-      badge.textContent = `Match ${tradeSummary.matchCount}`;
+      badge.textContent = t("app.card.match_badge", { count: tradeSummary.matchCount });
       badge.title = `Disponible chez ${tradeSummary.availableFrom.join(", ")}`;
     } else {
-      badge.textContent = `Vu chez ${tradeSummary.availableFrom.length}`;
+      badge.textContent = t("app.card.seen_badge", { count: tradeSummary.availableFrom.length });
       badge.title = tradeSummary.availableFrom.join(", ");
     }
     exchange.append(badge);
@@ -1661,8 +1728,8 @@ function createPokemonCard(p, opts) {
   const details = document.createElement("button");
   details.type = "button";
   details.className = "card-details";
-  details.textContent = "Fiche & cartes";
-  details.setAttribute("aria-label", `Ouvrir la fiche de ${displayName(p)}`);
+  details.textContent = t("app.card.details");
+  details.setAttribute("aria-label", t("app.card.open", { name: displayName(p) }));
   details.addEventListener("click", (event) => {
     event.preventDefault();
     event.stopPropagation();
@@ -1720,7 +1787,7 @@ function render() {
   const heroCount = document.getElementById("listHeroCount");
   const heroCards = document.getElementById("listHeroCards");
   if (heroPct) heroPct.textContent = `${pct}%`;
-  if (heroCount) heroCount.textContent = `${caughtCount} / ${barTotal} découverts`;
+  if (heroCount) heroCount.textContent = t("app.collection.discovered", { caught: caughtCount, total: barTotal });
   if (heroCards) {
     const stats = computeCardStats();
     heroCards.textContent = formatCardSummary(stats);
@@ -1771,7 +1838,7 @@ function render() {
       : (() => {
           const p = document.createElement("p");
           p.className = "empty-state";
-          p.textContent = "Aucun Pokémon ne correspond à ce filtre.";
+          p.textContent = t("app.list.no_filter");
           return p;
         })();
     if (node) grid.append(node);
@@ -1999,13 +2066,13 @@ function applyAppRoute() {
   if (elPokemon) elPokemon.hidden = view !== "pokemon";
   updateAppSwitchNav(view);
   const titles = {
-    liste: "pokevault — Collection",
-    stats: "pokevault — Statistiques",
-    settings: "pokevault — Réglages",
-    print: "pokevault — Impression",
-    classeur: "pokevault — Classeurs",
-    dresseurs: "pokevault — Dresseurs",
-    pokemon: "pokevault — Fiche Pokédex",
+    liste: `pokevault — ${t("app.nav.collection")}`,
+    stats: `pokevault — ${t("app.nav.stats")}`,
+    settings: `pokevault — ${t("app.nav.settings")}`,
+    print: `pokevault — ${t("app.nav.print")}`,
+    classeur: `pokevault — ${t("app.nav.binders")}`,
+    dresseurs: `pokevault — ${t("app.nav.trainers")}`,
+    pokemon: `pokevault — ${t("app.drawer.kicker")}`,
   };
   document.title = titles[view] || "pokevault";
   if (view === "liste" && !listViewStarted) {
@@ -2035,6 +2102,15 @@ function applyAppRoute() {
 }
 
 window.addEventListener("hashchange", applyAppRoute);
+window.PokevaultI18n?.subscribeLocale?.(() => {
+  window.PokevaultI18n?.applyTranslations?.();
+  fillRegionSelect();
+  fillTypeSelect();
+  renderRegionChips();
+  renderNarrativeChips();
+  if (allPokemon.length && currentViewFromHash() === "liste") render();
+  applyAppRoute();
+});
 
 window.applyPokedexAppRoute = applyAppRoute;
 
