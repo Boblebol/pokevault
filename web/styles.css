@@ -1617,10 +1617,6 @@ body {
   border-color: #555;
 }
 
-.card.is-dimmed {
-  opacity: 0.4;
-}
-
 .card--empty-slot {
   opacity: 0.55;
   pointer-events: none;
@@ -2118,8 +2114,39 @@ body {
     0 8px 24px rgba(0, 0, 0, 0.22);
 }
 
-.card.is-dimmed {
+.card.is-dimmed > :not(.card-action):not(.pokemon-network-row) {
   opacity: 0.35;
+}
+
+.card.is-dimmed .card-action,
+.card.is-dimmed .pokemon-network-row {
+  opacity: 1;
+}
+
+.card.is-dimmed .pokemon-trade-chip {
+  background: color-mix(in oklab, var(--control-bg) 92%, var(--surface-high));
+}
+
+.card.is-dimmed .pokemon-trade-chip[data-active="true"] {
+  border-color: var(--accent);
+  background: color-mix(in oklab, var(--accent) 24%, var(--control-bg));
+  color: var(--text);
+  box-shadow: 0 0 0 2px color-mix(in oklab, var(--accent) 30%, transparent);
+}
+
+.card.is-dimmed .pokemon-trade-chip[data-action="duplicate"][data-active="true"] {
+  border-color: rgba(255, 193, 7, 0.62);
+  background: color-mix(in oklab, #ffd36a 18%, var(--control-bg));
+  box-shadow: 0 0 0 2px rgba(255, 193, 7, 0.24);
+}
+
+.card.is-dimmed .pokemon-network-badge {
+  opacity: 1;
+}
+
+.card.is-dimmed .pokemon-network-badge.is-match {
+  border-color: rgba(0, 218, 243, 0.48);
+  background: rgba(0, 218, 243, 0.16);
 }
 
 .card-num {

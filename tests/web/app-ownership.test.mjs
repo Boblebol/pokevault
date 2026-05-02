@@ -34,7 +34,7 @@ async function loadModule() {
   return globalThis.window.PokedexCollection._test;
 }
 
-test("shouldDimCardForHighlight keeps tradeable doubles visible", async () => {
+test("shouldDimCardForHighlight dims doubles as captured cards", async () => {
   const api = await loadModule();
 
   assert.equal(
@@ -43,14 +43,18 @@ test("shouldDimCardForHighlight keeps tradeable doubles visible", async () => {
   );
   assert.equal(
     api.shouldDimCardForHighlight("caught", { caught: true, duplicate: true }),
-    false,
+    true,
   );
   assert.equal(
-    api.shouldDimCardForHighlight("caught", { caught: false, duplicate: true }),
+    api.shouldDimCardForHighlight("caught", { caught: false, duplicate: false }),
     false,
   );
   assert.equal(
     api.shouldDimCardForHighlight("missing", { caught: false, duplicate: false }),
     true,
+  );
+  assert.equal(
+    api.shouldDimCardForHighlight("missing", { caught: true, duplicate: true }),
+    false,
   );
 });
