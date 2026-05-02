@@ -71,7 +71,7 @@
     "pokemon_drawer.card_added": "Carte ajoutée — Pokédex marqué capturé.",
     "pokemon_drawer.card_add_failed": "Ajout impossible.",
     "pokemon_drawer.full_link": "Voir fiche complète →",
-    "pokemon_drawer.legacy_seen": "Vu manuel existant; les prochains statuts passent par Cherche, J'ai ou Double.",
+    "pokemon_drawer.legacy_seen": "Vu manuel existant; les prochains statuts passent par Cherche, Capturé ou Double.",
     "pokemon_drawer.forms_empty": "Aucune autre forme dans le Pokédex local.",
     "pokemon_drawer.hunt.high": "Priorite haute",
     "pokemon_drawer.hunt.active": "Recherche active",

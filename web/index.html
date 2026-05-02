@@ -141,7 +141,7 @@
                   <span data-i18n="app.filters.seen">Vus</span>
                 </button>
                 <button type="button" class="filter-btn" data-filter="caught" aria-pressed="false">
-                  <span data-i18n="app.filters.caught">J'ai</span>
+                  <span data-i18n="app.filters.caught">Capturés</span>
                 </button>
                 <button type="button" class="filter-btn filter-btn--bonus" data-filter="shiny" aria-pressed="false">
                   <span data-i18n="app.filters.shiny">Shiny</span>
@@ -195,7 +195,7 @@
                     class="region-filter"
                     aria-label="Choisir quelles cartes atténuer dans la grille"
                   >
-                    <option value="caught" data-i18n="app.dim.caught">Atténuer attrapés</option>
+                    <option value="caught" data-i18n="app.dim.caught">Atténuer capturés</option>
                     <option value="missing" data-i18n="app.dim.missing">Atténuer manquants</option>
                   </select>
                 </label>
@@ -296,7 +296,7 @@
                     <label class="binder-shell-select-wrap binder-dim-wrap">
                       <span class="binder-shell-select-label" data-i18n="app.filters.dim">Mise en avant</span>
                       <select id="binderDimSelect" class="region-filter binder-shell-select" aria-label="Choisir quelles cartes atténuer dans le classeur" data-i18n-aria-label="app.binders.dim_aria">
-                        <option value="caught" data-i18n="app.dim.caught">Atténuer attrapés</option>
+                        <option value="caught" data-i18n="app.dim.caught">Atténuer capturés</option>
                         <option value="missing" data-i18n="app.dim.missing">Atténuer manquants</option>
                       </select>
                     </label>
@@ -423,7 +423,7 @@
             <label class="region-filter-wrap settings-dim-label">
               <span class="region-filter-label" data-i18n="app.filters.dim">Mise en avant</span>
               <select id="settingsDimSelect" class="region-filter" aria-label="Mode global de mise en avant">
-                <option value="caught" data-i18n="app.dim.caught">Atténuer attrapés</option>
+                <option value="caught" data-i18n="app.dim.caught">Atténuer capturés</option>
                 <option value="missing" data-i18n="app.dim.missing">Atténuer manquants</option>
               </select>
             </label>
@@ -604,7 +604,7 @@
           </p>
           <ul class="onboarding__bullets">
             <li data-i18n="app.onboarding.step1.b1"><em>Cherche</em> marque ce qu'il te manque et alimente le focus.</li>
-            <li data-i18n="app.onboarding.step1.b2"><em>J'ai</em> confirme ta progression Pokédex.</li>
+            <li data-i18n="app.onboarding.step1.b2"><em>Capturé</em> confirme ta progression Pokédex.</li>
             <li data-i18n="app.onboarding.step1.b3"><em>Double</em> dit que tu peux proposer ce Pokémon en échange.</li>
           </ul>
         </section>
@@ -653,14 +653,14 @@
           <p class="onboarding__kicker" data-i18n="app.onboarding.step4.kicker">Étape 4 · Mode de suivi</p>
           <h3 class="onboarding__step-title" data-i18n="app.onboarding.step4.title">Simple ou avancé ?</h3>
           <p class="onboarding__lede" data-i18n="app.onboarding.step4.lede">
-            Simple garde la liste concentrée sur Cherche, J'ai et Double.
+            Simple garde la liste concentrée sur Cherche, Capturé et Double.
             Avancé rend les formes, shiny, notes, Dresseurs et cartes plus visibles.
           </p>
           <div class="onboarding__choices" role="radiogroup" aria-label="Mode de suivi Pokédex" data-i18n-aria-label="app.onboarding.mode">
             <label class="onboarding__choice">
               <input type="radio" name="onboardingTrackingMode" value="simple" checked />
               <span class="onboarding__choice-title" data-i18n="app.onboarding.simple">Simple</span>
-              <span class="onboarding__choice-sub" data-i18n="app.onboarding.simple_sub">Cherche, J'ai, Double. Les formes régionales restent disponibles.</span>
+              <span class="onboarding__choice-sub" data-i18n="app.onboarding.simple_sub">Cherche, Capturé, Double. Les formes régionales restent disponibles.</span>
             </label>
             <label class="onboarding__choice">
               <input type="radio" name="onboardingTrackingMode" value="advanced" />
@@ -712,8 +712,8 @@
           <li><kbd>/</kbd><span data-i18n="app.shortcuts.search">Focus la barre de recherche</span></li>
           <li><kbd>Esc</kbd><span data-i18n="app.shortcuts.clear">Vide / quitte la recherche ou la sélection</span></li>
           <li><kbd>j</kbd> / <kbd>k</kbd><span data-i18n="app.shortcuts.next">Pokémon suivant / précédent</span></li>
-          <li><kbd>c</kbd><span data-i18n="app.shortcuts.caught">Marque J'ai, ou retire J'ai si déjà actif</span></li>
-          <li><kbd>Shift</kbd>+<kbd>C</kbd><span data-i18n="app.shortcuts.double">Marque Double, ou repasse à J'ai</span></li>
+          <li><kbd>c</kbd><span data-i18n="app.shortcuts.caught">Marque Capturé, ou retire Capturé si déjà actif</span></li>
+          <li><kbd>Shift</kbd>+<kbd>C</kbd><span data-i18n="app.shortcuts.double">Marque Double, ou repasse à Capturé</span></li>
           <li><kbd>i</kbd><span data-i18n="app.shortcuts.open">Ouvre la fiche complète (drawer « Mes cartes »)</span></li>
           <li><kbd>?</kbd><span data-i18n="app.shortcuts.help">Ouvre cette aide</span></li>
         </ul>

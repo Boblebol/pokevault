@@ -60,7 +60,7 @@ const APP_FALLBACK_I18N = {
   "app.card.state_missing": ", recherché ou manquant",
   "app.card.match": ", {count} match échange",
   "app.card.seen_contact": ", vu chez {count} contact",
-  "app.card.action_caught": "J'ai",
+  "app.card.action_caught": "Capturé",
   "app.card.action_wanted": "Je cherche",
   "app.card.match_badge": "Match {count}",
   "app.card.seen_badge": "Vu chez {count}",
@@ -411,7 +411,7 @@ function setStatus(slug, state, shiny = false) {
 
 /**
  * Backward-compatible shortcut entry point.
- * Plain `c` toggles `J'ai`; Shift+C toggles `Double`.
+ * Plain `c` toggles `Capturé`; Shift+C toggles `Double`.
  *
  * @param {string} slug
  * @param {{ shift?: boolean }} [opts]
@@ -456,6 +456,13 @@ function ownershipStateForSlug(slug) {
   }
   const status = getStatus(key);
   return { wanted: false, caught: status.state === "caught", duplicate: false };
+}
+
+function shouldDimCardForHighlight(mode, ownership) {
+  const caught = Boolean(ownership?.caught);
+  const duplicate = Boolean(ownership?.duplicate);
+  if (duplicate) return false;
+  return mode === "missing" ? !caught : caught;
 }
 
 async function setHuntWanted(slug, wanted) {
@@ -1592,8 +1599,9 @@ function createPokemonCard(p, opts) {
   if (caught) classParts.push("is-caught");
   if (visualSeen) classParts.push("is-seen");
   if (shiny) classParts.push("is-shiny");
+  if (ownership.duplicate) classParts.push("is-duplicate");
   card.className = classParts.join(" ");
-  if ((dim === "caught" && caught) || (dim === "missing" && !caught)) {
+  if (shouldDimCardForHighlight(dim, { caught, duplicate: ownership.duplicate })) {
     card.classList.add("is-dimmed");
   }
   card.dataset.slug = key;
@@ -1743,6 +1751,11 @@ function createPokemonCard(p, opts) {
 window.PokedexCollection.createPokemonCard = createPokemonCard;
 window.PokedexCollection.poolForCollectionScope = poolForCollectionScope;
 window.PokedexCollection.computeCardStats = computeCardStats;
+if (window.__POKEVAULT_APP_TESTS__) {
+  window.PokedexCollection._test = {
+    shouldDimCardForHighlight,
+  };
+}
 window.PokedexCollection.formatCardSummary = formatCardSummary;
 
 function hasActiveFilterExceptMissing() {

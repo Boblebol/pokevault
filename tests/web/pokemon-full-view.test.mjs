@@ -211,7 +211,7 @@ test("renderInto shows trade-oriented ownership actions and exchange context", a
   const buttons = row.children;
   assert.deepEqual(buttons.map((button) => button.textContent), [
     "Cherche",
-    "J'ai",
+    "Capturé",
     "Double",
   ]);
   assert.equal(buttons[2].dataset.active, "true");

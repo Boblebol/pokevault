@@ -80,7 +80,7 @@ remaining active v1.1 track is carefully sourced Pokédex metadata, documented i
 
 Trainer Cards add an optional local contact layer for collectors who want to
 exchange wishlists and trade lists without accounts, public profiles or server
-sync. The base Pokédex stays simple: `Cherche`, `J'ai` and `Double` are the
+sync. The base Pokédex stays simple: `Cherche`, `Capturé` and `Double` are the
 visible actions, and imported contacts only add derived `Vu chez` / `Match`
 context. The first-run product tour introduces that model as a manual file
 exchange, so the feature stays visible without becoming required.
@@ -246,7 +246,7 @@ Optional: F13 (themes) to make step 3 richer.
 > instead of a simple on/off toggle.
 
 Current product note: the stored contract remains backward-compatible, but the
-main UI now exposes `Cherche`, `J'ai` and `Double`. Manual `seen` is legacy;
+main UI now exposes `Cherche`, `Capturé` and `Double`. Manual `seen` is legacy;
 `Vu chez` is derived from imported Trainer Cards.
 
 ### Acceptance

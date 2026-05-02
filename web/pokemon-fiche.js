@@ -43,7 +43,7 @@
     "pokemon_fiche.status.caught": "Attrapé",
     "pokemon_fiche.status.caught_shiny": "Attrapé shiny",
     "pokemon_fiche.ownership.wanted": "Cherche",
-    "pokemon_fiche.ownership.owned": "J'ai",
+    "pokemon_fiche.ownership.owned": "Capturé",
     "pokemon_fiche.ownership.duplicate": "Double",
     "pokemon_fiche.ownership.none": "Je n'ai pas",
     "pokemon_fiche.unknown": "Inconnu",
