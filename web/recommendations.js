@@ -7,6 +7,32 @@
 (function initRecommendations() {
   "use strict";
 
+  const FALLBACK_I18N = {
+    "recommendations.region.other": "Autre",
+    "recommendations.region.national": "National",
+    "recommendations.reason.priority_hunt": "Ta recherche prioritaire {name} avance {region}.",
+    "recommendations.reason.hunt": "Dans tes recherches : {name} avance {region}.",
+    "recommendations.reason.seen": "Deja apercu : {name} est le meilleur prochain pas pour {region}.",
+    "recommendations.reason.region_close": "{region} est proche d'etre completee : {missing} restant{plural}.",
+    "recommendations.reason.badge": "Aide aussi le badge {title} ({current}/{target}).",
+    "recommendations.next.seen": "Vu dans le Pokedex, pas encore capture.",
+    "recommendations.next.active_region": "Dans ta region active {region}.",
+    "recommendations.next.region_close": "{region} est proche : {missing} restant{plural}.",
+    "recommendations.next.missing": "{name} manque au Pokedex national.",
+    "recommendations.empty.region": "Toutes regions",
+    "recommendations.empty.reason": "Aucune cible manquante dans ce perimetre.",
+    "focus.reason.region_close": "{region} est proche d'etre completee.",
+  };
+
+  function t(key, params = {}) {
+    const runtime = window.PokevaultI18n;
+    if (runtime?.t) return runtime.t(key, params);
+    const template = FALLBACK_I18N[key] || key;
+    return String(template).replace(/\{([a-zA-Z0-9_]+)\}/g, (_, name) =>
+      Object.prototype.hasOwnProperty.call(params, name) ? String(params[name]) : `{${name}}`,
+    );
+  }
+
   function slugOf(p) {
     return String(p?.slug || "");
   }
@@ -33,7 +59,7 @@
 
   function regionLabel(id, defs) {
     const found = (defs || []).find((d) => String(d.id) === String(id));
-    return found?.label_fr || (id === "unknown" ? "Autre" : String(id || "National"));
+    return found?.label_fr || (id === "unknown" ? t("recommendations.region.other") : String(id || t("recommendations.region.national")));
   }
 
   function statusState(slug, caughtMap, statusMap) {
@@ -106,16 +132,19 @@
     const first = rows[0];
     const hunt = first ? huntMap?.[slugOf(first)] : null;
     if (hunt?.wanted && hunt.priority === "high") {
-      return `Ta recherche prioritaire ${displayName(first)} avance ${group.label}.`;
+      return t("recommendations.reason.priority_hunt", { name: displayName(first), region: group.label });
     }
     if (hunt?.wanted) {
-      return `Dans tes recherches : ${displayName(first)} avance ${group.label}.`;
+      return t("recommendations.reason.hunt", { name: displayName(first), region: group.label });
     }
     if (first && statusState(slugOf(first), caughtMap, statusMap) === "seen") {
-      return `Deja apercu : ${displayName(first)} est le meilleur prochain pas pour ${group.label}.`;
+      return t("recommendations.reason.seen", { name: displayName(first), region: group.label });
     }
     const missing = group.items.length;
-    return `${group.label} est proche d'etre completee : ${missing} restant${missing > 1 ? "s" : ""}.`;
+    return t(
+      window.PokevaultI18n?.t ? "focus.reason.region_close" : "recommendations.reason.region_close",
+      { region: group.label, missing, plural: missing > 1 ? "s" : "" },
+    );
   }
 
   function badgeReason(badge) {
@@ -124,7 +153,7 @@
     if (!title) return "";
     const current = Number.isFinite(Number(badge.current)) ? Number(badge.current) : 0;
     const target = Number.isFinite(Number(badge.target)) ? Number(badge.target) : 1;
-    return `Aide aussi le badge ${title} (${current}/${target}).`;
+    return t("recommendations.reason.badge", { title, current, target });
   }
 
   function missingCountByRegion(groups) {
@@ -153,14 +182,14 @@
 
   function nextActionReason(kind, p, regionId, defs, missingByRegion, nearestBadge) {
     const label = regionLabel(regionId, defs);
-    if (kind === "seen") return "Vu dans le Pokedex, pas encore capture.";
-    if (kind === "active_region") return `Dans ta region active ${label}.`;
+    if (kind === "seen") return t("recommendations.next.seen");
+    if (kind === "active_region") return t("recommendations.next.active_region", { region: label });
     if (kind === "regional_completion") {
       const missing = missingByRegion.get(regionId) || 1;
-      return `${label} est proche : ${missing} restant${missing > 1 ? "s" : ""}.`;
+      return t("recommendations.next.region_close", { region: label, missing, plural: missing > 1 ? "s" : "" });
     }
     if (kind === "badge") return badgeReason(nearestBadge);
-    return `${displayName(p)} manque au Pokedex national.`;
+    return t("recommendations.next.missing", { name: displayName(p) });
   }
 
   function buildNextActions({
@@ -217,9 +246,9 @@
     if (!best) {
       return {
         targetRegionId: "all",
-        targetRegion: "Toutes regions",
-        targetLabel: "Toutes regions",
-        reason: "Aucune cible manquante dans ce perimetre.",
+        targetRegion: t("recommendations.empty.region"),
+        targetLabel: t("recommendations.empty.region"),
+        reason: t("recommendations.empty.reason"),
         rows: [],
         groups: [],
       };

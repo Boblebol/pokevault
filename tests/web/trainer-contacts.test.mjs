@@ -233,6 +233,47 @@ test("renderContact exposes social contact links as clickable actions", async ()
   assert.match(article.innerHTML, /href="tel:\+33612345678"/);
 });
 
+test("renderContact follows English i18n labels when available", async () => {
+  const api = await loadModule();
+  globalThis.PokevaultI18n = {
+    t(key) {
+      return {
+        "trainers.want": "Wants",
+        "trainers.trade": "For trade",
+        "trainers.delete": "Delete",
+        "trainers.local_card": "Local Trainer Card",
+        "trainers.received_update": "Received update",
+        "trainers.region": "Region",
+        "trainers.favorite": "Favorite",
+        "trainers.private_note": "Private note",
+        "trainers.private_note_placeholder": "Only visible in this local book.",
+        "trainers.save_note": "Save note",
+        "trainers.none": "Nothing listed.",
+      }[key] || key;
+    },
+  };
+
+  const article = api.renderContact({
+    card: {
+      trainer_id: "misty-123",
+      display_name: "Misty",
+      wants: ["0054-psyduck"],
+      for_trade: ["0118-goldeen"],
+      updated_at: "2026-04-30T10:00:00+00:00",
+    },
+    private_note: "",
+    first_received_at: "2026-04-30T11:00:00+00:00",
+    last_received_at: "2026-04-30T11:00:00+00:00",
+  });
+
+  assert.match(article.innerHTML, /Wants/);
+  assert.match(article.innerHTML, /For trade/);
+  assert.match(article.innerHTML, /Received update/);
+  assert.doesNotMatch(article.innerHTML, /Cherche/);
+
+  delete globalThis.PokevaultI18n;
+});
+
 test("note requests trim private notes and target the trainer note endpoint", async () => {
   const api = await loadModule();
   const request = api.notePatchRequest("misty/123", "  Bring sleeves  ");

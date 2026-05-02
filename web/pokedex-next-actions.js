@@ -5,6 +5,22 @@
   "use strict";
 
   const DEFAULT_LIMIT = 3;
+  const FALLBACK_I18N = {
+    "next_actions.title": "À compléter maintenant",
+    "next_actions.empty": "Pokédex complet sur ce périmètre.",
+    "next_actions.open": "Ouvrir {name}",
+    "next_actions.default_reason": "À compléter.",
+    "next_actions.badge_near": "Badge proche : {title} ({current}/{target})",
+  };
+
+  function t(key, params = {}) {
+    const runtime = window.PokevaultI18n;
+    if (runtime?.t) return runtime.t(key, params);
+    const template = FALLBACK_I18N[key] || key;
+    return String(template).replace(/\{([a-zA-Z0-9_]+)\}/g, (_, name) =>
+      Object.prototype.hasOwnProperty.call(params, name) ? String(params[name]) : `{${name}}`,
+    );
+  }
 
   function el(tag, className, text) {
     const node = document.createElement(tag);
@@ -24,7 +40,7 @@
 
   function renderHeader(host, count) {
     const header = el("div", "pokedex-next-actions__header");
-    header.append(el("h2", "pokedex-next-actions__title", "À compléter maintenant"));
+    header.append(el("h2", "pokedex-next-actions__title", t("next_actions.title")));
     header.append(el("span", "pokedex-next-actions__meta", `${count}`));
     host.append(header);
   }
@@ -35,14 +51,14 @@
     if (!title) return;
     const current = Number.isFinite(Number(nearestBadge.current)) ? Number(nearestBadge.current) : 0;
     const target = Number.isFinite(Number(nearestBadge.target)) ? Number(nearestBadge.target) : 1;
-    host.append(el("p", "pokedex-next-actions__badge", `Badge proche : ${title} (${current}/${target})`));
+    host.append(el("p", "pokedex-next-actions__badge", t("next_actions.badge_near", { title, current, target })));
   }
 
   function renderAction(action, onOpen) {
     const row = el("button", `pokedex-next-action is-${action.kind || "missing"}`);
     row.type = "button";
     row.dataset.slug = action.slug;
-    row.setAttribute("aria-label", `Ouvrir ${action.name || action.slug}`);
+    row.setAttribute("aria-label", t("next_actions.open", { name: action.name || action.slug }));
     row.addEventListener("click", () => {
       if (typeof onOpen === "function") onOpen(action.slug, action, row);
     });
@@ -50,7 +66,7 @@
     row.append(el("span", "pokedex-next-action__num", displayNumber(action.number)));
     const body = el("span", "pokedex-next-action__body");
     body.append(el("strong", "pokedex-next-action__name", action.name || action.slug));
-    body.append(el("span", "pokedex-next-action__reason", action.reason || "À compléter."));
+    body.append(el("span", "pokedex-next-action__reason", action.reason || t("next_actions.default_reason")));
     row.append(body);
     row.append(el("span", "material-symbols-outlined pokedex-next-action__icon", "chevron_right"));
     return row;
@@ -62,7 +78,7 @@
     host.replaceChildren();
     renderHeader(host, rows.length);
     if (!rows.length) {
-      host.append(el("p", "pokedex-next-actions__empty", "Pokédex complet sur ce périmètre."));
+      host.append(el("p", "pokedex-next-actions__empty", t("next_actions.empty")));
       renderBadgeHint(host, nearestBadge);
       return;
     }

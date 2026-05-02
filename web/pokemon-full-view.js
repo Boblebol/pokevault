@@ -23,6 +23,46 @@
     played: "Played",
     poor: "Poor",
   };
+  const FALLBACK_I18N = {
+    "pokemon_full.back": "← Retour à la collection",
+    "pokemon_full.name_and": "et",
+    "pokemon_full.exchange.match": "Match possible avec {names}.",
+    "pokemon_full.exchange.seen": "Vu chez {names}.",
+    "pokemon_full.exchange.wanted_by": "{names} cherche ce Pokémon.",
+    "pokemon_full.legacy_seen": "Vu manuel existant; les prochains statuts passent par Cherche, J'ai ou Double.",
+    "pokemon_full.hunt.high": "Recherche prioritaire",
+    "pokemon_full.hunt.normal": "Dans mes recherches",
+    "pokemon_full.hunt.empty": "Active Cherche pour l'ajouter au focus.",
+    "pokemon_full.hunt.priority_normal": "Priorite normale",
+    "pokemon_full.hunt.priority_high": "Priorite haute",
+    "pokemon_full.note.empty": "Aucune note personnelle pour l'instant.",
+    "pokemon_full.defense": "Efficacité défensive",
+    "pokemon_full.weaknesses": "Faiblesses",
+    "pokemon_full.resistances": "Résistances",
+    "pokemon_full.immunities": "Immunités",
+    "pokemon_full.forms.empty": "Aucune autre forme dans le Pokédex local.",
+    "pokemon_full.cards.loading": "Chargement…",
+    "pokemon_full.cards.empty": "Aucune carte pour l'instant. Ouvre le drawer (bouton « Fiche & cartes » ou touche i) pour en ajouter.",
+    "pokemon_full.cards.failed": "Impossible de charger les cartes pour l'instant.",
+    "pokemon_full.table.set": "Set",
+    "pokemon_full.table.number": "N°",
+    "pokemon_full.table.variant": "Variante",
+    "pokemon_full.table.lang": "Langue",
+    "pokemon_full.table.condition": "Condition",
+    "pokemon_full.table.qty": "Qté",
+    "pokemon_full.table.note": "Note",
+    "pokemon_full.missing.slug": "Aucun Pokémon trouvé pour « {slug} ».",
+    "pokemon_full.missing.none": "Aucun Pokémon sélectionné.",
+  };
+
+  function t(key, params = {}) {
+    const runtime = window.PokevaultI18n;
+    if (runtime?.t) return runtime.t(key, params);
+    const template = FALLBACK_I18N[key] || key;
+    return String(template).replace(/\{([a-zA-Z0-9_]+)\}/g, (_, name) =>
+      Object.prototype.hasOwnProperty.call(params, name) ? String(params[name]) : `{${name}}`,
+    );
+  }
 
   function ficheHelpers() {
     return window.PokevaultPokemonFiche || {};
@@ -142,7 +182,7 @@
     const clean = (Array.isArray(names) ? names : []).filter(Boolean);
     if (!clean.length) return "";
     if (clean.length === 1) return clean[0];
-    if (clean.length === 2) return `${clean[0]} et ${clean[1]}`;
+    if (clean.length === 2) return `${clean[0]} ${t("pokemon_full.name_and")} ${clean[1]}`;
     return `${clean.slice(0, 2).join(", ")} +${clean.length - 2}`;
   }
 
@@ -153,16 +193,16 @@
     box.className = "pokemon-exchange-context";
     if (summary.matchCount > 0) {
       const line = document.createElement("p");
-      line.textContent = `Match possible avec ${formatNameList(summary.availableFrom)}.`;
+      line.textContent = t("pokemon_full.exchange.match", { names: formatNameList(summary.availableFrom) });
       box.append(line);
     } else if (summary.availableFrom.length > 0) {
       const line = document.createElement("p");
-      line.textContent = `Vu chez ${formatNameList(summary.availableFrom)}.`;
+      line.textContent = t("pokemon_full.exchange.seen", { names: formatNameList(summary.availableFrom) });
       box.append(line);
     }
     if (summary.canHelpCount > 0) {
       const line = document.createElement("p");
-      line.textContent = `${formatNameList(summary.wantedBy)} cherche ce Pokémon.`;
+      line.textContent = t("pokemon_full.exchange.wanted_by", { names: formatNameList(summary.wantedBy) });
       box.append(line);
     }
     return box;
@@ -190,7 +230,7 @@
     const back = document.createElement("a");
     back.className = "fullview-back";
     back.href = listReturnHash();
-    back.textContent = "← Retour à la collection";
+    back.textContent = t("pokemon_full.back");
     bar.append(back);
     root.append(bar);
   }
@@ -254,7 +294,7 @@
   }
 
   function buildStatusSection(root, p) {
-    const section = createFullSection("pokedex_status", "Statut Pokédex");
+    const section = createFullSection("pokedex_status");
     const status = window.PokedexCollection?.getStatus?.(p.slug) || {
       state: "not_met",
       shiny: false,
@@ -282,7 +322,7 @@
     if (status.state === "seen") {
       const legacy = document.createElement("p");
       legacy.className = "pokemon-status-legacy";
-      legacy.textContent = "Vu manuel existant; les prochains statuts passent par Cherche, J'ai ou Double.";
+      legacy.textContent = t("pokemon_full.legacy_seen");
       section.append(legacy);
     }
     const exchange = buildExchangeContext(p.slug);
@@ -292,22 +332,22 @@
   }
 
   function buildProgressSection(root, p) {
-    const section = createFullSection("personal_progress", "Progression personnelle");
+    const section = createFullSection("personal_progress");
     const huntBox = document.createElement("div");
     huntBox.className = "fullview-hero__status";
     const hunt = window.PokevaultHunts?.entry?.(p.slug);
     const huntLabel = document.createElement("span");
     huntLabel.className = "fullview-hero__status-label";
     huntLabel.textContent = hunt
-      ? hunt.priority === "high" ? "Recherche prioritaire" : "Dans mes recherches"
-      : "Active Cherche pour l'ajouter au focus.";
+      ? hunt.priority === "high" ? t("pokemon_full.hunt.high") : t("pokemon_full.hunt.normal")
+      : t("pokemon_full.hunt.empty");
     huntLabel.dataset.state = hunt ? "seen" : "not_met";
     huntBox.append(huntLabel);
 
     const priorityHunt = document.createElement("button");
     priorityHunt.type = "button";
     priorityHunt.className = "fullview-status-btn";
-    priorityHunt.textContent = hunt?.priority === "high" ? "Priorite normale" : "Priorite haute";
+    priorityHunt.textContent = hunt?.priority === "high" ? t("pokemon_full.hunt.priority_normal") : t("pokemon_full.hunt.priority_high");
     priorityHunt.disabled = !hunt;
     priorityHunt.addEventListener("click", async () => {
       await window.PokevaultHunts?.patch?.(p.slug, {
@@ -323,7 +363,7 @@
   }
 
   function buildNotesSection(root, p) {
-    const section = createFullSection("notes", "Notes");
+    const section = createFullSection("notes");
     const note = window.PokedexCollection?.getNote?.(p.slug) || "";
     const helper = ficheHelpers();
     if (typeof helper.createNoteEditor === "function") {
@@ -333,7 +373,7 @@
     } else {
       const empty = document.createElement("p");
       empty.className = "drawer-empty";
-      empty.textContent = note || "Aucune note personnelle pour l'instant.";
+      empty.textContent = note || t("pokemon_full.note.empty");
       section.append(empty);
     }
     root.append(section);
@@ -349,13 +389,13 @@
 
     const h = document.createElement("h2");
     h.className = "fullview-section__title";
-    h.textContent = "Efficacité défensive";
+    h.textContent = t("pokemon_full.defense");
     section.append(h);
 
     const groups = [
-      { label: "Faiblesses", test: (m) => m > 1 },
-      { label: "Résistances", test: (m) => m < 1 && m > 0 },
-      { label: "Immunités", test: (m) => m === 0 },
+      { label: t("pokemon_full.weaknesses"), test: (m) => m > 1 },
+      { label: t("pokemon_full.resistances"), test: (m) => m < 1 && m > 0 },
+      { label: t("pokemon_full.immunities"), test: (m) => m === 0 },
     ];
     const wrap = document.createElement("div");
     wrap.className = "fullview-weakness-wrap";
@@ -421,11 +461,11 @@
             statusLabel: statusLabel(status),
           };
         });
-    const section = createFullSection("forms", "Formes");
+    const section = createFullSection("forms");
     if (entries.length <= 1) {
       const empty = document.createElement("p");
       empty.className = "drawer-empty";
-      empty.textContent = "Aucune autre forme dans le Pokédex local.";
+      empty.textContent = t("pokemon_full.forms.empty");
       section.append(empty);
       root.append(section);
       return;
@@ -464,7 +504,7 @@
   }
 
   async function buildCardsSection(root, slug) {
-    const section = createFullSection("cards", "Mes cartes", { secondary: true });
+    const section = createFullSection("cards", undefined, { secondary: true });
     const helper = ficheHelpers();
     const disclosureBody = typeof helper.createCollapsibleBody === "function"
       ? helper.createCollapsibleBody(section, {
@@ -475,7 +515,7 @@
 
     const body = document.createElement("div");
     body.className = "fullview-cards-body";
-    body.textContent = "Chargement…";
+    body.textContent = t("pokemon_full.cards.loading");
     disclosureBody.append(body);
     root.append(section);
 
@@ -488,8 +528,7 @@
       if (!cards.length) {
         const empty = document.createElement("p");
         empty.className = "drawer-empty";
-        empty.textContent =
-          "Aucune carte pour l'instant. Ouvre le drawer (bouton « Fiche & cartes » ou touche i) pour en ajouter.";
+        empty.textContent = t("pokemon_full.cards.empty");
         body.append(empty);
         return;
       }
@@ -497,7 +536,15 @@
       table.className = "fullview-cards-table";
       const thead = document.createElement("thead");
       const headRow = document.createElement("tr");
-      for (const label of ["Set", "N°", "Variante", "Langue", "Condition", "Qté", "Note"]) {
+      for (const label of [
+        t("pokemon_full.table.set"),
+        t("pokemon_full.table.number"),
+        t("pokemon_full.table.variant"),
+        t("pokemon_full.table.lang"),
+        t("pokemon_full.table.condition"),
+        t("pokemon_full.table.qty"),
+        t("pokemon_full.table.note"),
+      ]) {
         const th = document.createElement("th");
         th.textContent = label;
         headRow.append(th);
@@ -530,7 +577,7 @@
       body.replaceChildren();
       const warn = document.createElement("p");
       warn.className = "drawer-empty";
-      warn.textContent = "Impossible de charger les cartes pour l'instant.";
+      warn.textContent = t("pokemon_full.cards.failed");
       body.append(warn);
     }
   }
@@ -556,8 +603,8 @@
     const msg = document.createElement("p");
     msg.className = "drawer-empty";
     msg.textContent = slug
-      ? `Aucun Pokémon trouvé pour « ${slug} ».`
-      : "Aucun Pokémon sélectionné.";
+      ? t("pokemon_full.missing.slug", { slug })
+      : t("pokemon_full.missing.none");
     wrap.append(msg);
     root.append(wrap);
   }

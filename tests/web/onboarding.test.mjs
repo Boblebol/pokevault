@@ -148,3 +148,24 @@ test("skipped onboarding stays dismissed until the user replays it", async () =>
   assert.equal(api.shouldOpen({ completed_at: "2026-04-26T12:00:00.000Z", skipped: false }), false);
   assert.equal(api.shouldOpen({ completed_at: null, skipped: true }), false);
 });
+
+test("settings profile summary follows English i18n labels", async () => {
+  const { api } = await loadModule();
+  globalThis.PokevaultI18n = {
+    t(key, params = {}) {
+      const messages = {
+        "onboarding.profile.undefined": "Profile: undefined — replay onboarding to customize.",
+        "onboarding.profile.summary": "Profile: Complete my Pokedex · {region} · {mode} · cards as add-on.",
+        "onboarding.mode.simple": "simple mode",
+        "onboarding.mode.advanced": "advanced mode",
+      };
+      return (messages[key] || key).replace(/\{([a-zA-Z0-9_]+)\}/g, (_, name) => String(params[name]));
+    },
+  };
+
+  assert.equal(api.formatSettingsProfileLabel(null), "Profile: undefined — replay onboarding to customize.");
+  assert.equal(
+    api.formatSettingsProfileLabel({ favorite_region: "kanto", tracking_mode: "advanced", skipped: false }),
+    "Profile: Complete my Pokedex · Kanto · advanced mode · cards as add-on.",
+  );
+});

@@ -40,6 +40,58 @@
   /** @type {Promise<object> | null} */ let summaryPromise = null;
   let huntsSubscribed = false;
   let trainerContactsSubscribed = false;
+  let localeSubscribed = false;
+  const FALLBACK_I18N = {
+    "pokemon_drawer.name_and": "et",
+    "pokemon_drawer.exchange.match": "Match possible avec {names}.",
+    "pokemon_drawer.exchange.seen": "Vu chez {names}.",
+    "pokemon_drawer.exchange.wanted_by": "{names} cherche ce Pokémon.",
+    "pokemon_drawer.delete": "Supprimer",
+    "pokemon_drawer.delete_aria": "Supprimer la carte {card}",
+    "pokemon_drawer.deleted": "Carte retirée.",
+    "pokemon_drawer.delete_failed": "Suppression impossible.",
+    "pokemon_drawer.set": "Set",
+    "pokemon_drawer.number": "Numéro",
+    "pokemon_drawer.variant": "Variante",
+    "pokemon_drawer.lang": "Langue",
+    "pokemon_drawer.condition": "Condition",
+    "pokemon_drawer.qty": "Quantité",
+    "pokemon_drawer.note": "Note",
+    "pokemon_drawer.add_card": "Ajouter la carte",
+    "pokemon_drawer.tcg_catalog": "Catalogue TCG",
+    "pokemon_drawer.tcg_placeholder": "Nom anglais",
+    "pokemon_drawer.tcg_search": "Chercher",
+    "pokemon_drawer.tcg_need_name": "Entre un nom de carte.",
+    "pokemon_drawer.tcg_searching": "Recherche...",
+    "pokemon_drawer.tcg_unavailable": "Recherche catalogue indisponible.",
+    "pokemon_drawer.tcg_no_result": "Aucun resultat.",
+    "pokemon_drawer.tcg_results": "{count} resultat{plural}.",
+    "pokemon_drawer.tcg_unnamed": "Carte sans nom",
+    "pokemon_drawer.tcg_selected": "Carte TCG selectionnee.",
+    "pokemon_drawer.card_added": "Carte ajoutée — Pokédex marqué capturé.",
+    "pokemon_drawer.card_add_failed": "Ajout impossible.",
+    "pokemon_drawer.full_link": "Voir fiche complète →",
+    "pokemon_drawer.legacy_seen": "Vu manuel existant; les prochains statuts passent par Cherche, J'ai ou Double.",
+    "pokemon_drawer.forms_empty": "Aucune autre forme dans le Pokédex local.",
+    "pokemon_drawer.hunt.high": "Priorite haute",
+    "pokemon_drawer.hunt.active": "Recherche active",
+    "pokemon_drawer.hunt.empty": "Active Cherche pour l'ajouter au focus.",
+    "pokemon_drawer.hunt.normal": "Priorite normale",
+    "pokemon_drawer.hunt.updated": "Recherche mise a jour.",
+    "pokemon_drawer.hunt.failed": "Recherche impossible a modifier.",
+    "pokemon_drawer.cards_title": "Mes cartes",
+    "pokemon_drawer.cards_empty": "Aucune carte pour l'instant. Ajoute la première ci-dessous.",
+    "pokemon_drawer.unknown": "Pokémon inconnu dans le Pokédex local.",
+  };
+
+  function t(key, params = {}) {
+    const runtime = window.PokevaultI18n;
+    if (runtime?.t) return runtime.t(key, params);
+    const template = FALLBACK_I18N[key] || key;
+    return String(template).replace(/\{([a-zA-Z0-9_]+)\}/g, (_, name) =>
+      Object.prototype.hasOwnProperty.call(params, name) ? String(params[name]) : `{${name}}`,
+    );
+  }
 
   function ensureMarkup() {
     if (rootEl) return;
@@ -62,6 +114,12 @@
     if (!trainerContactsSubscribed) {
       trainerContactsSubscribed = true;
       window.PokevaultTrainerContacts?.subscribe?.(() => {
+        if (currentSlug) renderAll();
+      });
+    }
+    if (!localeSubscribed) {
+      localeSubscribed = true;
+      window.PokevaultI18n?.subscribeLocale?.(() => {
         if (currentSlug) renderAll();
       });
     }
@@ -206,7 +264,7 @@
     const clean = (Array.isArray(names) ? names : []).filter(Boolean);
     if (!clean.length) return "";
     if (clean.length === 1) return clean[0];
-    if (clean.length === 2) return `${clean[0]} et ${clean[1]}`;
+    if (clean.length === 2) return `${clean[0]} ${t("pokemon_drawer.name_and")} ${clean[1]}`;
     return `${clean.slice(0, 2).join(", ")} +${clean.length - 2}`;
   }
 
@@ -217,16 +275,16 @@
     box.className = "pokemon-exchange-context";
     if (summary.matchCount > 0) {
       const line = document.createElement("p");
-      line.textContent = `Match possible avec ${formatNameList(summary.availableFrom)}.`;
+      line.textContent = t("pokemon_drawer.exchange.match", { names: formatNameList(summary.availableFrom) });
       box.append(line);
     } else if (summary.availableFrom.length > 0) {
       const line = document.createElement("p");
-      line.textContent = `Vu chez ${formatNameList(summary.availableFrom)}.`;
+      line.textContent = t("pokemon_drawer.exchange.seen", { names: formatNameList(summary.availableFrom) });
       box.append(line);
     }
     if (summary.canHelpCount > 0) {
       const line = document.createElement("p");
-      line.textContent = `${formatNameList(summary.wantedBy)} cherche ce Pokémon.`;
+      line.textContent = t("pokemon_drawer.exchange.wanted_by", { names: formatNameList(summary.wantedBy) });
       box.append(line);
     }
     return box;
@@ -328,8 +386,8 @@
     const del = document.createElement("button");
     del.type = "button";
     del.className = "drawer-card-row__delete";
-    del.textContent = "Supprimer";
-    del.setAttribute("aria-label", `Supprimer la carte ${setPart}${numPart}`);
+    del.textContent = t("pokemon_drawer.delete");
+    del.setAttribute("aria-label", t("pokemon_drawer.delete_aria", { card: `${setPart}${numPart}` }));
     del.addEventListener("click", () => onDeleteCard(card.id, row));
     row.append(del);
 
@@ -345,12 +403,12 @@
       if (!r.ok) throw new Error(`HTTP ${r.status}`);
       clearCache(currentSlug);
       if (rowEl && rowEl.parentElement) rowEl.parentElement.removeChild(rowEl);
-      notify("Carte retirée.", "info");
+      notify(t("pokemon_drawer.deleted"), "info");
       await renderCardList();
       emitCardsChanged();
     } catch (err) {
       console.error("drawer: delete failed", err);
-      notify("Suppression impossible.", "error");
+      notify(t("pokemon_drawer.delete_failed"), "error");
     }
   }
 
@@ -417,20 +475,20 @@
     setInput.type = "text";
     setInput.name = "set_id";
     setInput.autocomplete = "off";
-    grid.append(makeField("Set", setInput));
+    grid.append(makeField(t("pokemon_drawer.set"), setInput));
 
     const numInput = document.createElement("input");
     numInput.type = "text";
     numInput.name = "num";
     numInput.autocomplete = "off";
-    grid.append(makeField("Numéro", numInput));
+    grid.append(makeField(t("pokemon_drawer.number"), numInput));
 
     const variantInput = document.createElement("input");
     variantInput.type = "text";
     variantInput.name = "variant";
     variantInput.autocomplete = "off";
     variantInput.placeholder = "holo, reverse, alt…";
-    grid.append(makeField("Variante", variantInput));
+    grid.append(makeField(t("pokemon_drawer.variant"), variantInput));
 
     const langInput = document.createElement("input");
     langInput.type = "text";
@@ -438,7 +496,7 @@
     langInput.autocomplete = "off";
     langInput.maxLength = 5;
     langInput.placeholder = "fr";
-    grid.append(makeField("Langue", langInput));
+    grid.append(makeField(t("pokemon_drawer.lang"), langInput));
 
     const condSel = document.createElement("select");
     condSel.name = "condition";
@@ -449,20 +507,20 @@
       if (c.id === "near_mint") opt.selected = true;
       condSel.append(opt);
     }
-    grid.append(makeField("Condition", condSel));
+    grid.append(makeField(t("pokemon_drawer.condition"), condSel));
 
     const qtyInput = document.createElement("input");
     qtyInput.type = "number";
     qtyInput.name = "qty";
     qtyInput.min = "1";
     qtyInput.value = "1";
-    grid.append(makeField("Quantité", qtyInput));
+    grid.append(makeField(t("pokemon_drawer.qty"), qtyInput));
 
     const noteInput = document.createElement("input");
     noteInput.type = "text";
     noteInput.name = "note";
     noteInput.autocomplete = "off";
-    const noteLabel = makeField("Note", noteInput);
+    const noteLabel = makeField(t("pokemon_drawer.note"), noteInput);
     noteLabel.classList.add("drawer-add-form__note");
     grid.append(noteLabel);
 
@@ -473,7 +531,7 @@
     const submit = document.createElement("button");
     submit.type = "submit";
     submit.className = "drawer-add-form__submit";
-    submit.textContent = "Ajouter la carte";
+    submit.textContent = t("pokemon_drawer.add_card");
     actions.append(submit);
     form.append(actions);
 
@@ -488,20 +546,20 @@
     const label = document.createElement("label");
     label.className = "drawer-tcg-search__label";
     const labelText = document.createElement("span");
-    labelText.textContent = "Catalogue TCG";
+    labelText.textContent = t("pokemon_drawer.tcg_catalog");
     const row = document.createElement("div");
     row.className = "drawer-tcg-search__row";
 
     const input = document.createElement("input");
     input.type = "search";
     input.autocomplete = "off";
-    input.placeholder = "Nom anglais";
+    input.placeholder = t("pokemon_drawer.tcg_placeholder");
     input.value = defaultTcgSearchQuery();
     row.append(input);
 
     const button = document.createElement("button");
     button.type = "button";
-    button.textContent = "Chercher";
+    button.textContent = t("pokemon_drawer.tcg_search");
     row.append(button);
 
     label.append(labelText, row);
@@ -519,11 +577,11 @@
       const query = input.value.trim();
       if (!query) {
         results.replaceChildren();
-        status.textContent = "Entre un nom de carte.";
+        status.textContent = t("pokemon_drawer.tcg_need_name");
         return;
       }
       button.disabled = true;
-      status.textContent = "Recherche...";
+      status.textContent = t("pokemon_drawer.tcg_searching");
       try {
         const params = new URLSearchParams({ q: query, page_size: "8" });
         const response = await fetch(`${TCG_SEARCH_API}?${params.toString()}`);
@@ -534,7 +592,7 @@
       } catch (err) {
         console.error("drawer: tcg search failed", err);
         results.replaceChildren();
-        status.textContent = "Recherche catalogue indisponible.";
+        status.textContent = t("pokemon_drawer.tcg_unavailable");
       } finally {
         button.disabled = false;
       }
@@ -561,10 +619,10 @@
   function renderTcgResults(cards, form, resultsEl, statusEl) {
     resultsEl.replaceChildren();
     if (!cards.length) {
-      statusEl.textContent = "Aucun resultat.";
+      statusEl.textContent = t("pokemon_drawer.tcg_no_result");
       return;
     }
-    statusEl.textContent = `${cards.length} resultat${cards.length > 1 ? "s" : ""}.`;
+    statusEl.textContent = t("pokemon_drawer.tcg_results", { count: cards.length, plural: cards.length > 1 ? "s" : "" });
     for (const card of cards) {
       const item = document.createElement("button");
       item.type = "button";
@@ -580,7 +638,7 @@
       const meta = document.createElement("span");
       meta.className = "drawer-tcg-result__meta";
       const title = document.createElement("strong");
-      title.textContent = card.name || "Carte sans nom";
+      title.textContent = card.name || t("pokemon_drawer.tcg_unnamed");
       const details = document.createElement("span");
       const detailParts = [];
       if (card.set_name) detailParts.push(card.set_name);
@@ -591,7 +649,7 @@
       item.append(meta);
       item.addEventListener("click", () => {
         applyTcgCardToForm(form, card);
-        notify("Carte TCG selectionnee.", "ok");
+        notify(t("pokemon_drawer.tcg_selected"), "ok");
       });
       resultsEl.append(item);
     }
@@ -645,7 +703,7 @@
       if (!r.ok) throw new Error(`HTTP ${r.status}`);
       clearCache(currentSlug);
       form.reset();
-      notify("Carte ajoutée — Pokédex marqué capturé.", "ok");
+      notify(t("pokemon_drawer.card_added"), "ok");
       await renderCardList();
       if (typeof window.PokedexCollection?.setStatus === "function") {
         window.PokedexCollection.setStatus(currentSlug, "caught");
@@ -653,7 +711,7 @@
       emitCardsChanged();
     } catch (err) {
       console.error("drawer: create failed", err);
-      notify("Ajout impossible.", "error");
+      notify(t("pokemon_drawer.card_add_failed"), "error");
     }
   }
 
@@ -709,7 +767,7 @@
     const link = document.createElement("a");
     link.className = "drawer-header__full-link";
     link.href = pokemonRouteHref(p?.slug || currentSlug || "");
-    link.textContent = "Voir fiche complète →";
+    link.textContent = t("pokemon_drawer.full_link");
     link.addEventListener("click", () => close());
     meta.append(link);
     header.append(meta);
@@ -717,7 +775,7 @@
   }
 
   function buildStatusSection(slug) {
-    const section = createDrawerSection("pokedex_status", "Statut Pokédex");
+    const section = createDrawerSection("pokedex_status");
     const status =
       window.PokedexCollection?.getStatus?.(slug) || { state: "not_met", shiny: false };
     const ownership = ownershipState(slug);
@@ -743,7 +801,7 @@
     if (status.state === "seen") {
       const legacy = document.createElement("p");
       legacy.className = "pokemon-status-legacy";
-      legacy.textContent = "Vu manuel existant; les prochains statuts passent par Cherche, J'ai ou Double.";
+      legacy.textContent = t("pokemon_drawer.legacy_seen");
       section.append(legacy);
     }
     const exchange = buildExchangeContext(slug);
@@ -761,7 +819,7 @@
   }
 
   function buildFormsSection(pokemon) {
-    const section = createDrawerSection("forms", "Formes");
+    const section = createDrawerSection("forms");
     const helper = ficheHelpers();
     const all = window.PokedexCollection?.allPokemon || [];
     const entries = typeof helper.buildFormEntries === "function"
@@ -783,7 +841,7 @@
     if (entries.length <= 1) {
       const empty = document.createElement("p");
       empty.className = "drawer-empty";
-      empty.textContent = "Aucune autre forme dans le Pokédex local.";
+      empty.textContent = t("pokemon_drawer.forms_empty");
       section.append(empty);
       return section;
     }
@@ -812,7 +870,7 @@
   }
 
   function buildProgressSection(slug) {
-    const section = createDrawerSection("personal_progress", "Progression personnelle");
+    const section = createDrawerSection("personal_progress");
     const entry = window.PokevaultHunts?.entry?.(slug);
     const row = document.createElement("div");
     row.className = "drawer-status-row";
@@ -820,14 +878,14 @@
     const label = document.createElement("span");
     label.className = "drawer-status-row__label";
     label.textContent = entry
-      ? entry.priority === "high" ? "Priorite haute" : "Recherche active"
-      : "Active Cherche pour l'ajouter au focus.";
+      ? entry.priority === "high" ? t("pokemon_drawer.hunt.high") : t("pokemon_drawer.hunt.active")
+      : t("pokemon_drawer.hunt.empty");
     row.append(label);
 
     const priority = document.createElement("button");
     priority.type = "button";
     priority.className = "drawer-status-row__btn";
-    priority.textContent = entry?.priority === "high" ? "Priorite normale" : "Priorite haute";
+    priority.textContent = entry?.priority === "high" ? t("pokemon_drawer.hunt.normal") : t("pokemon_drawer.hunt.high");
     priority.disabled = !entry;
     priority.addEventListener("click", async () => {
       await patchHunt(slug, {
@@ -842,13 +900,13 @@
   }
 
   function buildNotesSection(slug) {
-    const section = createDrawerSection("notes", "Notes");
+    const section = createDrawerSection("notes");
     const note = window.PokedexCollection?.getNote?.(slug) || "";
     const helper = ficheHelpers();
     if (typeof helper.createNoteEditor === "function") {
       section.append(helper.createNoteEditor(note, async (text) => {
         await window.PokedexCollection?.setNote?.(slug, text);
-        notify(text ? "Note sauvegardée." : "Note supprimée.", "ok");
+        notify(text ? t("pokemon_fiche.note.saved") : t("pokemon_fiche.note.deleted"), "ok");
       }));
     }
     return section;
@@ -857,15 +915,15 @@
   async function patchHunt(slug, body) {
     try {
       await window.PokevaultHunts?.patch?.(slug, body);
-      notify("Recherche mise a jour.", "ok");
+      notify(t("pokemon_drawer.hunt.updated"), "ok");
     } catch (err) {
       console.error("drawer: hunt patch failed", err);
-      notify("Recherche impossible a modifier.", "error");
+      notify(t("pokemon_drawer.hunt.failed"), "error");
     }
   }
 
   function buildCardsSection() {
-    const section = createDrawerSection("cards", "Mes cartes");
+    const section = createDrawerSection("cards");
     section.classList?.add?.("is-secondary");
     let title = section.querySelector?.(".drawer-section__title")
       || section.querySelector?.(".pokemon-fiche-section__title");
@@ -874,7 +932,7 @@
       title.className = "drawer-section__title";
       section.append(title);
     }
-    title.textContent = "Mes cartes (";
+    title.textContent = `${t("pokemon_drawer.cards_title")} (`;
     const counter = document.createElement("span");
     counter.id = "drawerCardCount";
     counter.textContent = "0";
@@ -890,7 +948,7 @@
     const empty = document.createElement("p");
     empty.id = "drawerCardEmpty";
     empty.className = "drawer-empty";
-    empty.textContent = "Aucune carte pour l'instant. Ajoute la première ci-dessous.";
+    empty.textContent = t("pokemon_drawer.cards_empty");
     body.append(empty);
 
     const list = document.createElement("ul");
@@ -910,7 +968,7 @@
     if (!p) {
       const miss = document.createElement("p");
       miss.className = "drawer-empty";
-      miss.textContent = "Pokémon inconnu dans le Pokédex local.";
+      miss.textContent = t("pokemon_drawer.unknown");
       contentEl.append(miss);
       return;
     }

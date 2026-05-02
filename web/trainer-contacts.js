@@ -21,6 +21,56 @@
   let hasLoaded = false;
   let inflight = null;
   const listeners = new Set();
+  const FALLBACK_I18N = {
+    "trainers.mine.title": "Ma carte dresseur",
+    "trainers.mine.help": "Choisis uniquement ce que tu veux partager.",
+    "trainers.export": "Exporter",
+    "trainers.import": "Importer",
+    "trainers.id": "Identifiant stable",
+    "trainers.name": "Pseudo dresseur",
+    "trainers.favorite_region": "Région favorite",
+    "trainers.favorite_pokemon": "Pokémon favori (slug)",
+    "trainers.public_note": "Note publique",
+    "trainers.contact": "Contact partageable",
+    "trainers.contact_type": "Type de contact {index}",
+    "trainers.contact_value": "Lien, @pseudo, téléphone...",
+    "trainers.wants_placeholder": "Je cherche (un slug par ligne)",
+    "trainers.trade_placeholder": "Je peux échanger (un slug par ligne)",
+    "trainers.save": "Enregistrer",
+    "trainers.contacts.title": "Contacts dresseurs",
+    "trainers.contacts.help": "Les fiches reçues restent dans ce profil local.",
+    "trainers.search": "Rechercher",
+    "trainers.search_placeholder": "Pseudo, région, note, Pokémon...",
+    "trainers.empty_filtered": "Aucun contact ne correspond à cette recherche.",
+    "trainers.empty": "Aucune carte reçue pour le moment.",
+    "trainers.want": "Cherche",
+    "trainers.trade": "Echange",
+    "trainers.delete": "Supprimer",
+    "trainers.local_card": "Carte dresseur locale",
+    "trainers.received_update": "MAJ reçue",
+    "trainers.region": "Région",
+    "trainers.favorite": "Favori",
+    "trainers.private_note": "Note privée",
+    "trainers.private_note_placeholder": "Visible seulement dans ce carnet local.",
+    "trainers.save_note": "Enregistrer la note",
+    "trainers.none": "Rien indiqué.",
+    "trainers.confirm_delete": "Supprimer {name} du carnet local ?",
+    "trainers.note_saved": "Note privée enregistrée.",
+    "trainers.contact_deleted": "Contact supprimé.",
+    "trainers.create_before_export": "Crée ta carte avant de l'exporter.",
+    "trainers.invalid_card": "Carte dresseur invalide",
+    "trainers.invalid_file": "Fichier invalide : {message}",
+    "trainers.api_error": "Erreur API : {message}",
+    "trainers.error": "Erreur : {message}",
+    "trainers.unknown_date": "inconnue",
+  };
+
+  function tr(key, params = {}) {
+    const raw = window.PokevaultI18n?.t?.(key, params) || FALLBACK_I18N[key] || key;
+    return String(raw).replace(/\{([a-zA-Z0-9_]+)\}/g, (_, name) => (
+      Object.prototype.hasOwnProperty.call(params, name) ? String(params[name]) : `{${name}}`
+    ));
+  }
 
   function normalizeList(raw) {
     if (!Array.isArray(raw)) return [];
@@ -350,7 +400,7 @@
   }
 
   function shouldDeleteContact(name, confirmFn = window.confirm) {
-    return confirmFn(`Supprimer ${name} du carnet local ?`);
+    return confirmFn(tr("trainers.confirm_delete", { name }));
   }
 
   function render(message = "") {
@@ -365,32 +415,32 @@
     own.innerHTML = `
       <div class="trainer-panel-head">
         <div>
-          <p class="stats-kpi-label">Ma carte dresseur</p>
-          <p class="stats-kpi-sub">Choisis uniquement ce que tu veux partager.</p>
+          <p class="stats-kpi-label">${escapeText(tr("trainers.mine.title"))}</p>
+          <p class="stats-kpi-sub">${escapeText(tr("trainers.mine.help"))}</p>
         </div>
         <div class="trainer-actions">
           <button type="button" class="settings-action-btn" data-trainer-export>
             <span class="material-symbols-outlined" aria-hidden="true">download</span>
-            Exporter
+            ${escapeText(tr("trainers.export"))}
           </button>
           <button type="button" class="settings-action-btn" data-trainer-import>
             <span class="material-symbols-outlined" aria-hidden="true">upload</span>
-            Importer
+            ${escapeText(tr("trainers.import"))}
           </button>
         </div>
       </div>
       <form class="trainer-card-form" data-trainer-form>
-        <input name="trainer_id" class="search-input" placeholder="Identifiant stable" minlength="8" maxlength="80" required value="${escapeAttr(cachedBook.own_card?.trainer_id || generateTrainerId())}">
-        <input name="display_name" class="search-input" placeholder="Pseudo dresseur" maxlength="64" required value="${escapeAttr(cachedBook.own_card?.display_name || "")}">
-        <input name="favorite_region" class="search-input" placeholder="Région favorite" value="${escapeAttr(cachedBook.own_card?.favorite_region || "")}">
-        <input name="favorite_pokemon_slug" class="search-input" placeholder="Pokémon favori (slug)" value="${escapeAttr(cachedBook.own_card?.favorite_pokemon_slug || "")}">
-        <textarea name="public_note" class="search-input" placeholder="Note publique">${escapeText(cachedBook.own_card?.public_note || "")}</textarea>
+        <input name="trainer_id" class="search-input" placeholder="${escapeAttr(tr("trainers.id"))}" minlength="8" maxlength="80" required value="${escapeAttr(cachedBook.own_card?.trainer_id || generateTrainerId())}">
+        <input name="display_name" class="search-input" placeholder="${escapeAttr(tr("trainers.name"))}" maxlength="64" required value="${escapeAttr(cachedBook.own_card?.display_name || "")}">
+        <input name="favorite_region" class="search-input" placeholder="${escapeAttr(tr("trainers.favorite_region"))}" value="${escapeAttr(cachedBook.own_card?.favorite_region || "")}">
+        <input name="favorite_pokemon_slug" class="search-input" placeholder="${escapeAttr(tr("trainers.favorite_pokemon"))}" value="${escapeAttr(cachedBook.own_card?.favorite_pokemon_slug || "")}">
+        <textarea name="public_note" class="search-input" placeholder="${escapeAttr(tr("trainers.public_note"))}">${escapeText(cachedBook.own_card?.public_note || "")}</textarea>
         ${renderOwnContactFields(contactLinks)}
-        <textarea name="wants" class="search-input" placeholder="Je cherche (un slug par ligne)">${escapeText((cachedBook.own_card?.wants || []).join("\n"))}</textarea>
-        <textarea name="for_trade" class="search-input" placeholder="Je peux échanger (un slug par ligne)">${escapeText((cachedBook.own_card?.for_trade || []).join("\n"))}</textarea>
+        <textarea name="wants" class="search-input" placeholder="${escapeAttr(tr("trainers.wants_placeholder"))}">${escapeText((cachedBook.own_card?.wants || []).join("\n"))}</textarea>
+        <textarea name="for_trade" class="search-input" placeholder="${escapeAttr(tr("trainers.trade_placeholder"))}">${escapeText((cachedBook.own_card?.for_trade || []).join("\n"))}</textarea>
         <button type="submit" class="settings-action-btn settings-action-btn--confirm">
           <span class="material-symbols-outlined" aria-hidden="true">save</span>
-          Enregistrer
+          ${escapeText(tr("trainers.save"))}
         </button>
       </form>
       <p class="sync-hint" ${message ? "" : "hidden"}>${escapeText(message)}</p>
@@ -405,16 +455,16 @@
       const kind = isContactKind(link.kind) ? link.kind : DEFAULT_CONTACT_KINDS[index];
       return `
         <div class="trainer-contact-edit-row">
-          <select name="contact_kind_${index}" class="region-filter" aria-label="Type de contact ${index + 1}">
+          <select name="contact_kind_${index}" class="region-filter" aria-label="${escapeAttr(tr("trainers.contact_type", { index: index + 1 }))}">
             ${renderContactKindOptions(kind)}
           </select>
-          <input name="contact_value_${index}" class="search-input" placeholder="Lien, @pseudo, téléphone..." value="${escapeAttr(link.value || "")}">
+          <input name="contact_value_${index}" class="search-input" placeholder="${escapeAttr(tr("trainers.contact_value"))}" value="${escapeAttr(link.value || "")}">
         </div>
       `;
     }).join("");
     return `
       <fieldset class="trainer-contact-editor">
-        <legend>Contact partageable</legend>
+        <legend>${escapeText(tr("trainers.contact"))}</legend>
         ${rows}
       </fieldset>
     `;
@@ -436,13 +486,13 @@
     section.innerHTML = `
       <div class="trainer-panel-head">
         <div>
-          <p class="stats-kpi-label">Contacts dresseurs</p>
-          <p class="stats-kpi-sub">Les fiches reçues restent dans ce profil local.</p>
+          <p class="stats-kpi-label">${escapeText(tr("trainers.contacts.title"))}</p>
+          <p class="stats-kpi-sub">${escapeText(tr("trainers.contacts.help"))}</p>
         </div>
       </div>
       <label class="trainer-search">
-        <span>Rechercher</span>
-        <input name="trainer_search" class="search-input" placeholder="Pseudo, région, note, Pokémon..." value="${escapeAttr(activeSearch)}" data-trainer-search>
+        <span>${escapeText(tr("trainers.search"))}</span>
+        <input name="trainer_search" class="search-input" placeholder="${escapeAttr(tr("trainers.search_placeholder"))}" value="${escapeAttr(activeSearch)}" data-trainer-search>
       </label>
     `;
     const list = document.createElement("div");
@@ -451,8 +501,8 @@
       const empty = document.createElement("p");
       empty.className = "trainer-empty";
       empty.textContent = hasContacts
-        ? "Aucun contact ne correspond à cette recherche."
-        : "Aucune carte reçue pour le moment.";
+        ? tr("trainers.empty_filtered")
+        : tr("trainers.empty");
       list.append(empty);
     }
     for (const contact of contacts) list.append(renderContact(contact));
@@ -463,24 +513,24 @@
   function renderContact(contact) {
     const article = document.createElement("article");
     article.className = "trainer-contact-card";
-    const wants = renderTagGroup("Cherche", contact.card.wants);
-    const trades = renderTagGroup("Echange", contact.card.for_trade);
+    const wants = renderTagGroup(tr("trainers.want"), contact.card.wants);
+    const trades = renderTagGroup(tr("trainers.trade"), contact.card.for_trade);
     const links = renderContactLinks(contact.card.contact_links);
     article.innerHTML = `
       <div class="trainer-contact-card-head">
         <div>
           <h2>${escapeText(contact.card.display_name)}</h2>
-          <p>${escapeText(contact.card.public_note || "Carte dresseur locale")}</p>
+          <p>${escapeText(contact.card.public_note || tr("trainers.local_card"))}</p>
         </div>
         <button type="button" class="trainer-danger-btn" data-trainer-delete data-trainer-id="${escapeAttr(contact.card.trainer_id)}" data-trainer-name="${escapeAttr(contact.card.display_name)}">
           <span class="material-symbols-outlined" aria-hidden="true">delete</span>
-          Supprimer
+          ${escapeText(tr("trainers.delete"))}
         </button>
       </div>
-      <p class="stats-kpi-sub">MAJ reçue : ${escapeText(formatDate(contact.last_received_at))}</p>
+      <p class="stats-kpi-sub">${escapeText(tr("trainers.received_update"))} : ${escapeText(formatDate(contact.last_received_at))}</p>
       <dl class="trainer-contact-meta">
-        <div><dt>Région</dt><dd>${escapeText(contact.card.favorite_region || "-")}</dd></div>
-        <div><dt>Favori</dt><dd>${escapeText(contact.card.favorite_pokemon_slug || "-")}</dd></div>
+        <div><dt>${escapeText(tr("trainers.region"))}</dt><dd>${escapeText(contact.card.favorite_region || "-")}</dd></div>
+        <div><dt>${escapeText(tr("trainers.favorite"))}</dt><dd>${escapeText(contact.card.favorite_pokemon_slug || "-")}</dd></div>
       </dl>
       ${links}
       <div class="trainer-list-groups">
@@ -489,12 +539,12 @@
       </div>
       <form class="trainer-note-form" data-trainer-note-form data-trainer-id="${escapeAttr(contact.card.trainer_id)}">
         <label>
-          <span>Note privée</span>
-          <textarea class="search-input" name="private_note" placeholder="Visible seulement dans ce carnet local.">${escapeText(contact.private_note || "")}</textarea>
+          <span>${escapeText(tr("trainers.private_note"))}</span>
+          <textarea class="search-input" name="private_note" placeholder="${escapeAttr(tr("trainers.private_note_placeholder"))}">${escapeText(contact.private_note || "")}</textarea>
         </label>
         <button type="submit" class="settings-action-btn">
           <span class="material-symbols-outlined" aria-hidden="true">save</span>
-          Enregistrer la note
+          ${escapeText(tr("trainers.save_note"))}
         </button>
       </form>
     `;
@@ -504,11 +554,11 @@
   function renderTagGroup(title, items) {
     const clean = normalizeList(items);
     if (!clean.length) {
-      return `<div class="trainer-tag-group"><h3>${title}</h3><p class="stats-kpi-sub">Rien indiqué.</p></div>`;
+      return `<div class="trainer-tag-group"><h3>${escapeText(title)}</h3><p class="stats-kpi-sub">${escapeText(tr("trainers.none"))}</p></div>`;
     }
     return `
       <div class="trainer-tag-group">
-        <h3>${title}</h3>
+        <h3>${escapeText(title)}</h3>
         <ul>${clean.map((item) => `<li>${escapeText(item)}</li>`).join("")}</ul>
       </div>
     `;
@@ -573,14 +623,14 @@
     const request = notePatchRequest(trainerId, note);
     await ensureOk(await fetch(request.url, request.init));
     await loadBook();
-    render("Note privée enregistrée.");
+    render(tr("trainers.note_saved"));
   }
 
   async function deleteTrainerContact(trainerId) {
     const request = deleteContactRequest(trainerId);
     await ensureOk(await fetch(request.url, request.init));
     await loadBook();
-    render("Contact supprimé.");
+    render(tr("trainers.contact_deleted"));
   }
 
   function wire(root) {
@@ -588,7 +638,7 @@
     form?.addEventListener("submit", (event) => {
       event.preventDefault();
       const data = Object.fromEntries(new FormData(form).entries());
-      void saveOwnCard(cardFromForm(data)).catch((err) => render(`Erreur : ${err.message}`));
+      void saveOwnCard(cardFromForm(data)).catch((err) => render(tr("trainers.error", { message: err.message })));
     });
     root.querySelector("[data-trainer-export]")?.addEventListener("click", exportFile);
     root.querySelector("[data-trainer-import]")?.addEventListener("click", () => {
@@ -608,7 +658,7 @@
         event.preventDefault();
         const trainerId = noteForm.dataset.trainerId || "";
         const note = new FormData(noteForm).get("private_note");
-        void savePrivateNote(trainerId, note).catch((err) => render(`Erreur : ${err.message}`));
+        void savePrivateNote(trainerId, note).catch((err) => render(tr("trainers.error", { message: err.message })));
       });
     }
     for (const button of root.querySelectorAll("[data-trainer-delete]")) {
@@ -616,14 +666,14 @@
         const trainerId = button.dataset.trainerId || "";
         const name = button.dataset.trainerName || "ce contact";
         if (!shouldDeleteContact(name)) return;
-        void deleteTrainerContact(trainerId).catch((err) => render(`Erreur : ${err.message}`));
+        void deleteTrainerContact(trainerId).catch((err) => render(tr("trainers.error", { message: err.message })));
       });
     }
   }
 
   function exportFile() {
     if (!cachedBook.own_card) {
-      render("Crée ta carte avant de l'exporter.");
+      render(tr("trainers.create_before_export"));
       return;
     }
     const blob = new Blob([JSON.stringify(cachedBook.own_card, null, 2)], {
@@ -650,10 +700,10 @@
       reader.onload = () => {
         try {
           const card = normalizeCard(JSON.parse(reader.result));
-          if (!card) throw new Error("Carte dresseur invalide");
-          void importCard(card).catch((err) => render(`Erreur : ${err.message}`));
+          if (!card) throw new Error(tr("trainers.invalid_card"));
+          void importCard(card).catch((err) => render(tr("trainers.error", { message: err.message })));
         } catch (err) {
-          render(`Fichier invalide : ${err.message}`);
+          render(tr("trainers.invalid_file", { message: err.message }));
         }
         input.value = "";
       };
@@ -669,7 +719,7 @@
       await ensureLoaded({ force: true });
       render();
     } catch (err) {
-      render(`Erreur API : ${err.message}`);
+      render(tr("trainers.api_error", { message: err.message }));
     }
   }
 
@@ -689,7 +739,7 @@
   }
 
   function formatDate(value) {
-    if (!value) return "inconnue";
+    if (!value) return tr("trainers.unknown_date");
     const date = new Date(value);
     if (Number.isNaN(date.getTime())) return value;
     return date.toLocaleDateString("fr");
@@ -737,4 +787,7 @@
     };
   }
   window.PokevaultTrainerContacts = api;
+  window.PokevaultI18n?.subscribeLocale?.(() => {
+    if (started) render();
+  });
 })();

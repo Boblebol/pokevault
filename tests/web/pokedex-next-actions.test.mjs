@@ -144,3 +144,32 @@ test("renderFromState defaults to a short mobile-friendly list", async () => {
   assert.equal(actions.length, 3);
   assert.equal(list.children.length, 3);
 });
+
+test("renderNextActions follows English i18n labels when available", async () => {
+  const api = await loadModule();
+  globalThis.PokevaultI18n = {
+    t(key, params = {}) {
+      const messages = {
+        "next_actions.title": "Complete now",
+        "next_actions.empty": "Pokedex complete in this scope.",
+        "next_actions.open": "Open {name}",
+        "next_actions.default_reason": "To complete.",
+        "next_actions.badge_near": "Near badge: {title} ({current}/{target})",
+      };
+      return (messages[key] || key).replace(/\{([a-zA-Z0-9_]+)\}/g, (_, name) => String(params[name]));
+    },
+  };
+  const host = new FakeElement("section");
+
+  api.renderNextActions({
+    host,
+    actions: [{ slug: "001-a", number: "#001", name: "Bulbasaur" }],
+    nearestBadge: { title: "Century", current: 97, target: 100, unlocked: false },
+  });
+
+  assert.match(textTree(host), /Complete now/);
+  assert.match(textTree(host), /To complete/);
+  assert.match(textTree(host), /Near badge: Century \(97\/100\)/);
+  const list = host.children.find((child) => child.className === "pokedex-next-actions__list");
+  assert.equal(list.children[0].attributes["aria-label"], "Open Bulbasaur");
+});

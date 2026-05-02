@@ -18,6 +18,10 @@ physical cards, binders, badges and printable checklists.
 No account. No cloud database. No hosted live demo yet. Run it locally and keep
 your collection data in readable JSON files.
 
+The app and landing page open in French by default, with a lightweight FR/EN
+switch for collectors who prefer the interface in English. The switch is local
+only and does not add accounts, services or dependencies.
+
 Think of it as a private field notebook for the old Pokemon loop: explore route
 after route, note what you found, meet other Trainers, and complete your Pokedex
 without giving the journey to a hosted tracker.
@@ -62,6 +66,8 @@ works immediately after install. Optional artwork caches are generated locally.
 - Scrapes and exports a National Pokédex reference from Pokepedia.
 - Tracks Pokemon with simple `Cherche`, `J'ai` and `Double` actions, backed by
   backward-compatible progress JSON.
+- Lets the app and public landing switch between French and English while
+  keeping French as the default product language.
 - Opens Pokédex-first Pokémon fiches with trade-oriented status controls, linked forms,
   personal notes and collapsible card details.
 - Attaches owned physical cards to Pokemon entries.

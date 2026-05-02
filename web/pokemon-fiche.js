@@ -8,27 +8,67 @@
   "use strict";
 
   const SECTION_DEFINITIONS = [
-    { id: "identity", title: "Identité" },
-    { id: "pokedex_status", title: "Statut Pokédex" },
-    { id: "forms", title: "Formes" },
-    { id: "personal_progress", title: "Progression personnelle" },
-    { id: "notes", title: "Notes" },
-    { id: "cards", title: "Mes cartes", secondary: true },
+    { id: "identity", titleKey: "pokemon_fiche.section.identity" },
+    { id: "pokedex_status", titleKey: "pokemon_fiche.section.pokedex_status" },
+    { id: "forms", titleKey: "pokemon_fiche.section.forms" },
+    { id: "personal_progress", titleKey: "pokemon_fiche.section.personal_progress" },
+    { id: "notes", titleKey: "pokemon_fiche.section.notes" },
+    { id: "cards", titleKey: "pokemon_fiche.section.cards", secondary: true },
   ];
   const STATUS_ACTIONS = [
-    { id: "not_met", label: "Non rencontré", state: "not_met" },
-    { id: "seen", label: "Vu", state: "seen" },
-    { id: "caught", label: "Capturé", state: "caught" },
-    { id: "shiny", label: "Shiny" },
+    { id: "not_met", labelKey: "pokemon_fiche.action.not_met", state: "not_met" },
+    { id: "seen", labelKey: "pokemon_fiche.action.seen", state: "seen" },
+    { id: "caught", labelKey: "pokemon_fiche.action.caught", state: "caught" },
+    { id: "shiny", labelKey: "pokemon_fiche.action.shiny" },
   ];
   const OWNERSHIP_ACTIONS = [
-    { id: "wanted", label: "Cherche" },
-    { id: "owned", label: "J'ai" },
-    { id: "duplicate", label: "Double" },
+    { id: "wanted", labelKey: "pokemon_fiche.ownership.wanted" },
+    { id: "owned", labelKey: "pokemon_fiche.ownership.owned" },
+    { id: "duplicate", labelKey: "pokemon_fiche.ownership.duplicate" },
   ];
+  const FALLBACK_I18N = {
+    "pokemon_fiche.section.identity": "Identité",
+    "pokemon_fiche.section.pokedex_status": "Statut Pokédex",
+    "pokemon_fiche.section.forms": "Formes",
+    "pokemon_fiche.section.personal_progress": "Progression personnelle",
+    "pokemon_fiche.section.notes": "Notes",
+    "pokemon_fiche.section.cards": "Mes cartes",
+    "pokemon_fiche.section.generic": "Section",
+    "pokemon_fiche.action.not_met": "Non rencontré",
+    "pokemon_fiche.action.seen": "Vu",
+    "pokemon_fiche.action.caught": "Capturé",
+    "pokemon_fiche.action.shiny": "Shiny",
+    "pokemon_fiche.status.not_met": "Non rencontré",
+    "pokemon_fiche.status.seen": "Aperçu",
+    "pokemon_fiche.status.caught": "Attrapé",
+    "pokemon_fiche.status.caught_shiny": "Attrapé shiny",
+    "pokemon_fiche.ownership.wanted": "Cherche",
+    "pokemon_fiche.ownership.owned": "J'ai",
+    "pokemon_fiche.ownership.duplicate": "Double",
+    "pokemon_fiche.ownership.none": "Je n'ai pas",
+    "pokemon_fiche.unknown": "Inconnu",
+    "pokemon_fiche.note.placeholder": "Lieu, version, échange, objectif...",
+    "pokemon_fiche.note.save": "Sauver la note",
+    "pokemon_fiche.note.saved": "Note sauvegardée.",
+    "pokemon_fiche.note.deleted": "Note supprimée.",
+    "pokemon_fiche.note.failed": "Sauvegarde impossible.",
+  };
+
+  function t(key, params = {}) {
+    const runtime = window.PokevaultI18n;
+    if (runtime?.t) return runtime.t(key, params);
+    const template = FALLBACK_I18N[key] || key;
+    return String(template).replace(/\{([a-zA-Z0-9_]+)\}/g, (_, name) =>
+      Object.prototype.hasOwnProperty.call(params, name) ? String(params[name]) : `{${name}}`,
+    );
+  }
+
+  function sectionTitle(definition) {
+    return definition?.title || (definition?.titleKey ? t(definition.titleKey) : "");
+  }
 
   function buildFicheSectionPlan() {
-    return SECTION_DEFINITIONS.map((section) => ({ ...section }));
+    return SECTION_DEFINITIONS.map((section) => ({ ...section, title: sectionTitle(section) }));
   }
 
   function sectionDefinition(id) {
@@ -59,7 +99,7 @@
   function createFicheSection(options) {
     const definition = sectionDefinition(options?.id) || {};
     const id = options?.id || definition.id || "section";
-    const title = options?.title || definition.title || id;
+    const title = options?.title || sectionTitle(definition) || id;
     const headingLevel = Math.min(6, Math.max(2, Number(options?.headingLevel || 2)));
     const section = decorateFicheSection(
       document.createElement("section"),
@@ -101,7 +141,7 @@
       if (movable.length) {
         label.append(...movable);
       } else {
-        label.textContent = options.label || heading.textContent || "Section";
+        label.textContent = options.label || heading.textContent || t("pokemon_fiche.section.generic");
       }
 
       const indicator = document.createElement("span");
@@ -138,7 +178,7 @@
 
   function displayName(pokemon) {
     const names = pokemon?.names || {};
-    return names.fr || names.en || pokemon?.name_fr || pokemon?.slug || "Inconnu";
+    return names.fr || names.en || pokemon?.name_fr || pokemon?.slug || t("pokemon_fiche.unknown");
   }
 
   function subtitleName(pokemon) {
@@ -167,9 +207,9 @@
   function statusLabel(status) {
     const clean = normalizeStatus(status);
     const state = clean.state;
-    if (state === "caught") return clean.shiny ? "Attrapé shiny" : "Attrapé";
-    if (state === "seen") return "Aperçu";
-    return "Non rencontré";
+    if (state === "caught") return clean.shiny ? t("pokemon_fiche.status.caught_shiny") : t("pokemon_fiche.status.caught");
+    if (state === "seen") return t("pokemon_fiche.status.seen");
+    return t("pokemon_fiche.status.not_met");
   }
 
   function normalizeStatus(status) {
@@ -193,15 +233,16 @@
   function buildStatusActionModel(status) {
     const clean = normalizeStatus(status);
     return STATUS_ACTIONS.map((action) => {
+      const base = { ...action, label: t(action.labelKey) };
       if (action.id === "shiny") {
         return {
-          ...action,
+          ...base,
           active: clean.state === "caught" && clean.shiny,
           disabled: clean.state !== "caught",
         };
       }
       return {
-        ...action,
+        ...base,
         active: clean.state === action.state,
         disabled: false,
       };
@@ -233,16 +274,17 @@
 
   function ownershipLabel(state) {
     const clean = normalizeOwnershipState(state);
-    if (clean.duplicate) return "Double";
-    if (clean.wanted) return "Cherche";
-    if (clean.caught) return "J'ai";
-    return "Je n'ai pas";
+    if (clean.duplicate) return t("pokemon_fiche.ownership.duplicate");
+    if (clean.wanted) return t("pokemon_fiche.ownership.wanted");
+    if (clean.caught) return t("pokemon_fiche.ownership.owned");
+    return t("pokemon_fiche.ownership.none");
   }
 
   function buildOwnershipActionModel(state) {
     const clean = normalizeOwnershipState(state);
     return OWNERSHIP_ACTIONS.map((action) => ({
       ...action,
+      label: t(action.labelKey),
       active: action.id === "duplicate"
         ? clean.duplicate
         : action.id === "wanted"
@@ -405,7 +447,7 @@
     input.className = "pokemon-note-editor__input";
     input.maxLength = 500;
     input.rows = 3;
-    input.placeholder = "Lieu, version, échange, objectif...";
+    input.placeholder = t("pokemon_fiche.note.placeholder");
     input.value = normalizeNoteText(note);
     wrap.append(input);
 
@@ -414,7 +456,7 @@
     const save = document.createElement("button");
     save.type = "button";
     save.className = "pokemon-note-editor__save";
-    save.textContent = "Sauver la note";
+    save.textContent = t("pokemon_fiche.note.save");
     const status = document.createElement("span");
     status.className = "pokemon-note-editor__status";
     actions.append(save, status);
@@ -427,9 +469,9 @@
       status.textContent = "";
       try {
         if (typeof onSave === "function") await onSave(text);
-        status.textContent = text ? "Note sauvegardée." : "Note supprimée.";
+        status.textContent = text ? t("pokemon_fiche.note.saved") : t("pokemon_fiche.note.deleted");
       } catch {
-        status.textContent = "Sauvegarde impossible.";
+        status.textContent = t("pokemon_fiche.note.failed");
       } finally {
         save.disabled = false;
       }

@@ -261,3 +261,28 @@ test("normalizeNoteText trims notes and drops empty content", async () => {
   assert.equal(api.normalizeNoteText("   "), "");
   assert.equal(api.normalizeNoteText(null), "");
 });
+
+test("fiche labels follow English i18n when available", async () => {
+  const api = await loadModule();
+  globalThis.PokevaultI18n = {
+    t(key) {
+      return {
+        "pokemon_fiche.ownership.wanted": "Wanted",
+        "pokemon_fiche.ownership.owned": "Caught",
+        "pokemon_fiche.ownership.duplicate": "Double",
+        "pokemon_fiche.status.not_met": "Not met",
+        "pokemon_fiche.status.seen": "Seen",
+        "pokemon_fiche.status.caught": "Caught",
+        "pokemon_fiche.status.caught_shiny": "Shiny caught",
+      }[key] || key;
+    },
+  };
+
+  assert.deepEqual(api.buildOwnershipActionModel({}).map((action) => action.label), [
+    "Wanted",
+    "Caught",
+    "Double",
+  ]);
+  assert.equal(api.statusLabel({ state: "seen", shiny: false }), "Seen");
+  assert.equal(api.statusLabel({ state: "caught", shiny: true }), "Shiny caught");
+});

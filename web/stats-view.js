@@ -2,6 +2,43 @@
  * Vue Stats — pourcentages et compteurs par région (même périmètre « formes » que la liste).
  */
 
+const STATS_FALLBACK_I18N = {
+  "stats.next_badge": "Prochain badge",
+  "stats.badge": "Badge",
+  "stats.rail_caught": "{caught} / {total} attrapés",
+  "stats.rail_missing": "{count} manquants",
+  "stats.other": "Autre",
+  "stats.hero_title": "État global de complétion",
+  "stats.hero_pct": "{pct}% complété",
+  "stats.hero_sub": "{missing} manquants · {caught} / {total}",
+  "stats.hero_ring": "A ATTRAPER",
+  "stats.kpi.total": "Total spécimens",
+  "stats.kpi.total_sub": "Entrées suivies dans le Pokédex local",
+  "stats.kpi.caught": "Attrapés",
+  "stats.kpi.caught_sub": "{pct}% de complétion globale",
+  "stats.kpi.missing": "Manquants",
+  "stats.kpi.missing_sub": "Priorité collection",
+  "stats.kpi.cards": "Cartes cataloguées",
+  "stats.kpi.cards_empty": "Ajoute une carte pour activer le suivi TCG",
+  "stats.kpi.cards_sets": "{sets} set(s) catalogué(s)",
+  "stats.region_archive": "Archive régionale",
+  "stats.collection_gaps": "Lacunes de collection",
+  "stats.gap_line": "{type} · {count} spécimen(s) manquants",
+  "stats.objective_title": "Objectif session — {region}",
+  "stats.why": "Pourquoi ? {reason}",
+  "stats.all_regions": "Toutes régions",
+  "stats.type_completion": "Complétion par type",
+};
+
+function tStats(key, params = {}) {
+  const runtime = window.PokevaultI18n;
+  if (runtime?.t) return runtime.t(key, params);
+  const template = STATS_FALLBACK_I18N[key] || key;
+  return String(template).replace(/\{([a-zA-Z0-9_]+)\}/g, (_, name) =>
+    Object.prototype.hasOwnProperty.call(params, name) ? String(params[name]) : `{${name}}`,
+  );
+}
+
 function nationalNumStats(p) {
   const s = String(p.number || "").replace(/^#/, "").replace(/^0+/, "") || "0";
   const n = Number.parseInt(s, 10);
@@ -92,10 +129,10 @@ function renderStatsRailBadge(badge) {
   host.hidden = false;
   const title = document.createElement("p");
   title.className = "stats-rail-badge__kicker";
-  title.textContent = "Prochain badge";
+  title.textContent = tStats("stats.next_badge");
   const name = document.createElement("p");
   name.className = "stats-rail-badge__title";
-  name.textContent = badge.title || "Badge";
+  name.textContent = badge.title || tStats("stats.badge");
   const meta = document.createElement("p");
   meta.className = "stats-rail-badge__meta";
   meta.textContent = `${badge.current || 0} / ${badge.target || 1} · ${badge.hint || ""}`;
@@ -114,8 +151,8 @@ function renderStatsRail(caught, total) {
   const countEl = document.getElementById("statsRailCount");
   const missingEl = document.getElementById("statsRailMissing");
   if (pctEl) pctEl.textContent = `${pct}%`;
-  if (countEl) countEl.textContent = `${caught} / ${total} attrapés`;
-  if (missingEl) missingEl.textContent = `${Math.max(0, total - caught)} manquants`;
+  if (countEl) countEl.textContent = tStats("stats.rail_caught", { caught, total });
+  if (missingEl) missingEl.textContent = tStats("stats.rail_missing", { count: Math.max(0, total - caught) });
   renderStatsRailBadge(window.PokevaultBadges?.nearest?.());
 }
 
@@ -159,7 +196,7 @@ function renderStats() {
       byR[rid].total += 1;
       if (got) byR[rid].caught += 1;
     } else {
-      if (!byR._other) byR._other = { label: "Autre", caught: 0, total: 0 };
+      if (!byR._other) byR._other = { label: tStats("stats.other"), caught: 0, total: 0 };
       byR._other.total += 1;
       if (got) byR._other.caught += 1;
     }
@@ -176,13 +213,17 @@ function renderStats() {
   heroRight.className = "stats-hero-right";
   const heroTitle = document.createElement("h2");
   heroTitle.className = "stats-hero-title";
-  heroTitle.textContent = "État global de complétion";
+  heroTitle.textContent = tStats("stats.hero_title");
   const heroPct = document.createElement("p");
   heroPct.className = "stats-hero-pct";
-  heroPct.textContent = `${globalPct}% complété`;
+  heroPct.textContent = tStats("stats.hero_pct", { pct: globalPct });
   const heroSub = document.createElement("p");
   heroSub.className = "stats-hero-sub";
-  heroSub.textContent = `${Math.max(0, gTotal - gCaught)} manquants · ${gCaught} / ${gTotal}`;
+  heroSub.textContent = tStats("stats.hero_sub", {
+    missing: Math.max(0, gTotal - gCaught),
+    caught: gCaught,
+    total: gTotal,
+  });
   const ring = document.createElement("div");
   ring.className = "stats-hero-ring";
   const ringVal = document.createElement("span");
@@ -190,7 +231,7 @@ function renderStats() {
   ringVal.textContent = String(Math.max(0, gTotal - gCaught));
   const ringSub = document.createElement("span");
   ringSub.className = "stats-hero-ring-sub";
-  ringSub.textContent = "A ATTRAPER";
+  ringSub.textContent = tStats("stats.hero_ring");
   ring.style.setProperty("--pct", `${Math.max(0, Math.min(100, globalPct))}`);
   ring.append(ringVal, ringSub);
   heroLeft.append(heroTitle, heroPct, heroSub);
@@ -203,14 +244,14 @@ function renderStats() {
   const cardStats = PC?.computeCardStats ? PC.computeCardStats() : { cards: 0, sets: 0 };
   const cardSub =
     cardStats.cards === 0
-      ? "Ajoute une carte pour activer le suivi TCG"
-      : `${cardStats.sets} set(s) catalogué(s)`;
+      ? tStats("stats.kpi.cards_empty")
+      : tStats("stats.kpi.cards_sets", { sets: cardStats.sets });
   kpiGrid.append(
-    renderKpiCard("Total spécimens", String(gTotal), "Entrées suivies dans le Pokédex local"),
-    renderKpiCard("Attrapés", String(gCaught), `${globalPct}% de complétion globale`),
-    renderKpiCard("Manquants", String(Math.max(0, gTotal - gCaught)), "Priorité collection"),
+    renderKpiCard(tStats("stats.kpi.total"), String(gTotal), tStats("stats.kpi.total_sub")),
+    renderKpiCard(tStats("stats.kpi.caught"), String(gCaught), tStats("stats.kpi.caught_sub", { pct: globalPct })),
+    renderKpiCard(tStats("stats.kpi.missing"), String(Math.max(0, gTotal - gCaught)), tStats("stats.kpi.missing_sub")),
     renderKpiCard(
-      "Cartes catalogu\u00e9es",
+      tStats("stats.kpi.cards"),
       String(cardStats.cards),
       cardSub,
       cardStats.cards === 0 ? "is-dormant" : "",
@@ -224,7 +265,7 @@ function renderStats() {
   regWrap.className = "stats-region-wrap";
   const regTitle = document.createElement("h2");
   regTitle.className = "stats-section-title";
-  regTitle.textContent = "Archive régionale";
+  regTitle.textContent = tStats("stats.region_archive");
   regWrap.append(regTitle);
 
   for (const d of defs) {
@@ -278,12 +319,12 @@ function renderStats() {
     sec.className = "stats-gaps";
     const h = document.createElement("h2");
     h.className = "stats-section-title";
-    h.textContent = "Lacunes de collection";
+    h.textContent = tStats("stats.collection_gaps");
     sec.append(h);
     for (const [type, count] of missing) {
       const line = document.createElement("p");
       line.className = "stats-gap-line";
-      line.textContent = `${type} · ${count} spécimen(s) manquants`;
+      line.textContent = tStats("stats.gap_line", { type, count });
       sec.append(line);
     }
     sec.hidden = !showAdvanced;
@@ -297,18 +338,18 @@ function renderStats() {
     huntMap: window.PokevaultHunts?.state?.hunts || {},
     regionDefinitions: defs,
     limit: 6,
-  }) || { targetRegion: "Toutes régions", reason: "", rows: [] };
+  }) || { targetRegion: tStats("stats.all_regions"), reason: "", rows: [] };
   if (objective.rows.length) {
     const sec = document.createElement("section");
     sec.className = "stats-gaps";
     const h = document.createElement("h2");
     h.className = "stats-section-title";
-    h.textContent = `Objectif session — ${objective.targetRegion}`;
+    h.textContent = tStats("stats.objective_title", { region: objective.targetRegion });
     sec.append(h);
     if (objective.reason) {
       const why = document.createElement("p");
       why.className = "stats-gap-line stats-gap-line--why";
-      why.textContent = `Pourquoi ? ${objective.reason}`;
+      why.textContent = tStats("stats.why", { reason: objective.reason });
       sec.append(why);
     }
     for (const p of objective.rows) {
@@ -328,7 +369,7 @@ function renderStats() {
     sec.className = "stats-region-wrap";
     const h = document.createElement("h2");
     h.className = "stats-section-title";
-    h.textContent = "Complétion par type";
+    h.textContent = tStats("stats.type_completion");
     sec.append(h);
     for (const row of types) {
       const line = document.createElement("div");
@@ -357,6 +398,7 @@ function renderStats() {
 }
 
 let statsStarted = false;
+let statsLocaleSubbed = false;
 
 function renderBadgesBlock() {
   const host = document.getElementById("statsBadges");
@@ -377,6 +419,13 @@ function startStatsIfNeeded() {
       statsStarted = true;
       window.PokedexCollection?.subscribeCaught?.(() => renderStats());
       window.PokevaultBadges?.subscribe?.(() => {
+        renderStats();
+        renderBadgesBlock();
+      });
+    }
+    if (!statsLocaleSubbed) {
+      statsLocaleSubbed = true;
+      window.PokevaultI18n?.subscribeLocale?.(() => {
         renderStats();
         renderBadgesBlock();
       });
