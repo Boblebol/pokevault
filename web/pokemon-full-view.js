@@ -29,7 +29,7 @@
     "pokemon_full.exchange.match": "Match possible avec {names}.",
     "pokemon_full.exchange.seen": "Vu chez {names}.",
     "pokemon_full.exchange.wanted_by": "{names} cherche ce Pokémon.",
-    "pokemon_full.legacy_seen": "Vu manuel existant; les prochains statuts passent par Cherche, J'ai ou Double.",
+    "pokemon_full.legacy_seen": "Vu manuel existant; les prochains statuts passent par Cherche, Capturé ou Double.",
     "pokemon_full.hunt.high": "Recherche prioritaire",
     "pokemon_full.hunt.normal": "Dans mes recherches",
     "pokemon_full.hunt.empty": "Active Cherche pour l'ajouter au focus.",

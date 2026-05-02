@@ -109,7 +109,7 @@ def test_onboarding_product_tour_covers_local_trade_workflow() -> None:
     assert len(re.findall(r'<section class="onboarding__step\b', block)) == 5
     for text in [
         "Cherche",
-        "J'ai",
+        "Capturé",
         "Double",
         "Vu chez",
         "Match",

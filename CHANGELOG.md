@@ -23,6 +23,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- The ownership action formerly labelled `J'ai` is now `Capturé`, while
+  `Double` entries stay visible when caught cards are attenuated.
 - The public landing hero now leads with the French nostalgic exchange tagline:
   "Le Pokédex des collectionneurs qui préfèrent les vrais échanges au cloud."
 - Public docs now expose the same language switch in their shared navigation,

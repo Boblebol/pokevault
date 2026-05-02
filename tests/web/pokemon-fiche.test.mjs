@@ -135,7 +135,7 @@ test("buildOwnershipActionModel exposes compact trade-oriented actions", async (
 
   const empty = api.buildOwnershipActionModel({ wanted: false, caught: false, duplicate: false });
   assert.deepEqual(empty.map((action) => action.id), ["wanted", "owned", "duplicate"]);
-  assert.deepEqual(empty.map((action) => action.label), ["Cherche", "J'ai", "Double"]);
+  assert.deepEqual(empty.map((action) => action.label), ["Cherche", "Capturé", "Double"]);
   assert.deepEqual(empty.map((action) => action.active), [false, false, false]);
 
   const wanted = api.buildOwnershipActionModel({ wanted: true, caught: false, duplicate: false });

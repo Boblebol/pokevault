@@ -64,7 +64,7 @@ works immediately after install. Optional artwork caches are generated locally.
 ## What It Does
 
 - Scrapes and exports a National Pokédex reference from Pokepedia.
-- Tracks Pokemon with simple `Cherche`, `J'ai` and `Double` actions, backed by
+- Tracks Pokemon with simple `Cherche`, `Capturé` and `Double` actions, backed by
   backward-compatible progress JSON.
 - Lets the app and public landing switch between French and English while
   keeping French as the default product language.
@@ -108,6 +108,7 @@ file into your searchable local contact book.
 The exchange model stays close to the Pokedex:
 
 - `Cherche` marks Pokemon you want and feeds the focus list.
+- `Capturé` marks Pokemon already in your collection.
 - `Double` marks Pokemon you own twice and can offer for trade.
 - Contact lines can share Instagram, Facebook, phone, email, Discord or site
   details inside the exported card file.
