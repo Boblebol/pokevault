@@ -102,6 +102,12 @@ def test_dimmed_cards_keep_trade_controls_readable() -> None:
     assert ".card.is-dimmed {\n  opacity:" not in CSS
 
 
+def test_match_badge_is_visually_stronger_than_seen_badge() -> None:
+    assert ".pokemon-network-badge.is-match" in CSS
+    assert "var(--accent)" in CSS
+    assert "rgba(255, 193, 7" in CSS
+
+
 def test_binder_layout_settings_are_optional_and_use_sheet_language() -> None:
     classeur_view = HTML.split('id="viewClasseur"', 1)[1].split('id="viewDresseurs"', 1)[0]
 
