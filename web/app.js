@@ -460,8 +460,6 @@ function ownershipStateForSlug(slug) {
 
 function shouldDimCardForHighlight(mode, ownership) {
   const caught = Boolean(ownership?.caught);
-  const duplicate = Boolean(ownership?.duplicate);
-  if (duplicate) return false;
   return mode === "missing" ? !caught : caught;
 }
 
