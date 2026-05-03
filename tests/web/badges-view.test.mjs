@@ -4,6 +4,8 @@ import { test } from "node:test";
 function installBrowserStubs() {
   globalThis.__POKEVAULT_BADGES_TESTS__ = true;
   globalThis.window = globalThis;
+  delete globalThis.PokedexCollection;
+  delete globalThis.PokevaultArtwork;
   globalThis.PokevaultI18n = {
     getLocale: () => "en",
     t: (key, params = {}) => {
@@ -21,11 +23,13 @@ function installBrowserStubs() {
   globalThis.document = {
     readyState: "loading",
     addEventListener() {},
-    createElement() {
+    createElement(tagName = "") {
       const element = {
         attrs: {},
         children: [],
         className: "",
+        listeners: {},
+        tagName: String(tagName).toUpperCase(),
         append(...children) {
           this.children.push(...children);
         },
@@ -35,7 +39,9 @@ function installBrowserStubs() {
         setAttribute(name, value) {
           this.attrs[name] = String(value);
         },
-        addEventListener() {},
+        addEventListener(name, fn) {
+          this.listeners[name] = fn;
+        },
         classList: {
           add(...classes) {
             element.className = [element.className, ...classes].filter(Boolean).join(" ");
@@ -43,9 +49,7 @@ function installBrowserStubs() {
         },
         style: { setProperty() {} },
       };
-      return {
-        ...element,
-      };
+      return element;
     },
   };
 }
@@ -54,6 +58,19 @@ async function loadModule() {
   installBrowserStubs();
   await import(`../../web/badges-view.js?case=${Date.now()}`);
   return globalThis.window.PokevaultBadges._test;
+}
+
+function flatten(node) {
+  const children = Array.isArray(node?.children) ? node.children : [];
+  return [node, ...children.flatMap(flatten)];
+}
+
+function byClass(node, className) {
+  return flatten(node).filter((child) => String(child?.className || "").split(/\s+/).includes(className));
+}
+
+function textTree(node) {
+  return flatten(node).map((child) => String(child?.textContent || "")).join(" ");
 }
 
 test("nearestBadge chooses the locked badge closest to completion", async () => {
@@ -167,4 +184,72 @@ test("nearestBadge uses the smallest remaining count as tie-breaker", async () =
   });
 
   assert.equal(nearest.id, "shiny_ten");
+});
+
+test("buildBadgeTile previews required pokemon thumbnails", async () => {
+  const api = await loadModule();
+  globalThis.PokedexCollection = {
+    allPokemon: [
+      { slug: "0074-geodude", number: "0074", names: { en: "Geodude" }, image: "data/images/0074-geodude.png" },
+      { slug: "0095-onix", number: "0095", names: { en: "Onix" }, image: "data/images/0095-onix.png" },
+    ],
+  };
+
+  const tile = api.buildBadgeTile({
+    id: "kanto_brock",
+    title: "Brock - Badge",
+    description: "Capture Brock's team.",
+    unlocked: false,
+    current: 1,
+    target: 2,
+    percent: 50,
+    requirements: [
+      { slug: "0074-geodude", caught: true },
+      { slug: "0095-onix", caught: false },
+    ],
+  });
+
+  assert.equal(tile.attrs.tabindex, "0");
+  assert.equal(tile.attrs["aria-haspopup"], "dialog");
+  assert.equal(byClass(tile, "badge-requirement-chip").length, 2);
+  assert.equal(byClass(tile, "is-caught").length, 1);
+  assert.equal(byClass(tile, "is-missing").length, 1);
+  assert.match(textTree(tile), /Geodude/);
+  assert.match(textTree(tile), /Onix/);
+});
+
+test("buildBadgeDetail describes the pokemon required by the badge", async () => {
+  const api = await loadModule();
+  globalThis.PokedexCollection = {
+    allPokemon: [
+      { slug: "0074-geodude", number: "0074", names: { en: "Geodude" }, image: "data/images/0074-geodude.png" },
+      { slug: "0095-onix", number: "0095", names: { en: "Onix" }, image: "data/images/0095-onix.png" },
+    ],
+  };
+
+  const detail = api.buildBadgeDetail({
+    id: "kanto_brock",
+    title: "Brock - Badge",
+    description: "Capture Brock's team.",
+    unlocked: false,
+    current: 1,
+    target: 2,
+    percent: 50,
+    hint: "Encore 1 Pokemon de l'equipe à capturer.",
+    category: "gym",
+    region: "kanto",
+    rarity: "rare",
+    effect: "gloss",
+    requirements: [
+      { slug: "0074-geodude", caught: true },
+      { slug: "0095-onix", caught: false },
+    ],
+  });
+
+  assert.equal(detail.attrs.role, "dialog");
+  assert.equal(detail.attrs["aria-modal"], "true");
+  assert.match(textTree(detail), /Brock - Badge/);
+  assert.match(textTree(detail), /Geodude/);
+  assert.match(textTree(detail), /Onix/);
+  assert.equal(byClass(detail, "badge-detail-requirement").length, 2);
 });

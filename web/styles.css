@@ -901,9 +901,8 @@ body {
 
 .header {
   padding: 16px;
-  position: sticky;
-  top: 0;
-  z-index: 10;
+  position: relative;
+  z-index: 1;
   background: var(--bg);
   border-bottom: 1px solid #333;
 }
@@ -3995,6 +3994,8 @@ body {
 #viewClasseur .binder-page-grid--cards .card-img-wrap {
   width: 58px;
   height: 58px;
+  margin-left: auto;
+  margin-right: auto;
   margin-bottom: 5px;
 }
 
@@ -4020,10 +4021,12 @@ body {
 
 #viewClasseur .binder-page-grid--cards .binder-card {
   justify-content: flex-start;
-  align-items: flex-start;
+  align-items: center;
+  text-align: center;
 }
 
 #viewClasseur .binder-page-grid--cards .binder-card .card-top {
+  width: 100%;
   margin-bottom: 2px;
 }
 
@@ -4061,6 +4064,7 @@ body {
 }
 
 #viewClasseur .binder-page-grid--cards .binder-card .card-action {
+  width: 100%;
   margin-top: auto;
 }
 
@@ -4777,9 +4781,11 @@ body {
 
 .card-details {
   position: absolute;
-  top: 10px;
-  left: 10px;
+  --card-details-offset: 40px;
+  top: var(--card-details-offset);
+  left: 50%;
   z-index: 2;
+  max-width: calc(100% - 20px);
   padding: 4px 10px;
   font-size: 0.72rem;
   font-weight: 600;
@@ -4790,16 +4796,19 @@ body {
   border-radius: 999px;
   cursor: pointer;
   opacity: 0;
-  transform: translateY(-4px);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  transform: translate(-50%, -4px);
   transition: opacity 140ms ease, transform 140ms ease;
   pointer-events: none;
 }
 
 .card:hover .card-details,
-.card:focus-within .card-details,
+.card-details:focus-visible,
 .card.is-kb-focused .card-details {
   opacity: 1;
-  transform: translateY(0);
+  transform: translate(-50%, 0);
   pointer-events: auto;
 }
 
@@ -6468,7 +6477,19 @@ html[data-theme="paldea"] {
   border-radius: 10px;
   opacity: 0.55;
   overflow: hidden;
+  cursor: pointer;
   transition: opacity 150ms ease-out, border-color 150ms ease-out;
+}
+
+.badge-tile:hover,
+.badge-tile:focus-visible {
+  opacity: 0.82;
+  border-color: var(--control-hover);
+  outline: none;
+}
+
+.badge-tile:focus-visible {
+  box-shadow: 0 0 0 2px var(--electric);
 }
 
 .badge-tile::before,
@@ -6638,6 +6659,256 @@ html[data-theme="paldea"] {
   color: var(--accent);
 }
 
+.badge-requirement-preview {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  align-items: center;
+  margin-top: 8px;
+}
+
+.badge-requirement-chip {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  overflow: hidden;
+  border: 1px solid var(--outline-soft);
+  border-radius: 999px;
+  background: var(--surface-high);
+  color: var(--muted);
+  font-size: 0.65rem;
+  font-weight: 750;
+  line-height: 1;
+}
+
+.badge-requirement-chip__img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  padding: 2px;
+}
+
+.badge-requirement-chip__fallback {
+  padding-top: 1px;
+}
+
+.badge-requirement-chip__name {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.badge-requirement-chip.is-caught {
+  border-color: color-mix(in oklab, var(--success) 55%, transparent);
+  background: color-mix(in oklab, var(--success) 14%, var(--surface-high));
+  color: var(--success);
+}
+
+.badge-requirement-chip.is-missing {
+  opacity: 0.7;
+  filter: saturate(0.55);
+}
+
+.badge-requirement-chip--more {
+  background: var(--control-bg);
+  color: var(--text);
+}
+
+.badge-detail-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1200;
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  background: rgba(0, 0, 0, 0.58);
+  backdrop-filter: blur(8px);
+}
+
+.badge-detail {
+  position: relative;
+  width: 100%;
+  max-width: min(92vw, 560px);
+  max-height: min(86vh, 720px);
+  overflow: auto;
+  border: 1px solid var(--outline-soft);
+  border-radius: 8px;
+  background: var(--card);
+  color: var(--text);
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.36);
+}
+
+.badge-detail::before {
+  position: absolute;
+  inset: 0 0 auto;
+  height: 88px;
+  pointer-events: none;
+  content: "";
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.08), transparent),
+    linear-gradient(110deg, rgba(54, 213, 232, 0.12), rgba(242, 101, 34, 0.09), transparent);
+}
+
+.badge-detail__header,
+.badge-detail__desc,
+.badge-detail__meta,
+.badge-detail-progress,
+.badge-detail__requirements-section {
+  position: relative;
+  z-index: 1;
+}
+
+.badge-detail__header {
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr) 34px;
+  gap: 10px;
+  align-items: center;
+  padding: 18px 18px 8px;
+}
+
+.badge-detail__icon {
+  color: var(--accent);
+  font-size: 28px;
+}
+
+.badge-detail__title {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 750;
+}
+
+.badge-detail__close {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border: 1px solid var(--outline-soft);
+  border-radius: 999px;
+  background: var(--control-bg);
+  color: var(--text);
+  cursor: pointer;
+  font-size: 1.2rem;
+  line-height: 1;
+}
+
+.badge-detail__close:hover,
+.badge-detail__close:focus-visible {
+  border-color: var(--control-hover);
+  outline: none;
+}
+
+.badge-detail__close:focus-visible {
+  box-shadow: 0 0 0 2px var(--electric);
+}
+
+.badge-detail__desc {
+  margin: 0;
+  padding: 0 18px;
+  color: var(--muted);
+  font-size: 0.86rem;
+  line-height: 1.45;
+}
+
+.badge-detail__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 12px 18px 0;
+}
+
+.badge-detail__meta-pill {
+  border: 1px solid var(--outline-soft);
+  border-radius: 999px;
+  padding: 4px 8px;
+  background: var(--surface-high);
+  color: var(--muted);
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.badge-detail-progress {
+  padding: 14px 18px;
+}
+
+.badge-detail-progress__text {
+  margin: 0 0 8px;
+  color: var(--muted);
+  font-size: 0.78rem;
+}
+
+.badge-detail-progress__meter {
+  position: relative;
+  height: 7px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--surface-highest);
+}
+
+.badge-detail-progress__fill {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--electric), var(--accent-strong));
+}
+
+.badge-detail__requirements-section {
+  padding: 0 18px 18px;
+}
+
+.badge-detail__subtitle {
+  margin: 0 0 10px;
+  font-size: 0.82rem;
+  font-weight: 750;
+}
+
+.badge-detail-requirements {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(86px, 1fr));
+  gap: 8px;
+}
+
+.badge-detail-requirement {
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr);
+  gap: 8px;
+  align-items: center;
+  min-width: 0;
+  padding: 8px;
+  border: 1px solid var(--outline-soft);
+  border-radius: 8px;
+  background: var(--surface-high);
+}
+
+.badge-detail-requirement.is-missing {
+  opacity: 0.74;
+}
+
+.badge-detail-requirement__body {
+  min-width: 0;
+}
+
+.badge-detail-requirement__name {
+  margin: 0;
+  overflow: hidden;
+  color: var(--text);
+  font-size: 0.75rem;
+  font-weight: 750;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.badge-detail-requirement__meta {
+  margin: 2px 0 0;
+  color: var(--muted);
+  font-size: 0.68rem;
+}
+
 .stats-badges-empty {
   color: var(--muted);
   font-size: 0.85rem;
@@ -6738,6 +7009,9 @@ html[data-theme="paldea"] {
   .badge-filter__btn,
   .badge-tile,
   .badge-tile::before,
+  .badge-detail,
+  .badge-detail-overlay,
+  .badge-requirement-chip,
   .toast {
     transition: none;
   }

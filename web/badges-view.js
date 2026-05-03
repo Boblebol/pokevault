@@ -45,6 +45,13 @@
     "badges.region.alola": "Alola",
     "badges.region.galar": "Galar",
     "badges.region.paldea": "Paldea",
+    "badges.detail.open": "Ouvrir la fiche du badge {title}",
+    "badges.detail.close": "Fermer",
+    "badges.detail.progress": "{current} / {target}",
+    "badges.detail.requirements": "Pokemon concernes",
+    "badges.detail.caught": "Capture",
+    "badges.detail.missing": "A chercher",
+    "badges.detail.more": "+{count}",
   };
   const FILTER_OPTIONS = {
     status: [
@@ -165,6 +172,106 @@
       remaining: Math.max(0, target - current),
       hint: typeof badge?.hint === "string" ? badge.hint : "",
     };
+  }
+
+  function badgeRequirements(badge) {
+    const raw = Array.isArray(badge?.requirements) ? badge.requirements : [];
+    return raw
+      .map((item) => {
+        const slug = String(item?.slug || "").trim();
+        return slug ? { slug, caught: Boolean(item?.caught) } : null;
+      })
+      .filter(Boolean);
+  }
+
+  function pokemonBySlug(slug) {
+    const all = window.PokedexCollection?.allPokemon || [];
+    return all.find((p) => String(p?.slug || "") === slug) || null;
+  }
+
+  function displayPokemonName(p, slug) {
+    const names = p?.names || {};
+    return names.fr || names.en || names.ja || slug || "?";
+  }
+
+  function displayPokemonNumber(p) {
+    const raw = String(p?.number || "").replace(/^#/, "");
+    const clean = raw.replace(/^0+/, "") || raw || "";
+    return clean ? `#${clean}` : "";
+  }
+
+  function normalizePokemonImagePath(img) {
+    if (!img) return "";
+    const raw = String(img).replace(/^\.\//, "");
+    if (/^https?:\/\//i.test(raw)) return raw;
+    return raw.startsWith("/") ? raw : `/${raw}`;
+  }
+
+  function attachRequirementImage(img, pokemon) {
+    if (!img || !pokemon) return false;
+    const artwork = window.PokevaultArtwork;
+    if (typeof artwork?.resolve === "function") {
+      const resolved = artwork.resolve(pokemon);
+      if (resolved?.src) {
+        if (typeof artwork.attach === "function") artwork.attach(img, resolved);
+        else img.src = resolved.src;
+        return true;
+      }
+    }
+    const src = normalizePokemonImagePath(pokemon.image);
+    if (!src) return false;
+    img.src = src;
+    return true;
+  }
+
+  function buildRequirementChip(requirement) {
+    const pokemon = pokemonBySlug(requirement.slug);
+    const name = displayPokemonName(pokemon, requirement.slug);
+    const chip = document.createElement("span");
+    chip.className = `badge-requirement-chip ${requirement.caught ? "is-caught" : "is-missing"}`;
+    chip.title = name;
+    chip.setAttribute(
+      "aria-label",
+      `${name} - ${requirement.caught ? tr("badges.detail.caught") : tr("badges.detail.missing")}`,
+    );
+
+    const img = document.createElement("img");
+    img.className = "badge-requirement-chip__img";
+    img.alt = "";
+    img.loading = "lazy";
+    if (attachRequirementImage(img, pokemon)) {
+      chip.append(img);
+    } else {
+      const fallback = document.createElement("span");
+      fallback.className = "badge-requirement-chip__fallback";
+      fallback.textContent = displayPokemonNumber(pokemon) || "?";
+      chip.append(fallback);
+    }
+
+    const hiddenName = document.createElement("span");
+    hiddenName.className = "badge-requirement-chip__name";
+    hiddenName.textContent = name;
+    chip.append(hiddenName);
+    return chip;
+  }
+
+  function buildRequirementsPreview(badge) {
+    const requirements = badgeRequirements(badge);
+    if (!requirements.length) return null;
+
+    const preview = document.createElement("div");
+    preview.className = "badge-requirement-preview";
+    preview.setAttribute("aria-label", tr("badges.detail.requirements"));
+    for (const requirement of requirements.slice(0, 4)) {
+      preview.append(buildRequirementChip(requirement));
+    }
+    if (requirements.length > 4) {
+      const more = document.createElement("span");
+      more.className = "badge-requirement-chip badge-requirement-chip--more";
+      more.textContent = tr("badges.detail.more", { count: requirements.length - 4 });
+      preview.append(more);
+    }
+    return preview;
   }
 
   function nearestBadge(state = cachedState) {
@@ -350,12 +457,158 @@
     return select;
   }
 
+  function buildDetailRequirement(requirement) {
+    const pokemon = pokemonBySlug(requirement.slug);
+    const name = displayPokemonName(pokemon, requirement.slug);
+    const item = document.createElement("article");
+    item.className = `badge-detail-requirement ${requirement.caught ? "is-caught" : "is-missing"}`;
+
+    item.append(buildRequirementChip(requirement));
+
+    const body = document.createElement("div");
+    body.className = "badge-detail-requirement__body";
+    const title = document.createElement("h4");
+    title.className = "badge-detail-requirement__name";
+    title.textContent = name;
+    const meta = document.createElement("p");
+    meta.className = "badge-detail-requirement__meta";
+    const number = displayPokemonNumber(pokemon);
+    const status = requirement.caught ? tr("badges.detail.caught") : tr("badges.detail.missing");
+    meta.textContent = number ? `${number} · ${status}` : status;
+    body.append(title, meta);
+    item.append(body);
+    return item;
+  }
+
+  function buildBadgeDetail(badge, { onClose = null } = {}) {
+    const progress = normalizeProgress(badge);
+    const copy = displayBadgeCopy(badge);
+    const detail = document.createElement("section");
+    detail.className = badgeTileClassNames(badge).join(" ").replace("badge-tile", "badge-detail");
+    detail.setAttribute("role", "dialog");
+    detail.setAttribute("aria-modal", "true");
+    detail.setAttribute("aria-label", copy.title || tr("badges.gallery.title"));
+
+    const header = document.createElement("div");
+    header.className = "badge-detail__header";
+    const icon = document.createElement("span");
+    icon.className = "app-icon badge-detail__icon";
+    icon.setAttribute("aria-hidden", "true");
+    icon.textContent = badge?.unlocked ? "★" : "□";
+    const heading = document.createElement("h2");
+    heading.className = "badge-detail__title";
+    heading.textContent = copy.title;
+    const close = document.createElement("button");
+    close.type = "button";
+    close.className = "badge-detail__close";
+    close.setAttribute("aria-label", tr("badges.detail.close"));
+    close.textContent = "×";
+    if (typeof onClose === "function") close.addEventListener("click", onClose);
+    header.append(icon, heading, close);
+    detail.append(header);
+
+    const desc = document.createElement("p");
+    desc.className = "badge-detail__desc";
+    desc.textContent = copy.description;
+    detail.append(desc);
+
+    const meta = document.createElement("div");
+    meta.className = "badge-detail__meta";
+    const values = [
+      badge?.category ? tr(`badges.category.${badge.category}`) : "",
+      badge?.region ? tr(`badges.region.${badge.region}`) : "",
+      badge?.rarity || "",
+      badge?.effect || "",
+    ].filter(Boolean);
+    for (const value of values) {
+      const pill = document.createElement("span");
+      pill.className = "badge-detail__meta-pill";
+      pill.textContent = value;
+      meta.append(pill);
+    }
+    detail.append(meta);
+
+    const progressBlock = document.createElement("div");
+    progressBlock.className = "badge-detail-progress";
+    const progressText = document.createElement("p");
+    progressText.className = "badge-detail-progress__text";
+    progressText.textContent = `${tr("badges.detail.progress", progress)} · ${progress.hint}`;
+    const meter = document.createElement("div");
+    meter.className = "badge-detail-progress__meter";
+    meter.setAttribute("role", "progressbar");
+    meter.setAttribute("aria-valuemin", "0");
+    meter.setAttribute("aria-valuemax", "100");
+    meter.setAttribute("aria-valuenow", String(progress.percent));
+    const fill = document.createElement("span");
+    fill.className = "badge-detail-progress__fill";
+    fill.style.width = `${progress.percent}%`;
+    meter.append(fill);
+    progressBlock.append(progressText, meter);
+    detail.append(progressBlock);
+
+    const requirements = badgeRequirements(badge);
+    if (requirements.length) {
+      const section = document.createElement("section");
+      section.className = "badge-detail__requirements-section";
+      const subtitle = document.createElement("h3");
+      subtitle.className = "badge-detail__subtitle";
+      subtitle.textContent = tr("badges.detail.requirements");
+      const grid = document.createElement("div");
+      grid.className = "badge-detail-requirements";
+      for (const requirement of requirements) {
+        grid.append(buildDetailRequirement(requirement));
+      }
+      section.append(subtitle, grid);
+      detail.append(section);
+    }
+
+    return detail;
+  }
+
+  let activeDetail = null;
+
+  function closeBadgeDetail(overlay, onKeydown) {
+    document.removeEventListener?.("keydown", onKeydown);
+    overlay?.remove?.();
+    if (activeDetail?.overlay === overlay) activeDetail = null;
+  }
+
+  function openBadgeDetail(badge) {
+    if (activeDetail) closeBadgeDetail(activeDetail.overlay, activeDetail.onKeydown);
+    const overlay = document.createElement("div");
+    overlay.className = "badge-detail-overlay";
+    const onKeydown = (event) => {
+      if (event.key === "Escape") closeBadgeDetail(overlay, onKeydown);
+    };
+    const detail = buildBadgeDetail(badge, {
+      onClose: () => closeBadgeDetail(overlay, onKeydown),
+    });
+    overlay.addEventListener("click", (event) => {
+      if (event.target === overlay) closeBadgeDetail(overlay, onKeydown);
+    });
+    overlay.append(detail);
+    (document.body || lastHost || document.documentElement)?.append?.(overlay);
+    document.addEventListener?.("keydown", onKeydown);
+    activeDetail = { overlay, onKeydown };
+    detail.querySelector?.(".badge-detail__close")?.focus?.();
+    return overlay;
+  }
+
   function buildBadgeTile(badge) {
     const tile = document.createElement("article");
     tile.className = badgeTileClassNames(badge).join(" ");
-    tile.setAttribute("role", "listitem");
     const progress = normalizeProgress(badge);
     const copy = displayBadgeCopy(badge);
+    tile.setAttribute("role", "button");
+    tile.setAttribute("tabindex", "0");
+    tile.setAttribute("aria-haspopup", "dialog");
+    tile.setAttribute("aria-label", tr("badges.detail.open", { title: copy.title }));
+    tile.addEventListener("click", () => openBadgeDetail(badge));
+    tile.addEventListener("keydown", (event) => {
+      if (event.key !== "Enter" && event.key !== " ") return;
+      event.preventDefault?.();
+      openBadgeDetail(badge);
+    });
 
     const icon = document.createElement("span");
     icon.className = "app-icon badge-tile__icon";
@@ -372,6 +625,8 @@
     d.className = "badge-tile__desc";
     d.textContent = copy.description;
     body.append(t, d);
+    const preview = buildRequirementsPreview(badge);
+    if (preview) body.append(preview);
     if (!badge.unlocked) {
       const meter = document.createElement("div");
       meter.className = "badge-tile__meter";
@@ -448,6 +703,10 @@
       displayBadgeCopy,
       filterBadges,
       badgeTileClassNames,
+      badgeRequirements,
+      buildRequirementChip,
+      buildBadgeTile,
+      buildBadgeDetail,
       buildSegmentedFilter,
     };
   }

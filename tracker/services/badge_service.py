@@ -13,7 +13,13 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from tracker.models import BadgeDefinition, BadgeState, Card, CollectionProgress
+from tracker.models import (
+    BadgeDefinition,
+    BadgeRequirementPokemon,
+    BadgeState,
+    Card,
+    CollectionProgress,
+)
 from tracker.repository.base import CardRepository, ProgressRepository
 from tracker.services.badge_presentation import presentation_for_badge
 
@@ -52,7 +58,7 @@ class BadgeDef:
     metric: str
     target: int
     hint_unit: str
-    required_slug_sets: tuple[frozenset[str], ...] = ()
+    required_slug_sets: tuple[tuple[str, ...], ...] = ()
 
     def progress(
         self,
@@ -124,29 +130,65 @@ def _metric_value(
 
 
 def _team_badge_progress(
-    required_slug_sets: tuple[frozenset[str], ...],
+    required_slug_sets: tuple[tuple[str, ...], ...],
     progress: CollectionProgress,
     hint_unit: str,
 ) -> BadgeProgress:
+    required = _closest_required_slug_set(required_slug_sets, progress)
     caught = _caught_slugs(progress)
-    best_current = 0
+    target = max(1, len(required))
+    current = sum(1 for slug in required if slug in caught)
+    return BadgeProgress(
+        current=current,
+        target=target,
+        hint_unit=hint_unit,
+    )
+
+
+def _closest_required_slug_set(
+    required_slug_sets: tuple[tuple[str, ...], ...],
+    progress: CollectionProgress,
+) -> tuple[str, ...]:
+    caught = _caught_slugs(progress)
+    best_required: tuple[str, ...] = ()
     best_target = 1
     best_percent = -1.0
     for required in required_slug_sets:
         target = max(1, len(required))
-        current = len(required & caught)
+        current = sum(1 for slug in required if slug in caught)
         percent = current / target
         if percent > best_percent or (
             percent == best_percent and target < best_target
         ):
-            best_current = current
+            best_required = required
             best_target = target
             best_percent = percent
-    return BadgeProgress(
-        current=best_current,
-        target=best_target,
-        hint_unit=hint_unit,
-    )
+    return best_required
+
+
+def _team_badge_requirements(
+    required_slug_sets: tuple[tuple[str, ...], ...],
+    progress: CollectionProgress,
+    *,
+    unlocked: bool,
+) -> list[BadgeRequirementPokemon]:
+    required = _closest_required_slug_set(required_slug_sets, progress)
+    caught = _caught_slugs(progress)
+    return [
+        BadgeRequirementPokemon(slug=slug, caught=unlocked or slug in caught)
+        for slug in required
+    ]
+
+
+def _unique_ordered_slugs(slugs: tuple[str, ...]) -> tuple[str, ...]:
+    seen: set[str] = set()
+    ordered: list[str] = []
+    for slug in slugs:
+        clean = str(slug).strip()
+        if clean and clean not in seen:
+            ordered.append(clean)
+            seen.add(clean)
+    return tuple(ordered)
 
 
 def _team_badge(
@@ -162,7 +204,7 @@ def _team_badge(
         "team",
         1,
         "Pokemon de l'equipe à capturer",
-        tuple(frozenset(slugs) for slugs in required_slug_sets),
+        tuple(_unique_ordered_slugs(slugs) for slugs in required_slug_sets),
     )
 
 
@@ -2045,6 +2087,15 @@ class BadgeService:
                 badge.description,
                 badge.metric,
             )
+            requirements = (
+                _team_badge_requirements(
+                    badge.required_slug_sets,
+                    progress,
+                    unlocked=badge.id in unlocked,
+                )
+                if badge.required_slug_sets
+                else []
+            )
             catalog.append(
                 BadgeDefinition(
                     id=badge.id,
@@ -2061,6 +2112,7 @@ class BadgeService:
                     effect=presentation.effect,
                     reveal=presentation.reveal,
                     i18n=presentation.i18n,
+                    requirements=requirements,
                 )
             )
         return BadgeState(catalog=catalog, unlocked=sorted(unlocked))
