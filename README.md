@@ -79,7 +79,9 @@ works immediately after install. Optional artwork caches are generated locally.
 - Creates and imports optional Trainer Cards with shareable contact links,
   a searchable local contact book, local `Vu chez` context and `Match` hints
   from exchanged `Double` lists.
-- Shows collection stats, badge progress and focus recommendations.
+- Shows collection stats, badge progress and focus recommendations, including
+  "Souvenirs de Kanto" badges for Rouge/Bleu champions d'arene, Conseil 4,
+  Maitre de la Ligue and rival teams.
 - Exports/imports full local backups.
 - Prints binder or regional checklists.
 - Exposes a local FastAPI REST API for integrations.

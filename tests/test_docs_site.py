@@ -230,6 +230,18 @@ def test_trainer_contacts_document_local_trade_workflow() -> None:
         assert text in guide_text
 
 
+def test_kanto_nostalgia_badges_are_documented() -> None:
+    readme = (ROOT / "README.md").read_text(encoding="utf-8")
+    features = (DOCS / "features.html").read_text(encoding="utf-8")
+
+    for text in [readme, features]:
+        assert "Souvenirs de Kanto" in text
+        assert "Rouge/Bleu" in text
+        assert "champions d'arene" in text
+        assert "Conseil 4" in text
+        assert "rival" in text
+
+
 def test_public_story_centers_exploration_trainers_and_pokedex_completion() -> None:
     landing = (DOCS / "index.html").read_text(encoding="utf-8").lower()
     docs_i18n = (DOCS / "assets" / "i18n.js").read_text(encoding="utf-8").lower()

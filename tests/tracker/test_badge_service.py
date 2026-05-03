@@ -23,6 +23,11 @@ def _wire(tmp_path: Path) -> tuple[BadgeService, ProgressService, CardService]:
     return badge_service, progress_service, card_service
 
 
+def _catch_all(progress: ProgressService, slugs: list[str]) -> None:
+    for slug in slugs:
+        progress.patch_status(ProgressStatusPatch(slug=slug, state="caught"))
+
+
 def test_catalog_exposes_all_definitions(tmp_path: Path) -> None:
     badge_service, *_ = _wire(tmp_path)
     state = badge_service.state()
@@ -148,3 +153,113 @@ def test_metric_value_rejects_unknown_metric(tmp_path: Path) -> None:
 
     with pytest.raises(ValueError, match="Unknown badge metric"):
         _metric_value("unknown", progress.get_progress(), cards.list_all().cards)
+
+
+def test_kanto_badges_are_in_catalog(tmp_path: Path) -> None:
+    badge_service, *_ = _wire(tmp_path)
+
+    ids = {badge.id for badge in badge_service.state().catalog}
+
+    assert {
+        "kanto_brock",
+        "kanto_misty",
+        "kanto_lt_surge",
+        "kanto_erika",
+        "kanto_koga",
+        "kanto_sabrina",
+        "kanto_blaine",
+        "kanto_giovanni",
+        "kanto_lorelei",
+        "kanto_bruno",
+        "kanto_agatha",
+        "kanto_lance",
+        "kanto_rival_champion",
+    } <= ids
+
+
+def test_kanto_gym_badge_requires_full_caught_team(tmp_path: Path) -> None:
+    badge_service, progress, _ = _wire(tmp_path)
+    progress.patch_status(ProgressStatusPatch(slug="0074-geodude", state="caught"))
+
+    state = badge_service.state()
+    by_id = {badge.id: badge for badge in state.catalog}
+
+    assert by_id["kanto_brock"].unlocked is False
+    assert by_id["kanto_brock"].current == 1
+    assert by_id["kanto_brock"].target == 2
+    assert by_id["kanto_brock"].hint == "Encore 1 Pokemon de l'equipe à capturer."
+
+    progress.patch_status(ProgressStatusPatch(slug="0095-onix", state="caught"))
+    newly = badge_service.sync_unlocked()
+
+    assert "kanto_brock" in newly
+
+
+def test_kanto_team_badges_count_duplicate_species_once(tmp_path: Path) -> None:
+    badge_service, progress, _ = _wire(tmp_path)
+    _catch_all(progress, ["0109-koffing", "0089-muk"])
+
+    by_id = {badge.id: badge for badge in badge_service.state().catalog}
+
+    assert by_id["kanto_koga"].unlocked is False
+    assert by_id["kanto_koga"].current == 2
+    assert by_id["kanto_koga"].target == 3
+
+    progress.patch_status(ProgressStatusPatch(slug="0110-weezing", state="caught"))
+
+    assert "kanto_koga" in badge_service.sync_unlocked()
+
+
+def test_kanto_rival_badge_unlocks_with_any_final_team_variant(
+    tmp_path: Path,
+) -> None:
+    badge_service, progress, _ = _wire(tmp_path)
+    _catch_all(
+        progress,
+        [
+            "0018-pidgeot",
+            "0065-alakazam",
+            "0112-rhydon",
+            "0059-arcanine",
+            "0103-exeggutor",
+            "0009-blastoise",
+        ],
+    )
+
+    newly = set(badge_service.sync_unlocked())
+
+    assert "kanto_rival_champion" in newly
+
+
+def test_kanto_rival_progress_uses_closest_variant(tmp_path: Path) -> None:
+    badge_service, progress, _ = _wire(tmp_path)
+    _catch_all(
+        progress,
+        [
+            "0018-pidgeot",
+            "0065-alakazam",
+            "0112-rhydon",
+            "0059-arcanine",
+            "0103-exeggutor",
+        ],
+    )
+
+    by_id = {badge.id: badge for badge in badge_service.state().catalog}
+
+    assert by_id["kanto_rival_champion"].current == 5
+    assert by_id["kanto_rival_champion"].target == 6
+    assert by_id["kanto_rival_champion"].percent == 83
+
+
+def test_kanto_trainer_unlocks_are_monotonic(tmp_path: Path) -> None:
+    badge_service, progress, _ = _wire(tmp_path)
+    _catch_all(progress, ["0074-geodude", "0095-onix"])
+    badge_service.sync_unlocked()
+    progress.patch_status(ProgressStatusPatch(slug="0095-onix", state="not_met"))
+
+    by_id = {badge.id: badge for badge in badge_service.state().catalog}
+
+    assert by_id["kanto_brock"].unlocked is True
+    assert by_id["kanto_brock"].current == 2
+    assert by_id["kanto_brock"].target == 2
+    assert by_id["kanto_brock"].percent == 100

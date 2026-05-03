@@ -51,12 +51,19 @@ class BadgeDef:
     metric: str
     target: int
     hint_unit: str
+    required_slug_sets: tuple[frozenset[str], ...] = ()
 
     def progress(
         self,
         progress: CollectionProgress,
         cards: list[Card],
     ) -> BadgeProgress:
+        if self.required_slug_sets:
+            return _team_badge_progress(
+                self.required_slug_sets,
+                progress,
+                self.hint_unit,
+            )
         current = _metric_value(self.metric, progress, cards)
         return BadgeProgress(
             current=max(0, min(current, self.target)),
@@ -67,6 +74,14 @@ class BadgeDef:
 
 def _caught_count(progress: CollectionProgress) -> int:
     return sum(1 for s in progress.statuses.values() if s.state == "caught")
+
+
+def _caught_slugs(progress: CollectionProgress) -> set[str]:
+    return {
+        slug
+        for slug, status in progress.statuses.items()
+        if status.state == "caught"
+    }
 
 
 def _seen_count(progress: CollectionProgress) -> int:
@@ -105,6 +120,49 @@ def _metric_value(
     if metric == "card_qty":
         return _card_total_qty(cards)
     raise ValueError(f"Unknown badge metric: {metric}")
+
+
+def _team_badge_progress(
+    required_slug_sets: tuple[frozenset[str], ...],
+    progress: CollectionProgress,
+    hint_unit: str,
+) -> BadgeProgress:
+    caught = _caught_slugs(progress)
+    best_current = 0
+    best_target = 1
+    best_percent = -1.0
+    for required in required_slug_sets:
+        target = max(1, len(required))
+        current = len(required & caught)
+        percent = current / target
+        if percent > best_percent or (
+            percent == best_percent and target < best_target
+        ):
+            best_current = current
+            best_target = target
+            best_percent = percent
+    return BadgeProgress(
+        current=best_current,
+        target=best_target,
+        hint_unit=hint_unit,
+    )
+
+
+def _team_badge(
+    badge_id: str,
+    title: str,
+    description: str,
+    required_slug_sets: tuple[tuple[str, ...], ...],
+) -> BadgeDef:
+    return BadgeDef(
+        badge_id,
+        title,
+        description,
+        "team",
+        1,
+        "Pokemon de l'equipe à capturer",
+        tuple(frozenset(slugs) for slugs in required_slug_sets),
+    )
 
 
 BADGES: list[BadgeDef] = [
@@ -203,6 +261,133 @@ BADGES: list[BadgeDef] = [
         "card_qty",
         500,
         "carte en stock à ajouter",
+    ),
+    _team_badge(
+        "kanto_brock",
+        "Pierre - Roche de Kanto",
+        "Capturer l'equipe de Pierre dans Pokemon Rouge/Bleu.",
+        (("0074-geodude", "0095-onix"),),
+    ),
+    _team_badge(
+        "kanto_misty",
+        "Ondine - Cascade",
+        "Capturer l'equipe d'Ondine dans Pokemon Rouge/Bleu.",
+        (("0120-staryu", "0121-starmie"),),
+    ),
+    _team_badge(
+        "kanto_lt_surge",
+        "Major Bob - Foudre",
+        "Capturer l'equipe de Major Bob dans Pokemon Rouge/Bleu.",
+        (("0100-voltorb", "0025-pikachu", "0026-raichu"),),
+    ),
+    _team_badge(
+        "kanto_erika",
+        "Erika - Prisme",
+        "Capturer l'equipe d'Erika dans Pokemon Rouge/Bleu.",
+        (("0071-victreebel", "0114-tangela", "0045-vileplume"),),
+    ),
+    _team_badge(
+        "kanto_koga",
+        "Koga - Ame",
+        "Capturer l'equipe de Koga dans Pokemon Rouge/Bleu.",
+        (("0109-koffing", "0089-muk", "0109-koffing", "0110-weezing"),),
+    ),
+    _team_badge(
+        "kanto_sabrina",
+        "Morgane - Marais",
+        "Capturer l'equipe de Morgane dans Pokemon Rouge/Bleu.",
+        (("0064-kadabra", "0122-mr-mime", "0049-venomoth", "0065-alakazam"),),
+    ),
+    _team_badge(
+        "kanto_blaine",
+        "Auguste - Volcan",
+        "Capturer l'equipe d'Auguste dans Pokemon Rouge/Bleu.",
+        (("0058-growlithe", "0077-ponyta", "0078-rapidash", "0059-arcanine"),),
+    ),
+    _team_badge(
+        "kanto_giovanni",
+        "Giovanni - Terre",
+        "Capturer l'equipe de Giovanni dans Pokemon Rouge/Bleu.",
+        (
+            (
+                "0111-rhyhorn",
+                "0051-dugtrio",
+                "0031-nidoqueen",
+                "0034-nidoking",
+                "0112-rhydon",
+            ),
+        ),
+    ),
+    _team_badge(
+        "kanto_lorelei",
+        "Conseil 4 - Olga",
+        "Capturer l'equipe d'Olga au Plateau Indigo Rouge/Bleu.",
+        (
+            (
+                "0087-dewgong",
+                "0091-cloyster",
+                "0080-slowbro",
+                "0124-jynx",
+                "0131-lapras",
+            ),
+        ),
+    ),
+    _team_badge(
+        "kanto_bruno",
+        "Conseil 4 - Aldo",
+        "Capturer l'equipe d'Aldo au Plateau Indigo Rouge/Bleu.",
+        (("0095-onix", "0107-hitmonchan", "0106-hitmonlee", "0095-onix", "0068-machamp"),),
+    ),
+    _team_badge(
+        "kanto_agatha",
+        "Conseil 4 - Agatha",
+        "Capturer l'equipe d'Agatha au Plateau Indigo Rouge/Bleu.",
+        (("0094-gengar", "0042-golbat", "0093-haunter", "0024-arbok", "0094-gengar"),),
+    ),
+    _team_badge(
+        "kanto_lance",
+        "Conseil 4 - Peter",
+        "Capturer l'equipe de Peter au Plateau Indigo Rouge/Bleu.",
+        (
+            (
+                "0130-gyarados",
+                "0148-dragonair",
+                "0148-dragonair",
+                "0142-aerodactyl",
+                "0149-dragonite",
+            ),
+        ),
+    ),
+    _team_badge(
+        "kanto_rival_champion",
+        "Maitre de la Ligue - Rival",
+        "Capturer une equipe finale possible du rival dans Pokemon Rouge/Bleu.",
+        (
+            (
+                "0018-pidgeot",
+                "0065-alakazam",
+                "0112-rhydon",
+                "0130-gyarados",
+                "0103-exeggutor",
+                "0006-charizard",
+            ),
+            (
+                "0018-pidgeot",
+                "0065-alakazam",
+                "0112-rhydon",
+                "0059-arcanine",
+                "0103-exeggutor",
+                "0009-blastoise",
+            ),
+            (
+                "0018-pidgeot",
+                "0065-alakazam",
+                "0112-rhydon",
+                "0130-gyarados",
+                "0059-arcanine",
+                "0003-venusaur",
+            ),
+        ),
     ),
 ]
 
