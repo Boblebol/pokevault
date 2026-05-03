@@ -78,6 +78,24 @@ def test_put_own_card_accepts_social_contact_links(tmp_path: Path) -> None:
     ]
 
 
+def test_put_own_card_accepts_shared_badges(tmp_path: Path) -> None:
+    client = _client(tmp_path)
+    payload = _payload()
+    payload["badges"] = [
+        {"id": " kanto_brock ", "title": " Badge Roche "},
+        {"id": "kanto_brock", "title": "Duplicate"},
+        {"id": "kanto_misty", "title": "Badge Cascade"},
+    ]
+
+    response = client.put("/api/trainers/me", json=payload)
+
+    assert response.status_code == 200
+    assert response.json()["badges"] == [
+        {"id": "kanto_brock", "title": "Badge Roche"},
+        {"id": "kanto_misty", "title": "Badge Cascade"},
+    ]
+
+
 def test_import_card_creates_contact_then_updates(tmp_path: Path) -> None:
     client = _client(tmp_path)
 

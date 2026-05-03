@@ -131,6 +131,51 @@ test("cardFromForm keeps multiple shareable contact links", async () => {
   ]);
 });
 
+test("cardFromForm includes unlocked badges from the badge catalog", async () => {
+  const api = await loadModule();
+  globalThis.PokevaultBadges = {
+    state: {
+      catalog: [
+        { id: "kanto_brock", title: "Badge Roche", unlocked: true },
+        { id: "kanto_misty", title: "Badge Cascade", unlocked: true },
+        { id: "kanto_lance", title: "Lance", unlocked: false },
+      ],
+    },
+  };
+
+  const card = api.cardFromForm({
+    trainer_id: "trainer-123",
+    display_name: "Alex",
+  });
+
+  assert.deepEqual(card.badges, [
+    { id: "kanto_brock", title: "Badge Roche" },
+    { id: "kanto_misty", title: "Badge Cascade" },
+  ]);
+
+  delete globalThis.PokevaultBadges;
+});
+
+test("normalizeCard keeps compact shared badges and ignores invalid entries", async () => {
+  const api = await loadModule();
+  const card = api.normalizeCard({
+    trainer_id: "trainer-123",
+    display_name: "Alex",
+    badges: [
+      { id: " kanto_brock ", title: " Badge Roche " },
+      { id: "kanto_brock", title: "Duplicate" },
+      { id: "kanto_misty", title: "Badge Cascade" },
+      { id: "", title: "Blank" },
+    ],
+    updated_at: "2026-04-30T10:00:00+00:00",
+  });
+
+  assert.deepEqual(card.badges, [
+    { id: "kanto_brock", title: "Badge Roche" },
+    { id: "kanto_misty", title: "Badge Cascade" },
+  ]);
+});
+
 test("filterContacts matches local book fields and keeps display-name order", async () => {
   const api = await loadModule();
   const contacts = {
@@ -231,6 +276,30 @@ test("renderContact exposes social contact links as clickable actions", async ()
 
   assert.match(article.innerHTML, /href="https:\/\/instagram\.com\/misty_cards"/);
   assert.match(article.innerHTML, /href="tel:\+33612345678"/);
+});
+
+test("renderContact exposes shared trainer badges", async () => {
+  const api = await loadModule();
+  const article = api.renderContact({
+    card: {
+      trainer_id: "misty-123",
+      display_name: "Misty",
+      badges: [
+        { id: "kanto_brock", title: "Badge Roche" },
+        { id: "kanto_misty", title: "Badge Cascade" },
+      ],
+      wants: [],
+      for_trade: [],
+      updated_at: "2026-04-30T10:00:00+00:00",
+    },
+    private_note: "",
+    first_received_at: "2026-04-30T11:00:00+00:00",
+    last_received_at: "2026-04-30T11:00:00+00:00",
+  });
+
+  assert.match(article.innerHTML, /Badges/);
+  assert.match(article.innerHTML, /Badge Roche/);
+  assert.match(article.innerHTML, /Badge Cascade/);
 });
 
 test("renderContact follows English i18n labels when available", async () => {

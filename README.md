@@ -78,7 +78,7 @@ works immediately after install. Optional artwork caches are generated locally.
 - Maintains multiple local collection profiles.
 - Creates and imports optional Trainer Cards with shareable contact links,
   a searchable local contact book, local `Vu chez` context and `Match` hints
-  from exchanged `Double` lists.
+  from exchanged `Double` lists, plus automatically shared unlocked badges.
 - Shows collection stats, badge progress and focus recommendations, including
   "Souvenirs de Kanto" badges for Rouge/Bleu champions d'arene, Conseil 4,
   Maitre de la Ligue and rival teams.
@@ -114,6 +114,9 @@ The exchange model stays close to the Pokedex:
 - `Double` marks Pokemon you own twice and can offer for trade.
 - Contact lines can share Instagram, Facebook, phone, email, Discord or site
   details inside the exported card file.
+- Unlocked badges are included automatically in the exported Trainer Card, so
+  imported Dresseurs can show compact badge souvenirs without exposing locked
+  progress.
 - Imported cards can add `Vu chez` when another trainer has a duplicate, and
   `Match` when that duplicate is also on your `Cherche` list.
 
