@@ -82,7 +82,10 @@ works immediately after install. Optional artwork caches are generated locally.
 - Shows collection stats, badge progress and focus recommendations, including
   "Souvenirs de Kanto" badges for Rouge/Bleu champions d'arene, Conseil 4,
   Maitre de la Ligue and rival teams, plus Or/Argent badges for Johto, Kanto
-  post-game, the Conseil 4, Peter and Silver.
+  post-game, the Conseil 4, Peter and Silver. The same nostalgia catalog now
+  covers base-version teams sans remakes: Rubis/Saphir, Diamant/Perle,
+  Noir/Blanc, Noir 2/Blanc 2, X/Y, Soleil/Lune, Epee/Bouclier and
+  Ecarlate/Violet.
 - Exports/imports full local backups.
 - Prints binder or regional checklists.
 - Exposes a local FastAPI REST API for integrations.

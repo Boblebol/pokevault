@@ -387,3 +387,136 @@ def test_gold_silver_rival_progress_uses_closest_variant(tmp_path: Path) -> None
     assert by_id["gs_rival_silver"].current == 5
     assert by_id["gs_rival_silver"].target == 6
     assert by_id["gs_rival_silver"].percent == 83
+
+
+def test_base_generation_badges_are_in_catalog(tmp_path: Path) -> None:
+    badge_service, *_ = _wire(tmp_path)
+
+    ids = {badge.id for badge in badge_service.state().catalog}
+
+    assert {
+        "rs_roxanne",
+        "rs_steven",
+        "rs_wally",
+        "dp_roark",
+        "dp_cynthia",
+        "dp_rival_barry",
+        "bw_trio_badge",
+        "bw_alder",
+        "bw_n",
+        "b2w2_cheren",
+        "b2w2_iris",
+        "b2w2_hugh",
+        "xy_viola",
+        "xy_diantha",
+        "xy_rival",
+        "sm_hala",
+        "sm_kukui",
+        "sm_hau",
+        "swsh_milo",
+        "swsh_leon",
+        "swsh_hop",
+        "sv_katy",
+        "sv_geeta",
+        "sv_nemona",
+    } <= ids
+
+
+def test_ruby_sapphire_gym_badge_requires_full_caught_team(tmp_path: Path) -> None:
+    badge_service, progress, _ = _wire(tmp_path)
+    progress.patch_status(ProgressStatusPatch(slug="0074-geodude", state="caught"))
+
+    by_id = {badge.id: badge for badge in badge_service.state().catalog}
+
+    assert by_id["rs_roxanne"].unlocked is False
+    assert by_id["rs_roxanne"].current == 1
+    assert by_id["rs_roxanne"].target == 2
+
+    progress.patch_status(ProgressStatusPatch(slug="0299-nosepass", state="caught"))
+
+    assert "rs_roxanne" in badge_service.sync_unlocked()
+
+
+def test_ruby_sapphire_badges_count_duplicate_species_once(tmp_path: Path) -> None:
+    badge_service, progress, _ = _wire(tmp_path)
+    progress.patch_status(ProgressStatusPatch(slug="0218-slugma", state="caught"))
+
+    by_id = {badge.id: badge for badge in badge_service.state().catalog}
+
+    assert by_id["rs_flannery"].unlocked is False
+    assert by_id["rs_flannery"].current == 1
+    assert by_id["rs_flannery"].target == 2
+
+    progress.patch_status(ProgressStatusPatch(slug="0324-torkoal", state="caught"))
+
+    assert "rs_flannery" in badge_service.sync_unlocked()
+
+
+def test_black_white_trio_badge_unlocks_with_any_starter_variant(
+    tmp_path: Path,
+) -> None:
+    badge_service, progress, _ = _wire(tmp_path)
+    _catch_all(progress, ["0506-lillipup", "0513-pansear"])
+
+    newly = set(badge_service.sync_unlocked())
+
+    assert "bw_trio_badge" in newly
+
+
+def test_black_white_n_badge_unlocks_with_either_legendary_variant(
+    tmp_path: Path,
+) -> None:
+    badge_service, progress, _ = _wire(tmp_path)
+    _catch_all(
+        progress,
+        [
+            "0644-zekrom",
+            "0565-carracosta",
+            "0584-vanilluxe",
+            "0567-archeops",
+            "0571-zoroark",
+            "0601-klinklang",
+        ],
+    )
+
+    assert "bw_n" in set(badge_service.sync_unlocked())
+
+    badge_service, progress, _ = _wire(tmp_path / "white")
+    _catch_all(
+        progress,
+        [
+            "0643-reshiram",
+            "0565-carracosta",
+            "0584-vanilluxe",
+            "0567-archeops",
+            "0571-zoroark",
+            "0601-klinklang",
+        ],
+    )
+
+    assert "bw_n" in set(badge_service.sync_unlocked())
+
+
+def test_black_white_2_hugh_badge_uses_closest_starter_variant(
+    tmp_path: Path,
+) -> None:
+    badge_service, progress, _ = _wire(tmp_path)
+    _catch_all(
+        progress,
+        [
+            "0521-unfezant",
+            "0626-bouffalant",
+            "0604-eelektross",
+            "0330-flygon",
+            "0503-samurott",
+        ],
+    )
+
+    by_id = {badge.id: badge for badge in badge_service.state().catalog}
+
+    assert by_id["b2w2_hugh"].current == 5
+    assert by_id["b2w2_hugh"].target == 6
+
+    progress.patch_status(ProgressStatusPatch(slug="0512-simisage", state="caught"))
+
+    assert "b2w2_hugh" in badge_service.sync_unlocked()

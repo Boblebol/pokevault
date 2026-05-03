@@ -247,6 +247,15 @@ def test_kanto_nostalgia_badges_are_documented() -> None:
         assert "Johto" in text
         assert "Kanto" in text
         assert "Silver" in text
+        assert "Rubis/Saphir" in text
+        assert "Diamant/Perle" in text
+        assert "Noir/Blanc" in text
+        assert "Noir 2/Blanc 2" in text
+        assert "X/Y" in text
+        assert "Soleil/Lune" in text
+        assert "Epee/Bouclier" in text
+        assert "Ecarlate/Violet" in text
+        assert "sans remakes" in text
 
 
 def test_public_story_centers_exploration_trainers_and_pokedex_completion() -> None:
