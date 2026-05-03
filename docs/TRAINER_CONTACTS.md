@@ -31,6 +31,9 @@ Open the `Dresseurs` tab and fill only the public fields you want to share:
 - Pokemon you are looking for;
 - Pokemon you marked as `Double` and can trade.
 
+Unlocked badges are added automatically when you export the card. Locked badge
+progress is not included.
+
 You do not need to describe the full collection. If you only want to say "I can
 trade Leviator", mark that Pokemon as `Double` and leave the rest simple.
 
@@ -38,7 +41,8 @@ trade Leviator", mark that Pokemon as `Double` and leave the rest simple.
 
 Exporting a Trainer Card does not export the full collection. It only includes
 the fields placed on the card: display name, favorite region, favorite Pokemon,
-public note, optional contact links, wishlist, and trade list.
+public note, optional contact links, wishlist, trade list, and unlocked badge
+titles.
 
 The exported file is meant to be sent manually by any channel you already use.
 Pokevault does not upload it and does not create a public profile.
@@ -48,7 +52,8 @@ Pokevault does not upload it and does not create a public profile.
 When someone sends you a Trainer Card file, import it from the `Dresseurs` tab.
 Pokevault stores the received card in the current local profile and makes it
 searchable by trainer name, region, favorite Pokemon, contact lines such as
-Instagram, Facebook or Téléphone, wishlist, trade list, and private notes.
+Instagram, Facebook or Téléphone, wishlist, trade list, shared badges, and
+private notes.
 
 Private notes are attached to your local contact copy. They are never included
 when you export your own Trainer Card.

@@ -193,12 +193,15 @@ def test_trainer_contacts_are_documented_publicly() -> None:
     assert "Instagram" in guide_text
     assert "Facebook" in guide_text
     assert "Téléphone" in guide_text
+    assert "Unlocked badges are added automatically" in guide_text
     assert "Trainer Cards" in readme
     assert "data/trainer-contacts.json" in readme
     assert "/api/trainers" in readme
     assert "searchable local contact book" in readme
+    assert "automatically shared unlocked badges" in readme
     assert "Trainer Cards" in features
     assert "searchable local contact book" in features
+    assert "automatically shared unlocked badges" in features
     assert "Dresseurs" in roadmap
     assert "trainer-contacts.json" in architecture
 

@@ -7,7 +7,12 @@ from pathlib import Path
 import pytest
 from fastapi import HTTPException
 
-from tracker.models import TrainerCard, TrainerContactLink, TrainerContactNotePatch
+from tracker.models import (
+    TrainerCard,
+    TrainerCardBadge,
+    TrainerContactLink,
+    TrainerContactNotePatch,
+)
 from tracker.repository.json_trainer_contact_repository import JsonTrainerContactRepository
 from tracker.services.trainer_contact_service import TrainerContactService
 
@@ -56,6 +61,27 @@ def test_save_own_card_cleans_links_and_lists(tmp_path: Path) -> None:
     assert saved.contact_links[0].value == "alex@example.test"
     assert saved.wants == ["0001-bulbasaur", "0004-charmander"]
     assert saved.for_trade == ["0007-squirtle"]
+
+
+def test_save_own_card_cleans_shared_badges(tmp_path: Path) -> None:
+    service = TrainerContactService(JsonTrainerContactRepository(tmp_path / "trainers.json"))
+    card = _card().model_copy(
+        update={
+            "badges": [
+                TrainerCardBadge(id=" kanto_brock ", title=" Badge Roche "),
+                TrainerCardBadge(id="kanto_brock", title="Duplicate"),
+                TrainerCardBadge(id="kanto_misty", title=" Badge Cascade "),
+                TrainerCardBadge(id="   ", title="Blank"),
+            ],
+        },
+    )
+
+    saved = service.save_own_card(card)
+
+    assert [(badge.id, badge.title) for badge in saved.badges] == [
+        ("kanto_brock", "Badge Roche"),
+        ("kanto_misty", "Badge Cascade"),
+    ]
 
 
 def test_import_card_creates_then_updates_by_trainer_id(tmp_path: Path) -> None:

@@ -23,7 +23,7 @@
   const listeners = new Set();
   const FALLBACK_I18N = {
     "trainers.mine.title": "Ma carte dresseur",
-    "trainers.mine.help": "Choisis uniquement ce que tu veux partager.",
+    "trainers.mine.help": "Choisis tes infos publiques. Les badges obtenus sont inclus automatiquement.",
     "trainers.export": "Exporter",
     "trainers.import": "Importer",
     "trainers.id": "Identifiant stable",
@@ -45,6 +45,7 @@
     "trainers.empty": "Aucune carte reçue pour le moment.",
     "trainers.want": "Cherche",
     "trainers.trade": "Echange",
+    "trainers.badges": "Badges",
     "trainers.delete": "Supprimer",
     "trainers.local_card": "Carte dresseur locale",
     "trainers.received_update": "MAJ reçue",
@@ -77,6 +78,30 @@
     return raw.map((x) => String(x || "").trim()).filter(Boolean).slice(0, 40);
   }
 
+  function normalizeBadges(raw) {
+    if (!Array.isArray(raw)) return [];
+    const seen = new Set();
+    const out = [];
+    for (const badge of raw) {
+      const id = String(badge?.id || "").trim();
+      const title = String(badge?.title || "").trim();
+      if (!id || !title || seen.has(id)) continue;
+      seen.add(id);
+      out.push({ id, title });
+      if (out.length >= 80) break;
+    }
+    return out;
+  }
+
+  function sharedBadgesFromState(state = window.PokevaultBadges?.state) {
+    const catalog = Array.isArray(state?.catalog) ? state.catalog : [];
+    return normalizeBadges(
+      catalog
+        .filter((badge) => badge?.unlocked)
+        .map((badge) => ({ id: badge.id, title: badge.title })),
+    );
+  }
+
   function normalizeCard(raw) {
     if (!raw || typeof raw !== "object") return null;
     const trainerId = String(raw.trainer_id || "").trim();
@@ -105,6 +130,7 @@
         .slice(0, 6),
       wants: normalizeList(raw.wants),
       for_trade: normalizeList(raw.for_trade),
+      badges: normalizeBadges(raw.badges),
       updated_at: String(raw.updated_at || new Date().toISOString()),
     };
   }
@@ -151,6 +177,7 @@
       contact_links: contactLinksFromForm(values),
       wants: splitLines(values.wants),
       for_trade: splitLines(values.for_trade),
+      badges: sharedBadgesFromState(),
       updated_at: new Date().toISOString(),
     };
   }
@@ -286,6 +313,7 @@
       contact_links: [],
       wants: [],
       for_trade: [],
+      badges: [],
       updated_at: new Date().toISOString(),
     };
   }
@@ -362,6 +390,7 @@
       ...(card.contact_links || []).flatMap((link) => [link.label, link.value]),
       ...(card.wants || []),
       ...(card.for_trade || []),
+      ...(card.badges || []).flatMap((badge) => [badge.id, badge.title]),
     ].join(" ").toLowerCase();
   }
 
@@ -515,6 +544,7 @@
     article.className = "trainer-contact-card";
     const wants = renderTagGroup(tr("trainers.want"), contact.card.wants);
     const trades = renderTagGroup(tr("trainers.trade"), contact.card.for_trade);
+    const badges = renderBadgeGroup(contact.card.badges);
     const links = renderContactLinks(contact.card.contact_links);
     article.innerHTML = `
       <div class="trainer-contact-card-head">
@@ -534,6 +564,7 @@
       </dl>
       ${links}
       <div class="trainer-list-groups">
+        ${badges}
         ${wants}
         ${trades}
       </div>
@@ -560,6 +591,17 @@
       <div class="trainer-tag-group">
         <h3>${escapeText(title)}</h3>
         <ul>${clean.map((item) => `<li>${escapeText(item)}</li>`).join("")}</ul>
+      </div>
+    `;
+  }
+
+  function renderBadgeGroup(items) {
+    const badges = normalizeBadges(items);
+    if (!badges.length) return "";
+    return `
+      <div class="trainer-tag-group trainer-tag-group--badges">
+        <h3>${escapeText(tr("trainers.badges"))}</h3>
+        <ul>${badges.map((badge) => `<li>${escapeText(badge.title)}</li>`).join("")}</ul>
       </div>
     `;
   }
@@ -640,7 +682,9 @@
       const data = Object.fromEntries(new FormData(form).entries());
       void saveOwnCard(cardFromForm(data)).catch((err) => render(tr("trainers.error", { message: err.message })));
     });
-    root.querySelector("[data-trainer-export]")?.addEventListener("click", exportFile);
+    root.querySelector("[data-trainer-export]")?.addEventListener("click", () => {
+      void exportFile().catch((err) => render(tr("trainers.error", { message: err.message })));
+    });
     root.querySelector("[data-trainer-import]")?.addEventListener("click", () => {
       document.getElementById("trainerImportFileInput")?.click();
     });
@@ -671,18 +715,26 @@
     }
   }
 
-  function exportFile() {
+  async function exportFile() {
     if (!cachedBook.own_card) {
       render(tr("trainers.create_before_export"));
       return;
     }
-    const blob = new Blob([JSON.stringify(cachedBook.own_card, null, 2)], {
+    if (!window.PokevaultBadges?.state && typeof window.PokevaultBadges?.poll === "function") {
+      await window.PokevaultBadges.poll({ silent: true });
+    }
+    const card = {
+      ...cachedBook.own_card,
+      badges: sharedBadgesFromState(),
+      updated_at: new Date().toISOString(),
+    };
+    const blob = new Blob([JSON.stringify(card, null, 2)], {
       type: "application/json",
     });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `${safeFilePart(cachedBook.own_card.display_name)}-pokevault-trainer.json`;
+    a.download = `${safeFilePart(card.display_name)}-pokevault-trainer.json`;
     document.body.append(a);
     a.click();
     a.remove();
@@ -770,6 +822,8 @@
   if (window.__POKEVAULT_TRAINERS_TESTS__) {
     api._test = {
       normalizeCard,
+      normalizeBadges,
+      sharedBadgesFromState,
       normalizeBook,
       cardFromForm,
       validateTrainerCard,

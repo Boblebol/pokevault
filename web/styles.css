@@ -6867,6 +6867,15 @@ html[data-theme="paldea"] {
   gap: 0.75rem;
 }
 
+.trainer-tag-group--badges {
+  grid-column: 1 / -1;
+}
+
+.trainer-tag-group--badges li {
+  border-color: rgba(255, 203, 5, 0.42);
+  background: rgba(255, 203, 5, 0.08);
+}
+
 .trainer-tag-group h3 {
   margin: 0 0 0.4rem;
   font-size: 0.78rem;
