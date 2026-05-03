@@ -21,6 +21,7 @@
           <a href="#/dresseurs" class="app-switch-link" data-view="dresseurs" data-i18n="app.nav.trainers">Dresseurs</a>
           <a href="#/print" class="app-switch-link" data-view="print" data-i18n="app.nav.print">Impression</a>
           <a href="#/stats" class="app-switch-link" data-view="stats" data-i18n="app.nav.stats">Statistiques</a>
+          <a href="#/docs" class="app-switch-link" data-view="docs" data-i18n="app.nav.docs">Docs</a>
           <a href="#/settings" class="app-switch-link" data-view="settings" data-i18n="app.nav.settings">Réglages</a>
         </nav>
         <div class="app-language-switch" role="group" aria-label="Langue" data-i18n-aria-label="app.language">
@@ -395,6 +396,161 @@
               </section>
             </div>
           </div>
+        </section>
+      </div>
+
+      <div id="viewDocs" class="app-view" hidden>
+        <header class="header app-collection-header binder-header docs-header">
+          <h1 class="title" data-i18n="app.docs.title">Docs</h1>
+          <p class="collection-subtitle" data-i18n="app.docs.subtitle">
+            Guide embarqué pour utiliser Pokevault sans quitter l'app locale.
+          </p>
+        </header>
+        <section class="docs-shell" aria-label="Documentation Pokevault" data-i18n-aria-label="app.docs.shell">
+          <section class="docs-hero">
+            <p class="docs-kicker" data-i18n="app.docs.kicker">Documentation intégrée</p>
+            <h2 data-i18n="app.docs.hero.title">Tout garder en local, tout comprendre vite.</h2>
+            <p data-i18n="app.docs.hero.text">
+              Pokevault suit ton Pokédex, tes cartes physiques, tes classeurs et
+              tes échanges Dresseur avec des fichiers JSON lisibles sur ta
+              machine. Cette page résume les workflows actifs de la version 1.3.0.
+            </p>
+          </section>
+
+          <div class="docs-grid">
+            <article class="docs-card">
+              <h2 data-i18n="app.docs.installation.title">Installation et lancement</h2>
+              <ul class="docs-list">
+                <li data-i18n="app.docs.installation.install">Installe les dépendances avec `make install`.</li>
+                <li data-i18n="app.docs.installation.run">Lance l'app locale avec `make dev`, puis ouvre `http://127.0.0.1:8765/`.</li>
+                <li data-i18n="app.docs.installation.reference">Le Pokédex de référence est livré dans `data/pokedex.json`; aucun scrape n'est requis pour démarrer.</li>
+                <li data-i18n="app.docs.installation.language">Le français est la langue par défaut; le bouton FR/EN change l'app sans compte ni service externe.</li>
+              </ul>
+            </article>
+
+            <article class="docs-card">
+              <h2 data-i18n="app.docs.concepts.title">Concepts principaux</h2>
+              <ul class="docs-list">
+                <li data-i18n="app.docs.concepts.pokedex">Pokédex-first: les cartes physiques enrichissent chaque Pokémon, elles ne remplacent pas la progression Pokédex.</li>
+                <li data-i18n="app.docs.concepts.local">Local-first: progression, cartes, profils, contacts et classeurs restent dans des fichiers JSON lisibles.</li>
+                <li data-i18n="app.docs.concepts.trade">Échanges manuels: les Cartes Dresseur sont exportées et importées par fichier, sans synchronisation serveur.</li>
+              </ul>
+            </article>
+
+            <article class="docs-card">
+              <h2 data-i18n="app.docs.collection.title">Collection</h2>
+              <ul class="docs-list">
+                <li data-i18n="app.docs.collection.wanted">`Cherche` marque les priorités personnelles et les échanges souhaités.</li>
+                <li data-i18n="app.docs.collection.caught">`Capturé` confirme la progression Pokédex et alimente les stats, badges et classeurs.</li>
+                <li data-i18n="app.docs.collection.double">`Double` indique ce que tu peux proposer à un autre Dresseur.</li>
+                <li data-i18n="app.docs.collection.filters">Régions, formes, types, tags narratifs, recherche floue et recommandations partagent le même état filtré.</li>
+                <li data-i18n="app.docs.collection.context">`Vu chez` et `Match` viennent des cartes reçues; ils n'écrasent jamais ta progression locale.</li>
+              </ul>
+            </article>
+
+            <article class="docs-card">
+              <h2 data-i18n="app.docs.fiches_cards.title">Fiches Pokémon et cartes</h2>
+              <ul class="docs-list">
+                <li data-i18n="app.docs.fiches_cards.drawer">Le bouton `Fiche & cartes` ouvre le drawer avec statut, formes liées, notes, recherches et cartes.</li>
+                <li data-i18n="app.docs.fiches_cards.full">La fiche complète ajoute l'artwork, les types, les faiblesses/résistances et les cartes repliées.</li>
+                <li data-i18n="app.docs.fiches_cards.card_fields">Chaque carte peut stocker set, numéro, variante, langue, état, quantité, image et note.</li>
+                <li data-i18n="app.docs.fiches_cards.tcg">La recherche TCG préremplit les métadonnées depuis l'API publique Pokémon TCG.</li>
+              </ul>
+            </article>
+
+            <article class="docs-card">
+              <h2 data-i18n="app.docs.binders.title">Classeurs physiques</h2>
+              <ul class="docs-list">
+                <li data-i18n="app.docs.binders.default">Le format par défaut est 3×3 · 10 feuillets recto-verso, soit 180 emplacements.</li>
+                <li data-i18n="app.docs.binders.custom">Les réglages permettent grilles custom, périmètre de formes et organisation nationale, régionale ou par familles.</li>
+                <li data-i18n="app.docs.binders.split">Si une région dépasse la capacité, Pokevault crée des sections comme Kanto 1 / Kanto 2.</li>
+                <li data-i18n="app.docs.binders.family">Le mode Familles garde les évolutions alignées avec des cases vides volontaires.</li>
+              </ul>
+            </article>
+
+            <article class="docs-card">
+              <h2 data-i18n="app.docs.trainers.title">Cartes Dresseur</h2>
+              <ul class="docs-list">
+                <li data-i18n="app.docs.trainers.create">Crée ta carte avec pseudo, région favorite, note publique et jusqu'à trois contacts partageables.</li>
+                <li data-i18n="app.docs.trainers.export">Export/import se fait par fichier; aucun compte, aucun profil public et aucune sync automatique.</li>
+                <li data-i18n="app.docs.trainers.compare">Les listes `Cherche` et `Double` des contacts produisent `Vu chez` et `Match` dans ta Collection.</li>
+                <li data-i18n="app.docs.trainers.badges">Les badges débloqués sont partagés automatiquement avec `id` et `title`; les badges scellés restent privés.</li>
+              </ul>
+            </article>
+
+            <article class="docs-card">
+              <h2 data-i18n="app.docs.badges.title">Badges, missions et stats</h2>
+              <ul class="docs-list">
+                <li data-i18n="app.docs.badges.stats">Statistiques suit la complétion globale, régionale, par type et par badge.</li>
+                <li data-i18n="app.docs.badges.gallery">La galerie garde les badges verrouillés scellés jusqu'au déblocage.</li>
+                <li data-i18n="app.docs.badges.mission">Un badge d'équipe peut devenir une mission active et remonter les cibles manquantes dans Collection.</li>
+                <li data-i18n="app.docs.badges.catalog">Le catalogue couvre Kanto, Johto et les équipes de base Rubis/Saphir à Écarlate/Violet, sans remakes.</li>
+              </ul>
+            </article>
+
+            <article class="docs-card">
+              <h2 data-i18n="app.docs.data_files.title">Fichiers de données</h2>
+              <ul class="docs-list">
+                <li data-i18n="app.docs.data_files.reference">Référence versionnée: `data/pokedex.json`, `data/narrative-tags.json`, `data/evolution-families.json`.</li>
+                <li data-i18n="app.docs.data_files.progress">Progression: `data/collection-progress.json`.</li>
+                <li data-i18n="app.docs.data_files.cards">Cartes et recherches: `data/collection-cards.json`, `data/hunts.json`.</li>
+                <li data-i18n="app.docs.data_files.binders">Classeurs: `data/binder-config.json`, `data/binder-placements.json`.</li>
+                <li data-i18n="app.docs.data_files.trainers">Dresseurs: `data/trainer-contacts.json`.</li>
+              </ul>
+            </article>
+
+            <article class="docs-card">
+              <h2 data-i18n="app.docs.profiles_backup.title">Profils et sauvegardes</h2>
+              <ul class="docs-list">
+                <li data-i18n="app.docs.profiles_backup.default">Le profil `default` utilise les fichiers historiques sous `data/`.</li>
+                <li data-i18n="app.docs.profiles_backup.extra">Les autres profils vivent sous `data/profiles/<id>/...` avec leur propre progression, cartes et classeurs.</li>
+                <li data-i18n="app.docs.profiles_backup.export">`Réglages` exporte une sauvegarde complète versionnée.</li>
+                <li data-i18n="app.docs.profiles_backup.import">L'import remplace l'état local après confirmation; les Cartes Dresseur restent un échange séparé.</li>
+              </ul>
+            </article>
+
+            <article class="docs-card docs-card--wide">
+              <h2 data-i18n="app.docs.api.title">API locale</h2>
+              <ul class="docs-list docs-list--columns">
+                <li data-i18n="app.docs.api.health">`/api/health`: version et état de l'API.</li>
+                <li data-i18n="app.docs.api.progress">`/api/progress`: progression, statuts, notes.</li>
+                <li data-i18n="app.docs.api.cards">`/api/cards`: cartes physiques par Pokémon.</li>
+                <li data-i18n="app.docs.api.hunts">`/api/hunts`: recherches actives.</li>
+                <li data-i18n="app.docs.api.badges">`/api/badges`: catalogue et badges débloqués.</li>
+                <li data-i18n="app.docs.api.profiles">`/api/profiles`: profils locaux.</li>
+                <li data-i18n="app.docs.api.trainers">`/api/trainers`: Cartes Dresseur et contacts reçus.</li>
+                <li data-i18n="app.docs.api.binder">`/api/binder/*`: configuration et placements classeur.</li>
+                <li data-i18n="app.docs.api.backup">`/api/export` et `/api/import`: sauvegarde complète.</li>
+              </ul>
+            </article>
+
+            <article class="docs-card">
+              <h2 data-i18n="app.docs.shortcuts.title">Raccourcis</h2>
+              <ul class="docs-list">
+                <li data-i18n="app.docs.shortcuts.search">`/` focus recherche, `Esc` efface ou quitte.</li>
+                <li data-i18n="app.docs.shortcuts.nav">`j` / `k` déplacent la sélection.</li>
+                <li data-i18n="app.docs.shortcuts.status">`c` marque Capturé, `Shift+C` marque Double.</li>
+                <li data-i18n="app.docs.shortcuts.open">`i` ouvre la fiche; `?` affiche l'aide clavier.</li>
+              </ul>
+            </article>
+
+            <article class="docs-card">
+              <h2 data-i18n="app.docs.limits.title">Limites et sécurité</h2>
+              <ul class="docs-list">
+                <li data-i18n="app.docs.limits.no_cloud">Pas de cloud, pas de compte, pas de synchronisation automatique.</li>
+                <li data-i18n="app.docs.limits.manual">Les fichiers reçus doivent venir de personnes de confiance; l'import reste manuel.</li>
+                <li data-i18n="app.docs.limits.unofficial">Projet fan non affilié à Nintendo, The Pokémon Company, Game Freak, Creatures, Poképédia ou la marque Pokémon.</li>
+                <li data-i18n="app.docs.limits.languages">FR: documentation produit complète. EN: complete product documentation.</li>
+              </ul>
+            </article>
+          </div>
+
+          <nav class="docs-links" aria-label="Liens de documentation" data-i18n-aria-label="app.docs.links">
+            <a href="https://github.com/Boblebol/pokevault/blob/main/README.md" target="_blank" rel="noopener noreferrer" data-i18n="app.docs.link.readme">README complet</a>
+            <a href="https://boblebol.github.io/pokevault/features.html" target="_blank" rel="noopener noreferrer" data-i18n="app.docs.link.features">Features publiques</a>
+            <a href="https://github.com/Boblebol/pokevault/blob/main/docs/TRAINER_CONTACTS.md" target="_blank" rel="noopener noreferrer" data-i18n="app.docs.link.trainers">Guide Cartes Dresseur</a>
+            <a href="https://github.com/Boblebol/pokevault/blob/main/CHANGELOG.md" target="_blank" rel="noopener noreferrer" data-i18n="app.docs.link.changelog">Changelog</a>
+          </nav>
         </section>
       </div>
 

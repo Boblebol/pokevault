@@ -66,6 +66,7 @@ const APP_FALLBACK_I18N = {
   "app.card.seen_badge": "Vu chez {count}",
   "app.card.details": "Fiche & cartes",
   "app.card.open": "Ouvrir la fiche de {name}",
+  "app.nav.docs": "Docs",
   "app.title.settings": "pokevault — Réglages",
 };
 
@@ -1755,6 +1756,7 @@ window.PokedexCollection.poolForCollectionScope = poolForCollectionScope;
 window.PokedexCollection.computeCardStats = computeCardStats;
 if (window.__POKEVAULT_APP_TESTS__) {
   window.PokedexCollection._test = {
+    currentViewFromHash,
     isSupportedBackupSchemaVersion,
     shouldDimCardForHighlight,
   };
@@ -2044,6 +2046,7 @@ function currentViewFromHash() {
   if (raw === "dresseurs") return "dresseurs";
   if (raw === "settings") return "settings";
   if (raw === "print") return "print";
+  if (raw === "docs") return "docs";
   if (raw.startsWith("pokemon/")) return "pokemon";
   if (raw === "liste" || raw === "") return "liste";
   return "liste";
@@ -2078,6 +2081,7 @@ function applyAppRoute() {
   const elStats = document.getElementById("viewStats");
   const elSettings = document.getElementById("viewSettings");
   const elPrint = document.getElementById("viewPrint");
+  const elDocs = document.getElementById("viewDocs");
   const elPokemon = document.getElementById("viewPokemon");
   if (elListe) elListe.hidden = view !== "liste";
   if (elClasseur) elClasseur.hidden = view !== "classeur";
@@ -2085,6 +2089,7 @@ function applyAppRoute() {
   if (elStats) elStats.hidden = view !== "stats";
   if (elSettings) elSettings.hidden = view !== "settings";
   if (elPrint) elPrint.hidden = view !== "print";
+  if (elDocs) elDocs.hidden = view !== "docs";
   if (elPokemon) elPokemon.hidden = view !== "pokemon";
   updateAppSwitchNav(view);
   const titles = {
@@ -2092,6 +2097,7 @@ function applyAppRoute() {
     stats: `pokevault — ${t("app.nav.stats")}`,
     settings: `pokevault — ${t("app.nav.settings")}`,
     print: `pokevault — ${t("app.nav.print")}`,
+    docs: `pokevault — ${t("app.nav.docs")}`,
     classeur: `pokevault — ${t("app.nav.binders")}`,
     dresseurs: `pokevault — ${t("app.nav.trainers")}`,
     pokemon: `pokevault — ${t("app.drawer.kicker")}`,

@@ -138,12 +138,26 @@ def test_web_app_supports_fr_en_switch_on_main_surfaces() -> None:
         "app.binders.title",
         "app.trainers.title",
         "app.print.title",
+        "app.docs.title",
         "app.settings.title",
         "app.onboarding.title",
         "app.shortcuts.title",
         "app.drawer.kicker",
     ]:
         assert f'data-i18n="{key}"' in index
+        assert key in i18n
+    assert 'href="#/docs"' in index
+    assert 'id="viewDocs"' in index
+    assert '"app.nav.docs"' in i18n
+    for key in [
+        "app.docs.quick_start.title",
+        "app.docs.workflow.title",
+        "app.docs.trainers.title",
+        "app.docs.binders.title",
+        "app.docs.badges.title",
+        "app.docs.data.title",
+        "app.docs.api.title",
+    ]:
         assert key in i18n
 
 
@@ -217,6 +231,89 @@ def test_trade_state_model_is_documented_publicly() -> None:
         assert "Double" in text
     assert "Vu chez" in guide_text
     assert "Match" in guide_text
+
+
+def test_in_app_documentation_is_documented_publicly() -> None:
+    readme = (ROOT / "README.md").read_text(encoding="utf-8")
+    features = (DOCS / "features.html").read_text(encoding="utf-8")
+
+    for text in [readme, features]:
+        assert "#/docs" in text
+        assert "App documentation" in text
+        assert "local-first data" in text
+        assert "Badge missions" in text
+        assert "Trainer Cards" in text
+        assert "physical binder" in text.lower()
+
+
+def test_in_app_docs_cover_complete_product_workflows_in_both_languages() -> None:
+    index = (WEB / "index.html").read_text(encoding="utf-8")
+    i18n = (WEB / "i18n.js").read_text(encoding="utf-8")
+
+    required_keys = [
+        "app.docs.installation.title",
+        "app.docs.concepts.title",
+        "app.docs.collection.title",
+        "app.docs.fiches_cards.title",
+        "app.docs.binders.title",
+        "app.docs.trainers.title",
+        "app.docs.badges.title",
+        "app.docs.data_files.title",
+        "app.docs.profiles_backup.title",
+        "app.docs.api.title",
+        "app.docs.shortcuts.title",
+        "app.docs.limits.title",
+    ]
+    for key in required_keys:
+        assert f'data-i18n="{key}"' in index
+        assert key in i18n
+
+    for text in [
+        "data/collection-progress.json",
+        "data/collection-cards.json",
+        "data/hunts.json",
+        "data/binder-config.json",
+        "data/trainer-contacts.json",
+        "/api/progress",
+        "/api/cards",
+        "/api/trainers",
+        "/api/export",
+        "/api/import",
+        "FR:",
+        "EN:",
+    ]:
+        assert text in i18n
+
+
+def test_public_features_page_has_bilingual_product_copy() -> None:
+    features = (DOCS / "features.html").read_text(encoding="utf-8")
+    i18n = (DOCS / "assets" / "i18n.js").read_text(encoding="utf-8")
+
+    required_keys = [
+        "features.hero.title",
+        "features.collection.title",
+        "features.binders.title",
+        "features.trainers.title",
+        "features.badges.title",
+        "features.data.title",
+        "features.docs.title",
+        "features.api.title",
+    ]
+    for key in required_keys:
+        assert f'data-i18n="{key}"' in features
+        assert key in i18n
+
+    assert "FR:" in i18n
+    assert "EN:" in i18n
+
+
+def test_readme_is_developer_oriented_and_delegates_product_docs() -> None:
+    readme = (ROOT / "README.md").read_text(encoding="utf-8")
+
+    assert "## Developer Quick Start" in readme
+    assert "## Product Documentation" in readme
+    assert "Detailed product documentation lives in the app" in readme
+    assert "## Feature Documentation" not in readme
 
 
 def test_trainer_contacts_document_local_trade_workflow() -> None:

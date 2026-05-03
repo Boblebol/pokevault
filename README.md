@@ -33,6 +33,7 @@ without giving the journey to a hosted tracker.
 ## Links
 
 - [Project site](https://boblebol.github.io/pokevault/)
+- App documentation: run `make dev`, then open `#/docs` in the local app
 - [Release notes](CHANGELOG.md)
 - [Roadmap](docs/ROADMAP.md)
 - [V1.1 Pokédex-first tickets](docs/V1_1_POKEDEX_FIRST.md)
@@ -42,7 +43,7 @@ without giving the journey to a hosted tracker.
 - [Release process](RELEASING.md)
 - [Security policy](SECURITY.md)
 
-## Quick Start
+## Developer Quick Start
 
 Requirements:
 
@@ -61,37 +62,23 @@ Open the local app at [http://127.0.0.1:8765](http://127.0.0.1:8765/).
 The reference `data/pokedex.json` is shipped with the repository, so the UI
 works immediately after install. Optional artwork caches are generated locally.
 
-## What It Does
+## Product Documentation
 
-- Scrapes and exports a National Pokédex reference from Pokepedia.
-- Tracks Pokemon with simple `Cherche`, `Capturé` and `Double` actions, backed by
-  backward-compatible progress JSON.
-- Lets the app and public landing switch between French and English while
-  keeping French as the default product language.
-- Opens Pokédex-first Pokémon fiches with trade-oriented status controls, linked forms,
-  personal notes and collapsible card details.
-- Attaches owned physical cards to Pokemon entries.
-- Searches the public Pokemon TCG API to prefill card metadata.
-- Models binder pages, grids and card placements, with an optional 3×3 ·
-  10 feuillets default, regional splits such as Kanto 1 / Kanto 2 and
-  evolution-family layouts with intentional empty slots.
-- Maintains multiple local collection profiles.
-- Creates and imports optional Trainer Cards with shareable contact links,
-  a searchable local contact book, local `Vu chez` context and `Match` hints
-  from exchanged `Double` lists, plus automatically shared unlocked badges.
-- Shows collection stats, badge progress and active badge missions, including
-  "Souvenirs de Kanto" badges for Rouge/Bleu champions d'arene, Conseil 4,
-  Maitre de la Ligue and rival teams, plus Or/Argent badges for Johto, Kanto
-  post-game, the Conseil 4, Peter and Silver. The same nostalgia catalog now
-  covers base-version teams sans remakes: Rubis/Saphir, Diamant/Perle,
-  Noir/Blanc, Noir 2/Blanc 2, X/Y, Soleil/Lune, Epee/Bouclier and
-  Ecarlate/Violet.
-- Presents Badge Side Quest V1 as a badge gallery with sealed badges kept
-  hidden until unlocked, Pokemon requirement previews and an active mission
-  panel that can guide the next collection targets from a chosen badge.
-- Exports/imports full local backups.
-- Prints binder or regional checklists.
-- Exposes a local FastAPI REST API for integrations.
+App documentation: Detailed product documentation lives in the app. Run `make dev`, open
+[http://127.0.0.1:8765](http://127.0.0.1:8765/) and go to `#/docs`.
+
+That in-app guide is bilingual FR/EN and covers Collection, physical binder
+planning, Trainer Cards, Badge missions, local-first data files, profiles,
+backups, shortcuts and the local REST API. The public feature overview is
+available at [docs/features.html](docs/features.html).
+
+Product coverage includes automatically shared unlocked badges on each Trainer
+Card, Badge Side Quest V1 as a badge gallery with sealed badges, and the
+nostalgia catalog: Souvenirs de Kanto for Rouge/Bleu champions d'arene,
+Conseil 4, Maitre de la Ligue and rival teams; Or/Argent for Johto, Kanto,
+Peter and Silver; then base teams sans remakes from Rubis/Saphir,
+Diamant/Perle, Noir/Blanc, Noir 2/Blanc 2, X/Y, Soleil/Lune, Epee/Bouclier and
+Ecarlate/Violet.
 
 Pokevault is an unofficial fan project. It is not affiliated with Nintendo,
 The Pokémon Company, Game Freak, Creatures, Poképédia or the Pokémon brand.
