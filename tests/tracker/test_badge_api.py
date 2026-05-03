@@ -122,3 +122,28 @@ def test_badges_endpoint_exposes_kanto_trainer_badges(tmp_path: Path) -> None:
         "hint": "Badge obtenu.",
     }
     assert "kanto_brock" in body["unlocked"]
+
+
+def test_badges_endpoint_exposes_gold_silver_trainer_badges(tmp_path: Path) -> None:
+    client = _build_app(tmp_path)
+    for slug in ["0016-pidgey", "0017-pidgeotto"]:
+        pr = client.patch(
+            "/api/progress/status",
+            json={"slug": slug, "state": "caught"},
+        )
+        assert pr.status_code == 200
+
+    body = client.get("/api/badges").json()
+    by_id = {b["id"]: b for b in body["catalog"]}
+
+    assert by_id["gs_falkner"] == {
+        "id": "gs_falkner",
+        "title": "Albert - Zephyr",
+        "description": "Capturer l'equipe d'Albert dans Pokemon Or/Argent.",
+        "unlocked": True,
+        "current": 2,
+        "target": 2,
+        "percent": 100,
+        "hint": "Badge obtenu.",
+    }
+    assert "gs_falkner" in body["unlocked"]

@@ -243,6 +243,10 @@ def test_kanto_nostalgia_badges_are_documented() -> None:
         assert "champions d'arene" in text
         assert "Conseil 4" in text
         assert "rival" in text
+        assert "Or/Argent" in text
+        assert "Johto" in text
+        assert "Kanto" in text
+        assert "Silver" in text
 
 
 def test_public_story_centers_exploration_trainers_and_pokedex_completion() -> None:
