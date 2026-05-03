@@ -68,7 +68,7 @@
     body.append(el("strong", "pokedex-next-action__name", action.name || action.slug));
     body.append(el("span", "pokedex-next-action__reason", action.reason || t("next_actions.default_reason")));
     row.append(body);
-    row.append(el("span", "material-symbols-outlined pokedex-next-action__icon", "chevron_right"));
+    row.append(el("span", "app-icon pokedex-next-action__icon", "›"));
     return row;
   }
 

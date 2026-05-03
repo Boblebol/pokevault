@@ -3,7 +3,7 @@
 [![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![Tests](https://img.shields.io/badge/tracker_coverage-100%25-brightgreen.svg)](#quality)
-[![Version: 1.1.0](https://img.shields.io/badge/version-1.1.0-00daf3.svg)](CHANGELOG.md)
+[![Version: 1.2.0](https://img.shields.io/badge/version-1.2.0-00daf3.svg)](CHANGELOG.md)
 
 <p align="center">
   <img src="docs/assets/logo.svg" alt="pokevault logo" width="140">
@@ -159,7 +159,7 @@ make fetch        # Full Pokepedia scrape
 make fetch-test   # Small scrape for development
 make fetch-shiny  # Download shiny artworks locally
 make fetch-evolutions # Generate evolution-family binder layout data
-make check        # Lint + tests + tracker coverage
+make check        # Lint + tests + tracker coverage + web tests
 make docker-up    # Pull and start the published Docker image
 make docker-up-local # Build this checkout and start it
 make docker-down  # Stop docker compose
@@ -171,6 +171,8 @@ Only reference data is versioned:
 
 - `data/pokedex.json`
 - `data/narrative-tags.json`
+- `data/evolution-families.json`
+- `data/evolution-family-overrides.json`
 
 User state is local and ignored by Git:
 
@@ -238,7 +240,7 @@ The `tracker/` package is kept at 100% line coverage.
 make check
 ```
 
-CI runs lint, coverage and Docker build checks on pull requests.
+CI runs lint, coverage, web tests and Docker build checks on pull requests.
 
 ## Release Notes
 

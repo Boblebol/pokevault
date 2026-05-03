@@ -7,7 +7,7 @@
  *
  * Usage
  * -----
- *     PokevaultToast.show("Badge débloqué", "Century", { icon: "military_tech" });
+ *     PokevaultToast.show("Badge débloqué", "Century", { icon: "★" });
  *     PokevaultToast.show("Simple message"); // accepts (title, description?)
  */
 (function initToast() {
@@ -47,7 +47,7 @@
 
     if (options.icon) {
       const icon = document.createElement("span");
-      icon.className = "material-symbols-outlined toast__icon";
+      icon.className = "app-icon toast__icon";
       icon.setAttribute("aria-hidden", "true");
       icon.textContent = String(options.icon);
       el.append(icon);

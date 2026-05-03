@@ -17,7 +17,7 @@ AWK ?= awk
 
 .DEFAULT_GOAL := help
 
-.PHONY: help vars install dev open fetch fetch-test fetch-shiny fetch-evolutions test test-cov lint fmt check clean \
+.PHONY: help vars install dev open fetch fetch-test fetch-shiny fetch-evolutions test test-cov web-test lint fmt check clean \
 	build docker-build docker-up docker-up-local docker-down docker-logs
 
 ##@ General
@@ -86,13 +86,16 @@ test: ## Lancer tous les tests
 test-cov: ## Lancer les tests avec couverture (100% tracker)
 	$(UV) run pytest tests/ --cov=tracker --cov-report=term-missing --cov-fail-under=100
 
+web-test: ## Lancer les tests web vanilla Node
+	node --test tests/web/*.test.mjs
+
 lint: ## Verifier le style (ruff check)
 	$(UV) run ruff check pokedex/ tracker/ main.py tests/
 
 fmt: ## Formater le code (ruff format)
 	$(UV) run ruff format pokedex/ tracker/ main.py tests/
 
-check: lint test-cov ## Executer lint + tests couverture
+check: lint test-cov web-test ## Executer lint + tests couverture + tests web
 
 ##@ Docker
 

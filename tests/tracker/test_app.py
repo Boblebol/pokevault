@@ -90,9 +90,40 @@ def test_create_app_serves_static_and_api(tmp_path: Path) -> None:
     r_dex = client.get("/data/pokedex.json")
     assert r_dex.status_code == 200
     assert "max-age=86400" in r_dex.headers.get("cache-control", "").lower()
-    assert client.get("/data/hello.txt").status_code == 200
-    assert client.get("/data/hello.txt").text == "hi"
     assert client.get("/").status_code == 200
+
+
+def test_data_static_mount_does_not_expose_user_state(tmp_path: Path) -> None:
+    _minimal_layout(tmp_path)
+    data = tmp_path / "data"
+    (data / "pokedex.json").write_text('{"pokemon":[]}', encoding="utf-8")
+    (data / "narrative-tags.json").write_text('{"tags":[]}', encoding="utf-8")
+    (data / "evolution-families.json").write_text('{"families":[]}', encoding="utf-8")
+    (data / "evolution-family-overrides.json").write_text("{}", encoding="utf-8")
+    (data / "collection-progress.json").write_text(
+        '{"caught":{"secret":true}}', encoding="utf-8"
+    )
+    (data / "trainer-contacts.json").write_text(
+        '{"contacts":{"secret":{}}}', encoding="utf-8"
+    )
+    images = data / "images"
+    images.mkdir()
+    (images / "bulbasaur.png").write_bytes(b"image")
+    shiny_images = data / "images_shiny"
+    shiny_images.mkdir()
+    (shiny_images / "bulbasaur.png").write_bytes(b"shiny")
+
+    app = create_app(TrackerSettings(repo_root=tmp_path))
+    client = TestClient(app)
+
+    assert client.get("/data/pokedex.json").status_code == 200
+    assert client.get("/data/narrative-tags.json").status_code == 200
+    assert client.get("/data/evolution-families.json").status_code == 200
+    assert client.get("/data/evolution-family-overrides.json").status_code == 200
+    assert client.get("/data/images/bulbasaur.png").status_code == 200
+    assert client.get("/data/images_shiny/bulbasaur.png").status_code == 200
+    assert client.get("/data/collection-progress.json").status_code == 404
+    assert client.get("/data/trainer-contacts.json").status_code == 404
 
 
 def test_create_app_web_dir_missing(tmp_path: Path) -> None:

@@ -5,13 +5,13 @@
 
 const API_PROGRESS = "/api/progress";
 const API_HEALTH = "/api/health";
-const APP_VERSION = "1.1.0";
+const APP_VERSION = "1.2.0";
 const PROGRESS_QUEUE_KEY = "pokedex_progress_queue";
 const FORM_FILTER_STORAGE_KEY = "pokedexFormFilter";
 const TYPE_FILTER_STORAGE_KEY = "pokedexTypeFilter";
 
 const APP_FALLBACK_I18N = {
-  "app.sync.progress_unavailable": "Progression fichier indisponible — lance « make web » depuis la racine du projet.",
+  "app.sync.progress_unavailable": "Progression fichier indisponible — lance « make dev » depuis la racine du projet.",
   "app.sync.pending": "{count} modification(s) en attente de synchro…",
   "app.sync.offline": "Hors ligne ou serveur indisponible — synchro différée.",
   "app.sync.exchange_failed": "Action d'échange non synchronisée : {message}.",
@@ -1398,6 +1398,10 @@ function setupSettingsView() {
 
 let pendingImportPayload = null;
 
+function isSupportedBackupSchemaVersion(value) {
+  return value === 1 || value === 2 || value === 3;
+}
+
 function getCollectionScopeSlugSet() {
   const pool = window.PokedexCollection?.poolForCollectionScope
     ? window.PokedexCollection.poolForCollectionScope()
@@ -1496,7 +1500,7 @@ function setupExportImport() {
     reader.onload = () => {
       try {
         const data = JSON.parse(reader.result);
-        if (data.schema_version !== 1) throw new Error(t("app.import.unsupported"));
+        if (!isSupportedBackupSchemaVersion(data.schema_version)) throw new Error(t("app.import.unsupported"));
         if (!data.progress || !data.binder_config || !data.binder_placements) {
           throw new Error(t("app.import.required"));
         }
@@ -1629,10 +1633,10 @@ function createPokemonCard(p, opts) {
   const statusClass = caught ? "is-caught" : visualSeen ? "is-seen" : "is-missing";
   statusIcon.className = `card-status-icon ${statusClass}`;
   statusIcon.textContent = caught
-    ? (shiny ? "auto_awesome" : "check_circle")
+    ? (shiny ? "✦" : "✓")
     : visualSeen
-      ? "visibility"
-      : "radio_button_unchecked";
+      ? "◉"
+      : "○";
   statusIcon.setAttribute("aria-hidden", "true");
   top.append(numEl, statusIcon);
   card.append(top);
@@ -1751,6 +1755,7 @@ window.PokedexCollection.poolForCollectionScope = poolForCollectionScope;
 window.PokedexCollection.computeCardStats = computeCardStats;
 if (window.__POKEVAULT_APP_TESTS__) {
   window.PokedexCollection._test = {
+    isSupportedBackupSchemaVersion,
     shouldDimCardForHighlight,
   };
 }

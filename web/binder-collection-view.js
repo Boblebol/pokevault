@@ -32,7 +32,7 @@ const BINDER_SHELL_FALLBACK_I18N = {
   "binder_shell.metric.completion": "Complétion",
   "binder_shell.metric.page_spread": "Page spread",
   "binder_shell.metric.pages": "{count} pages",
-  "binder_shell.hint.empty": "{format} Charge le Pokédex (make web) pour remplir les cases.",
+  "binder_shell.hint.empty": "{format} Charge le Pokédex (make dev) pour remplir les cases.",
   "binder_shell.hint.slots": "{format} Emplacements {first}-{last} sur {slots} cases, {entries} Pokémon.",
 };
 

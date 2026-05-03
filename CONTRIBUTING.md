@@ -95,7 +95,7 @@ l'historique mais ne sont plus recommandés pour les nouvelles PR.
 - Le projet utilise [ruff](https://docs.astral.sh/ruff/) pour le linting et le formatage.
 - Configuration dans `pyproject.toml` : `line-length = 100`, cible `py311`.
 - `make fmt` formate automatiquement le code.
-- `make check` vérifie lint + couverture avant push.
+- `make check` vérifie lint + couverture + tests web avant push.
 - Le workflow complet de release est documenté dans [RELEASING.md](RELEASING.md).
 
 ### Tests
@@ -116,7 +116,7 @@ l'historique mais ne sont plus recommandés pour les nouvelles PR.
 - Un tag `vX.Y.Z` déclenche [`.github/workflows/release.yml`](.github/workflows/release.yml) :
   création automatique de la Release GitHub (notes extraites du
   CHANGELOG) + push de l'image `ghcr.io/<owner>/pokevault:<semver>`.
-- Dependabot met à jour pip / docker / github-actions une fois par mois.
+- Dependabot met à jour uv / docker / github-actions une fois par mois.
 
 ### Données Pokédex
 

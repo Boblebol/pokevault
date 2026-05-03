@@ -47,17 +47,38 @@ def create_app(settings: TrackerSettings | None = None) -> FastAPI:
         msg = f"Dossier web introuvable : {web_dir}"
         raise RuntimeError(msg)
 
-    pokedex_file = s.pokedex_path.resolve()
+    public_json_files = {
+        "pokedex.json": s.pokedex_path.resolve(),
+        "narrative-tags.json": data_dir / "narrative-tags.json",
+        "evolution-families.json": data_dir / "evolution-families.json",
+        "evolution-family-overrides.json": data_dir / "evolution-family-overrides.json",
+    }
 
-    @app.get("/data/pokedex.json")
-    def serve_pokedex_json() -> FileResponse:
-        if not pokedex_file.is_file():
-            raise HTTPException(status_code=404, detail="pokedex.json absent")
+    def serve_public_json(filename: str) -> FileResponse:
+        json_file = public_json_files[filename]
+        if not json_file.is_file():
+            raise HTTPException(status_code=404, detail=f"{filename} absent")
         return FileResponse(
-            pokedex_file,
+            json_file,
             media_type="application/json",
             headers={"Cache-Control": "max-age=86400, immutable"},
         )
+
+    @app.get("/data/pokedex.json")
+    def serve_pokedex_json() -> FileResponse:
+        return serve_public_json("pokedex.json")
+
+    @app.get("/data/narrative-tags.json")
+    def serve_narrative_tags_json() -> FileResponse:
+        return serve_public_json("narrative-tags.json")
+
+    @app.get("/data/evolution-families.json")
+    def serve_evolution_families_json() -> FileResponse:
+        return serve_public_json("evolution-families.json")
+
+    @app.get("/data/evolution-family-overrides.json")
+    def serve_evolution_family_overrides_json() -> FileResponse:
+        return serve_public_json("evolution-family-overrides.json")
 
     @app.middleware("http")
     async def disable_web_cache(request, call_next):
@@ -71,11 +92,22 @@ def create_app(settings: TrackerSettings | None = None) -> FastAPI:
         response.headers["Expires"] = "0"
         return response
 
-    app.mount(
-        "/data",
-        StaticFiles(directory=str(data_dir), check_dir=True),
-        name="data",
-    )
+    images_dir = data_dir / "images"
+    if images_dir.is_dir():
+        app.mount(
+            "/data/images",
+            StaticFiles(directory=str(images_dir), check_dir=True),
+            name="data-images",
+        )
+
+    shiny_images_dir = data_dir / "images_shiny"
+    if shiny_images_dir.is_dir():
+        app.mount(
+            "/data/images_shiny",
+            StaticFiles(directory=str(shiny_images_dir), check_dir=True),
+            name="data-images-shiny",
+        )
+
     app.mount(
         "/",
         StaticFiles(directory=str(web_dir), html=True, check_dir=True),
