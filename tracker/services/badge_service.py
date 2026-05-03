@@ -15,6 +15,7 @@ from dataclasses import dataclass
 
 from tracker.models import BadgeDefinition, BadgeState, Card, CollectionProgress
 from tracker.repository.base import CardRepository, ProgressRepository
+from tracker.services.badge_presentation import presentation_for_badge
 
 
 @dataclass(frozen=True)
@@ -2038,6 +2039,12 @@ class BadgeService:
                 cards,
                 unlocked,
             )
+            presentation = presentation_for_badge(
+                badge.id,
+                badge.title,
+                badge.description,
+                badge.metric,
+            )
             catalog.append(
                 BadgeDefinition(
                     id=badge.id,
@@ -2048,6 +2055,12 @@ class BadgeService:
                     target=badge_progress.target,
                     percent=badge_progress.percent,
                     hint=badge_progress.hint,
+                    category=presentation.category,
+                    region=presentation.region,
+                    rarity=presentation.rarity,
+                    effect=presentation.effect,
+                    reveal=presentation.reveal,
+                    i18n=presentation.i18n,
                 )
             )
         return BadgeState(catalog=catalog, unlocked=sorted(unlocked))

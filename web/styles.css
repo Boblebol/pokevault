@@ -6383,6 +6383,72 @@ html[data-theme="paldea"] {
   margin-top: 16px;
 }
 
+.badge-gallery-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  justify-content: space-between;
+  margin: 12px 0;
+}
+
+.badge-filter {
+  display: flex;
+  flex: 1 1 260px;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  min-width: 0;
+}
+
+.badge-filter__btn,
+.badge-filter__select {
+  min-height: 34px;
+  border: 1px solid var(--control-border);
+  border-radius: 6px;
+  background: var(--control-bg);
+  color: var(--text);
+  font: 650 0.78rem / 1.2 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+.badge-filter__btn {
+  padding: 0 12px;
+  cursor: pointer;
+  transition:
+    transform 150ms ease-out,
+    border-color 150ms ease-out,
+    background 150ms ease-out,
+    color 150ms ease-out;
+}
+
+.badge-filter__btn:hover {
+  border-color: var(--control-hover);
+  background: var(--surface-high);
+  transform: translateY(-1px);
+}
+
+.badge-filter__btn.is-active,
+.badge-filter__btn[aria-pressed="true"] {
+  border-color: var(--accent);
+  background: linear-gradient(135deg, var(--accent), var(--accent-strong));
+  color: var(--accent-ink);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.12),
+    0 6px 16px rgba(242, 101, 34, 0.18);
+}
+
+.badge-filter__btn:focus-visible,
+.badge-filter__select:focus-visible {
+  outline: 2px solid var(--electric);
+  outline-offset: 2px;
+}
+
+.badge-filter__select {
+  flex: 0 1 190px;
+  padding: 0 32px 0 10px;
+  cursor: pointer;
+}
+
 .stats-badges-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
@@ -6391,6 +6457,7 @@ html[data-theme="paldea"] {
 }
 
 .badge-tile {
+  position: relative;
   display: grid;
   grid-template-columns: 32px 1fr auto;
   align-items: center;
@@ -6400,12 +6467,117 @@ html[data-theme="paldea"] {
   border: 1px solid rgba(255, 255, 255, 0.06);
   border-radius: 10px;
   opacity: 0.55;
+  overflow: hidden;
   transition: opacity 150ms ease-out, border-color 150ms ease-out;
+}
+
+.badge-tile::before,
+.badge-tile::after {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  content: "";
+}
+
+.badge-tile::before {
+  opacity: 0;
+  transition: opacity 180ms ease-out;
+}
+
+.badge-tile::after {
+  width: 42%;
+  background: linear-gradient(
+    105deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.02) 26%,
+    rgba(255, 255, 255, 0.24) 48%,
+    rgba(54, 213, 232, 0.1) 58%,
+    transparent 74%
+  );
+  opacity: 0;
+  transform: translateX(-145%) skewX(-14deg);
+}
+
+.badge-tile > * {
+  position: relative;
+  z-index: 1;
 }
 
 .badge-tile.is-unlocked {
   opacity: 1;
   border-color: var(--accent);
+}
+
+.badge-tile.is-unlocked::before {
+  opacity: 1;
+}
+
+.badge-tile.is-unlocked::after {
+  animation: badge-shine 4.8s ease-in-out infinite;
+}
+
+.badge-tile.badge-tile--mystery {
+  border-color: color-mix(in oklab, var(--muted) 28%, transparent);
+  background:
+    linear-gradient(135deg, rgba(179, 193, 203, 0.06), transparent 58%),
+    var(--card);
+}
+
+.badge-tile.badge-tile--mystery .badge-tile__icon {
+  filter: grayscale(1) contrast(0.82);
+}
+
+.badge-tile.badge-tile--gloss::before {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.14), transparent 42%),
+    linear-gradient(135deg, rgba(54, 213, 232, 0.08), transparent 62%);
+}
+
+.badge-tile.badge-tile--prism::before {
+  background:
+    linear-gradient(120deg, rgba(54, 213, 232, 0.14), transparent 28%),
+    linear-gradient(210deg, rgba(255, 209, 102, 0.13), transparent 38%),
+    linear-gradient(330deg, rgba(255, 107, 95, 0.12), transparent 42%);
+}
+
+.badge-tile.badge-tile--holo::before {
+  background:
+    repeating-linear-gradient(
+      115deg,
+      rgba(255, 255, 255, 0.06) 0,
+      rgba(255, 255, 255, 0.06) 1px,
+      transparent 1px,
+      transparent 9px
+    ),
+    linear-gradient(135deg, rgba(54, 213, 232, 0.16), rgba(255, 107, 95, 0.1));
+}
+
+.badge-tile.badge-tile--rival::before {
+  background:
+    linear-gradient(90deg, rgba(255, 143, 143, 0.12), transparent 44%),
+    linear-gradient(180deg, rgba(255, 209, 102, 0.09), transparent 58%);
+}
+
+.badge-tile.badge-tile--gloss.is-unlocked,
+.badge-tile.badge-tile--prism.is-unlocked,
+.badge-tile.badge-tile--holo.is-unlocked,
+.badge-tile.badge-tile--rival.is-unlocked {
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.06),
+    0 8px 20px rgba(0, 0, 0, 0.18);
+}
+
+.badge-tile.badge-tile--prism.is-unlocked {
+  border-color: color-mix(in oklab, var(--electric) 62%, var(--accent));
+}
+
+.badge-tile.badge-tile--holo.is-unlocked {
+  border-color: color-mix(in oklab, var(--electric) 72%, white);
+}
+
+.badge-tile.badge-tile--rival.is-unlocked {
+  border-color: color-mix(in oklab, var(--danger) 60%, var(--warning));
 }
 
 .badge-tile__icon {
@@ -6510,6 +6682,74 @@ html[data-theme="paldea"] {
   height: 100%;
   border-radius: inherit;
   background: var(--accent);
+}
+
+.toast.toast--badge-unlock {
+  border-left-color: var(--warning);
+  background:
+    linear-gradient(135deg, rgba(255, 209, 102, 0.12), transparent 48%),
+    var(--card);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 209, 102, 0.08),
+    0 14px 34px rgba(0, 0, 0, 0.38);
+  animation: badge-toast-pop 260ms ease-out;
+}
+
+.toast.toast--badge-unlock .toast__icon {
+  color: var(--warning);
+}
+
+@keyframes badge-shine {
+  0%,
+  62% {
+    opacity: 0;
+    transform: translateX(-145%) skewX(-14deg);
+  }
+
+  72% {
+    opacity: 0.65;
+  }
+
+  88%,
+  100% {
+    opacity: 0;
+    transform: translateX(245%) skewX(-14deg);
+  }
+}
+
+@keyframes badge-toast-pop {
+  0% {
+    opacity: 0;
+    transform: translateX(18px) scale(0.98);
+  }
+
+  65% {
+    opacity: 1;
+    transform: translateX(0) scale(1.015);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .badge-filter__btn,
+  .badge-tile,
+  .badge-tile::before,
+  .toast {
+    transition: none;
+  }
+
+  .badge-filter__btn:hover {
+    transform: none;
+  }
+
+  .badge-tile.is-unlocked::after,
+  .toast.toast--badge-unlock {
+    animation: none;
+  }
 }
 
 /* ── F15: Profil multi-Pokédex ── */

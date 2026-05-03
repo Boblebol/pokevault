@@ -302,6 +302,62 @@ test("renderContact exposes shared trainer badges", async () => {
   assert.match(article.innerHTML, /Badge Cascade/);
 });
 
+test("renderContact prefers badge catalog labels for shared trainer badges", async () => {
+  const api = await loadModule();
+  globalThis.PokevaultBadges = {
+    labelForId(id) {
+      return {
+        kanto_brock: "Boulder Badge",
+      }[id] || "";
+    },
+  };
+
+  const article = api.renderContact({
+    card: {
+      trainer_id: "misty-123",
+      display_name: "Misty",
+      badges: [
+        { id: "kanto_brock", title: "Badge Roche" },
+        { id: "kanto_misty", title: "Badge Cascade" },
+      ],
+      wants: [],
+      for_trade: [],
+      updated_at: "2026-04-30T10:00:00+00:00",
+    },
+    private_note: "",
+    first_received_at: "2026-04-30T11:00:00+00:00",
+    last_received_at: "2026-04-30T11:00:00+00:00",
+  });
+
+  assert.match(article.innerHTML, /Boulder Badge/);
+  assert.doesNotMatch(article.innerHTML, /Badge Roche/);
+  assert.match(article.innerHTML, /Badge Cascade/);
+
+  delete globalThis.PokevaultBadges;
+});
+
+test("subscribeBadgeCatalog refreshes Trainer Card badge labels", async () => {
+  const api = await loadModule();
+  const root = new FakeElement("div");
+  let subscribed = false;
+  globalThis.document.getElementById = (id) => (
+    id === "trainerContactsRoot" ? root : null
+  );
+  globalThis.PokevaultBadges = {
+    subscribe(fn) {
+      subscribed = true;
+      fn();
+      return () => {};
+    },
+  };
+
+  api.subscribeBadgeCatalog();
+
+  assert.equal(subscribed, true);
+  assert.equal(root.children.length, 2);
+  delete globalThis.PokevaultBadges;
+});
+
 test("renderContact follows English i18n labels when available", async () => {
   const api = await loadModule();
   globalThis.PokevaultI18n = {

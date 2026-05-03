@@ -7,11 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [1.3.0] — 2026-05-03
+
 ### Added
 
+- "Souvenirs de Kanto" badges cover Rouge/Bleu Gym Leaders, Conseil 4,
+  Champion/rival variants and monotonic collection progress.
+- Trainer Cards automatically share unlocked badges, so imported Dresseurs can
+  show compact badge souvenirs without exposing locked progress.
+- Or/Argent nostalgia badges cover Johto, Kanto post-game, Conseil 4, Champion
+  Peter and Rival Silver variants.
 - Nostalgia badges now cover base-version trainer teams from Rubis/Saphir
   through Ecarlate/Violet, including N and Noir 2/Blanc 2 while excluding
   remakes.
+- Badge Side Quest V1 turns the badge list into a mysterious gallery with
+  sealed locked badges, localized rarity/effect copy, animated glossy unlock
+  states and current public badge labels on shared Trainer Cards.
 
 ## [1.2.0] — 2026-05-03
 

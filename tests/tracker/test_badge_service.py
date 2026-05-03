@@ -9,6 +9,7 @@ import pytest
 from tracker.models import CardCreate, ProgressStatusPatch
 from tracker.repository.json_card_repository import JsonCardRepository
 from tracker.repository.json_progress_repository import JsonProgressRepository
+from tracker.services.badge_presentation import presentation_for_badge
 from tracker.services.badge_service import BADGES, BadgeService, _metric_value
 from tracker.services.card_service import CardService
 from tracker.services.progress_service import ProgressService
@@ -51,6 +52,98 @@ def test_catalog_exposes_progress_metadata(tmp_path: Path) -> None:
     assert by_id["century"].target == 100
     assert by_id["century"].percent == 3
     assert by_id["century"].hint == "Encore 97 Pokémon à attraper."
+
+
+def test_catalog_exposes_badge_presentation_metadata(tmp_path: Path) -> None:
+    badge_service, *_ = _wire(tmp_path)
+
+    by_id = {badge.id: badge for badge in badge_service.state().catalog}
+
+    brock = by_id["kanto_brock"]
+    assert brock.category == "gym"
+    assert brock.region == "kanto"
+    assert brock.rarity == "rare"
+    assert brock.effect == "gloss"
+    assert brock.reveal == "mystery"
+    assert brock.i18n["fr"].mystery_title
+    assert brock.i18n["en"].mystery_title
+    assert "Brock" in brock.i18n["en"].title
+    assert "Capture" in brock.i18n["en"].description
+
+    champion = by_id["kanto_rival_champion"]
+    assert champion.category == "rival"
+    assert champion.rarity == "legendary"
+    assert champion.effect == "rival"
+
+    first_catch = by_id["first_catch"]
+    assert first_catch.category == "milestone"
+    assert first_catch.region == "global"
+    assert first_catch.reveal == "transparent"
+
+
+def test_team_badge_english_copy_handles_non_trainer_ids(tmp_path: Path) -> None:
+    badge_service, *_ = _wire(tmp_path)
+
+    by_id = {badge.id: badge for badge in badge_service.state().catalog}
+
+    opelucid = by_id["bw_opelucid"].i18n["en"]
+    assert opelucid.title == "Drayden/Iris - Badge"
+    assert opelucid.description == (
+        "Capture Drayden/Iris's team in Pokemon Black/White."
+    )
+
+    elite_larry = by_id["sv_elite_larry"].i18n["en"]
+    assert elite_larry.title == "Larry - Elite Four Badge"
+
+
+def test_every_badge_has_required_presentation_copy(tmp_path: Path) -> None:
+    badge_service, *_ = _wire(tmp_path)
+
+    missing: list[str] = []
+    for badge in badge_service.state().catalog:
+        if badge.category not in {
+            "milestone",
+            "card",
+            "gym",
+            "elite_four",
+            "champion",
+            "rival",
+        }:
+            missing.append(f"{badge.id}: category={badge.category!r}")
+        if badge.rarity not in {"common", "rare", "epic", "legendary"}:
+            missing.append(f"{badge.id}: rarity={badge.rarity!r}")
+        if badge.effect not in {"metal", "gloss", "prism", "holo", "rival"}:
+            missing.append(f"{badge.id}: effect={badge.effect!r}")
+        for locale in ("fr", "en"):
+            copy = badge.i18n.get(locale)
+            if copy is None:
+                missing.append(f"{badge.id}: missing {locale}")
+                continue
+            if not copy.title.strip():
+                missing.append(f"{badge.id}: missing {locale}.title")
+            if not copy.description.strip():
+                missing.append(f"{badge.id}: missing {locale}.description")
+            if badge.reveal == "mystery" and not copy.mystery_title.strip():
+                missing.append(f"{badge.id}: missing {locale}.mystery_title")
+
+    assert missing == []
+
+
+def test_badge_presentation_defaults_unknown_team_prefix_to_global() -> None:
+    presentation = presentation_for_badge(
+        "custom_secret",
+        "Secret - Badge",
+        "Capturer une equipe secrete.",
+        "team",
+    )
+
+    assert presentation.region == "global"
+    assert presentation.i18n["en"]["description"] == (
+        "Capture Custom Secret's mystery team."
+    )
+    assert presentation.i18n["en"]["mystery_hint"] == (
+        "A mystery team is waiting to be rebuilt."
+    )
 
 
 def test_unlocked_badge_progress_stays_complete_if_source_drops(tmp_path: Path) -> None:
