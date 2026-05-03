@@ -263,3 +263,127 @@ def test_kanto_trainer_unlocks_are_monotonic(tmp_path: Path) -> None:
     assert by_id["kanto_brock"].current == 2
     assert by_id["kanto_brock"].target == 2
     assert by_id["kanto_brock"].percent == 100
+
+
+def test_gold_silver_badges_are_in_catalog(tmp_path: Path) -> None:
+    badge_service, *_ = _wire(tmp_path)
+
+    ids = {badge.id for badge in badge_service.state().catalog}
+
+    assert {
+        "gs_falkner",
+        "gs_bugsy",
+        "gs_whitney",
+        "gs_morty",
+        "gs_chuck",
+        "gs_jasmine",
+        "gs_pryce",
+        "gs_clair",
+        "gs_brock",
+        "gs_misty",
+        "gs_lt_surge",
+        "gs_erika",
+        "gs_janine",
+        "gs_sabrina",
+        "gs_blaine",
+        "gs_blue",
+        "gs_will",
+        "gs_koga",
+        "gs_bruno",
+        "gs_karen",
+        "gs_lance",
+        "gs_rival_silver",
+    } <= ids
+
+
+def test_gold_silver_johto_gym_badge_requires_full_caught_team(
+    tmp_path: Path,
+) -> None:
+    badge_service, progress, _ = _wire(tmp_path)
+    progress.patch_status(ProgressStatusPatch(slug="0016-pidgey", state="caught"))
+
+    by_id = {badge.id: badge for badge in badge_service.state().catalog}
+
+    assert by_id["gs_falkner"].unlocked is False
+    assert by_id["gs_falkner"].current == 1
+    assert by_id["gs_falkner"].target == 2
+
+    progress.patch_status(ProgressStatusPatch(slug="0017-pidgeotto", state="caught"))
+
+    assert "gs_falkner" in badge_service.sync_unlocked()
+
+
+def test_gold_silver_kanto_badge_uses_gold_silver_team(tmp_path: Path) -> None:
+    badge_service, progress, _ = _wire(tmp_path)
+    _catch_all(progress, ["0074-geodude", "0095-onix"])
+
+    by_id = {badge.id: badge for badge in badge_service.state().catalog}
+
+    assert by_id["kanto_brock"].current == 2
+    assert by_id["kanto_brock"].target == 2
+    assert by_id["gs_brock"].unlocked is False
+    assert by_id["gs_brock"].current == 1
+    assert by_id["gs_brock"].target == 5
+
+    _catch_all(
+        progress,
+        ["0075-graveler", "0111-rhyhorn", "0139-omastar", "0141-kabutops"],
+    )
+
+    assert "gs_brock" in badge_service.sync_unlocked()
+
+
+def test_gold_silver_lance_counts_duplicate_dragonite_once(tmp_path: Path) -> None:
+    badge_service, progress, _ = _wire(tmp_path)
+    _catch_all(progress, ["0130-gyarados", "0006-charizard", "0142-aerodactyl"])
+
+    by_id = {badge.id: badge for badge in badge_service.state().catalog}
+
+    assert by_id["gs_lance"].unlocked is False
+    assert by_id["gs_lance"].current == 3
+    assert by_id["gs_lance"].target == 4
+
+    progress.patch_status(ProgressStatusPatch(slug="0149-dragonite", state="caught"))
+
+    assert "gs_lance" in badge_service.sync_unlocked()
+
+
+def test_gold_silver_rival_badge_unlocks_with_any_rematch_variant(
+    tmp_path: Path,
+) -> None:
+    badge_service, progress, _ = _wire(tmp_path)
+    _catch_all(
+        progress,
+        [
+            "0215-sneasel",
+            "0169-crobat",
+            "0082-magneton",
+            "0094-gengar",
+            "0065-alakazam",
+            "0157-typhlosion",
+        ],
+    )
+
+    newly = set(badge_service.sync_unlocked())
+
+    assert "gs_rival_silver" in newly
+
+
+def test_gold_silver_rival_progress_uses_closest_variant(tmp_path: Path) -> None:
+    badge_service, progress, _ = _wire(tmp_path)
+    _catch_all(
+        progress,
+        [
+            "0215-sneasel",
+            "0169-crobat",
+            "0082-magneton",
+            "0094-gengar",
+            "0065-alakazam",
+        ],
+    )
+
+    by_id = {badge.id: badge for badge in badge_service.state().catalog}
+
+    assert by_id["gs_rival_silver"].current == 5
+    assert by_id["gs_rival_silver"].target == 6
+    assert by_id["gs_rival_silver"].percent == 83

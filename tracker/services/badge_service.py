@@ -389,6 +389,213 @@ BADGES: list[BadgeDef] = [
             ),
         ),
     ),
+    _team_badge(
+        "gs_falkner",
+        "Albert - Zephyr",
+        "Capturer l'equipe d'Albert dans Pokemon Or/Argent.",
+        (("0016-pidgey", "0017-pidgeotto"),),
+    ),
+    _team_badge(
+        "gs_bugsy",
+        "Hector - Essaim",
+        "Capturer l'equipe d'Hector dans Pokemon Or/Argent.",
+        (("0011-metapod", "0014-kakuna", "0123-scyther"),),
+    ),
+    _team_badge(
+        "gs_whitney",
+        "Blanche - Plaine",
+        "Capturer l'equipe de Blanche dans Pokemon Or/Argent.",
+        (("0035-clefairy", "0241-miltank"),),
+    ),
+    _team_badge(
+        "gs_morty",
+        "Mortimer - Brume",
+        "Capturer l'equipe de Mortimer dans Pokemon Or/Argent.",
+        (("0092-gastly", "0093-haunter", "0093-haunter", "0094-gengar"),),
+    ),
+    _team_badge(
+        "gs_chuck",
+        "Chuck - Choc",
+        "Capturer l'equipe de Chuck dans Pokemon Or/Argent.",
+        (("0057-primeape", "0062-poliwrath"),),
+    ),
+    _team_badge(
+        "gs_jasmine",
+        "Jasmine - Mineral",
+        "Capturer l'equipe de Jasmine dans Pokemon Or/Argent.",
+        (("0081-magnemite", "0081-magnemite", "0208-steelix"),),
+    ),
+    _team_badge(
+        "gs_pryce",
+        "Fredo - Glacier",
+        "Capturer l'equipe de Fredo dans Pokemon Or/Argent.",
+        (("0086-seel", "0087-dewgong", "0221-piloswine"),),
+    ),
+    _team_badge(
+        "gs_clair",
+        "Sandra - Lever",
+        "Capturer l'equipe de Sandra dans Pokemon Or/Argent.",
+        (("0148-dragonair", "0148-dragonair", "0148-dragonair", "0230-kingdra"),),
+    ),
+    _team_badge(
+        "gs_brock",
+        "Pierre - Roche Or/Argent",
+        "Capturer l'equipe de Pierre dans le Kanto de Pokemon Or/Argent.",
+        (
+            (
+                "0075-graveler",
+                "0111-rhyhorn",
+                "0139-omastar",
+                "0141-kabutops",
+                "0095-onix",
+            ),
+        ),
+    ),
+    _team_badge(
+        "gs_misty",
+        "Ondine - Cascade Or/Argent",
+        "Capturer l'equipe d'Ondine dans le Kanto de Pokemon Or/Argent.",
+        (("0055-golduck", "0195-quagsire", "0131-lapras", "0121-starmie"),),
+    ),
+    _team_badge(
+        "gs_lt_surge",
+        "Major Bob - Foudre Or/Argent",
+        "Capturer l'equipe de Major Bob dans le Kanto de Pokemon Or/Argent.",
+        (
+            (
+                "0026-raichu",
+                "0101-electrode",
+                "0082-magneton",
+                "0101-electrode",
+                "0125-electabuzz",
+            ),
+        ),
+    ),
+    _team_badge(
+        "gs_erika",
+        "Erika - Prisme Or/Argent",
+        "Capturer l'equipe d'Erika dans le Kanto de Pokemon Or/Argent.",
+        (("0114-tangela", "0071-victreebel", "0189-jumpluff", "0182-bellossom"),),
+    ),
+    _team_badge(
+        "gs_janine",
+        "Jeannine - Ame",
+        "Capturer l'equipe de Jeannine dans le Kanto de Pokemon Or/Argent.",
+        (
+            (
+                "0169-crobat",
+                "0110-weezing",
+                "0168-ariados",
+                "0110-weezing",
+                "0049-venomoth",
+            ),
+        ),
+    ),
+    _team_badge(
+        "gs_sabrina",
+        "Morgane - Marais Or/Argent",
+        "Capturer l'equipe de Morgane dans le Kanto de Pokemon Or/Argent.",
+        (("0196-espeon", "0122-mr-mime", "0065-alakazam"),),
+    ),
+    _team_badge(
+        "gs_blaine",
+        "Auguste - Volcan Or/Argent",
+        "Capturer l'equipe d'Auguste dans le Kanto de Pokemon Or/Argent.",
+        (("0219-magcargo", "0126-magmar", "0078-rapidash"),),
+    ),
+    _team_badge(
+        "gs_blue",
+        "Blue - Terre",
+        "Capturer l'equipe de Blue dans le Kanto de Pokemon Or/Argent.",
+        (
+            (
+                "0018-pidgeot",
+                "0065-alakazam",
+                "0112-rhydon",
+                "0130-gyarados",
+                "0103-exeggutor",
+                "0059-arcanine",
+            ),
+        ),
+    ),
+    _team_badge(
+        "gs_will",
+        "Conseil 4 - Clement",
+        "Capturer l'equipe de Clement au Plateau Indigo Or/Argent.",
+        (("0178-xatu", "0124-jynx", "0103-exeggutor", "0080-slowbro", "0178-xatu"),),
+    ),
+    _team_badge(
+        "gs_koga",
+        "Conseil 4 - Koga",
+        "Capturer l'equipe de Koga au Plateau Indigo Or/Argent.",
+        (
+            (
+                "0168-ariados",
+                "0049-venomoth",
+                "0205-forretress",
+                "0089-muk",
+                "0169-crobat",
+            ),
+        ),
+    ),
+    _team_badge(
+        "gs_bruno",
+        "Conseil 4 - Aldo",
+        "Capturer l'equipe d'Aldo au Plateau Indigo Or/Argent.",
+        (("0237-hitmontop", "0106-hitmonlee", "0107-hitmonchan", "0095-onix", "0068-machamp"),),
+    ),
+    _team_badge(
+        "gs_karen",
+        "Conseil 4 - Marion",
+        "Capturer l'equipe de Marion au Plateau Indigo Or/Argent.",
+        (("0197-umbreon", "0045-vileplume", "0198-murkrow", "0094-gengar", "0229-houndoom"),),
+    ),
+    _team_badge(
+        "gs_lance",
+        "Maitre de la Ligue - Peter",
+        "Capturer l'equipe de Peter, Maitre de la Ligue Or/Argent.",
+        (
+            (
+                "0130-gyarados",
+                "0149-dragonite",
+                "0149-dragonite",
+                "0142-aerodactyl",
+                "0006-charizard",
+                "0149-dragonite",
+            ),
+        ),
+    ),
+    _team_badge(
+        "gs_rival_silver",
+        "Rival Silver - Plateau Indigo",
+        "Capturer une equipe finale possible de Silver dans Pokemon Or/Argent.",
+        (
+            (
+                "0215-sneasel",
+                "0169-crobat",
+                "0082-magneton",
+                "0094-gengar",
+                "0065-alakazam",
+                "0154-meganium",
+            ),
+            (
+                "0215-sneasel",
+                "0169-crobat",
+                "0082-magneton",
+                "0094-gengar",
+                "0065-alakazam",
+                "0157-typhlosion",
+            ),
+            (
+                "0215-sneasel",
+                "0169-crobat",
+                "0082-magneton",
+                "0094-gengar",
+                "0065-alakazam",
+                "0160-feraligatr",
+            ),
+        ),
+    ),
 ]
 
 
