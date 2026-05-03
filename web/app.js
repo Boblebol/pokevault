@@ -1826,6 +1826,7 @@ function render() {
     regionDefinitions,
     activeRegionId: regionFilter,
     nearestBadge: window.PokevaultBadges?.nearest?.(),
+    activeMissionSlugs: window.PokevaultBadgeMission?.activeTargetSlugs?.() || [],
     onOpen: openRecommendedPokemon,
   });
   const fill = document.getElementById("progressFill");
@@ -1859,7 +1860,7 @@ function render() {
         })();
     if (node) grid.append(node);
     updateListDisplayInfo({ full: sliced.full, end: 0, total: 0 });
-    window.PokevaultFocus?.refresh?.();
+    window.PokevaultBadgeMission?.refresh?.();
     return;
   }
 
@@ -1869,7 +1870,7 @@ function render() {
 
   updateListDisplayInfo({ full: sliced.full, end: sliced.end, total: sliced.total });
   window.PokevaultKeyboard?.repaint?.();
-  window.PokevaultFocus?.refresh?.();
+  window.PokevaultBadgeMission?.refresh?.();
 }
 
 function syncQuickFilterButtons() {
@@ -1940,6 +1941,7 @@ let listHuntsSubscribed = false;
 let listCardsSubscribed = false;
 let listBadgesSubscribed = false;
 let listTrainerContactsSubscribed = false;
+let listBadgeMissionSubscribed = false;
 
 function readStoredFormFilterMode() {
   try {
@@ -2021,6 +2023,10 @@ async function startTracker() {
   if (!listBadgesSubscribed) {
     listBadgesSubscribed = true;
     window.PokevaultBadges?.subscribe?.(() => render());
+  }
+  if (!listBadgeMissionSubscribed) {
+    listBadgeMissionSubscribed = true;
+    window.PokevaultBadgeMission?.subscribe?.(() => render());
   }
   if (!window.__pokedexOnlineFlushWired) {
     window.__pokedexOnlineFlushWired = true;

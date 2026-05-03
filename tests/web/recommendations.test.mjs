@@ -115,6 +115,29 @@ test("buildNextActions ranks seen targets before active-region misses", async ()
   assert.match(actions[1].reason, /Johto/);
 });
 
+test("buildNextActions prioritizes active badge mission targets", async () => {
+  const api = await loadModule();
+  const pool = [
+    { slug: "001-a", number: "#001", region: "kanto", names: { fr: "A" } },
+    { slug: "002-b", number: "#002", region: "kanto", names: { fr: "B" } },
+    { slug: "003-c", number: "#003", region: "kanto", names: { fr: "C" } },
+  ];
+  const statusMap = {
+    "003-c": { state: "seen", shiny: false },
+  };
+
+  const actions = api.buildNextActions({
+    pool,
+    statusMap,
+    activeMissionSlugs: ["002-b"],
+    limit: 3,
+  });
+
+  assert.deepEqual(actions.map((action) => action.slug), ["002-b", "003-c", "001-a"]);
+  assert.equal(actions[0].kind, "badge_mission");
+  assert.match(actions[0].reason, /Mission badge/);
+});
+
 test("buildNextActions keeps stable tie-breakers for equal candidates", async () => {
   const api = await loadModule();
   const pool = [

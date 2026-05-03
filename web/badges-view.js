@@ -52,6 +52,8 @@
     "badges.detail.caught": "Capture",
     "badges.detail.missing": "A chercher",
     "badges.detail.more": "+{count}",
+    "badges.detail.follow": "Suivre ce badge",
+    "badges.detail.following": "Mission active",
   };
   const FILTER_OPTIONS = {
     status: [
@@ -548,6 +550,22 @@
 
     const requirements = badgeRequirements(badge);
     if (requirements.length) {
+      const actions = document.createElement("div");
+      actions.className = "badge-detail__actions";
+      const follow = document.createElement("button");
+      follow.type = "button";
+      follow.className = "badge-detail__mission-btn";
+      const following = window.PokevaultBadgeMission?.activeId === badge?.id;
+      follow.textContent = following ? tr("badges.detail.following") : tr("badges.detail.follow");
+      follow.disabled = following;
+      follow.addEventListener("click", () => {
+        window.PokevaultBadgeMission?.setActiveBadge?.(badge.id);
+        follow.textContent = tr("badges.detail.following");
+        follow.disabled = true;
+      });
+      actions.append(follow);
+      detail.append(actions);
+
       const section = document.createElement("section");
       section.className = "badge-detail__requirements-section";
       const subtitle = document.createElement("h3");

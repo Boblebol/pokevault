@@ -79,6 +79,16 @@ def test_badge_detail_modal_and_pokemon_preview_are_responsive() -> None:
     assert "height: 30px;" in chips
 
 
+def test_badge_mission_replaces_focus_session_panels() -> None:
+    assert 'id="badgeMissionPanel"' in HTML
+    assert 'src="/badge-mission.js"' in HTML
+    assert 'src="/focus-session.js"' not in HTML
+    assert "focusPanelList" not in HTML
+    assert "focusPanelStats" not in HTML
+    assert ".focus-panel" not in CSS
+    assert ".is-focus-target" not in CSS
+
+
 def test_collection_home_orders_mobile_workflow_before_grid() -> None:
     """Progression, recommendations and filters must precede the grid in HTML."""
 

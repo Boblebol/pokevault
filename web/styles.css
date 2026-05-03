@@ -3681,7 +3681,8 @@ body {
   margin: 0;
 }
 
-.focus-panel {
+.badge-mission-panel,
+.badge-mission {
   display: grid;
   gap: 10px;
   min-width: 0;
@@ -3691,7 +3692,13 @@ body {
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
 }
 
-.focus-panel__header {
+.badge-mission {
+  padding: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.badge-mission__header {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -3699,7 +3706,7 @@ body {
   min-width: 0;
 }
 
-.focus-panel__title {
+.badge-mission__title {
   margin: 0;
   color: #ffe9e6;
   font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
@@ -3707,49 +3714,34 @@ body {
   line-height: 1.15;
 }
 
-.focus-panel__meta {
+.badge-mission__progress {
   flex: 0 0 auto;
   color: var(--electric);
   font-size: 0.72rem;
   font-weight: 800;
 }
 
-.focus-panel__body,
-.focus-panel__hint,
-.focus-panel__why {
+.badge-mission__body,
+.badge-mission__badge-title {
   margin: 0;
   color: #c9a9a3;
   font-size: 0.76rem;
   line-height: 1.35;
 }
 
-.focus-panel__why {
+.badge-mission__badge-title {
   color: #dfc4bd;
+  font-weight: 750;
 }
 
-.focus-panel__meter {
-  overflow: hidden;
-  height: 7px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.08);
-}
-
-.focus-panel__bar {
-  height: 100%;
-  width: 0%;
-  border-radius: inherit;
-  background: linear-gradient(90deg, var(--electric), #9ee6c7);
-  transition: width 180ms ease;
-}
-
-.focus-panel__targets {
+.badge-mission__targets {
   display: grid;
   gap: 6px;
 }
 
-.focus-panel__target {
+.badge-mission-target {
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
+  grid-template-columns: 32px minmax(0, 1fr);
   gap: 8px;
   align-items: center;
   width: 100%;
@@ -3763,25 +3755,44 @@ body {
   text-align: left;
 }
 
-.focus-panel__target:hover,
-.focus-panel__target:focus-visible {
+.badge-mission-target:hover,
+.badge-mission-target:focus-visible {
   border-color: rgba(255, 204, 64, 0.5);
   background: rgba(255, 204, 64, 0.08);
   outline: none;
 }
 
-.focus-panel__target.is-complete {
+.badge-mission-target.is-caught {
   color: #bce9d3;
   border-color: rgba(110, 220, 160, 0.28);
 }
 
-.focus-panel__target-num {
+.badge-mission-target__thumb {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
   color: #c4a29d;
   font-size: 0.66rem;
   font-weight: 800;
 }
 
-.focus-panel__target-name {
+.badge-mission-target__thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  padding: 2px;
+}
+
+.badge-mission-target__body {
+  display: grid;
+  min-width: 0;
+}
+
+.badge-mission-target__name {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -3789,19 +3800,22 @@ body {
   font-weight: 700;
 }
 
-.focus-panel__target-state {
-  font-size: 1rem;
-  line-height: 1;
+.badge-mission-target__state {
   color: var(--electric);
+  font-size: 0.68rem;
+  font-weight: 700;
 }
 
-.focus-panel__actions {
+.badge-mission__actions {
   display: flex;
   align-items: center;
   gap: 8px;
 }
 
-.focus-panel__btn {
+.badge-mission__clear,
+.badge-mission__link {
+  display: inline-grid;
+  place-items: center;
   min-height: 34px;
   padding: 0 12px;
   border: 1px solid rgba(255, 204, 64, 0.34);
@@ -3810,40 +3824,33 @@ body {
   background: var(--electric);
   font-weight: 800;
   cursor: pointer;
+  text-decoration: none;
 }
 
-.focus-panel__btn:hover,
-.focus-panel__btn:focus-visible {
+.badge-mission__clear:hover,
+.badge-mission__clear:focus-visible,
+.badge-mission__link:hover,
+.badge-mission__link:focus-visible {
   filter: brightness(1.06);
   outline: none;
 }
 
-.focus-panel__btn--ghost {
+.badge-mission__clear {
   color: #ffe9e6;
   background: rgba(255, 255, 255, 0.07);
   border-color: rgba(255, 255, 255, 0.14);
 }
 
-.card.is-focus-target {
+.card.is-badge-mission-target {
   box-shadow:
     0 0 0 2px rgba(255, 204, 64, 0.42),
     var(--card-shadow, 0 16px 34px rgba(0, 0, 0, 0.28));
 }
 
-.card.is-focus-complete {
+.card.is-badge-mission-complete {
   box-shadow:
     0 0 0 2px rgba(110, 220, 160, 0.5),
     var(--card-shadow, 0 16px 34px rgba(0, 0, 0, 0.28));
-}
-
-.card.is-focus-pulse {
-  animation: focus-pulse 900ms ease;
-}
-
-@keyframes focus-pulse {
-  0% { transform: translateY(0); }
-  35% { transform: translateY(-4px); }
-  100% { transform: translateY(0); }
 }
 
 #viewStats .stats-main {
@@ -4670,7 +4677,7 @@ body {
     order: 4;
   }
 
-  #viewListe .collection-rail .focus-panel {
+  #viewListe .collection-rail .badge-mission-panel {
     order: 5;
   }
 
@@ -6830,6 +6837,35 @@ html[data-theme="paldea"] {
   font-size: 0.68rem;
   font-weight: 700;
   text-transform: uppercase;
+}
+
+.badge-detail__actions {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  padding: 14px 18px 0;
+}
+
+.badge-detail__mission-btn {
+  min-height: 36px;
+  border: 1px solid color-mix(in oklab, var(--accent) 62%, transparent);
+  border-radius: 8px;
+  padding: 0 12px;
+  background: var(--accent);
+  color: var(--accent-ink);
+  cursor: pointer;
+  font-weight: 800;
+}
+
+.badge-detail__mission-btn:disabled {
+  cursor: default;
+  opacity: 0.72;
+}
+
+.badge-detail__mission-btn:not(:disabled):hover,
+.badge-detail__mission-btn:focus-visible {
+  filter: brightness(1.05);
+  outline: none;
 }
 
 .badge-detail-progress {

@@ -34,17 +34,17 @@ cloud, pas de classement public.
 
 Statut : repoussé.
 
-Les sessions Focus et la progression de badges existent déjà. Les streaks et les
+Les missions badge et la progression de badges existent déjà. Les streaks et les
 badges quotidiens sont repoussés pour éviter une boucle de rétention artificielle
 avant d'avoir assez de recul sur l'usage réel.
 
-### Constructeur de session Focus
+### Constructeur de mission libre
 
 Statut : repoussé.
 
-Aujourd'hui, une session Focus reste volontairement courte et automatique. Un
+Aujourd'hui, la mission active est volontairement centrée sur un badge. Un
 constructeur manuel par région, tag, type ou classeur sera réévalué si les
-sessions automatiques deviennent trop limitées pour les usages avancés.
+missions badge deviennent trop limitées pour les usages avancés.
 
 ## Cartes TCG
 

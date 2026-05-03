@@ -79,7 +79,7 @@ works immediately after install. Optional artwork caches are generated locally.
 - Creates and imports optional Trainer Cards with shareable contact links,
   a searchable local contact book, local `Vu chez` context and `Match` hints
   from exchanged `Double` lists, plus automatically shared unlocked badges.
-- Shows collection stats, badge progress and focus recommendations, including
+- Shows collection stats, badge progress and active badge missions, including
   "Souvenirs de Kanto" badges for Rouge/Bleu champions d'arene, Conseil 4,
   Maitre de la Ligue and rival teams, plus Or/Argent badges for Johto, Kanto
   post-game, the Conseil 4, Peter and Silver. The same nostalgia catalog now
@@ -87,7 +87,8 @@ works immediately after install. Optional artwork caches are generated locally.
   Noir/Blanc, Noir 2/Blanc 2, X/Y, Soleil/Lune, Epee/Bouclier and
   Ecarlate/Violet.
 - Presents Badge Side Quest V1 as a badge gallery with sealed badges kept
-  hidden until unlocked, then reuses those public labels on each Trainer Card.
+  hidden until unlocked, Pokemon requirement previews and an active mission
+  panel that can guide the next collection targets from a chosen badge.
 - Exports/imports full local backups.
 - Prints binder or regional checklists.
 - Exposes a local FastAPI REST API for integrations.
@@ -115,7 +116,7 @@ file into your searchable local contact book.
 
 The exchange model stays close to the Pokedex:
 
-- `Cherche` marks Pokemon you want and feeds the focus list.
+- `Cherche` marks Pokemon you want for trades and personal priorities.
 - `Capturé` marks Pokemon already in your collection.
 - `Double` marks Pokemon you own twice and can offer for trade.
 - Contact lines can share Instagram, Facebook, phone, email, Discord or site
@@ -223,7 +224,7 @@ in `data/collection-cards.json`.
 
 Trainer Cards are separate from full backups and never sync automatically.
 `Double` marks a Pokemon as available in your exported Trainer Card, while
-`Cherche` feeds the local focus list. Imported cards can show `Vu chez` and
+`Cherche` keeps personal trade priorities explicit. Imported cards can show `Vu chez` and
 `Match` context without a cloud account. See [Trainer Cards](docs/TRAINER_CONTACTS.md)
 for the local exchange guide.
 

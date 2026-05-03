@@ -9,7 +9,7 @@ server.
 The core Pokedex remains the main product. The app uses three small
 Pokemon-oriented actions everywhere:
 
-- `Cherche`: this Pokemon is missing and goes into the local focus list.
+- `Cherche`: this Pokemon is missing for trades and personal priorities.
 - `Capturé`: this Pokemon is owned.
 - `Double`: this Pokemon is owned twice and can be offered for trade.
 
