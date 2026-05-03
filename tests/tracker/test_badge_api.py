@@ -97,3 +97,28 @@ def test_badges_first_card_triggers_unlock(tmp_path: Path) -> None:
     body = client.get("/api/badges").json()
     assert "first_card" in body["unlocked"]
     assert "first_catch" in body["unlocked"]
+
+
+def test_badges_endpoint_exposes_kanto_trainer_badges(tmp_path: Path) -> None:
+    client = _build_app(tmp_path)
+    for slug in ["0074-geodude", "0095-onix"]:
+        pr = client.patch(
+            "/api/progress/status",
+            json={"slug": slug, "state": "caught"},
+        )
+        assert pr.status_code == 200
+
+    body = client.get("/api/badges").json()
+    by_id = {b["id"]: b for b in body["catalog"]}
+
+    assert by_id["kanto_brock"] == {
+        "id": "kanto_brock",
+        "title": "Pierre - Roche de Kanto",
+        "description": "Capturer l'equipe de Pierre dans Pokemon Rouge/Bleu.",
+        "unlocked": True,
+        "current": 2,
+        "target": 2,
+        "percent": 100,
+        "hint": "Badge obtenu.",
+    }
+    assert "kanto_brock" in body["unlocked"]
