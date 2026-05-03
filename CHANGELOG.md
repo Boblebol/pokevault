@@ -7,6 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [1.4.0] — 2026-05-03
+
+### Added
+
+- Badge missions replace the legacy focus-session workflow across collection
+  recommendations, badge targets and next-action routing.
+- Badge requirement details now expose Pokemon cards with localized copy,
+  responsive layout coverage and service-level tests.
+- The local app now includes a complete bilingual `#/docs` product guide for
+  setup, Collection, fiches, cards, binders, Trainer Cards, Badge missions,
+  local files, profiles, backups, shortcuts and REST API endpoints.
+- The public feature page now ships bilingual FR/EN product copy through the
+  shared docs language switch.
+
+### Changed
+
+- README is now developer-focused and delegates full product documentation to
+  the in-app guide.
+
 ## [1.3.0] — 2026-05-03
 
 ### Added
