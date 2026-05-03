@@ -75,7 +75,7 @@
     "pokemon_drawer.forms_empty": "Aucune autre forme dans le Pokédex local.",
     "pokemon_drawer.hunt.high": "Priorite haute",
     "pokemon_drawer.hunt.active": "Recherche active",
-    "pokemon_drawer.hunt.empty": "Active Cherche pour l'ajouter au focus.",
+    "pokemon_drawer.hunt.empty": "Active Cherche pour le garder dans tes priorites personnelles.",
     "pokemon_drawer.hunt.normal": "Priorite normale",
     "pokemon_drawer.hunt.updated": "Recherche mise a jour.",
     "pokemon_drawer.hunt.failed": "Recherche impossible a modifier.",

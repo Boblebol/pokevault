@@ -452,6 +452,15 @@ class BadgeLocalizedCopy(BaseModel):
     mystery_hint: str = ""
 
 
+class BadgeRequirementPokemon(BaseModel):
+    """Pokemon required by a team badge, with current completion state."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    slug: str
+    caught: bool = False
+
+
 class BadgeDefinition(BaseModel):
     """Roadmap F12 — static badge definition exposed to the UI."""
 
@@ -471,6 +480,7 @@ class BadgeDefinition(BaseModel):
     effect: str = "metal"
     reveal: str = "transparent"
     i18n: dict[str, BadgeLocalizedCopy] = Field(default_factory=dict)
+    requirements: list[BadgeRequirementPokemon] = Field(default_factory=list)
 
 
 class BadgeState(BaseModel):

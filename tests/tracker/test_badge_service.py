@@ -288,6 +288,23 @@ def test_kanto_gym_badge_requires_full_caught_team(tmp_path: Path) -> None:
     assert "kanto_brock" in newly
 
 
+def test_team_badge_exposes_required_pokemon_with_caught_state(
+    tmp_path: Path,
+) -> None:
+    badge_service, progress, _ = _wire(tmp_path)
+    progress.patch_status(ProgressStatusPatch(slug="0074-geodude", state="caught"))
+
+    by_id = {badge.id: badge for badge in badge_service.state().catalog}
+
+    assert [
+        (requirement.slug, requirement.caught)
+        for requirement in by_id["kanto_brock"].requirements
+    ] == [
+        ("0074-geodude", True),
+        ("0095-onix", False),
+    ]
+
+
 def test_kanto_team_badges_count_duplicate_species_once(tmp_path: Path) -> None:
     badge_service, progress, _ = _wire(tmp_path)
     _catch_all(progress, ["0109-koffing", "0089-muk"])

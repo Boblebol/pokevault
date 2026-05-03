@@ -18,10 +18,10 @@
     "recommendations.next.seen": "Vu dans le Pokedex, pas encore capture.",
     "recommendations.next.active_region": "Dans ta region active {region}.",
     "recommendations.next.region_close": "{region} est proche : {missing} restant{plural}.",
+    "recommendations.next.badge_mission": "Mission badge active.",
     "recommendations.next.missing": "{name} manque au Pokedex national.",
     "recommendations.empty.region": "Toutes regions",
     "recommendations.empty.reason": "Aucune cible manquante dans ce perimetre.",
-    "focus.reason.region_close": "{region} est proche d'etre completee.",
   };
 
   function t(key, params = {}) {
@@ -141,10 +141,11 @@
       return t("recommendations.reason.seen", { name: displayName(first), region: group.label });
     }
     const missing = group.items.length;
-    return t(
-      window.PokevaultI18n?.t ? "focus.reason.region_close" : "recommendations.reason.region_close",
-      { region: group.label, missing, plural: missing > 1 ? "s" : "" },
-    );
+    return t("recommendations.reason.region_close", {
+      region: group.label,
+      missing,
+      plural: missing > 1 ? "s" : "",
+    });
   }
 
   function badgeReason(badge) {
@@ -173,6 +174,7 @@
   }
 
   function nextActionPriority(kind) {
+    if (kind === "badge_mission") return -1;
     if (kind === "seen") return 0;
     if (kind === "active_region") return 1;
     if (kind === "regional_completion") return 2;
@@ -182,6 +184,7 @@
 
   function nextActionReason(kind, p, regionId, defs, missingByRegion, nearestBadge) {
     const label = regionLabel(regionId, defs);
+    if (kind === "badge_mission") return t("recommendations.next.badge_mission");
     if (kind === "seen") return t("recommendations.next.seen");
     if (kind === "active_region") return t("recommendations.next.active_region", { region: label });
     if (kind === "regional_completion") {
@@ -199,11 +202,17 @@
     regionDefinitions = [],
     activeRegionId = "all",
     nearestBadge = null,
+    activeMissionSlugs = [],
     limit = 3,
   } = {}) {
     const groups = regionGroups(pool, caughtMap, statusMap, {}, regionDefinitions);
     const closestRegionId = groups[0]?.id || "";
     const missingByRegion = missingCountByRegion(groups);
+    const missionOrder = new Map(
+      (Array.isArray(activeMissionSlugs) ? activeMissionSlugs : [])
+        .map((slug, index) => [String(slug || "").trim(), index])
+        .filter(([slug]) => slug),
+    );
     const actions = [];
     for (const p of Array.isArray(pool) ? pool : []) {
       const slug = slugOf(p);
@@ -211,7 +220,10 @@
       const state = statusState(slug, caughtMap, statusMap);
       if (state === "caught") continue;
       const regionId = regionIdFor(p, regionDefinitions);
-      const kind = nextActionKind(p, state, regionId, activeRegionId, closestRegionId, nearestBadge);
+      const missionIndex = missionOrder.has(slug) ? missionOrder.get(slug) : -1;
+      const kind = missionIndex >= 0
+        ? "badge_mission"
+        : nextActionKind(p, state, regionId, activeRegionId, closestRegionId, nearestBadge);
       actions.push({
         slug,
         pokemon: p,
@@ -220,12 +232,16 @@
         regionId,
         regionLabel: regionLabel(regionId, regionDefinitions),
         kind,
+        missionIndex,
         reason: nextActionReason(kind, p, regionId, regionDefinitions, missingByRegion, nearestBadge),
       });
     }
     actions.sort((a, b) => {
       const byKind = nextActionPriority(a.kind) - nextActionPriority(b.kind);
       if (byKind !== 0) return byKind;
+      if (a.kind === "badge_mission" && b.kind === "badge_mission") {
+        return a.missionIndex - b.missionIndex;
+      }
       if (a.number !== b.number) return a.number - b.number;
       return a.slug.localeCompare(b.slug);
     });

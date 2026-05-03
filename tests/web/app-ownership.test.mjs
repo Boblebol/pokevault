@@ -67,3 +67,11 @@ test("backup import accepts schema versions emitted by the backend", async () =>
   assert.equal(api.isSupportedBackupSchemaVersion(3), true);
   assert.equal(api.isSupportedBackupSchemaVersion(99), false);
 });
+
+test("docs route is recognized as a first-class app view", async () => {
+  const api = await loadModule();
+
+  globalThis.location.hash = "#/docs";
+
+  assert.equal(api.currentViewFromHash(), "docs");
+});

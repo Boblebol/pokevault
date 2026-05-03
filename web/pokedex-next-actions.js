@@ -10,7 +10,6 @@
     "next_actions.empty": "Pokédex complet sur ce périmètre.",
     "next_actions.open": "Ouvrir {name}",
     "next_actions.default_reason": "À compléter.",
-    "next_actions.badge_near": "Badge proche : {title} ({current}/{target})",
   };
 
   function t(key, params = {}) {
@@ -45,15 +44,6 @@
     host.append(header);
   }
 
-  function renderBadgeHint(host, nearestBadge) {
-    if (!nearestBadge || nearestBadge.unlocked) return;
-    const title = String(nearestBadge.title || "").trim();
-    if (!title) return;
-    const current = Number.isFinite(Number(nearestBadge.current)) ? Number(nearestBadge.current) : 0;
-    const target = Number.isFinite(Number(nearestBadge.target)) ? Number(nearestBadge.target) : 1;
-    host.append(el("p", "pokedex-next-actions__badge", t("next_actions.badge_near", { title, current, target })));
-  }
-
   function renderAction(action, onOpen) {
     const row = el("button", `pokedex-next-action is-${action.kind || "missing"}`);
     row.type = "button";
@@ -72,20 +62,18 @@
     return row;
   }
 
-  function renderNextActions({ host, actions = [], nearestBadge = null, onOpen = null } = {}) {
+  function renderNextActions({ host, actions = [], onOpen = null } = {}) {
     if (!host) return;
     const rows = cleanActions(actions);
     host.replaceChildren();
     renderHeader(host, rows.length);
     if (!rows.length) {
       host.append(el("p", "pokedex-next-actions__empty", t("next_actions.empty")));
-      renderBadgeHint(host, nearestBadge);
       return;
     }
     const list = el("div", "pokedex-next-actions__list");
     for (const action of rows) list.append(renderAction(action, onOpen));
     host.append(list);
-    renderBadgeHint(host, nearestBadge);
   }
 
   function renderFromState({
@@ -96,6 +84,7 @@
     regionDefinitions,
     activeRegionId = "all",
     nearestBadge = null,
+    activeMissionSlugs = [],
     limit = DEFAULT_LIMIT,
     onOpen = null,
   } = {}) {
@@ -106,9 +95,10 @@
       regionDefinitions,
       activeRegionId,
       nearestBadge,
+      activeMissionSlugs,
       limit,
     }) || [];
-    renderNextActions({ host, actions, nearestBadge, onOpen });
+    renderNextActions({ host, actions, onOpen });
     return actions;
   }
 

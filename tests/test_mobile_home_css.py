@@ -18,6 +18,77 @@ def _media_block(max_width: int) -> str:
     return CSS[start:] if next_media < 0 else CSS[start:next_media]
 
 
+def _blocks(selector: str) -> list[str]:
+    return re.findall(rf"{re.escape(selector)}\s*\{{([^}}]+)\}}", CSS, flags=re.MULTILINE)
+
+
+def test_page_headers_scroll_with_content_under_fixed_app_bar() -> None:
+    """The global nav stays fixed; per-page headers must not cover content."""
+
+    topbar = "\n".join(_blocks(".stitch-topbar"))
+    assert "position: fixed;" in topbar
+
+    header_blocks = _blocks(".header")
+    assert header_blocks
+    for block in header_blocks:
+        assert "position: sticky" not in block
+        assert "top: 0" not in block
+
+
+def test_details_pill_does_not_cover_top_left_card_number() -> None:
+    block = "\n".join(_blocks(".card-details"))
+    assert "top: var(--card-details-offset" in block
+    assert "left: 50%;" in block
+    assert "transform: translate(-50%, -4px);" in block
+    assert "top: 10px;" not in block
+    assert "left: 10px;" not in block
+    assert "transform: translate(-50%, 0);" in CSS
+
+
+def test_details_pill_is_not_kept_open_by_other_card_controls() -> None:
+    assert ".card:focus-within .card-details" not in CSS
+    assert ".card-details:focus-visible" in CSS
+    assert ".card:hover .card-details" in CSS
+
+
+def test_binder_cards_keep_pokemon_content_centered() -> None:
+    block = "\n".join(_blocks("#viewClasseur .binder-page-grid--cards .binder-card"))
+    assert "align-items: center;" in block
+    assert "align-items: flex-start;" not in block
+
+    image_wrap = "\n".join(_blocks("#viewClasseur .binder-page-grid--cards .card-img-wrap"))
+    assert "margin-left: auto;" in image_wrap
+    assert "margin-right: auto;" in image_wrap
+
+
+def test_badge_detail_modal_and_pokemon_preview_are_responsive() -> None:
+    overlay = "\n".join(_blocks(".badge-detail-overlay"))
+    assert "position: fixed;" in overlay
+    assert "inset: 0;" in overlay
+
+    detail = "\n".join(_blocks(".badge-detail"))
+    assert "max-width: min(92vw, 560px);" in detail
+    assert "max-height: min(86vh, 720px);" in detail
+    assert "overflow: auto;" in detail
+
+    requirements = "\n".join(_blocks(".badge-detail-requirements"))
+    assert "grid-template-columns: repeat(auto-fill, minmax(86px, 1fr));" in requirements
+
+    chips = "\n".join(_blocks(".badge-requirement-chip"))
+    assert "width: 30px;" in chips
+    assert "height: 30px;" in chips
+
+
+def test_badge_mission_replaces_focus_session_panels() -> None:
+    assert 'id="badgeMissionPanel"' in HTML
+    assert 'src="/badge-mission.js"' in HTML
+    assert 'src="/focus-session.js"' not in HTML
+    assert "focusPanelList" not in HTML
+    assert "focusPanelStats" not in HTML
+    assert ".focus-panel" not in CSS
+    assert ".is-focus-target" not in CSS
+
+
 def test_collection_home_orders_mobile_workflow_before_grid() -> None:
     """Progression, recommendations and filters must precede the grid in HTML."""
 

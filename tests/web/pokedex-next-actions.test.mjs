@@ -154,7 +154,6 @@ test("renderNextActions follows English i18n labels when available", async () =>
         "next_actions.empty": "Pokedex complete in this scope.",
         "next_actions.open": "Open {name}",
         "next_actions.default_reason": "To complete.",
-        "next_actions.badge_near": "Near badge: {title} ({current}/{target})",
       };
       return (messages[key] || key).replace(/\{([a-zA-Z0-9_]+)\}/g, (_, name) => String(params[name]));
     },
@@ -169,7 +168,7 @@ test("renderNextActions follows English i18n labels when available", async () =>
 
   assert.match(textTree(host), /Complete now/);
   assert.match(textTree(host), /To complete/);
-  assert.match(textTree(host), /Near badge: Century \(97\/100\)/);
+  assert.doesNotMatch(textTree(host), /Near badge: Century \(97\/100\)/);
   const list = host.children.find((child) => child.className === "pokedex-next-actions__list");
   assert.equal(list.children[0].attributes["aria-label"], "Open Bulbasaur");
 });
