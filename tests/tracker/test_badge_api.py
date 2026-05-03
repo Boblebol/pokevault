@@ -147,3 +147,46 @@ def test_badges_endpoint_exposes_gold_silver_trainer_badges(tmp_path: Path) -> N
         "hint": "Badge obtenu.",
     }
     assert "gs_falkner" in body["unlocked"]
+
+
+def test_badges_endpoint_exposes_base_generation_trainer_badges(
+    tmp_path: Path,
+) -> None:
+    client = _build_app(tmp_path)
+    for slug in ["0829-gossifleur", "0830-eldegoss"]:
+        pr = client.patch(
+            "/api/progress/status",
+            json={"slug": slug, "state": "caught"},
+        )
+        assert pr.status_code == 200
+    for slug in ["0919-nymble", "0917-tarountula", "0216-teddiursa"]:
+        pr = client.patch(
+            "/api/progress/status",
+            json={"slug": slug, "state": "caught"},
+        )
+        assert pr.status_code == 200
+
+    body = client.get("/api/badges").json()
+    by_id = {b["id"]: b for b in body["catalog"]}
+
+    assert by_id["swsh_milo"] == {
+        "id": "swsh_milo",
+        "title": "Milo - Plante",
+        "description": "Capturer l'equipe de Milo dans Pokemon Epee/Bouclier.",
+        "unlocked": True,
+        "current": 2,
+        "target": 2,
+        "percent": 100,
+        "hint": "Badge obtenu.",
+    }
+    assert by_id["sv_katy"] == {
+        "id": "sv_katy",
+        "title": "Katy - Insecte",
+        "description": "Capturer l'equipe de Katy dans Pokemon Ecarlate/Violet.",
+        "unlocked": True,
+        "current": 3,
+        "target": 3,
+        "percent": 100,
+        "hint": "Badge obtenu.",
+    }
+    assert {"swsh_milo", "sv_katy"} <= set(body["unlocked"])

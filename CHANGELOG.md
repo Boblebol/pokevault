@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Added
+
+- Nostalgia badges now cover base-version trainer teams from Rubis/Saphir
+  through Ecarlate/Violet, including N and Noir 2/Blanc 2 while excluding
+  remakes.
+
 ## [1.2.0] — 2026-05-03
 
 ### Added
