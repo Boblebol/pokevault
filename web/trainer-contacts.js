@@ -20,6 +20,7 @@
   let started = false;
   let hasLoaded = false;
   let inflight = null;
+  let badgeCatalogUnsubscribe = null;
   const listeners = new Set();
   const FALLBACK_I18N = {
     "trainers.mine.title": "Ma carte dresseur",
@@ -478,6 +479,15 @@
     wire(root);
   }
 
+  function subscribeBadgeCatalog() {
+    if (badgeCatalogUnsubscribe) return;
+    const subscribeBadges = window.PokevaultBadges?.subscribe;
+    if (typeof subscribeBadges !== "function") return;
+    badgeCatalogUnsubscribe = subscribeBadges(() => {
+      render();
+    });
+  }
+
   function renderOwnContactFields(contactLinks) {
     const rows = Array.from({ length: 3 }, (_, index) => {
       const link = contactLinks[index] || {};
@@ -598,10 +608,14 @@
   function renderBadgeGroup(items) {
     const badges = normalizeBadges(items);
     if (!badges.length) return "";
+    const labelForBadge = (badge) => {
+      const catalogLabel = window.PokevaultBadges?.labelForId?.(badge.id);
+      return String(catalogLabel || badge.title).trim() || badge.title;
+    };
     return `
       <div class="trainer-tag-group trainer-tag-group--badges">
         <h3>${escapeText(tr("trainers.badges"))}</h3>
-        <ul>${badges.map((badge) => `<li>${escapeText(badge.title)}</li>`).join("")}</ul>
+        <ul>${badges.map((badge) => `<li>${escapeText(labelForBadge(badge))}</li>`).join("")}</ul>
       </div>
     `;
   }
@@ -770,6 +784,7 @@
     try {
       await ensureLoaded({ force: true });
       render();
+      subscribeBadgeCatalog();
     } catch (err) {
       render(tr("trainers.api_error", { message: err.message }));
     }
@@ -834,6 +849,7 @@
       tradeSummary,
       filterContacts,
       renderContact,
+      subscribeBadgeCatalog,
       notePatchRequest,
       deleteContactRequest,
       shouldDeleteContact,

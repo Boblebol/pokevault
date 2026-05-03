@@ -16,10 +16,121 @@
   "use strict";
 
   const API_BADGES = "/api/badges";
+  const FALLBACK_I18N = {
+    "badges.gallery.title": "Galerie de badges",
+    "badges.gallery.empty": "Aucun badge pour l'instant.",
+    "badges.gallery.count": "{unlocked} / {total} obtenus",
+    "badges.toast.title": "Badge debloque",
+    "badges.status.unlocked": "Obtenu",
+    "badges.status.sealed": "{percent}%",
+    "badges.filter.status": "Statut des badges",
+    "badges.filter.category": "Categorie de badges",
+    "badges.filter.region": "Region des badges",
+    "badges.filter.all": "Tous",
+    "badges.filter.unlocked": "Obtenus",
+    "badges.filter.locked": "Scelles",
+    "badges.category.milestone": "Paliers",
+    "badges.category.card": "Cartes",
+    "badges.category.gym": "Arenes",
+    "badges.category.elite_four": "Conseil 4",
+    "badges.category.champion": "Maitres",
+    "badges.category.rival": "Rivaux",
+    "badges.region.global": "Global",
+    "badges.region.kanto": "Kanto",
+    "badges.region.johto": "Johto",
+    "badges.region.hoenn": "Hoenn",
+    "badges.region.sinnoh": "Sinnoh",
+    "badges.region.unova": "Unys",
+    "badges.region.kalos": "Kalos",
+    "badges.region.alola": "Alola",
+    "badges.region.galar": "Galar",
+    "badges.region.paldea": "Paldea",
+  };
+  const FILTER_OPTIONS = {
+    status: [
+      ["all", "badges.filter.all"],
+      ["unlocked", "badges.filter.unlocked"],
+      ["locked", "badges.filter.locked"],
+    ],
+    category: [
+      ["all", "badges.filter.all"],
+      ["milestone", "badges.category.milestone"],
+      ["card", "badges.category.card"],
+      ["gym", "badges.category.gym"],
+      ["elite_four", "badges.category.elite_four"],
+      ["champion", "badges.category.champion"],
+      ["rival", "badges.category.rival"],
+    ],
+    region: [
+      ["all", "badges.filter.all"],
+      ["global", "badges.region.global"],
+      ["kanto", "badges.region.kanto"],
+      ["johto", "badges.region.johto"],
+      ["hoenn", "badges.region.hoenn"],
+      ["sinnoh", "badges.region.sinnoh"],
+      ["unova", "badges.region.unova"],
+      ["kalos", "badges.region.kalos"],
+      ["alola", "badges.region.alola"],
+      ["galar", "badges.region.galar"],
+      ["paldea", "badges.region.paldea"],
+    ],
+  };
 
   let cachedState = null;
   let inflight = null;
+  let lastHost = null;
+  const galleryFilters = { status: "all", category: "all", region: "all" };
   const listeners = new Set();
+
+  function tr(key, params = {}) {
+    const raw = window.PokevaultI18n?.t?.(key, params) || FALLBACK_I18N[key] || key;
+    return String(raw).replace(/\{([a-zA-Z0-9_]+)\}/g, (_, name) => (
+      Object.prototype.hasOwnProperty.call(params, name) ? String(params[name]) : `{${name}}`
+    ));
+  }
+
+  function activeLocale() {
+    return window.PokevaultI18n?.getLocale?.() || "fr";
+  }
+
+  function localizedBadgeEntry(badge) {
+    const i18n = badge?.i18n && typeof badge.i18n === "object" ? badge.i18n : {};
+    return i18n[activeLocale()] || i18n.fr || i18n.en || null;
+  }
+
+  function displayBadgeCopy(badge, { forceReveal = false } = {}) {
+    const entry = localizedBadgeEntry(badge);
+    const hidden = !forceReveal && !badge?.unlocked && badge?.reveal === "mystery";
+    if (hidden) {
+      return {
+        title: entry?.mystery_title || entry?.title || badge?.title || "Badge scelle",
+        description: entry?.mystery_hint || badge?.hint || "",
+      };
+    }
+    return {
+      title: entry?.title || badge?.title || "",
+      description: entry?.description || badge?.description || "",
+    };
+  }
+
+  function filterBadges(catalog, filters = galleryFilters) {
+    return (Array.isArray(catalog) ? catalog : []).filter((badge) => {
+      if (filters.status === "unlocked" && !badge?.unlocked) return false;
+      if (filters.status === "locked" && badge?.unlocked) return false;
+      if (filters.category !== "all" && badge?.category !== filters.category) return false;
+      if (filters.region !== "all" && badge?.region !== filters.region) return false;
+      return true;
+    });
+  }
+
+  function badgeTileClassNames(badge) {
+    const classes = ["badge-tile"];
+    if (badge?.unlocked) classes.push("is-unlocked");
+    if (badge?.category) classes.push(`badge-tile--${badge.category}`);
+    if (badge?.effect) classes.push(`badge-tile--${badge.effect}`);
+    if (badge?.reveal === "mystery") classes.push("badge-tile--mystery");
+    return classes;
+  }
 
   async function fetchState() {
     const r = await fetch(API_BADGES);
@@ -88,11 +199,13 @@
     for (const id of newIds) {
       const def = byId.get(id);
       if (!def) continue;
-      T.show("Badge débloqué", def.title, {
+      const copy = displayBadgeCopy(def, { forceReveal: true });
+      const toast = T.show(tr("badges.toast.title"), copy.title, {
         icon: "★",
         tone: "ok",
-        duration: 6000,
+        duration: 6500,
       });
+      toast?.classList?.add("toast--badge-unlock", `toast--badge-${def.effect || "metal"}`);
     }
   }
 
@@ -141,47 +254,108 @@
 
   function renderInto(host) {
     if (!host) return;
+    lastHost = host;
     host.replaceChildren();
     const section = document.createElement("section");
     section.className = "stats-badges";
 
     const title = document.createElement("h2");
     title.className = "stats-section-title";
-    title.textContent = "Badges Pokédex";
+    title.textContent = tr("badges.gallery.title");
     section.append(title);
+
+    const state = cachedState || { catalog: [], unlocked: [] };
+    if (state.catalog.length) {
+      const total = state.catalog.length;
+      const unlocked = state.catalog.filter((b) => b.unlocked).length;
+      const sub = document.createElement("p");
+      sub.className = "stats-kpi-sub";
+      sub.textContent = tr("badges.gallery.count", { unlocked, total });
+      section.append(sub);
+      section.append(buildGalleryControls());
+    }
 
     const grid = document.createElement("div");
     grid.className = "stats-badges-grid";
     section.append(grid);
 
-    const state = cachedState || { catalog: [], unlocked: [] };
     if (!state.catalog.length) {
       const empty = document.createElement("p");
       empty.className = "stats-badges-empty";
-      empty.textContent = "Aucun badge pour l’instant.";
+      empty.textContent = tr("badges.gallery.empty");
       section.append(empty);
     } else {
-      const total = state.catalog.length;
-      const unlocked = state.catalog.filter((b) => b.unlocked).length;
-      const sub = document.createElement("p");
-      sub.className = "stats-kpi-sub";
-      sub.textContent = `${unlocked} / ${total} obtenus`;
-      section.insertBefore(sub, grid);
-
-      for (const badge of state.catalog) {
+      const visibleCatalog = filterBadges(state.catalog, galleryFilters);
+      for (const badge of visibleCatalog) {
         grid.append(buildBadgeTile(badge));
+      }
+      if (!visibleCatalog.length) {
+        const empty = document.createElement("p");
+        empty.className = "stats-badges-empty";
+        empty.textContent = tr("badges.gallery.empty");
+        section.append(empty);
       }
     }
 
     host.append(section);
   }
 
+  function buildGalleryControls() {
+    const controls = document.createElement("div");
+    controls.className = "badge-gallery-controls";
+    controls.append(
+      buildSegmentedFilter("status", "badges.filter.status", FILTER_OPTIONS.status),
+      buildSegmentedFilter("category", "badges.filter.category", FILTER_OPTIONS.category),
+      buildRegionSelect(),
+    );
+    return controls;
+  }
+
+  function buildSegmentedFilter(name, labelKey, options) {
+    const wrap = document.createElement("div");
+    wrap.className = "badge-filter";
+    wrap.setAttribute("role", "group");
+    wrap.setAttribute("aria-label", tr(labelKey));
+    for (const [value, optionKey] of options) {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "badge-filter__btn";
+      button.setAttribute("aria-pressed", galleryFilters[name] === value ? "true" : "false");
+      if (galleryFilters[name] === value) button.classList.add("is-active");
+      button.textContent = tr(optionKey);
+      button.addEventListener("click", () => {
+        galleryFilters[name] = value;
+        if (lastHost) renderInto(lastHost);
+      });
+      wrap.append(button);
+    }
+    return wrap;
+  }
+
+  function buildRegionSelect() {
+    const select = document.createElement("select");
+    select.className = "badge-filter__select";
+    select.setAttribute("aria-label", tr("badges.filter.region"));
+    for (const [value, optionKey] of FILTER_OPTIONS.region) {
+      const option = document.createElement("option");
+      option.value = value;
+      option.textContent = tr(optionKey);
+      option.selected = galleryFilters.region === value;
+      select.append(option);
+    }
+    select.addEventListener("change", () => {
+      galleryFilters.region = select.value || "all";
+      if (lastHost) renderInto(lastHost);
+    });
+    return select;
+  }
+
   function buildBadgeTile(badge) {
     const tile = document.createElement("article");
-    tile.className = "badge-tile";
-    if (badge.unlocked) tile.classList.add("is-unlocked");
+    tile.className = badgeTileClassNames(badge).join(" ");
     tile.setAttribute("role", "listitem");
     const progress = normalizeProgress(badge);
+    const copy = displayBadgeCopy(badge);
 
     const icon = document.createElement("span");
     icon.className = "app-icon badge-tile__icon";
@@ -193,10 +367,10 @@
     body.className = "badge-tile__body";
     const t = document.createElement("h3");
     t.className = "badge-tile__title";
-    t.textContent = badge.title;
+    t.textContent = copy.title;
     const d = document.createElement("p");
     d.className = "badge-tile__desc";
-    d.textContent = badge.description;
+    d.textContent = copy.description;
     body.append(t, d);
     if (!badge.unlocked) {
       const meter = document.createElement("div");
@@ -219,7 +393,9 @@
 
     const status = document.createElement("span");
     status.className = "badge-tile__status";
-    status.textContent = badge.unlocked ? "Obtenu" : `${progress.percent}%`;
+    status.textContent = badge.unlocked
+      ? tr("badges.status.unlocked")
+      : tr("badges.status.sealed", { percent: progress.percent });
     tile.append(status);
 
     return tile;
@@ -247,15 +423,32 @@
     poll,
     subscribe,
     renderInto,
+    displayCopy: displayBadgeCopy,
+    labelForId(id, state = cachedState) {
+      const catalog = Array.isArray(state?.catalog) ? state.catalog : [];
+      const badge = catalog.find((item) => item?.id === id);
+      if (!badge) return "";
+      return displayBadgeCopy(
+        { ...badge, unlocked: true },
+        { forceReveal: true },
+      ).title;
+    },
     nearest: nearestBadge,
     get state() {
       return cachedState;
     },
   };
+  window.PokevaultI18n?.subscribeLocale?.(() => {
+    if (lastHost) renderInto(lastHost);
+  });
   if (window.__POKEVAULT_BADGES_TESTS__) {
     window.PokevaultBadges._test = {
       nearestBadge,
       normalizeProgress,
+      displayBadgeCopy,
+      filterBadges,
+      badgeTileClassNames,
+      buildSegmentedFilter,
     };
   }
 })();

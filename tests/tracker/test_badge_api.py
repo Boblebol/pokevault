@@ -37,6 +37,10 @@ def _build_app(tmp_path: Path) -> TestClient:
     return TestClient(app)
 
 
+def _assert_badge_contains(actual: dict, expected: dict) -> None:
+    assert {key: actual[key] for key in expected} == expected
+
+
 def test_badges_endpoint_empty_state(tmp_path: Path) -> None:
     client = _build_app(tmp_path)
     r = client.get("/api/badges")
@@ -58,16 +62,19 @@ def test_badges_endpoint_exposes_progress_metadata(tmp_path: Path) -> None:
     body = client.get("/api/badges").json()
 
     by_id = {b["id"]: b for b in body["catalog"]}
-    assert by_id["first_catch"] == {
-        "id": "first_catch",
-        "title": "Premier Pokéball",
-        "description": "Attraper ton premier Pokémon.",
-        "unlocked": True,
-        "current": 1,
-        "target": 1,
-        "percent": 100,
-        "hint": "Badge obtenu.",
-    }
+    _assert_badge_contains(
+        by_id["first_catch"],
+        {
+            "id": "first_catch",
+            "title": "Premier Pokéball",
+            "description": "Attraper ton premier Pokémon.",
+            "unlocked": True,
+            "current": 1,
+            "target": 1,
+            "percent": 100,
+            "hint": "Badge obtenu.",
+        },
+    )
     assert by_id["century"]["current"] == 1
     assert by_id["century"]["target"] == 100
     assert by_id["century"]["percent"] == 1
@@ -111,16 +118,24 @@ def test_badges_endpoint_exposes_kanto_trainer_badges(tmp_path: Path) -> None:
     body = client.get("/api/badges").json()
     by_id = {b["id"]: b for b in body["catalog"]}
 
-    assert by_id["kanto_brock"] == {
-        "id": "kanto_brock",
-        "title": "Pierre - Roche de Kanto",
-        "description": "Capturer l'equipe de Pierre dans Pokemon Rouge/Bleu.",
-        "unlocked": True,
-        "current": 2,
-        "target": 2,
-        "percent": 100,
-        "hint": "Badge obtenu.",
-    }
+    _assert_badge_contains(
+        by_id["kanto_brock"],
+        {
+            "id": "kanto_brock",
+            "title": "Pierre - Roche de Kanto",
+            "description": "Capturer l'equipe de Pierre dans Pokemon Rouge/Bleu.",
+            "unlocked": True,
+            "current": 2,
+            "target": 2,
+            "percent": 100,
+            "hint": "Badge obtenu.",
+        },
+    )
+    assert by_id["kanto_brock"]["category"] == "gym"
+    assert by_id["kanto_brock"]["region"] == "kanto"
+    assert by_id["kanto_brock"]["effect"] == "gloss"
+    assert by_id["kanto_brock"]["reveal"] == "mystery"
+    assert by_id["kanto_brock"]["i18n"]["en"]["mystery_title"]
     assert "kanto_brock" in body["unlocked"]
 
 
@@ -136,16 +151,19 @@ def test_badges_endpoint_exposes_gold_silver_trainer_badges(tmp_path: Path) -> N
     body = client.get("/api/badges").json()
     by_id = {b["id"]: b for b in body["catalog"]}
 
-    assert by_id["gs_falkner"] == {
-        "id": "gs_falkner",
-        "title": "Albert - Zephyr",
-        "description": "Capturer l'equipe d'Albert dans Pokemon Or/Argent.",
-        "unlocked": True,
-        "current": 2,
-        "target": 2,
-        "percent": 100,
-        "hint": "Badge obtenu.",
-    }
+    _assert_badge_contains(
+        by_id["gs_falkner"],
+        {
+            "id": "gs_falkner",
+            "title": "Albert - Zephyr",
+            "description": "Capturer l'equipe d'Albert dans Pokemon Or/Argent.",
+            "unlocked": True,
+            "current": 2,
+            "target": 2,
+            "percent": 100,
+            "hint": "Badge obtenu.",
+        },
+    )
     assert "gs_falkner" in body["unlocked"]
 
 
@@ -169,24 +187,30 @@ def test_badges_endpoint_exposes_base_generation_trainer_badges(
     body = client.get("/api/badges").json()
     by_id = {b["id"]: b for b in body["catalog"]}
 
-    assert by_id["swsh_milo"] == {
-        "id": "swsh_milo",
-        "title": "Milo - Plante",
-        "description": "Capturer l'equipe de Milo dans Pokemon Epee/Bouclier.",
-        "unlocked": True,
-        "current": 2,
-        "target": 2,
-        "percent": 100,
-        "hint": "Badge obtenu.",
-    }
-    assert by_id["sv_katy"] == {
-        "id": "sv_katy",
-        "title": "Katy - Insecte",
-        "description": "Capturer l'equipe de Katy dans Pokemon Ecarlate/Violet.",
-        "unlocked": True,
-        "current": 3,
-        "target": 3,
-        "percent": 100,
-        "hint": "Badge obtenu.",
-    }
+    _assert_badge_contains(
+        by_id["swsh_milo"],
+        {
+            "id": "swsh_milo",
+            "title": "Milo - Plante",
+            "description": "Capturer l'equipe de Milo dans Pokemon Epee/Bouclier.",
+            "unlocked": True,
+            "current": 2,
+            "target": 2,
+            "percent": 100,
+            "hint": "Badge obtenu.",
+        },
+    )
+    _assert_badge_contains(
+        by_id["sv_katy"],
+        {
+            "id": "sv_katy",
+            "title": "Katy - Insecte",
+            "description": "Capturer l'equipe de Katy dans Pokemon Ecarlate/Violet.",
+            "unlocked": True,
+            "current": 3,
+            "target": 3,
+            "percent": 100,
+            "hint": "Badge obtenu.",
+        },
+    )
     assert {"swsh_milo", "sv_katy"} <= set(body["unlocked"])

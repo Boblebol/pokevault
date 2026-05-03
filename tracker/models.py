@@ -441,6 +441,17 @@ class ProfileDeleteResponse(BaseModel):
     deleted: int = Field(ge=0)
 
 
+class BadgeLocalizedCopy(BaseModel):
+    """Localized badge display copy and locked mystery copy."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    title: str
+    description: str
+    mystery_title: str = ""
+    mystery_hint: str = ""
+
+
 class BadgeDefinition(BaseModel):
     """Roadmap F12 — static badge definition exposed to the UI."""
 
@@ -454,6 +465,12 @@ class BadgeDefinition(BaseModel):
     target: int = Field(default=1, ge=1)
     percent: int = Field(default=0, ge=0, le=100)
     hint: str = "Commence par une première action."
+    category: str = "milestone"
+    region: str = "global"
+    rarity: str = "common"
+    effect: str = "metal"
+    reveal: str = "transparent"
+    i18n: dict[str, BadgeLocalizedCopy] = Field(default_factory=dict)
 
 
 class BadgeState(BaseModel):

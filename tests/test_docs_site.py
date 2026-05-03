@@ -258,6 +258,16 @@ def test_kanto_nostalgia_badges_are_documented() -> None:
         assert "sans remakes" in text
 
 
+def test_badge_side_quest_v1_is_documented_publicly() -> None:
+    readme = (ROOT / "README.md").read_text(encoding="utf-8")
+    features = (DOCS / "features.html").read_text(encoding="utf-8")
+
+    for text in [readme, features]:
+        assert "badge gallery" in text
+        assert "sealed badges" in text
+        assert "Trainer Card" in text
+
+
 def test_public_story_centers_exploration_trainers_and_pokedex_completion() -> None:
     landing = (DOCS / "index.html").read_text(encoding="utf-8").lower()
     docs_i18n = (DOCS / "assets" / "i18n.js").read_text(encoding="utf-8").lower()

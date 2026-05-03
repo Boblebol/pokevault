@@ -86,6 +86,8 @@ works immediately after install. Optional artwork caches are generated locally.
   covers base-version teams sans remakes: Rubis/Saphir, Diamant/Perle,
   Noir/Blanc, Noir 2/Blanc 2, X/Y, Soleil/Lune, Epee/Bouclier and
   Ecarlate/Violet.
+- Presents Badge Side Quest V1 as a badge gallery with sealed badges kept
+  hidden until unlocked, then reuses those public labels on each Trainer Card.
 - Exports/imports full local backups.
 - Prints binder or regional checklists.
 - Exposes a local FastAPI REST API for integrations.
@@ -121,6 +123,9 @@ The exchange model stays close to the Pokedex:
 - Unlocked badges are included automatically in the exported Trainer Card, so
   imported Dresseurs can show compact badge souvenirs without exposing locked
   progress.
+- The shared payload stays compact with badge `id` and `title` only; imported
+  cards render current badge gallery labels when available and fall back to the
+  stored title for sealed badges or older catalogs.
 - Imported cards can add `Vu chez` when another trainer has a duplicate, and
   `Match` when that duplicate is also on your `Cherche` list.
 
