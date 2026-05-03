@@ -29,9 +29,9 @@
   box-sizing: border-box;
 }
 
-.material-symbols-outlined,
+.app-icon,
 .card-status-icon {
-  font-family: "Material Symbols Outlined", sans-serif;
+  font-family: inherit;
   font-weight: normal;
   font-style: normal;
   line-height: 1;
@@ -40,7 +40,6 @@
   white-space: nowrap;
   direction: ltr;
   -webkit-font-smoothing: antialiased;
-  font-variation-settings: "FILL" 0, "wght" 450, "GRAD" 0, "opsz" 24;
 }
 
 html,
@@ -1119,7 +1118,7 @@ body {
   margin: 0;
   font-size: 1.05rem;
   letter-spacing: 0.02em;
-  font-family: "Space Grotesk", "Inter", system-ui, sans-serif;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   font-weight: 600;
 }
 
@@ -1238,7 +1237,7 @@ body {
   margin: 0;
   font-size: 1.15rem;
   letter-spacing: 0.02em;
-  font-family: "Space Grotesk", "Inter", system-ui, sans-serif;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   font-weight: 600;
 }
 
@@ -1308,7 +1307,7 @@ body {
 
 .onboarding__step-title {
   margin: 0;
-  font-family: "Space Grotesk", "Inter", system-ui, sans-serif;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   font-size: 1.35rem;
   letter-spacing: 0.01em;
   line-height: 1.25;
@@ -1887,7 +1886,7 @@ html.site-onboarding-pending .app-view {
 
 html,
 body {
-  font-family: "Inter", "Space Grotesk", system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   background:
     radial-gradient(120% 120% at 100% 0%, color-mix(in oklab, var(--accent) 9%, transparent), transparent 48%),
     var(--bg);
@@ -2007,7 +2006,7 @@ body {
 
 .title,
 .wizard-title {
-  font-family: "Space Grotesk", "Inter", system-ui, sans-serif;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   letter-spacing: -0.02em;
   font-weight: 700;
 }
@@ -2040,7 +2039,7 @@ body {
 
 .stats-big {
   font-size: 1.35rem;
-  font-family: "Space Grotesk", "Inter", system-ui, sans-serif;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   font-weight: 650;
 }
 
@@ -2151,7 +2150,7 @@ body {
 
 .card-num {
   font-variant-numeric: tabular-nums;
-  font-family: "Space Grotesk", "Inter", system-ui, sans-serif;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   letter-spacing: 0.04em;
 }
 
@@ -2197,7 +2196,7 @@ body {
 .binder-slot-num {
   color: #c29e98;
   letter-spacing: 0.04em;
-  font-family: "Space Grotesk", "Inter", system-ui, sans-serif;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
 }
 
 .binder-slot-name {
@@ -2517,7 +2516,7 @@ body {
 
 .stats-kpi-value {
   margin: 0;
-  font-family: "Space Grotesk", "Inter", system-ui, sans-serif;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   font-size: 1.3rem;
   color: #ffe5e1;
 }
@@ -2566,7 +2565,7 @@ body {
 
 .binder-metric-card p {
   margin: 0;
-  font-family: "Space Grotesk", "Inter", system-ui, sans-serif;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   font-size: 1.2rem;
   color: #ffe5e1;
 }
@@ -2679,7 +2678,7 @@ body {
 .list-hero-pct {
   display: block;
   color: var(--electric);
-  font-family: "Space Grotesk", "Inter", system-ui, sans-serif;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   font-weight: 700;
   font-size: 2.2rem;
   line-height: 1;
@@ -2751,7 +2750,7 @@ body {
   display: block;
   margin: 4px 0 2px;
   color: var(--text, #fff8f4);
-  font-family: "Space Grotesk", "Inter", system-ui, sans-serif;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   font-size: 1.15rem;
   line-height: 1;
 }
@@ -2818,7 +2817,7 @@ body {
   margin: 0;
   min-width: 0;
   color: var(--text, #fff8f4);
-  font-family: "Space Grotesk", "Inter", system-ui, sans-serif;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   font-size: 0.9rem;
   line-height: 1.15;
 }
@@ -2974,7 +2973,7 @@ body {
 }
 
 .stitch-brand {
-  font-family: "Space Grotesk", "Inter", system-ui, sans-serif;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   font-size: 1.12rem;
   font-weight: 700;
   letter-spacing: -0.02em;
@@ -3130,7 +3129,6 @@ body {
 }
 
 #viewListe .grid .card-status-icon {
-  font-family: "Material Symbols Outlined", sans-serif;
   font-size: 18px;
   line-height: 1;
   display: inline-flex;
@@ -3255,7 +3253,6 @@ body {
   min-width: 44px;
   padding-left: 0;
   padding-right: 0;
-  font-family: "Material Symbols Outlined", sans-serif;
   font-size: 18px;
   letter-spacing: 0;
 }
@@ -3327,7 +3324,7 @@ body {
 .stats-hero-pct {
   margin: 0;
   color: #ffe5e1;
-  font-family: "Space Grotesk", "Inter", system-ui, sans-serif;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   font-size: 2.2rem;
   font-weight: 700;
   letter-spacing: -0.02em;
@@ -3432,7 +3429,7 @@ body {
 
 #viewClasseur .binder-vault-item-name,
 #viewPrint .binder-vault-item-name {
-  font-family: "Space Grotesk", "Inter", system-ui, sans-serif;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   font-size: 0.86rem;
   font-weight: 600;
 }
@@ -3661,7 +3658,7 @@ body {
 
 #viewStats .stats-rail-value {
   color: var(--electric);
-  font-family: "Space Grotesk", "Inter", system-ui, sans-serif;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   font-weight: 700;
   font-size: 2.2rem;
   line-height: 1;
@@ -3706,7 +3703,7 @@ body {
 .focus-panel__title {
   margin: 0;
   color: #ffe9e6;
-  font-family: "Space Grotesk", "Inter", system-ui, sans-serif;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   font-size: 0.9rem;
   line-height: 1.15;
 }
@@ -3794,7 +3791,6 @@ body {
 }
 
 .focus-panel__target-state {
-  font-family: "Material Symbols Outlined";
   font-size: 1rem;
   line-height: 1;
   color: var(--electric);
@@ -3908,7 +3904,7 @@ body {
 
 #viewStats .stats-hero-ring-value {
   display: block;
-  font-family: "Space Grotesk", "Inter", system-ui, sans-serif;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   font-size: 1.9rem;
   font-weight: 700;
   color: #ffe5e1;
@@ -4105,7 +4101,7 @@ body {
   background: rgba(255 255 255 / 0.06);
   color: var(--md-on-surface, #e3e3e3);
   text-decoration: none;
-  font: 500 0.85rem / 1.4 "Inter", sans-serif;
+  font: 500 0.85rem / 1.4 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   cursor: pointer;
   transition: background 0.15s, border-color 0.15s;
 }
@@ -4115,7 +4111,7 @@ body {
   border-color: rgba(255 255 255 / 0.24);
 }
 
-.settings-action-btn .material-symbols-outlined {
+.settings-action-btn .app-icon {
   font-size: 18px;
 }
 
@@ -4178,7 +4174,7 @@ body {
 }
 
 .print-control-group label {
-  font: 500 0.75rem / 1.3 "Inter", sans-serif;
+  font: 500 0.75rem / 1.3 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   color: rgba(255 255 255 / 0.55);
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -4190,11 +4186,11 @@ body {
   border: 1px solid rgba(255 255 255 / 0.12);
   background: rgba(255 255 255 / 0.06);
   color: var(--md-on-surface, #e3e3e3);
-  font: 400 0.85rem / 1.4 "Inter", sans-serif;
+  font: 400 0.85rem / 1.4 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
 }
 
 .print-summary {
-  font: 400 0.85rem / 1.4 "Inter", sans-serif;
+  font: 400 0.85rem / 1.4 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   color: rgba(255 255 255 / 0.55);
   margin-left: auto;
 }
@@ -4208,7 +4204,7 @@ body {
   border-radius: 8px;
   background: var(--surface-high);
   color: var(--text);
-  font: 600 0.9rem / 1.4 "Inter", sans-serif;
+  font: 600 0.9rem / 1.4 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   cursor: pointer;
   transition: background 0.15s, border-color 0.15s;
 }
@@ -4223,7 +4219,7 @@ body {
 }
 
 .print-section-title {
-  font: 600 1.1rem / 1.4 "Space Grotesk", sans-serif;
+  font: 600 1.1rem / 1.4 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   color: var(--md-on-surface, #e3e3e3);
   margin: 0 0 6px;
   padding-bottom: 4px;
@@ -4233,7 +4229,7 @@ body {
 .print-table {
   width: 100%;
   border-collapse: collapse;
-  font: 400 0.82rem / 1.4 "Inter", sans-serif;
+  font: 400 0.82rem / 1.4 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
 }
 
 .print-table th {
@@ -4328,7 +4324,7 @@ body {
 }
 
 .stitch-footer-logo {
-  font-family: "Space Grotesk", "Inter", system-ui, sans-serif;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   font-weight: 700;
   letter-spacing: -0.02em;
   text-transform: uppercase;
@@ -4398,7 +4394,7 @@ body {
   color: #00daf3;
 }
 
-.stitch-footer-link .material-symbols-outlined {
+.stitch-footer-link .app-icon {
   font-size: 1rem;
   line-height: 1;
 }
@@ -4548,7 +4544,7 @@ body {
 }
 
 #viewPrint .print-section-title {
-  font-family: "Space Grotesk", "Inter", sans-serif;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   color: #ffe5e1;
   letter-spacing: -0.01em;
 }
@@ -6530,7 +6526,7 @@ html[data-theme="paldea"] {
   color: inherit;
   padding: 8px 12px;
   border-radius: 8px;
-  font: 500 0.85rem / 1.4 "Inter", sans-serif;
+  font: 500 0.85rem / 1.4 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
 }
 
 .profiles-name-input:focus {
@@ -6791,7 +6787,7 @@ html[data-theme="paldea"] {
 
 .trainer-contact-card h2 {
   margin: 0 0 0.4rem;
-  font-family: "Space Grotesk", Inter, sans-serif;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   font-size: 1.05rem;
 }
 

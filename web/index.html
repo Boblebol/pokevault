@@ -4,14 +4,6 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>pokevault</title>
-    <link
-      rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@300;400;500;600;700&display=swap"
-    />
-    <link
-      rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL,GRAD,opsz@100..700,0..1,-50..200,20..48"
-    />
     <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml" />
     <link rel="stylesheet" href="/styles.css" />
   </head>
@@ -399,7 +391,7 @@
                     </div>
                     <span class="print-summary" id="printSummary"></span>
                     <button type="button" class="print-action-btn" id="printBtn">
-                      <span class="material-symbols-outlined" aria-hidden="true">print</span>
+                      <span class="app-icon" aria-hidden="true">⎙</span>
                       <span data-i18n="app.print.action">Imprimer</span>
                     </button>
                   </div>
@@ -441,15 +433,15 @@
             <p class="stats-kpi-sub" data-i18n="app.settings.data_help">Exporter ou importer toute la collection (attrapés + classeurs).</p>
             <div class="settings-data-actions">
               <button type="button" class="settings-action-btn" id="exportBtn">
-                <span class="material-symbols-outlined" aria-hidden="true">download</span>
+                <span class="app-icon" aria-hidden="true">↓</span>
                 <span data-i18n="app.settings.export">Exporter JSON</span>
               </button>
               <button type="button" class="settings-action-btn" id="importBtn">
-                <span class="material-symbols-outlined" aria-hidden="true">upload</span>
+                <span class="app-icon" aria-hidden="true">↑</span>
                 <span data-i18n="app.settings.import">Importer JSON</span>
               </button>
               <a href="#/print" class="settings-action-btn" id="printFromSettingsBtn">
-                <span class="material-symbols-outlined" aria-hidden="true">print</span>
+                <span class="app-icon" aria-hidden="true">⎙</span>
                 <span data-i18n="app.settings.print">Checklist impression</span>
               </a>
               <input type="file" id="importFileInput" accept=".json" hidden />
@@ -472,7 +464,7 @@
             <p class="stats-kpi-sub" id="settingsProfileLabel" data-i18n="app.settings.profile_label">Profil : —</p>
             <div class="settings-data-actions">
               <button type="button" class="settings-action-btn" id="replayOnboardingBtn">
-                <span class="material-symbols-outlined" aria-hidden="true">play_circle</span>
+                <span class="app-icon" aria-hidden="true">▶</span>
                 <span data-i18n="app.settings.replay">Rejouer l'onboarding</span>
               </button>
             </div>
@@ -499,11 +491,11 @@
                 maxlength="64"
               />
               <button type="button" class="settings-action-btn" id="settingsProfileCreateBtn">
-                <span class="material-symbols-outlined" aria-hidden="true">person_add</span>
+                <span class="app-icon" aria-hidden="true">+</span>
                 <span data-i18n="app.settings.create">Créer</span>
               </button>
               <button type="button" class="settings-action-btn settings-action-btn--cancel" id="settingsProfileDeleteBtn">
-                <span class="material-symbols-outlined" aria-hidden="true">delete</span>
+                <span class="app-icon" aria-hidden="true">×</span>
                 <span data-i18n="app.settings.delete">Supprimer</span>
               </button>
             </div>
@@ -544,7 +536,7 @@
             aria-label="Portfolio d'Alexandre"
             data-i18n-aria-label="app.footer.portfolio_aria"
           >
-            <span class="material-symbols-outlined" aria-hidden="true">public</span>
+            <span class="app-icon" aria-hidden="true">◎</span>
             Portfolio
           </a>
           <a
@@ -554,7 +546,7 @@
             rel="noopener noreferrer"
             aria-label="GitHub boblebol"
           >
-            <span class="material-symbols-outlined" aria-hidden="true">code</span>
+            <span class="app-icon" aria-hidden="true">&lt;&gt;</span>
             GitHub
           </a>
           <a
@@ -564,7 +556,7 @@
             rel="noopener noreferrer"
             aria-label="LinkedIn boblebol"
           >
-            <span class="material-symbols-outlined" aria-hidden="true">hub</span>
+            <span class="app-icon" aria-hidden="true">in</span>
             LinkedIn
           </a>
         </nav>
@@ -582,7 +574,7 @@
             aria-label="Passer l'onboarding"
             data-i18n-aria-label="app.onboarding.skip"
           >
-            <span class="material-symbols-outlined" aria-hidden="true">close</span>
+            <span class="app-icon" aria-hidden="true">×</span>
           </button>
         </header>
 
@@ -705,7 +697,7 @@
         <header class="kb-help__header">
           <h2 id="shortcutsHelpTitle" class="kb-help__title" data-i18n="app.shortcuts.title">Raccourcis clavier</h2>
           <button type="button" class="kb-help__close" data-kb-close aria-label="Fermer l'aide" data-i18n-aria-label="app.shortcuts.close">
-            <span class="material-symbols-outlined" aria-hidden="true">close</span>
+            <span class="app-icon" aria-hidden="true">×</span>
           </button>
         </header>
         <ul class="kb-help__list">

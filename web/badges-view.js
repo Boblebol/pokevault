@@ -89,7 +89,7 @@
       const def = byId.get(id);
       if (!def) continue;
       T.show("Badge débloqué", def.title, {
-        icon: "military_tech",
+        icon: "★",
         tone: "ok",
         duration: 6000,
       });
@@ -184,9 +184,9 @@
     const progress = normalizeProgress(badge);
 
     const icon = document.createElement("span");
-    icon.className = "material-symbols-outlined badge-tile__icon";
+    icon.className = "app-icon badge-tile__icon";
     icon.setAttribute("aria-hidden", "true");
-    icon.textContent = badge.unlocked ? "military_tech" : "lock";
+    icon.textContent = badge.unlocked ? "★" : "□";
     tile.append(icon);
 
     const body = document.createElement("div");

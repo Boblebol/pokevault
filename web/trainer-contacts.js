@@ -420,11 +420,11 @@
         </div>
         <div class="trainer-actions">
           <button type="button" class="settings-action-btn" data-trainer-export>
-            <span class="material-symbols-outlined" aria-hidden="true">download</span>
+            <span class="app-icon" aria-hidden="true">↓</span>
             ${escapeText(tr("trainers.export"))}
           </button>
           <button type="button" class="settings-action-btn" data-trainer-import>
-            <span class="material-symbols-outlined" aria-hidden="true">upload</span>
+            <span class="app-icon" aria-hidden="true">↑</span>
             ${escapeText(tr("trainers.import"))}
           </button>
         </div>
@@ -439,7 +439,7 @@
         <textarea name="wants" class="search-input" placeholder="${escapeAttr(tr("trainers.wants_placeholder"))}">${escapeText((cachedBook.own_card?.wants || []).join("\n"))}</textarea>
         <textarea name="for_trade" class="search-input" placeholder="${escapeAttr(tr("trainers.trade_placeholder"))}">${escapeText((cachedBook.own_card?.for_trade || []).join("\n"))}</textarea>
         <button type="submit" class="settings-action-btn settings-action-btn--confirm">
-          <span class="material-symbols-outlined" aria-hidden="true">save</span>
+          <span class="app-icon" aria-hidden="true">✓</span>
           ${escapeText(tr("trainers.save"))}
         </button>
       </form>
@@ -523,7 +523,7 @@
           <p>${escapeText(contact.card.public_note || tr("trainers.local_card"))}</p>
         </div>
         <button type="button" class="trainer-danger-btn" data-trainer-delete data-trainer-id="${escapeAttr(contact.card.trainer_id)}" data-trainer-name="${escapeAttr(contact.card.display_name)}">
-          <span class="material-symbols-outlined" aria-hidden="true">delete</span>
+          <span class="app-icon" aria-hidden="true">×</span>
           ${escapeText(tr("trainers.delete"))}
         </button>
       </div>
@@ -543,7 +543,7 @@
           <textarea class="search-input" name="private_note" placeholder="${escapeAttr(tr("trainers.private_note_placeholder"))}">${escapeText(contact.private_note || "")}</textarea>
         </label>
         <button type="submit" class="settings-action-btn">
-          <span class="material-symbols-outlined" aria-hidden="true">save</span>
+          <span class="app-icon" aria-hidden="true">✓</span>
           ${escapeText(tr("trainers.save_note"))}
         </button>
       </form>

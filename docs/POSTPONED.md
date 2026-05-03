@@ -83,6 +83,42 @@ Le multi-profils permet aujourd'hui de créer, sélectionner et supprimer des
 profils. Le renommage est utile mais non bloquant : l'utilisateur peut créer un
 nouveau profil avec le bon nom et supprimer l'ancien si besoin.
 
+## Durcissement Non Bloquant
+
+Ces suivis viennent de l'audit du 2026-05-03. Ils améliorent la robustesse ou
+la confiance de release, mais ne bloquent pas la remise en état courante tant
+qu'aucun symptôme utilisateur n'est observé.
+
+### Écritures JSON atomiques et verrouillées
+
+Statut : repoussé.
+
+Les repositories JSON écrivent aujourd'hui des fichiers locaux profilés. Un
+suivi dédié doit remplacer les écritures directes par une stratégie temp-file
+plus `replace`, avec un verrou optionnel autour des écritures concurrentes. Le
+ticket devra couvrir au minimum les dépôts de progression, cartes, classeurs,
+profils et contacts dresseurs, puis ajouter des tests de non-corruption en cas
+d'écriture interrompue.
+
+### Smoke E2E Playwright
+
+Statut : repoussé.
+
+La couverture actuelle reste majoritairement unitaire et statique. Un suivi
+Playwright doit ajouter un smoke test navigateur pour les parcours critiques :
+onboarding, restauration de backup, exposition des données, collection sur
+mobile et runtime Docker. Le but est de détecter une régression de wiring ou de
+bundle, pas de remplacer les tests métier existants.
+
+### Screenshots JPEG avec extension `.png`
+
+Statut : repoussé.
+
+Certains screenshots de documentation sont stockés avec une extension `.png`
+alors que leur contenu est encodé en JPEG. Un suivi doit choisir entre
+réencoder réellement ces images en PNG ou les renommer en `.jpg`, puis mettre à
+jour toutes les références docs concernées dans la même passe.
+
 ## Sortie Du Backlog Repoussé
 
 Pour promouvoir une idée dans la roadmap active, il faut :

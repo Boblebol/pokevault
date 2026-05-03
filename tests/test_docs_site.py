@@ -113,6 +113,18 @@ def test_web_app_references_runtime_brand_assets() -> None:
     assert ("src", "/assets/logo-mark.svg") in links
 
 
+def test_web_app_has_no_third_party_font_requests() -> None:
+    index = (WEB / "index.html").read_text(encoding="utf-8")
+
+    assert "fonts.googleapis.com" not in index
+    assert "fonts.gstatic.com" not in index
+    assert "Material+Symbols" not in index
+    for path in [WEB / "index.html", WEB / "styles.css", *WEB.glob("*.js")]:
+        text = path.read_text(encoding="utf-8")
+        assert "Material Symbols" not in text, path
+        assert "material-symbols" not in text, path
+
+
 def test_web_app_supports_fr_en_switch_on_main_surfaces() -> None:
     index = (WEB / "index.html").read_text(encoding="utf-8")
     i18n = (WEB / "i18n.js").read_text(encoding="utf-8")

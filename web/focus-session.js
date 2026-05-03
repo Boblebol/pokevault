@@ -245,7 +245,7 @@
         plural: saved.slugs.length > 1 ? "s" : "",
         region: saved.targetLabel,
       }), {
-        icon: "flag",
+        icon: "⚑",
         tone: "ok",
       });
     }
@@ -338,7 +338,7 @@
       row.dataset.slug = slug;
       row.append(el("span", "focus-panel__target-num", p ? displayNumber(p) : "—"));
       row.append(el("span", "focus-panel__target-name", p ? displayName(p) : slug));
-      row.append(el("span", "focus-panel__target-state", done ? "check" : "radio_button_unchecked"));
+      row.append(el("span", "focus-panel__target-state", done ? "✓" : "○"));
       list.append(row);
     }
     host.append(list);

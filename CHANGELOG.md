@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [1.2.0] — 2026-05-03
+
 ### Added
 
 - Optional evolution-family binder layouts now use generated
@@ -31,6 +33,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   "Le Pokédex des collectionneurs qui préfèrent les vrais échanges au cloud."
 - Public docs now expose the same language switch in their shared navigation,
   while long-form docs stay readable as static project documentation.
+- `make check` now runs the vanilla Node web tests in addition to Python lint
+  and coverage.
+- The audit remediation plan is tracked under
+  `superpowers/plans/2026-05-03-audit-remediation.md`.
+- Non-blocking hardening follow-ups are documented for atomic JSON writes,
+  Playwright smoke tests and screenshot format cleanup.
+- The local web app now uses system fonts and local text symbols instead of
+  remote Google Fonts / Material Symbols requests.
+
+### Fixed
+
+- UI backup import now accepts schema versions 1, 2 and 3, matching the backend
+  export payload.
+- Runtime empty-state help now points to `make dev` instead of the removed
+  `make web` command.
+- README and contributing docs now match the current reference data and
+  Dependabot `uv` workflow.
+
+### Security
+
+- Public `/data` routes now expose only whitelisted reference JSON files and
+  image directories, keeping user state JSON behind typed API endpoints.
+- Docker Compose now binds the published app port to `127.0.0.1` by default.
 
 ## [1.1.0] — 2026-04-28
 

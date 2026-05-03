@@ -3,7 +3,7 @@ services:
     image: ${DOCKER_IMAGE:-ghcr.io/boblebol/pokevault}:${DOCKER_TAG:-latest}
     build: .
     ports:
-      - "8765:8765"
+      - "127.0.0.1:8765:8765"
     volumes:
       - ./data:/app/data
     environment:

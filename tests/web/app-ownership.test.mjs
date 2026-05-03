@@ -58,3 +58,12 @@ test("shouldDimCardForHighlight dims doubles as captured cards", async () => {
     false,
   );
 });
+
+test("backup import accepts schema versions emitted by the backend", async () => {
+  const api = await loadModule();
+
+  assert.equal(api.isSupportedBackupSchemaVersion(1), true);
+  assert.equal(api.isSupportedBackupSchemaVersion(2), true);
+  assert.equal(api.isSupportedBackupSchemaVersion(3), true);
+  assert.equal(api.isSupportedBackupSchemaVersion(99), false);
+});
