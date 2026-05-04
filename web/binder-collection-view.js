@@ -3,13 +3,14 @@
  * choix du classeur, navigation feuillet recto/verso.
  */
 
-/** @type {{ cfg: object | null; binderId: string; sheet: number; face: number; ordered: unknown[] }} */
+/** @type {{ cfg: object | null; binderId: string; sheet: number; face: number; ordered: unknown[]; slots: unknown[] }} */
 const shellState = {
   cfg: null,
   binderId: "",
   sheet: 0,
   face: 0,
   ordered: [],
+  slots: [],
 };
 
 let shellInited = false;
@@ -32,6 +33,8 @@ const BINDER_SHELL_FALLBACK_I18N = {
   "binder_shell.metric.completion": "Complétion",
   "binder_shell.metric.page_spread": "Page spread",
   "binder_shell.metric.pages": "{count} pages",
+  "binder_shell.reserved_family": "Reserve famille",
+  "binder_shell.empty_slot": "Emplacement vide",
   "binder_shell.hint.empty": "{format} Charge le Pokédex (make dev) pour remplir les cases.",
   "binder_shell.hint.slots": "{format} Emplacements {first}-{last} sur {slots} cases, {entries} Pokémon.",
 };
@@ -125,6 +128,28 @@ function totalLogicalPages(binder) {
 
 function realOrderedEntries(ordered) {
   return Array.isArray(ordered) ? ordered.filter(Boolean) : [];
+}
+
+function createReservedSlotCard(slot = {}) {
+  const card = document.createElement("div");
+  card.className = "card card--reserved-slot binder-card";
+  card.dataset.emptyKind = String(slot?.emptyKind || "");
+  card.dataset.familyId = String(slot?.familyId || "");
+
+  const label = document.createElement("span");
+  label.className = "card-empty-label";
+  label.textContent = tBinderShell(
+    slot?.emptyKind === "family_reserved"
+      ? "binder_shell.reserved_family"
+      : "binder_shell.empty_slot",
+  );
+
+  const meta = document.createElement("span");
+  meta.className = "card-empty-meta";
+  meta.textContent = `#${slot?.slot || ""}`;
+
+  card.append(label, meta);
+  return card;
 }
 
 /**
@@ -295,6 +320,7 @@ function renderBinderPageGrid() {
   const binder = getActiveBinder(cfg);
   const PC = window.PokedexCollection;
   if (!host || !binder || !window.PokedexBinder?.orderPokemonForBinder) {
+    shellState.slots = [];
     if (host) host.replaceChildren();
     if (metricsHost) metricsHost.replaceChildren();
     return;
@@ -317,6 +343,16 @@ function renderBinderPageGrid() {
             : window.PokedexBinder.pokemonMatchesFormRule(p, rule),
         )
     : raw;
+  const slots = window.PokevaultBinderLayout?.computeBinderSlots
+    ? window.PokevaultBinderLayout.computeBinderSlots({
+        binder,
+        pokemon,
+        defs,
+        familyData: window.PokedexBinder?.cachedFamilyData || null,
+        includeCapacity: true,
+      })
+    : [];
+  shellState.slots = Array.isArray(slots) ? slots : [];
   shellState.ordered = window.PokedexBinder.orderPokemonForBinder(binder, pokemon, defs);
   renderVaultsNav(cfg, binder.id, shellState.ordered);
 
@@ -356,9 +392,14 @@ function renderBinderPageGrid() {
 
     for (let i = 0; i < perFace; i++) {
       const idx = slotOffset + i;
-      const p = shellState.ordered[idx];
+      const slot = shellState.slots?.[idx] || null;
+      const p = slot ? slot.pokemon : shellState.ordered[idx];
       if (makeCard) {
-        const card = p ? makeCard(p) : makeCard(null, { empty: true });
+        const card = p
+          ? makeCard(p)
+          : slot?.emptyKind === "family_reserved"
+            ? createReservedSlotCard(slot)
+            : makeCard(null, { empty: true });
         if (card) {
           card.classList.add("binder-card");
           grid.append(card);
@@ -405,14 +446,15 @@ function renderBinderPageGrid() {
   }
 
   if (hint) {
-    const slotTotal = shellState.ordered.length;
+    const physicalSlots = shellState.slots.length ? shellState.slots : shellState.ordered;
+    const slotTotal = physicalSlots.length;
     const entryTotal = realOrderedEntries(shellState.ordered).length;
     const firstSlot = pageStart * perFace;
     const lastIdx =
       slotTotal > 0 ? Math.min(slotTotal - 1, pageStart * perFace + nShow * perFace - 1) : -1;
     const modeText = binderFormatText(binder);
     hint.textContent =
-      slotTotal === 0
+      entryTotal === 0
         ? tBinderShell("binder_shell.hint.empty", { format: modeText })
         : tBinderShell("binder_shell.hint.slots", {
             format: modeText,
@@ -467,6 +509,7 @@ function syncFromConfig(cfg) {
   if (empty) {
     shellState.binderId = "";
     shellState.ordered = [];
+    shellState.slots = [];
     const grid = document.getElementById("binderPagesHost");
     if (grid) grid.replaceChildren();
     return;
@@ -529,6 +572,7 @@ window.PokedexBinderShell = {
 if (window.__POKEVAULT_BINDER_SHELL_TESTS__) {
   window.PokedexBinderShell._test = {
     binderFormatText,
+    createReservedSlotCard,
     faceLabels,
   };
 }

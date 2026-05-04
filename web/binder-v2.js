@@ -1948,6 +1948,9 @@ window.PokedexBinder = {
   get cachedConfig() {
     return lastConfigJson;
   },
+  get cachedFamilyData() {
+    return binderEvolutionFamilies;
+  },
   _test: {
     binderCapacity,
     buildFamilyBinderWorkspace,
