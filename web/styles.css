@@ -4305,6 +4305,81 @@ body {
   display: none;
 }
 
+.print-placeholder-page {
+  margin-bottom: 16px;
+  padding: 16px;
+  border: 1px solid rgba(255 255 255 / 0.08);
+  border-radius: 8px;
+  background: rgba(255 255 255 / 0.03);
+}
+
+.print-placeholder-grid {
+  --placeholder-cols: 3;
+  display: grid;
+  grid-template-columns: repeat(var(--placeholder-cols), minmax(0, 1fr));
+  grid-auto-rows: minmax(190px, auto);
+  gap: 10px;
+  align-items: stretch;
+}
+
+.print-placeholder-card {
+  min-width: 0;
+  padding: 10px;
+  border: 1px solid rgba(255 255 255 / 0.14);
+  border-radius: 8px;
+  background: rgba(255 255 255 / 0.05);
+  color: var(--md-on-surface, #e3e3e3);
+  display: grid;
+  grid-template-rows: auto minmax(90px, 1fr) auto auto auto;
+  gap: 6px;
+  overflow: hidden;
+}
+
+.print-placeholder-card--reserved {
+  place-items: center;
+  border-style: dashed;
+  background: rgba(255 255 255 / 0.025);
+  color: rgba(255 255 255 / 0.48);
+  text-align: center;
+  font: 700 0.78rem / 1.3 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  text-transform: uppercase;
+}
+
+.print-placeholder-card__top {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  color: rgba(255 255 255 / 0.58);
+  font: 700 0.72rem / 1.3 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  text-transform: uppercase;
+}
+
+.print-placeholder-card__image {
+  width: 100%;
+  height: 112px;
+  object-fit: contain;
+  align-self: center;
+  justify-self: center;
+}
+
+.print-placeholder-card strong {
+  color: var(--md-on-surface, #e3e3e3);
+  font: 700 0.96rem / 1.15 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  overflow-wrap: anywhere;
+}
+
+.print-placeholder-card > span {
+  color: rgba(255 255 255 / 0.6);
+  font: 500 0.8rem / 1.25 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  overflow-wrap: anywhere;
+}
+
+.print-placeholder-card > small {
+  color: rgba(255 255 255 / 0.42);
+  font: 500 0.68rem / 1.25 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  overflow-wrap: anywhere;
+}
+
 .print-toolbar {
   display: grid;
   gap: 12px;
@@ -4767,6 +4842,69 @@ body {
   .print-table td { color: #111; border-bottom-color: #ddd; }
   .print-table tr.is-caught td { color: #999; }
   .print-check { color: #000 !important; }
+
+  .print-output.is-placeholders {
+    background: #fff;
+  }
+
+  .print-placeholder-page {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: #fff;
+    color: #000;
+    break-after: page;
+  }
+
+  .print-placeholder-page:last-child {
+    break-after: auto;
+  }
+
+  .print-placeholder-grid {
+    grid-auto-rows: minmax(82mm, auto);
+    gap: 4mm;
+  }
+
+  .print-placeholder-card {
+    min-height: 82mm;
+    padding: 3mm;
+    border: 0.25mm solid #111;
+    border-radius: 2mm;
+    background: #fff;
+    color: #000;
+    break-inside: avoid;
+  }
+
+  .print-placeholder-card--reserved {
+    border-style: dashed;
+    color: #777;
+    background: #fff;
+  }
+
+  .print-placeholder-card__top {
+    color: #333;
+    font-size: 7.5pt;
+  }
+
+  .print-placeholder-card__image {
+    height: 30mm;
+  }
+
+  .print-placeholder-card strong {
+    color: #000;
+    font-size: 10pt;
+  }
+
+  .print-placeholder-card > span {
+    color: #444;
+    font-size: 8pt;
+  }
+
+  .print-placeholder-card > small {
+    color: #666;
+    font-size: 6.8pt;
+  }
 
   .print-page-break { break-before: page; }
 

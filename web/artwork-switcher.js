@@ -17,6 +17,7 @@
  *
  * The module exposes ``window.PokevaultArtwork`` with:
  *   - ``resolve(p)`` → ``{ src, fallbacks }`` used by renderers.
+ *   - ``resolveForMode(p, mode)`` → same resolver for a specific mode.
  *   - ``mode`` / ``setMode(id)`` / ``subscribe(fn)``.
  *   - ``refreshCards()`` — re-index card thumbnails (called by the
  *     drawer after create/delete via ``pokevault:cards-changed``).
@@ -88,9 +89,10 @@
     return cardByslug.get(slug) || "";
   }
 
-  function resolve(p) {
+  function resolveForMode(p, mode = currentMode) {
+    const selected = isValid(mode) ? mode : DEFAULT_MODE;
     const def = normalizeDefault(p);
-    if (currentMode === "shiny") {
+    if (selected === "shiny") {
       const local = shinyPath(p);
       const cdn = shinyCdnPath(p);
       const chain = [local, cdn, def].filter(
@@ -98,11 +100,15 @@
       );
       return { src: chain[0] || def, fallbacks: chain.slice(1) };
     }
-    if (currentMode === "card") {
+    if (selected === "card") {
       const ca = cardArt(p);
       return { src: ca || def, fallbacks: ca && def !== ca ? [def] : [] };
     }
     return { src: def, fallbacks: [] };
+  }
+
+  function resolve(p) {
+    return resolveForMode(p, currentMode);
   }
 
   async function refreshCards() {
@@ -184,6 +190,7 @@
       return MODES.slice();
     },
     resolve,
+    resolveForMode,
     attach,
     setMode,
     subscribe,
