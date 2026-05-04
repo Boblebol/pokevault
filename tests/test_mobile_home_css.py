@@ -51,6 +51,15 @@ def test_details_pill_is_not_kept_open_by_other_card_controls() -> None:
     assert ".card:hover .card-details" in CSS
 
 
+def test_details_pill_stays_hover_only_on_dimmed_cards() -> None:
+    selector = (
+        ".card.is-dimmed > "
+        ":not(.card-action):not(.pokemon-network-row):not(.card-details)"
+    )
+    block = "\n".join(_blocks(selector))
+    assert "opacity: 0.35;" in block
+
+
 def test_binder_cards_keep_pokemon_content_centered() -> None:
     block = "\n".join(_blocks("#viewClasseur .binder-page-grid--cards .binder-card"))
     assert "align-items: center;" in block

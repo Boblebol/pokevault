@@ -2112,7 +2112,7 @@ body {
     0 8px 24px rgba(0, 0, 0, 0.22);
 }
 
-.card.is-dimmed > :not(.card-action):not(.pokemon-network-row) {
+.card.is-dimmed > :not(.card-action):not(.pokemon-network-row):not(.card-details) {
   opacity: 0.35;
 }
 
