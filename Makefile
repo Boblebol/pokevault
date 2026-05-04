@@ -17,7 +17,7 @@ AWK ?= awk
 
 .DEFAULT_GOAL := help
 
-.PHONY: help vars install dev open fetch fetch-test fetch-shiny fetch-evolutions test test-cov web-test lint fmt check clean \
+.PHONY: help vars install dev open fetch fetch-test fetch-shiny fetch-evolutions test test-cov web-test lightpanda-e2e lint fmt check clean \
 	build docker-build docker-up docker-up-local docker-down docker-logs
 
 ##@ General
@@ -88,6 +88,9 @@ test-cov: ## Lancer les tests avec couverture (100% tracker)
 
 web-test: ## Lancer les tests web vanilla Node
 	node --test tests/web/*.test.mjs
+
+lightpanda-e2e: ## Lancer les checks navigateur optionnels Lightpanda
+	node tests/e2e/lightpanda-print-placeholders.mjs
 
 lint: ## Verifier le style (ruff check)
 	$(UV) run ruff check pokedex/ tracker/ main.py tests/
