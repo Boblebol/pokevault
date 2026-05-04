@@ -75,3 +75,18 @@ test("docs route is recognized as a first-class app view", async () => {
 
   assert.equal(api.currentViewFromHash(), "docs");
 });
+
+test("artwork changes rerender the active Pokemon route", async () => {
+  const api = await loadModule();
+  const rendered = [];
+  globalThis.location.hash = "#/pokemon/0001-bulbasaur";
+  globalThis.PokevaultFullView = {
+    render(slug) {
+      rendered.push(slug);
+    },
+  };
+
+  api.rerenderArtworkSurface();
+
+  assert.deepEqual(rendered, ["0001-bulbasaur"]);
+});

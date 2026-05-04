@@ -108,6 +108,25 @@
     return s.startsWith("/") ? s : `/${s}`;
   }
 
+  function attachPokemonArtwork(img, pokemon) {
+    const artwork = window.PokevaultArtwork;
+    if (typeof artwork?.resolve === "function") {
+      const resolved = artwork.resolve(pokemon);
+      if (resolved?.src) {
+        if (typeof artwork.attach === "function") {
+          artwork.attach(img, resolved);
+        } else {
+          img.src = resolved.src;
+        }
+        return true;
+      }
+    }
+    const src = normalizeImgPath(pokemon?.image);
+    if (!src) return false;
+    img.src = src;
+    return true;
+  }
+
   function displayName(p) {
     const helper = ficheHelpers();
     if (typeof helper.displayName === "function") return helper.displayName(p);
@@ -242,10 +261,8 @@
 
     const imgWrap = document.createElement("div");
     imgWrap.className = "fullview-hero__img";
-    const src = normalizeImgPath(p.image);
-    if (src) {
-      const img = document.createElement("img");
-      img.src = src;
+    const img = document.createElement("img");
+    if (attachPokemonArtwork(img, p)) {
       img.alt = displayName(p);
       imgWrap.append(img);
     }
@@ -479,10 +496,8 @@
       a.href = pokemonRouteHref(entry.slug);
       a.dataset.current = entry.current ? "true" : "false";
       if (entry.current) a.setAttribute("aria-current", "page");
-      const src = normalizeImgPath(f.image);
-      if (src) {
-        const img = document.createElement("img");
-        img.src = src;
+      const img = document.createElement("img");
+      if (attachPokemonArtwork(img, f)) {
         img.alt = "";
         img.loading = "lazy";
         a.append(img);
