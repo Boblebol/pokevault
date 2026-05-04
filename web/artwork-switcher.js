@@ -2,7 +2,7 @@
  * Pokevault — artwork switcher (roadmap F11).
  *
  * Provides a single place to resolve the best image for a Pokémon
- * tile + fallback chain. Three v1 modes:
+ * tile + fallback chain. Modes:
  *
  *   - ``default`` — Sugimori/official artwork from ``data/images/``.
  *   - ``shiny``   — local ``data/images_shiny/<slug>.png`` first, then
@@ -12,11 +12,14 @@
  *   - ``card``    — first user-owned card thumbnail from
  *     ``/api/cards`` (indexed by ``pokemon_slug``); falls back to
  *     default when no card is owned.
+ *   - ``sprite_gen*`` — generation-specific sprites from the PokéAPI
+ *     sprite CDN, falling back to the default artwork.
  *
  * Mode is persisted in ``localStorage['pokevault.ui.artwork']``.
  *
  * The module exposes ``window.PokevaultArtwork`` with:
  *   - ``resolve(p)`` → ``{ src, fallbacks }`` used by renderers.
+ *   - ``resolveForMode(p, mode)`` → same resolver for a specific mode.
  *   - ``mode`` / ``setMode(id)`` / ``subscribe(fn)``.
  *   - ``refreshCards()`` — re-index card thumbnails (called by the
  *     drawer after create/delete via ``pokevault:cards-changed``).
@@ -30,7 +33,19 @@
     { id: "default", label: "Sugimori" },
     { id: "shiny", label: "Shiny (fallback si absent)" },
     { id: "card", label: "Première carte TCG" },
+    { id: "sprite_gen1", label: "Sprite Gen 1" },
+    { id: "sprite_gen2", label: "Sprite Gen 2" },
+    { id: "sprite_gen3", label: "Sprite Gen 3" },
+    { id: "sprite_gen4", label: "Sprite Gen 4" },
+    { id: "sprite_gen5", label: "Sprite Gen 5" },
   ];
+  const SPRITE_VERSION_PATHS = {
+    sprite_gen1: "versions/generation-i/red-blue",
+    sprite_gen2: "versions/generation-ii/crystal",
+    sprite_gen3: "versions/generation-iii/emerald",
+    sprite_gen4: "versions/generation-iv/platinum",
+    sprite_gen5: "versions/generation-v/black-white",
+  };
 
   function readStored() {
     try {
@@ -82,15 +97,31 @@
     return `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/shiny/${natId}.png`;
   }
 
+  function nationalIdFromSlug(p) {
+    const slug = String(p?.slug || "");
+    const m = slug.match(/^(\d{1,4})/);
+    if (!m) return 0;
+    const natId = parseInt(m[1], 10);
+    return Number.isFinite(natId) && natId > 0 ? natId : 0;
+  }
+
+  function generationSpritePath(p, mode) {
+    const versionPath = SPRITE_VERSION_PATHS[mode];
+    const natId = nationalIdFromSlug(p);
+    if (!versionPath || !natId) return "";
+    return `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${versionPath}/${natId}.png`;
+  }
+
   function cardArt(p) {
     const slug = String(p?.slug || "");
     if (!slug) return "";
     return cardByslug.get(slug) || "";
   }
 
-  function resolve(p) {
+  function resolveForMode(p, mode = currentMode) {
+    const selected = isValid(mode) ? mode : DEFAULT_MODE;
     const def = normalizeDefault(p);
-    if (currentMode === "shiny") {
+    if (selected === "shiny") {
       const local = shinyPath(p);
       const cdn = shinyCdnPath(p);
       const chain = [local, cdn, def].filter(
@@ -98,11 +129,22 @@
       );
       return { src: chain[0] || def, fallbacks: chain.slice(1) };
     }
-    if (currentMode === "card") {
+    if (selected === "card") {
       const ca = cardArt(p);
       return { src: ca || def, fallbacks: ca && def !== ca ? [def] : [] };
     }
+    if (SPRITE_VERSION_PATHS[selected]) {
+      const sprite = generationSpritePath(p, selected);
+      const chain = [sprite, def].filter(
+        (url, idx, arr) => url && arr.indexOf(url) === idx,
+      );
+      return { src: chain[0] || def, fallbacks: chain.slice(1) };
+    }
     return { src: def, fallbacks: [] };
+  }
+
+  function resolve(p) {
+    return resolveForMode(p, currentMode);
   }
 
   async function refreshCards() {
@@ -184,6 +226,7 @@
       return MODES.slice();
     },
     resolve,
+    resolveForMode,
     attach,
     setMode,
     subscribe,

@@ -7,6 +7,7 @@ let printStarted = false;
 let printLocaleSubbed = false;
 let printSelectedBinder = "all";
 let printSearchQuery = "";
+let printArtworkMode = "global";
 
 const PRINT_FALLBACK_I18N = {
   "print.pill.selection": "SÉLECTION",
@@ -17,6 +18,10 @@ const PRINT_FALLBACK_I18N = {
   "print.subtitle.caught": "{caught}/{total} attrapés ({pct}%)",
   "print.footer": "pokevault · {date} · ☑ = attrapé · ☐ = manquant",
   "print.footer_pocket": "pokevault pocket · {date} · ☑ = attrapé · ☐ = manquant",
+  "print.artwork.global": "Comme l'app",
+  "print.placeholder.reserve": "Reserve famille",
+  "print.placeholder.missing": "Manquant",
+  "print.placeholder.caught": "Capture",
   "print.col.name": "Nom",
   "print.col.binder": "Classeur",
   "print.col.page": "Page",
@@ -71,6 +76,7 @@ async function startPrintView() {
   if (!printLocaleSubbed) {
     printLocaleSubbed = true;
     window.PokevaultI18n?.subscribeLocale?.(() => {
+      fillPrintArtworkOptions(document.getElementById("printArtworkSelect"));
       renderPrintVaultsNav();
       renderPrintView();
     });
@@ -204,6 +210,39 @@ function wirePrintControls() {
     btn.dataset.printWired = "1";
     btn.addEventListener("click", () => window.print());
   }
+  const artwork = document.getElementById("printArtworkSelect");
+  if (artwork) {
+    fillPrintArtworkOptions(artwork);
+    if (!artwork.dataset.printWired) {
+      artwork.dataset.printWired = "1";
+      artwork.addEventListener("change", () => {
+        printArtworkMode = artwork.value || "global";
+        renderPrintView();
+      });
+    }
+  }
+}
+
+function fillPrintArtworkOptions(sel) {
+  if (!sel) return;
+  const current = printArtworkMode || "global";
+  sel.replaceChildren();
+
+  const addOption = (value, label) => {
+    const opt = document.createElement("option");
+    opt.value = String(value || "");
+    opt.textContent = String(label || value || "");
+    sel.append(opt);
+  };
+
+  addOption("global", tPrint("print.artwork.global"));
+  for (const mode of window.PokevaultArtwork?.modes || []) {
+    addOption(mode.id, mode.label || mode.id);
+  }
+
+  const values = Array.from(sel.options || []).map((opt) => opt.value);
+  printArtworkMode = values.includes(current) ? current : "global";
+  sel.value = printArtworkMode;
 }
 
 function getBinderConfig() {
@@ -247,6 +286,175 @@ function matchesPrintSearch(p, q) {
   return blob.includes(qq);
 }
 
+function pageKeyForSlot(slot, binderId = "") {
+  const id = String(slot?.binderId || binderId || "");
+  const page = Number(slot?.page) || 1;
+  return `${id}:${page}`;
+}
+
+function displayEnglishNamePrint(p) {
+  const n = p?.names || {};
+  return n.en || n.ja || p?.slug || "";
+}
+
+function placeholderStatusLabel(caught) {
+  return tPrint(caught ? "print.placeholder.caught" : "print.placeholder.missing");
+}
+
+function pokemonCaughtPrint(p, caughtMap = {}) {
+  const slug = String(p?.slug || "");
+  if (!slug) return false;
+  return caughtMap instanceof Map ? Boolean(caughtMap.get(slug)) : Boolean(caughtMap[slug]);
+}
+
+function normalizedDefaultArtworkPrint(p) {
+  const raw = String(p?.image || "");
+  if (!raw) return "";
+  if (/^https?:\/\//i.test(raw)) return raw;
+  return raw.startsWith("/") ? raw : `/${raw}`;
+}
+
+function shinyArtworkPathPrint(p) {
+  const slug = String(p?.slug || "");
+  if (!slug) return "";
+  return `/data/images_shiny/${encodeURIComponent(slug)}.png`;
+}
+
+function shinyCdnArtworkPathPrint(p) {
+  const slug = String(p?.slug || "");
+  const m = slug.match(/^(\d{1,4})/);
+  if (!m) return "";
+  const natId = Number.parseInt(m[1], 10);
+  if (!Number.isFinite(natId) || natId <= 0) return "";
+  return `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/shiny/${natId}.png`;
+}
+
+function defaultArtworkResultPrint(p) {
+  return { src: normalizedDefaultArtworkPrint(p), fallbacks: [] };
+}
+
+function resolvePrintArtwork(p, mode = printArtworkMode) {
+  const A = window.PokevaultArtwork;
+  const selected = mode || "global";
+
+  if (selected === "global") {
+    return A?.resolve ? A.resolve(p) : defaultArtworkResultPrint(p);
+  }
+  if (A?.resolveForMode) {
+    return A.resolveForMode(p, selected);
+  }
+  if (selected === "default") {
+    return defaultArtworkResultPrint(p);
+  }
+  if (selected === "shiny") {
+    const def = normalizedDefaultArtworkPrint(p);
+    const chain = [shinyArtworkPathPrint(p), shinyCdnArtworkPathPrint(p), def].filter(
+      (url, idx, arr) => url && arr.indexOf(url) === idx,
+    );
+    return { src: chain[0] || def, fallbacks: chain.slice(1) };
+  }
+  if (selected === "card") {
+    if (A?.resolve && A.mode === "card") return A.resolve(p);
+    return defaultArtworkResultPrint(p);
+  }
+
+  return defaultArtworkResultPrint(p);
+}
+
+function buildPlaceholderSection(binder = {}, slots = [], caughtMap = {}, filterMode = "all", searchQuery = printSearchQuery) {
+  if (binder && typeof binder === "object" && !Array.isArray(binder) && Array.isArray(binder.slots)) {
+    const opts = binder;
+    return buildPlaceholderSection(
+      opts.binder || {},
+      opts.slots,
+      opts.caughtMap || {},
+      opts.filterMode || "all",
+      opts.searchQuery ?? printSearchQuery,
+    );
+  }
+
+  const sourceSlots = Array.isArray(slots) ? slots : [];
+  const firstSlot = sourceSlots.find(Boolean) || {};
+  const binderId = String(binder?.id || firstSlot.binderId || "");
+  const title = String(binder?.name || binder?.id || firstSlot.binderName || binderId || "");
+  const rows = Math.max(1, Number(binder?.rows) || 3);
+  const cols = Math.max(1, Number(binder?.cols) || 3);
+  const pagesByKey = new Map();
+
+  const ensurePage = (rawSlot) => {
+    const page = Number(rawSlot.page) || 1;
+    const sheet = Number(rawSlot.sheet) || Math.floor((page - 1) / 2) + 1;
+    const face = rawSlot.face || (page % 2 === 1 ? "R" : "V");
+    const key = pageKeyForSlot(rawSlot, binderId);
+    if (!pagesByKey.has(key)) {
+      pagesByKey.set(key, {
+        key,
+        binderId: String(rawSlot.binderId || binderId),
+        page,
+        sheet,
+        face,
+        slots: [],
+        hasVisiblePokemon: false,
+      });
+    }
+    return pagesByKey.get(key);
+  };
+
+  for (const rawSlot of sourceSlots) {
+    if (!rawSlot || rawSlot.emptyKind === "capacity_empty") continue;
+
+    const p = rawSlot.pokemon || null;
+    let caught = false;
+    if (p) {
+      caught = pokemonCaughtPrint(p, caughtMap);
+      if (filterMode === "caught" && !caught) continue;
+      if (filterMode === "missing" && caught) continue;
+      if (!matchesPrintSearch(p, searchQuery)) continue;
+    }
+
+    const page = Number(rawSlot.page) || 1;
+    const sheet = Number(rawSlot.sheet) || Math.floor((page - 1) / 2) + 1;
+    const face = rawSlot.face || (page % 2 === 1 ? "R" : "V");
+    const pageEntry = ensurePage(rawSlot);
+    if (p) pageEntry.hasVisiblePokemon = true;
+
+    pageEntry.slots.push({
+      ...rawSlot,
+      binderId: String(rawSlot.binderId || binderId),
+      binderName: String(rawSlot.binderName || title),
+      page,
+      sheet,
+      face,
+      slot: Number(rawSlot.slot) || 1,
+      row: Number(rawSlot.row) || 1,
+      col: Number(rawSlot.col) || 1,
+      pokemon: p,
+      emptyKind: rawSlot.emptyKind || null,
+      title: p ? displayNamePrint(p) : tPrint("print.placeholder.reserve"),
+      subtitle: p ? displayEnglishNamePrint(p) : "",
+      number: p ? displayNumPrint(p.number) : "",
+      caught,
+      status: p ? placeholderStatusLabel(caught) : "",
+    });
+  }
+
+  const pages = Array.from(pagesByKey.values())
+    .filter((page) => page.hasVisiblePokemon)
+    .sort((a, b) => a.page - b.page)
+    .map((page) => ({
+      key: page.key,
+      binderId: page.binderId,
+      page: page.page,
+      sheet: page.sheet,
+      face: page.face,
+      slots: page.slots.slice().sort((a, b) =>
+        (a.row - b.row) || (a.col - b.col) || (a.slot - b.slot),
+      ),
+    }));
+
+  return { binderId, title, rows, cols, pages };
+}
+
 function renderPrintView() {
   const output = document.getElementById("printOutput");
   const summary = document.getElementById("printSummary");
@@ -271,8 +479,29 @@ function renderPrintView() {
   let sectionIdx = 0;
 
   output.classList.toggle("is-pocket", groupMode === "pocket");
+  output.classList.toggle("is-placeholders", groupMode === "placeholders");
 
-  if (groupMode === "pocket") {
+  if (groupMode === "placeholders") {
+    const targetBinders = selectedBinder === "all"
+      ? binders
+      : binders.filter((b) => String(b.id) === selectedBinder);
+
+    for (const binder of targetBinders) {
+      const section = buildPlaceholderSectionForBinder(
+        binder,
+        listScopedPokemon,
+        caughtMap,
+        defs,
+        cfg,
+        filterMode,
+      );
+      totalEntries += section.pages.reduce(
+        (sum, page) => sum + page.slots.filter((slot) => slot.pokemon).length,
+        0,
+      );
+      output.append(buildPlaceholderSectionElement(section, date, sectionIdx++ > 0));
+    }
+  } else if (groupMode === "pocket") {
     const sections = buildRegionSections(
       listScopedPokemon,
       binders,
@@ -323,6 +552,30 @@ function renderPrintView() {
       if (node) output.append(node);
     }
   }
+}
+
+function buildPlaceholderSectionForBinder(binder, allPokemon, caughtMap, defs, cfg, filterMode) {
+  const B = window.PokedexBinder;
+  const rule = B?.getFormRuleForBinder?.(cfg, binder) || null;
+  const pool = rule && B?.selectBinderPokemonPool
+    ? B.selectBinderPokemonPool(allPokemon, rule)
+    : allPokemon;
+  const slots = window.PokevaultBinderLayout?.computeBinderSlots
+    ? window.PokevaultBinderLayout.computeBinderSlots({
+        binder,
+        pokemon: pool,
+        defs,
+        familyData: B?.cachedFamilyData || null,
+        includeCapacity: true,
+      })
+    : [];
+  return buildPlaceholderSection(
+    binder,
+    Array.isArray(slots) ? slots : [],
+    caughtMap,
+    filterMode,
+    printSearchQuery,
+  );
 }
 
 function buildBinderSection(binder, allPokemon, caughtMap, defs, cfg, filterMode) {
@@ -534,6 +787,97 @@ function buildSectionElement(section, date, showBinderCol, pageBreakBefore) {
   return frag;
 }
 
+function buildPlaceholderSectionElement(section, date, pageBreakBefore) {
+  const frag = document.createDocumentFragment();
+  const cols = Math.max(1, Number(section.cols) || 3);
+
+  section.pages.forEach((page, pageIdx) => {
+    const wrapper = document.createElement("div");
+    wrapper.className = "print-placeholder-page";
+    if (pageBreakBefore || pageIdx > 0) wrapper.classList.add("print-page-break");
+
+    const h2 = document.createElement("h2");
+    h2.className = "print-section-title print-placeholder-page__title";
+    h2.textContent = `${section.title} — P${page.page} f.${page.sheet}${page.face}`;
+    wrapper.append(h2);
+
+    const grid = document.createElement("div");
+    grid.className = "print-placeholder-grid";
+    grid.style.setProperty("--placeholder-cols", String(cols));
+    grid.style.gridTemplateColumns = `repeat(${cols}, minmax(0, 1fr))`;
+    for (const slot of page.slots) {
+      grid.append(buildPlaceholderCardElement(slot));
+    }
+    wrapper.append(grid);
+
+    const footer = document.createElement("div");
+    footer.className = "print-footer";
+    footer.textContent = formatPrintFooter(date, false);
+    wrapper.append(footer);
+
+    frag.append(wrapper);
+  });
+
+  return frag;
+}
+
+function buildPlaceholderCardElement(slot) {
+  const article = document.createElement("article");
+  article.className = "print-placeholder-card";
+  article.classList.add(
+    slot.emptyKind === "family_reserved"
+      ? "print-placeholder-card--reserved"
+      : "print-placeholder-card--pokemon",
+  );
+  article.style.gridColumn = String(Math.max(1, Number(slot.col) || 1));
+  article.style.gridRow = String(Math.max(1, Number(slot.row) || 1));
+
+  if (slot.emptyKind === "family_reserved") {
+    article.textContent = tPrint("print.placeholder.reserve");
+    return article;
+  }
+
+  const p = slot.pokemon || {};
+  const top = document.createElement("div");
+  top.className = "print-placeholder-card__top";
+  const num = document.createElement("span");
+  num.textContent = slot.number || displayNumPrint(p.number);
+  const status = document.createElement("span");
+  status.textContent = slot.status || placeholderStatusLabel(slot.caught);
+  top.append(num, status);
+  article.append(top);
+
+  const artwork = window.PokevaultArtwork;
+  const resolved = resolvePrintArtwork(p);
+  if (resolved?.src) {
+    const img = document.createElement("img");
+    img.className = "print-placeholder-card__image";
+    img.alt = slot.title || displayNamePrint(p);
+    img.loading = "eager";
+    img.decoding = "sync";
+    if (artwork?.attach) {
+      artwork.attach(img, resolved);
+    } else {
+      img.src = resolved.src;
+    }
+    article.append(img);
+  }
+
+  const title = document.createElement("strong");
+  title.textContent = slot.title || displayNamePrint(p);
+  article.append(title);
+
+  const subtitle = document.createElement("span");
+  subtitle.textContent = slot.subtitle || displayEnglishNamePrint(p);
+  article.append(subtitle);
+
+  const meta = document.createElement("small");
+  meta.textContent = `${slot.binderName} · P${slot.page} f.${slot.sheet}${slot.face} · case ${slot.slot}`;
+  article.append(meta);
+
+  return article;
+}
+
 function buildPocketSectionElement(section, date, pageBreakBefore) {
   const frag = document.createDocumentFragment();
   const wrapper = document.createElement("div");
@@ -630,5 +974,11 @@ if (window.__POKEVAULT_PRINT_TESTS__) {
     formatEntrySummary,
     formatPrintSubtitle,
     formatPrintFooter,
+    buildPlaceholderSection,
+    buildPlaceholderCardElement,
+    resolvePrintArtwork,
+    setPrintArtworkMode(mode) {
+      printArtworkMode = mode || "global";
+    },
   };
 }

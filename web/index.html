@@ -383,7 +383,12 @@
                         <option value="binder" data-i18n="app.print.binder_pages">Pages de classeur</option>
                         <option value="region" data-i18n="app.print.region">Région</option>
                         <option value="pocket" data-i18n="app.print.pocket">Pocket A5 (par région)</option>
+                        <option value="placeholders" data-i18n="app.print.placeholders">Placeholders cartes</option>
                       </select>
+                    </div>
+                    <div class="print-control-group" id="printArtworkGroup">
+                      <label for="printArtworkSelect" data-i18n="app.print.artwork">Image impression</label>
+                      <select id="printArtworkSelect" class="region-filter"></select>
                     </div>
                     <span class="print-summary" id="printSummary"></span>
                     <button type="button" class="print-action-btn" id="printBtn">
@@ -910,6 +915,7 @@
     <script src="/pokemon-fiche.js" defer></script>
     <script src="/pokemon-drawer.js" defer></script>
     <script src="/pokemon-full-view.js" defer></script>
+    <script src="/binder-layout-engine.js" defer></script>
     <script src="/binder-v2.js" defer></script>
     <script src="/hunt-list.js" defer></script>
     <script src="/pokedex-filters.js" defer></script>

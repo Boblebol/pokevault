@@ -42,6 +42,7 @@ async function loadModule() {
   if (!binderApi) {
     installBrowserStubs();
     importCase += 1;
+    await import(`../../web/binder-layout-engine.js?case=${Date.now()}-${importCase}-engine`);
     await import(`../../web/binder-v2.js?case=${Date.now()}-${importCase}`);
     binderApi = globalThis.window.PokedexBinder._test;
   }
@@ -144,6 +145,48 @@ test("orderPokemonForBinder respects regional range chunks", async () => {
   );
 });
 
+test("orderPokemonForBinder handles null binder with national order", async () => {
+  const api = await loadModule();
+  const pokemon = [makePokemon(1)[0], makePokemon(1, "johto")[0]];
+  pokemon[0].slug = "0002-pokemon-2";
+  pokemon[0].number = "0002";
+  pokemon[1].slug = "0001-pokemon-1";
+  pokemon[1].number = "0001";
+
+  const ordered = api.orderPokemonForBinder(null, pokemon, []);
+
+  assert.deepEqual(
+    ordered.map((p) => p.slug),
+    ["0001-pokemon-1", "0002-pokemon-2"],
+  );
+});
+
+test("orderPokemonForBinder delegates non-null binders to the layout engine", async () => {
+  const api = await loadModule();
+  const engine = globalThis.window.PokevaultBinderLayout;
+  const original = engine.orderPokemonForBinder;
+  const binder = { id: "x" };
+  const pokemon = makePokemon(1);
+  const defs = [];
+  let received = null;
+
+  try {
+    engine.orderPokemonForBinder = (args) => {
+      received = args;
+      return [{ slug: "sentinel" }];
+    };
+
+    const ordered = api.orderPokemonForBinder(binder, pokemon, defs);
+
+    assert.deepEqual(ordered, [{ slug: "sentinel" }]);
+    assert.equal(received.binder, binder);
+    assert.equal(received.pokemon, pokemon);
+    assert.equal(received.defs, defs);
+  } finally {
+    engine.orderPokemonForBinder = original;
+  }
+});
+
 test("default workspace is only created for empty configs", async () => {
   const api = await loadModule();
 
@@ -187,6 +230,7 @@ test("family binder ordering pads evolution rows with intentional holes", async 
     [],
   );
 
+  assert.equal(Boolean(globalThis.window.PokevaultBinderLayout), true);
   assert.deepEqual(
     ordered.map((p) => p?.slug || null),
     ["0133-eevee", "0134-vaporeon", null, null, "0135-jolteon", null],
@@ -236,6 +280,76 @@ test("family binder workspace splits on family blocks without dropping holes", a
     [
       ["Familles 1", 0, 6],
       ["Familles 2", 6, 3],
+    ],
+  );
+});
+
+test("family binder workspace counts page-aware gaps in binder ranges", async () => {
+  const api = await loadModule();
+  const families = {
+    families: [
+      { id: "f1", layout_rows: [["0001-a", "0002-b", "0003-c"]] },
+      {
+        id: "f2",
+        layout_rows: [
+          ["0004-d", "0005-e", "0006-f"],
+          ["0007-g", "0008-h", "0009-i"],
+        ],
+      },
+    ],
+  };
+  const pokemon = [
+    "0001-a",
+    "0002-b",
+    "0003-c",
+    "0004-d",
+    "0005-e",
+    "0006-f",
+    "0007-g",
+    "0008-h",
+    "0009-i",
+  ].map((slug, idx) => ({
+    slug,
+    number: String(idx + 1).padStart(4, "0"),
+  }));
+
+  const result = api.buildFamilyBinderWorkspace(
+    {
+      name: "Familles",
+      organization: "family",
+      formScope: "base_only",
+      rows: 2,
+      cols: 3,
+      sheetCount: 1,
+    },
+    pokemon,
+    families,
+    "test",
+  );
+
+  assert.deepEqual(
+    result.configBody.binders.map((binder) => [binder.range_start, binder.range_limit]),
+    [[0, 12]],
+  );
+
+  api.setEvolutionFamilyData(families);
+  const ordered = api.orderPokemonForBinder(result.configBody.binders[0], pokemon, []);
+
+  assert.deepEqual(
+    ordered.map((p) => p?.slug || null),
+    [
+      "0001-a",
+      "0002-b",
+      "0003-c",
+      null,
+      null,
+      null,
+      "0004-d",
+      "0005-e",
+      "0006-f",
+      "0007-g",
+      "0008-h",
+      "0009-i",
     ],
   );
 });

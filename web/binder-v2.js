@@ -864,6 +864,15 @@ function applyBinderRange(sorted, binder) {
  */
 function orderPokemonForBinder(binder, pokemon, defs) {
   if (!binder) return sortBinderNationalOrder(pokemon);
+  const engine = window.PokevaultBinderLayout;
+  if (engine?.orderPokemonForBinder) {
+    return engine.orderPokemonForBinder({
+      binder,
+      pokemon,
+      defs,
+      familyData: binderEvolutionFamilies,
+    });
+  }
   const scope = String(binder.region_scope || binder.region_id || "").trim();
   const pool = scope
     ? pokemon.filter((p) => effectiveRegionId(p, defs) === scope)
@@ -1410,34 +1419,14 @@ function buildRegionalBinderWorkspace(draft, defs, pokemon, seed = Date.now().to
   };
 }
 
-function buildFamilyBinderWorkspace(draft, pokemon, familyData, seed = Date.now().toString(36)) {
-  const scope = normalizeFormScope(draft.formScope);
-  const formRule = formRuleFromScope(scope);
-  const layout = normalizedBinderLayout(draft);
-  const capacity = binderCapacity(layout);
-  const selectedPokemon = selectBinderPokemonPool(Array.isArray(pokemon) ? pokemon : [], formRule);
-  const blocks = familyLayoutBlocks(selectedPokemon, familyData, layout.cols);
-  const binders = [];
-  const byBinder = {};
+function familyWorkspaceRangesFromBlocks(blocks, capacity) {
+  const ranges = [];
   let currentStart = 0;
   let currentLength = 0;
 
   const closeChunk = () => {
     if (currentLength <= 0) return;
-    const idx = binders.length + 1;
-    const id = `classeur-${seed}-familles-${idx}`;
-    binders.push({
-      id,
-      name: `Familles ${idx}`,
-      cols: layout.cols,
-      rows: layout.rows,
-      sheet_count: layout.sheetCount,
-      form_rule_id: formRule.id,
-      organization: "family",
-      range_start: currentStart,
-      range_limit: currentLength,
-    });
-    byBinder[id] = {};
+    ranges.push({ start: currentStart, length: currentLength });
     currentStart += currentLength;
     currentLength = 0;
   };
@@ -1462,6 +1451,125 @@ function buildFamilyBinderWorkspace(draft, pokemon, familyData, seed = Date.now(
     currentLength += blockLength;
   }
   closeChunk();
+
+  return ranges;
+}
+
+function familyWorkspaceRangesFromEngine(selectedPokemon, familyData, layout, capacity) {
+  const engine = window.PokevaultBinderLayout;
+  if (!engine?.computeBinderSlots) return null;
+
+  const slots = engine.computeBinderSlots({
+    binder: {
+      organization: "family",
+      cols: layout.cols,
+      rows: layout.rows,
+      sheet_count: layout.sheetCount,
+    },
+    pokemon: selectedPokemon,
+    defs: [],
+    familyData,
+    includeCapacity: false,
+  });
+  if (!Array.isArray(slots)) return null;
+
+  const units = [];
+  let index = 0;
+  let gapLength = 0;
+
+  while (index < slots.length) {
+    const slot = slots[index];
+    if (slot?.emptyKind === "capacity_empty") {
+      gapLength += 1;
+      index += 1;
+      continue;
+    }
+
+    const familyId = String(slot?.familyId || slot?.pokemon?.slug || `family-${index}`);
+    const familyStart = index;
+    let familyLength = 0;
+    while (index < slots.length) {
+      const current = slots[index];
+      const currentFamilyId = String(current?.familyId || current?.pokemon?.slug || `family-${familyStart}`);
+      if (current?.emptyKind === "capacity_empty" || currentFamilyId !== familyId) break;
+      familyLength += 1;
+      index += 1;
+    }
+    units.push({ gapLength, familyStart, familyLength });
+    gapLength = 0;
+  }
+
+  const ranges = [];
+  let currentStart = null;
+  let currentLength = 0;
+
+  const closeChunk = () => {
+    if (currentStart === null || currentLength <= 0) return;
+    ranges.push({ start: currentStart, length: currentLength });
+    currentStart = null;
+    currentLength = 0;
+  };
+
+  for (const unit of units) {
+    if (unit.familyLength > capacity) {
+      closeChunk();
+      let remaining = unit.familyLength;
+      let start = unit.familyStart;
+      while (remaining > 0) {
+        const chunkLength = Math.min(capacity, remaining);
+        ranges.push({ start, length: chunkLength });
+        start += chunkLength;
+        remaining -= chunkLength;
+      }
+      continue;
+    }
+
+    const gapLength = currentLength > 0 ? unit.gapLength : 0;
+    const nextLength = gapLength + unit.familyLength;
+    if (currentLength > 0 && currentLength + nextLength > capacity) {
+      closeChunk();
+    }
+
+    if (currentLength <= 0) {
+      currentStart = unit.familyStart;
+      currentLength = unit.familyLength;
+    } else {
+      currentLength += nextLength;
+    }
+  }
+  closeChunk();
+
+  return ranges;
+}
+
+function buildFamilyBinderWorkspace(draft, pokemon, familyData, seed = Date.now().toString(36)) {
+  const scope = normalizeFormScope(draft.formScope);
+  const formRule = formRuleFromScope(scope);
+  const layout = normalizedBinderLayout(draft);
+  const capacity = binderCapacity(layout);
+  const selectedPokemon = selectBinderPokemonPool(Array.isArray(pokemon) ? pokemon : [], formRule);
+  const ranges =
+    familyWorkspaceRangesFromEngine(selectedPokemon, familyData, layout, capacity) ||
+    familyWorkspaceRangesFromBlocks(familyLayoutBlocks(selectedPokemon, familyData, layout.cols), capacity);
+  const binders = [];
+  const byBinder = {};
+
+  for (const range of ranges) {
+    const idx = binders.length + 1;
+    const id = `classeur-${seed}-familles-${idx}`;
+    binders.push({
+      id,
+      name: `Familles ${idx}`,
+      cols: layout.cols,
+      rows: layout.rows,
+      sheet_count: layout.sheetCount,
+      form_rule_id: formRule.id,
+      organization: "family",
+      range_start: range.start,
+      range_limit: range.length,
+    });
+    byBinder[id] = {};
+  }
 
   if (binders.length === 1) binders[0].name = "Familles";
 
@@ -1839,6 +1947,9 @@ window.PokedexBinder = {
   getEffectiveFormRuleForCollection,
   get cachedConfig() {
     return lastConfigJson;
+  },
+  get cachedFamilyData() {
+    return binderEvolutionFamilies;
   },
   _test: {
     binderCapacity,

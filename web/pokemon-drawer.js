@@ -41,6 +41,7 @@
   let huntsSubscribed = false;
   let trainerContactsSubscribed = false;
   let localeSubscribed = false;
+  let artworkSubscribed = false;
   const FALLBACK_I18N = {
     "pokemon_drawer.name_and": "et",
     "pokemon_drawer.exchange.match": "Match possible avec {names}.",
@@ -120,6 +121,12 @@
     if (!localeSubscribed) {
       localeSubscribed = true;
       window.PokevaultI18n?.subscribeLocale?.(() => {
+        if (currentSlug) renderAll();
+      });
+    }
+    if (!artworkSubscribed) {
+      artworkSubscribed = true;
+      window.PokevaultArtwork?.subscribe?.(() => {
         if (currentSlug) renderAll();
       });
     }
@@ -215,6 +222,25 @@
     const s = String(img).replace(/^\.\//, "");
     if (s.startsWith("http")) return s;
     return s.startsWith("/") ? s : `/${s}`;
+  }
+
+  function attachPokemonArtwork(img, pokemon) {
+    const artwork = window.PokevaultArtwork;
+    if (typeof artwork?.resolve === "function") {
+      const resolved = artwork.resolve(pokemon);
+      if (resolved?.src) {
+        if (typeof artwork.attach === "function") {
+          artwork.attach(img, resolved);
+        } else {
+          img.src = resolved.src;
+        }
+        return true;
+      }
+    }
+    const src = normalizeImgPath(pokemon?.image);
+    if (!src) return false;
+    img.src = src;
+    return true;
   }
 
   function displayNumber(num) {
@@ -721,10 +747,8 @@
     decorateFicheSection(header, "identity");
     const imgWrap = document.createElement("div");
     imgWrap.className = "drawer-header__img";
-    const src = normalizeImgPath(p?.image);
-    if (src) {
-      const img = document.createElement("img");
-      img.src = src;
+    const img = document.createElement("img");
+    if (attachPokemonArtwork(img, p)) {
       img.alt = "";
       img.loading = "lazy";
       imgWrap.append(img);

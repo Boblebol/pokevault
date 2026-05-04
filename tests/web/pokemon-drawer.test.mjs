@@ -13,6 +13,8 @@ class FakeElement {
     this.hidden = false;
     this.type = "";
     this.id = "";
+    this.src = "";
+    this.href = "";
     this.events = {};
     this.classList = {
       add: (...classes) => {
@@ -33,8 +35,11 @@ class FakeElement {
   append(...nodes) {
     for (const node of nodes) {
       if (typeof node === "string") {
-        this.children.push(new FakeText(node));
+        const text = new FakeText(node);
+        text.parentElement = this;
+        this.children.push(text);
       } else {
+        if (node) node.parentElement = this;
         this.children.push(node);
       }
     }
@@ -53,6 +58,10 @@ class FakeElement {
     this[name] = String(value);
   }
 
+  focus() {
+    globalThis.document.activeElement = this;
+  }
+
   querySelector(selector) {
     return findInTree(this, selector);
   }
@@ -63,6 +72,7 @@ class FakeText {
     this.tagName = "#TEXT";
     this.textContent = text;
     this.children = [];
+    this.parentElement = null;
   }
 }
 
@@ -91,12 +101,14 @@ function installBrowserStubs() {
   globalThis.addEventListener = () => {};
   globalThis.location = { hash: "" };
   globalThis.history = { replaceState() {} };
+  globalThis.__drawerRoot = null;
   globalThis.document = {
     activeElement: null,
+    body: new FakeElement("body"),
     addEventListener() {},
     dispatchEvent() {},
-    getElementById() {
-      return null;
+    getElementById(id) {
+      return id === "pokemonDrawer" ? globalThis.__drawerRoot : null;
     },
     createElement(tagName) {
       return new FakeElement(tagName);
@@ -105,6 +117,12 @@ function installBrowserStubs() {
       return new FakeText(text);
     },
   };
+  globalThis.fetch = async () => ({
+    ok: true,
+    async json() {
+      return { cards: [] };
+    },
+  });
 }
 
 async function loadModule() {
@@ -188,4 +206,78 @@ test("buildCardsSection keeps add-card and TCG search inside a collapsed B5 body
   assert.equal(toggle["aria-expanded"], "false");
   assert.ok(body.querySelector("#drawerAddCardForm"));
   assert.ok(body.querySelector(".drawer-tcg-search"));
+});
+
+function makeDrawerRoot() {
+  const root = new FakeElement("div");
+  root.id = "pokemonDrawer";
+  root.hidden = true;
+  const panel = new FakeElement("div");
+  panel.className = "drawer__panel";
+  const scrim = new FakeElement("button");
+  scrim.className = "drawer__scrim";
+  const content = new FakeElement("div");
+  content.id = "pokemonDrawerContent";
+  const status = new FakeElement("p");
+  status.id = "pokemonDrawerStatus";
+  const close = new FakeElement("button");
+  close.id = "pokemonDrawerClose";
+  panel.append(close, content, status);
+  root.append(scrim, panel);
+  return { root, content };
+}
+
+function drawerHeaderImage(content) {
+  const header = content.children.find((child) => child.dataset?.section === "identity");
+  const imageWrap = header.children.find((child) => child.className === "drawer-header__img");
+  return imageWrap.children[0];
+}
+
+test("drawer rerenders header artwork when artwork mode changes", async () => {
+  await loadModule();
+  const { root, content } = makeDrawerRoot();
+  globalThis.__drawerRoot = root;
+  globalThis.PokedexCollection = {
+    allPokemon: [
+      {
+        slug: "0001-bulbasaur",
+        number: "0001",
+        names: { fr: "Bulbizarre" },
+        image: "images/0001-bulbasaur.png",
+        types: ["Plante"],
+        region: "kanto",
+      },
+    ],
+    getStatus() {
+      return { state: "caught", shiny: false };
+    },
+    ownershipStateForSlug() {
+      return { wanted: false, caught: true, duplicate: false };
+    },
+    tradeSummaryForSlug() {
+      return { availableFrom: [], wantedBy: [], matchCount: 0, canHelpCount: 0 };
+    },
+    getNote() {
+      return "";
+    },
+  };
+  let artworkSuffix = "initial";
+  let artworkListener = null;
+  globalThis.PokevaultArtwork = {
+    resolve(pokemon) {
+      return { src: `/drawer/${artworkSuffix}/${pokemon.slug}.png`, fallbacks: [] };
+    },
+    subscribe(listener) {
+      artworkListener = listener;
+      return () => {};
+    },
+  };
+
+  globalThis.window.PokevaultDrawer.open("0001-bulbasaur", null);
+  assert.equal(drawerHeaderImage(content).src, "/drawer/initial/0001-bulbasaur.png");
+
+  artworkSuffix = "updated";
+  artworkListener();
+
+  assert.equal(drawerHeaderImage(content).src, "/drawer/updated/0001-bulbasaur.png");
 });

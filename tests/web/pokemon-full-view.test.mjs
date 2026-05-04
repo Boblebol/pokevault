@@ -64,6 +64,15 @@ function installBrowserStubs(root) {
       return { cards: [] };
     },
   });
+  globalThis.PokevaultArtwork = {
+    resolve(pokemon) {
+      return { src: `/sprite/${pokemon.slug}.png`, fallbacks: ["/fallback.png"] };
+    },
+    attach(img, resolved) {
+      img.src = resolved.src;
+      img.dataset.fallbacks = resolved.fallbacks.join(",");
+    },
+  };
   globalThis.PokedexCollection = {
     statusCalls,
     ownershipCalls,
@@ -73,6 +82,7 @@ function installBrowserStubs(root) {
         slug: "0001-bulbasaur",
         number: "0001",
         names: { fr: "Bulbizarre", en: "Bulbasaur" },
+        image: "images/0001-bulbasaur.png",
         types: ["Plante"],
         region: "kanto",
       },
@@ -80,6 +90,7 @@ function installBrowserStubs(root) {
         slug: "0001-bulbasaur-alola",
         number: "0001",
         names: { fr: "Bulbizarre d'Alola" },
+        image: "images/0001-bulbasaur-alola.png",
         form: "Forme d'Alola",
         types: ["Plante"],
         region: "alola",
@@ -173,6 +184,49 @@ async function loadModules(root) {
   }
   return fullViewApi;
 }
+
+test("renderInto resolves hero image through artwork switcher", async () => {
+  const root = new FakeElement("div");
+  const api = await loadModules(root);
+
+  api.renderInto(root, "0001-bulbasaur");
+
+  const hero = root.children.find((child) => child.dataset?.section === "identity");
+  const imageWrap = hero.children.find((child) => child.className === "fullview-hero__img");
+  const img = imageWrap.children[0];
+  assert.equal(img.src, "/sprite/0001-bulbasaur.png");
+  assert.equal(img.dataset.fallbacks, "/fallback.png");
+});
+
+test("renderInto resolves form images through artwork switcher", async () => {
+  const root = new FakeElement("div");
+  const api = await loadModules(root);
+
+  api.renderInto(root, "0001-bulbasaur");
+
+  const formsSection = root.children.find((child) => child.dataset?.section === "forms");
+  const list = formsSection.children.find((child) => child.className === "fullview-forms-grid");
+  const alolaImg = list.children[1].children[0];
+  assert.equal(alolaImg.src, "/sprite/0001-bulbasaur-alola.png");
+  assert.equal(alolaImg.dataset.fallbacks, "/fallback.png");
+});
+
+test("renderInto uses artwork resolve source without attach helper", async () => {
+  const root = new FakeElement("div");
+  const api = await loadModules(root);
+  globalThis.PokevaultArtwork = {
+    resolve(pokemon) {
+      return { src: `/resolved-only/${pokemon.slug}.png`, fallbacks: ["/ignored.png"] };
+    },
+  };
+
+  api.renderInto(root, "0001-bulbasaur");
+
+  const hero = root.children.find((child) => child.dataset?.section === "identity");
+  const imageWrap = hero.children.find((child) => child.className === "fullview-hero__img");
+  const img = imageWrap.children[0];
+  assert.equal(img.src, "/resolved-only/0001-bulbasaur.png");
+});
 
 test("renderInto lays out the B1 fiche sections before secondary cards", async () => {
   const root = new FakeElement("div");

@@ -1275,8 +1275,16 @@ function setupArtworkSelect() {
   sel.addEventListener("change", () => A.setMode(sel.value));
   A.subscribe((id) => {
     if (sel.value !== id) sel.value = id;
-    if (typeof render === "function") render();
+    rerenderArtworkSurface();
   });
+}
+
+function rerenderArtworkSurface() {
+  if (currentViewFromHash() === "pokemon" && typeof window.PokevaultFullView?.render === "function") {
+    window.PokevaultFullView.render(currentPokemonSlugFromHash());
+    return;
+  }
+  if (typeof render === "function") render();
 }
 
 function setupProfileSwitcher() {
@@ -1758,6 +1766,7 @@ if (window.__POKEVAULT_APP_TESTS__) {
   window.PokedexCollection._test = {
     currentViewFromHash,
     isSupportedBackupSchemaVersion,
+    rerenderArtworkSurface,
     shouldDimCardForHighlight,
   };
 }
