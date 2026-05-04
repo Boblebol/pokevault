@@ -90,3 +90,172 @@ test("computeBinderSlots caps capacity output when pokemon exceed physical slots
     ["0001-pokemon-1", "0002-pokemon-2", "0003-pokemon-3", "0004-pokemon-4"],
   );
 });
+
+test("family slots preserve intentional holes and expose reserved metadata", async () => {
+  const api = await loadEngine();
+  const slots = api.computeBinderSlots({
+    binder: { id: "families", name: "Familles", organization: "family", rows: 2, cols: 3, sheet_count: 1 },
+    pokemon: [
+      { slug: "0133-eevee", number: "0133" },
+      { slug: "0134-vaporeon", number: "0134" },
+      { slug: "0135-jolteon", number: "0135" },
+    ],
+    familyData: {
+      families: [
+        {
+          id: "0133-eevee",
+          layout_rows: [
+            ["0133-eevee", "0134-vaporeon"],
+            [null, "0135-jolteon"],
+          ],
+        },
+      ],
+    },
+  });
+
+  assert.deepEqual(
+    slots.map((slot) => [slot.pokemon?.slug || null, slot.emptyKind, slot.familyId]),
+    [
+      ["0133-eevee", null, "0133-eevee"],
+      ["0134-vaporeon", null, "0133-eevee"],
+      [null, "family_reserved", "0133-eevee"],
+      [null, "family_reserved", "0133-eevee"],
+      ["0135-jolteon", null, "0133-eevee"],
+      [null, "family_reserved", "0133-eevee"],
+    ],
+  );
+});
+
+test("family slots preserve reserved-only rows inside represented family blocks", async () => {
+  const api = await loadEngine();
+  const slots = api.computeBinderSlots({
+    binder: { id: "families", name: "Familles", organization: "family", rows: 3, cols: 3, sheet_count: 1 },
+    pokemon: [
+      { slug: "0133-eevee", number: "0133" },
+      { slug: "0134-vaporeon", number: "0134" },
+    ],
+    familyData: {
+      families: [
+        {
+          id: "0133-eevee",
+          layout_rows: [
+            ["0133-eevee", "0134-vaporeon"],
+            [null, "0135-jolteon"],
+          ],
+        },
+      ],
+    },
+  });
+
+  assert.deepEqual(
+    slots.slice(3, 6).map((slot) => [slot.pokemon?.slug || null, slot.emptyKind, slot.familyId]),
+    [
+      [null, "family_reserved", "0133-eevee"],
+      [null, "family_reserved", "0133-eevee"],
+      [null, "family_reserved", "0133-eevee"],
+    ],
+  );
+});
+
+test("family slots wrap overwide rows without dropping pokemon", async () => {
+  const api = await loadEngine();
+  const slots = api.computeBinderSlots({
+    binder: { id: "families", name: "Familles", organization: "family", rows: 2, cols: 2, sheet_count: 1 },
+    pokemon: [
+      { slug: "0001-a", number: "0001" },
+      { slug: "0002-b", number: "0002" },
+      { slug: "0003-c", number: "0003" },
+    ],
+    familyData: {
+      families: [
+        {
+          id: "f1",
+          layout_rows: [["0001-a", "0002-b", "0003-c"]],
+        },
+      ],
+    },
+  });
+
+  assert.deepEqual(
+    slots.map((slot) => [slot.pokemon?.slug || null, slot.emptyKind, slot.familyId]),
+    [
+      ["0001-a", null, "f1"],
+      ["0002-b", null, "f1"],
+      ["0003-c", null, "f1"],
+      [null, "family_reserved", "f1"],
+    ],
+  );
+});
+
+test("family block starts on next page when remaining rows cannot fit it", async () => {
+  const api = await loadEngine();
+  const slots = api.computeBinderSlots({
+    binder: { id: "families", name: "Familles", organization: "family", rows: 2, cols: 3, sheet_count: 2 },
+    pokemon: [
+      { slug: "0001-a", number: "0001" },
+      { slug: "0002-b", number: "0002" },
+      { slug: "0003-c", number: "0003" },
+      { slug: "0004-d", number: "0004" },
+      { slug: "0005-e", number: "0005" },
+      { slug: "0006-f", number: "0006" },
+      { slug: "0007-g", number: "0007" },
+      { slug: "0008-h", number: "0008" },
+      { slug: "0009-i", number: "0009" },
+    ],
+    familyData: {
+      families: [
+        { id: "f1", layout_rows: [["0001-a", "0002-b", "0003-c"]] },
+        { id: "f2", layout_rows: [["0004-d", "0005-e", "0006-f"], ["0007-g", "0008-h", "0009-i"]] },
+      ],
+    },
+    includeCapacity: true,
+  });
+
+  const f2First = slots.find((slot) => slot.pokemon?.slug === "0004-d");
+  assert.equal(f2First.page, 2);
+  assert.equal(slots[3].emptyKind, "capacity_empty");
+  assert.equal(slots[4].emptyKind, "capacity_empty");
+  assert.equal(slots[5].emptyKind, "capacity_empty");
+});
+
+test("orderPokemonForBinder preserves page-aware family gaps", async () => {
+  const api = await loadEngine();
+  const ordered = api.orderPokemonForBinder({
+    binder: { id: "families", name: "Familles", organization: "family", rows: 2, cols: 3, sheet_count: 2 },
+    pokemon: [
+      { slug: "0001-a", number: "0001" },
+      { slug: "0002-b", number: "0002" },
+      { slug: "0003-c", number: "0003" },
+      { slug: "0004-d", number: "0004" },
+      { slug: "0005-e", number: "0005" },
+      { slug: "0006-f", number: "0006" },
+      { slug: "0007-g", number: "0007" },
+      { slug: "0008-h", number: "0008" },
+      { slug: "0009-i", number: "0009" },
+    ],
+    familyData: {
+      families: [
+        { id: "f1", layout_rows: [["0001-a", "0002-b", "0003-c"]] },
+        { id: "f2", layout_rows: [["0004-d", "0005-e", "0006-f"], ["0007-g", "0008-h", "0009-i"]] },
+      ],
+    },
+  });
+
+  assert.deepEqual(
+    ordered.map((p) => p?.slug || null),
+    [
+      "0001-a",
+      "0002-b",
+      "0003-c",
+      null,
+      null,
+      null,
+      "0004-d",
+      "0005-e",
+      "0006-f",
+      "0007-g",
+      "0008-h",
+      "0009-i",
+    ],
+  );
+});

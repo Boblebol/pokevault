@@ -97,16 +97,128 @@
     return { pokemon: null, emptyKind: "capacity_empty", familyId: null };
   }
 
-  function basicItemsForBinder(binder = {}, pokemon = [], defs = []) {
+  function familyReservedItem(familyId) {
+    return { pokemon: null, emptyKind: "family_reserved", familyId };
+  }
+
+  function padRowToColumns(row, cols, familyId, emptyKind = "family_reserved") {
+    const out = row.slice(0, cols);
+    while (out.length < cols) {
+      out.push(emptyKind === "capacity_empty" ? capacityItem() : familyReservedItem(familyId));
+    }
+    return out;
+  }
+
+  function chunkRowToColumns(row, cols, familyId) {
+    const chunks = [];
+    const width = positiveInt(cols, 3);
+    for (let start = 0; start < row.length; start += width) {
+      chunks.push(padRowToColumns(row.slice(start, start + width), width, familyId));
+    }
+    return chunks.length ? chunks : [padRowToColumns([], width, familyId)];
+  }
+
+  function familyLayoutBlocks(pokemon = [], familyData = null, cols = 3) {
+    const bySlug = new Map();
+    for (const p of pokemon) {
+      const slug = String(p?.slug || "");
+      if (slug) bySlug.set(slug, p);
+    }
+
+    const emitted = new Set();
+    const families = Array.isArray(familyData?.families) ? familyData.families : [];
+    const blocks = [];
+
+    for (const family of families) {
+      const familyId = String(family?.id || "");
+      const rows = Array.isArray(family?.layout_rows) ? family.layout_rows : [];
+      const blockRows = [];
+      let hasRepresentedPokemon = false;
+
+      for (const rawRow of rows) {
+        if (!Array.isArray(rawRow)) continue;
+        const row = [];
+        for (const slugRaw of rawRow) {
+          if (!slugRaw) {
+            row.push(familyReservedItem(familyId));
+            continue;
+          }
+          const slug = String(slugRaw);
+          const p = bySlug.get(slug);
+          if (!p || emitted.has(slug)) {
+            row.push(familyReservedItem(familyId));
+            continue;
+          }
+          row.push(pokemonItem(p, familyId));
+          emitted.add(slug);
+          hasRepresentedPokemon = true;
+        }
+        blockRows.push(...chunkRowToColumns(row, cols, familyId));
+      }
+
+      if (hasRepresentedPokemon) blocks.push({ familyId, rows: blockRows });
+    }
+
+    const leftovers = sortNational(
+      pokemon.filter((p) => p?.slug && !emitted.has(String(p.slug))),
+    );
+    for (const p of leftovers) {
+      blocks.push({
+        familyId: String(p.slug || ""),
+        rows: [padRowToColumns([pokemonItem(p, String(p.slug || ""))], cols, String(p.slug || ""))],
+      });
+    }
+    return blocks;
+  }
+
+  function flattenFamilyBlocksPageAware(blocks = [], layout) {
+    const out = [];
+    let rowInPage = 0;
+
+    for (const block of blocks) {
+      const blockRows = block.rows || [];
+      if (
+        rowInPage > 0 &&
+        blockRows.length <= layout.rows &&
+        rowInPage + blockRows.length > layout.rows
+      ) {
+        while (rowInPage < layout.rows) {
+          out.push(...padRowToColumns([], layout.cols, null, "capacity_empty"));
+          rowInPage += 1;
+        }
+        rowInPage = 0;
+      }
+
+      for (const row of blockRows) {
+        out.push(...padRowToColumns(row, layout.cols, block.familyId));
+        rowInPage = (rowInPage + 1) % layout.rows;
+      }
+    }
+    return out;
+  }
+
+  function basicItemsForBinder(binder = {}, pokemon = [], defs = [], familyData = null) {
+    const layout = normalizedLayout(binder);
     const scoped = applyBinderScope(pokemon, binder, defs);
-    const org = binder.organization === "by_region" ? "by_region" : "national";
+    const org =
+      binder.organization === "by_region" || binder.organization === "family"
+        ? binder.organization
+        : "national";
+
+    if (org === "family" && familyData && Array.isArray(familyData.families)) {
+      return flattenFamilyBlocksPageAware(
+        familyLayoutBlocks(scoped, familyData, layout.cols),
+        layout,
+      );
+    }
+
     const sorted = org === "by_region" && defs.length ? sortRegional(scoped, defs) : sortNational(scoped);
     return sorted.map((p) => pokemonItem(p));
   }
 
-  function computeBinderSlots({ binder = {}, pokemon = [], defs = [], includeCapacity = false } = {}) {
+  function computeBinderSlots({ binder = {}, pokemon = [], defs = [], familyData = null, includeCapacity = false } = {}) {
     const layout = normalizedLayout(binder);
-    const ranged = applyBinderRange(basicItemsForBinder(binder, pokemon, defs), binder);
+    const ranged = applyBinderRange(basicItemsForBinder(binder, pokemon, defs, familyData), binder);
     const items = includeCapacity ? ranged.slice(0, layout.capacity) : ranged.slice();
     if (includeCapacity) {
       while (items.length < layout.capacity) items.push(capacityItem());
@@ -122,8 +234,11 @@
   }
 
   function orderPokemonForBinder({ binder = {}, pokemon = [], defs = [], familyData = null } = {}) {
-    void familyData;
-    return computeBinderSlots({ binder, pokemon, defs, includeCapacity: false })
+    const slots = computeBinderSlots({ binder, pokemon, defs, familyData, includeCapacity: false });
+    if (binder.organization === "family") {
+      return slots.map((slot) => slot.pokemon || null);
+    }
+    return slots
       .filter((slot) => slot.emptyKind !== "capacity_empty")
       .map((slot) => slot.pokemon || null);
   }
@@ -135,6 +250,8 @@
       applyBinderRange,
       computeBinderSlots,
       effectiveRegionId,
+      familyLayoutBlocks,
+      flattenFamilyBlocksPageAware,
       normalizedLayout,
       orderPokemonForBinder,
       slotMeta,
