@@ -115,7 +115,7 @@
     return out;
   }
 
-  function chunkRowToColumns(row, cols, familyId) {
+  function chunkRowToColumns(row, cols) {
     const chunks = [];
     const width = positiveInt(cols, 3);
     for (let start = 0; start < row.length; start += width) {
@@ -159,7 +159,7 @@
           emitted.add(slug);
           hasRepresentedPokemon = true;
         }
-        blockRows.push(...chunkRowToColumns(row, cols, familyId));
+        blockRows.push(...chunkRowToColumns(row, cols));
       }
 
       if (hasRepresentedPokemon) blocks.push({ familyId, rows: blockRows });

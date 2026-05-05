@@ -356,6 +356,32 @@ test("family layout packs a complete solo family into remaining row cells", asyn
   );
 });
 
+test("family layout packs leftover pokemon into remaining row cells", async () => {
+  const api = await loadEngine();
+  const slots = api.computeBinderSlots({
+    binder: { id: "families", name: "Familles", organization: "family", rows: 3, cols: 3, sheet_count: 1 },
+    pokemon: [
+      { slug: "0325-spoink", number: "0325" },
+      { slug: "0326-grumpig", number: "0326" },
+      { slug: "0327-spinda", number: "0327" },
+    ],
+    familyData: {
+      families: [
+        { id: "0325-spoink", layout_rows: [["0325-spoink", "0326-grumpig"]] },
+      ],
+    },
+  });
+
+  assert.deepEqual(
+    slots.slice(0, 3).map((slot) => [slot.pokemon?.slug || null, slot.emptyKind, slot.familyId]),
+    [
+      ["0325-spoink", null, "0325-spoink"],
+      ["0326-grumpig", null, "0325-spoink"],
+      ["0327-spinda", null, "0327-spinda"],
+    ],
+  );
+});
+
 test("family layout preserves explicit holes before Tarpaud as family reserved", async () => {
   const api = await loadEngine();
   const slots = api.computeBinderSlots({
