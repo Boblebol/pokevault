@@ -97,6 +97,12 @@ test("defaults to French and falls back to French for missing English keys", asy
   assert.equal(api.t("app.nav.settings"), "Réglages");
   assert.equal(api.t("missing.key"), "missing.key");
   assert.equal(api.t("app.nav.settings", {}, "en"), "Settings");
+  assert.equal(api.t("app.settings.artwork"), "Images / sprites");
+  assert.equal(api.t("app.settings.artwork", {}, "en"), "Images / sprites");
+  assert.equal(api.t("app.print.placeholders"), "Petites fiches classeur");
+  assert.equal(api.t("app.print.placeholders", {}, "en"), "Small binder cards");
+  assert.equal(api.t("app.binders.settings"), "Modifier format");
+  assert.equal(api.t("app.binders.settings", {}, "en"), "Edit format");
 });
 
 test("persists English locale, interpolates values and hydrates DOM attributes", async () => {
