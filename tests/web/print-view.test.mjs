@@ -172,6 +172,39 @@ test("placeholder section keeps reserved slots on pages with a search match", as
   );
 });
 
+test("placeholder section skips alignment empties", async () => {
+  const api = await loadModule();
+  const slots = [
+    ...placeholderSlots(),
+    {
+      binderId: "kanto",
+      binderName: "Kanto",
+      page: 1,
+      sheet: 1,
+      face: "R",
+      slot: 3,
+      row: 1,
+      col: 3,
+      pokemon: null,
+      emptyKind: "alignment_empty",
+      familyId: null,
+    },
+  ];
+
+  const section = api.buildPlaceholderSection(
+    { id: "kanto", name: "Kanto", rows: 1, cols: 3 },
+    slots,
+    {},
+    "all",
+    "",
+  );
+
+  assert.deepEqual(
+    section.pages[0].slots.map((slot) => slot.emptyKind),
+    [null, "family_reserved"],
+  );
+});
+
 test("print artwork default mode ignores the global artwork resolver", async () => {
   const api = await loadModule();
   globalThis.PokevaultArtwork = {

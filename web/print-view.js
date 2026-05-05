@@ -401,7 +401,13 @@ function buildPlaceholderSection(binder = {}, slots = [], caughtMap = {}, filter
   };
 
   for (const rawSlot of sourceSlots) {
-    if (!rawSlot || rawSlot.emptyKind === "capacity_empty") continue;
+    if (
+      !rawSlot ||
+      rawSlot.emptyKind === "capacity_empty" ||
+      rawSlot.emptyKind === "alignment_empty"
+    ) {
+      continue;
+    }
 
     const p = rawSlot.pokemon || null;
     let caught = false;

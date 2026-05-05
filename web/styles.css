@@ -3759,6 +3759,11 @@ body {
   text-align: center;
 }
 
+.card--alignment-empty {
+  opacity: 0.58;
+  background: color-mix(in srgb, var(--surface-low) 58%, transparent);
+}
+
 .card-empty-label {
   font-size: 0.72rem;
   font-weight: 700;

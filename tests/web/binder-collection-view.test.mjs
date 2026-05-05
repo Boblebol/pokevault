@@ -115,6 +115,21 @@ test("binder shell creates a visible family reserved card", async () => {
   assert.equal(card.textContent.includes("Reserve famille"), true);
 });
 
+test("binder grid renders alignment empty as quiet empty slot", async () => {
+  const api = await loadModule();
+  const card = api.createReservedSlotCard({
+    emptyKind: "alignment_empty",
+    familyId: null,
+    slot: 2,
+  });
+
+  assert.equal(card.dataset.emptyKind, "alignment_empty");
+  assert.equal(card.dataset.familyId, "");
+  assert.equal(card.className.includes("card--alignment-empty"), true);
+  assert.ok(String(card.textContent || "").includes("Emplacement vide"));
+  assert.equal(String(card.textContent || "").includes("Reserve famille"), false);
+});
+
 test("binder shell renders physical slots while nav metrics use logical binder totals", async () => {
   await loadModule({
     document: createFakeDocument({
