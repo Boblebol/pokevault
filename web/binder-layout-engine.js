@@ -101,10 +101,16 @@
     return { pokemon: null, emptyKind: "family_reserved", familyId };
   }
 
+  function alignmentEmptyItem() {
+    return { pokemon: null, emptyKind: "alignment_empty", familyId: null };
+  }
+
   function padRowToColumns(row, cols, familyId, emptyKind = "family_reserved") {
     const out = row.slice(0, cols);
     while (out.length < cols) {
-      out.push(emptyKind === "capacity_empty" ? capacityItem() : familyReservedItem(familyId));
+      if (emptyKind === "capacity_empty") out.push(capacityItem());
+      else if (emptyKind === "alignment_empty") out.push(alignmentEmptyItem());
+      else out.push(familyReservedItem(familyId));
     }
     return out;
   }
@@ -113,9 +119,9 @@
     const chunks = [];
     const width = positiveInt(cols, 3);
     for (let start = 0; start < row.length; start += width) {
-      chunks.push(padRowToColumns(row.slice(start, start + width), width, familyId));
+      chunks.push(row.slice(start, start + width));
     }
-    return chunks.length ? chunks : [padRowToColumns([], width, familyId)];
+    return chunks.length ? chunks : [[]];
   }
 
   function familyLayoutBlocks(pokemon = [], familyData = null, cols = 3) {
@@ -163,9 +169,10 @@
       pokemon.filter((p) => p?.slug && !emitted.has(String(p.slug))),
     );
     for (const p of leftovers) {
+      const familyId = String(p.slug || "");
       blocks.push({
-        familyId: String(p.slug || ""),
-        rows: [padRowToColumns([pokemonItem(p, String(p.slug || ""))], cols, String(p.slug || ""))],
+        familyId,
+        rows: [[pokemonItem(p, familyId)]],
       });
     }
     return blocks;
@@ -174,26 +181,60 @@
   function flattenFamilyBlocksPageAware(blocks = [], layout) {
     const out = [];
     let rowInPage = 0;
+    let currentRow = null;
+    let currentFamilyId = null;
+
+    function flushCurrent(emptyKind = "family_reserved", familyId = currentFamilyId) {
+      if (!currentRow) return;
+      out.push(...padRowToColumns(currentRow, layout.cols, familyId, emptyKind));
+      currentRow = null;
+      currentFamilyId = null;
+      rowInPage = (rowInPage + 1) % layout.rows;
+    }
+
+    function closePageWithCapacity() {
+      while (rowInPage < layout.rows) {
+        out.push(...padRowToColumns([], layout.cols, null, "capacity_empty"));
+        rowInPage += 1;
+      }
+      rowInPage = 0;
+    }
+
+    function startNextPageIfBlockWouldSplit(blockRowCount) {
+      if (
+        rowInPage > 0 &&
+        blockRowCount <= layout.rows &&
+        rowInPage + blockRowCount > layout.rows
+      ) {
+        closePageWithCapacity();
+      }
+    }
 
     for (const block of blocks) {
       const blockRows = block.rows || [];
-      if (
-        rowInPage > 0 &&
-        blockRows.length <= layout.rows &&
-        rowInPage + blockRows.length > layout.rows
-      ) {
-        while (rowInPage < layout.rows) {
-          out.push(...padRowToColumns([], layout.cols, null, "capacity_empty"));
-          rowInPage += 1;
-        }
-        rowInPage = 0;
-      }
+      if (!currentRow) startNextPageIfBlockWouldSplit(blockRows.length);
 
-      for (const row of blockRows) {
-        out.push(...padRowToColumns(row, layout.cols, block.familyId));
-        rowInPage = (rowInPage + 1) % layout.rows;
+      for (let rowIndex = 0; rowIndex < blockRows.length; rowIndex += 1) {
+        const row = blockRows[rowIndex] || [];
+        if (rowIndex > 0) flushCurrent("family_reserved", block.familyId);
+
+        if (currentRow && currentRow.length + row.length > layout.cols) {
+          flushCurrent("alignment_empty", null);
+          startNextPageIfBlockWouldSplit(blockRows.length - rowIndex);
+        }
+
+        if (!currentRow) {
+          currentRow = [];
+          currentFamilyId = block.familyId;
+        }
+
+        currentRow.push(...row);
+        currentFamilyId = block.familyId;
+        if (currentRow.length >= layout.cols) flushCurrent("family_reserved", block.familyId);
       }
     }
+
+    flushCurrent("family_reserved", currentFamilyId);
     return out;
   }
 

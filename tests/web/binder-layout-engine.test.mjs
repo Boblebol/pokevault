@@ -259,3 +259,76 @@ test("orderPokemonForBinder preserves page-aware family gaps", async () => {
     ],
   );
 });
+
+test("family layout packs a complete solo family into remaining row cells", async () => {
+  const api = await loadEngine();
+  const slots = api.computeBinderSlots({
+    binder: { id: "families", name: "Familles", organization: "family", rows: 3, cols: 3, sheet_count: 1 },
+    pokemon: [
+      { slug: "0325-spoink", number: "0325" },
+      { slug: "0326-grumpig", number: "0326" },
+      { slug: "0327-spinda", number: "0327" },
+    ],
+    familyData: {
+      families: [
+        { id: "0325-spoink", layout_rows: [["0325-spoink", "0326-grumpig"]] },
+        { id: "0327-spinda", layout_rows: [["0327-spinda"]] },
+      ],
+    },
+  });
+
+  assert.deepEqual(
+    slots.slice(0, 3).map((slot) => [slot.pokemon?.slug || null, slot.emptyKind]),
+    [
+      ["0325-spoink", null],
+      ["0326-grumpig", null],
+      ["0327-spinda", null],
+    ],
+  );
+});
+
+test("family layout closes a short branch row when the next family row cannot fit", async () => {
+  const api = await loadEngine();
+  const slots = api.computeBinderSlots({
+    binder: { id: "families", name: "Familles", organization: "family", rows: 3, cols: 3, sheet_count: 1 },
+    pokemon: [
+      { slug: "0060-poliwag", number: "0060" },
+      { slug: "0061-poliwhirl", number: "0061" },
+      { slug: "0062-poliwrath", number: "0062" },
+      { slug: "0186-politoed", number: "0186" },
+      { slug: "0063-abra", number: "0063" },
+      { slug: "0064-kadabra", number: "0064" },
+      { slug: "0065-alakazam", number: "0065" },
+    ],
+    familyData: {
+      families: [
+        {
+          id: "0060-poliwag",
+          layout_rows: [
+            ["0060-poliwag", "0061-poliwhirl", "0062-poliwrath"],
+            ["0186-politoed"],
+          ],
+        },
+        {
+          id: "0063-abra",
+          layout_rows: [["0063-abra", "0064-kadabra", "0065-alakazam"]],
+        },
+      ],
+    },
+  });
+
+  assert.deepEqual(
+    slots.slice(0, 9).map((slot) => [slot.pokemon?.slug || null, slot.emptyKind, slot.familyId]),
+    [
+      ["0060-poliwag", null, "0060-poliwag"],
+      ["0061-poliwhirl", null, "0060-poliwag"],
+      ["0062-poliwrath", null, "0060-poliwag"],
+      ["0186-politoed", null, "0060-poliwag"],
+      [null, "alignment_empty", null],
+      [null, "alignment_empty", null],
+      ["0063-abra", null, "0063-abra"],
+      ["0064-kadabra", null, "0063-abra"],
+      ["0065-alakazam", null, "0063-abra"],
+    ],
+  );
+});
