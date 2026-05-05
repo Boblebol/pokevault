@@ -118,10 +118,10 @@ test("family slots preserve intentional holes and expose reserved metadata", asy
     [
       ["0133-eevee", null, "0133-eevee"],
       ["0134-vaporeon", null, "0133-eevee"],
-      [null, "family_reserved", "0133-eevee"],
+      [null, "alignment_empty", null],
       [null, "family_reserved", "0133-eevee"],
       ["0135-jolteon", null, "0133-eevee"],
-      [null, "family_reserved", "0133-eevee"],
+      [null, "alignment_empty", null],
     ],
   );
 });
@@ -152,7 +152,7 @@ test("family slots preserve reserved-only rows inside represented family blocks"
     [
       [null, "family_reserved", "0133-eevee"],
       [null, "family_reserved", "0133-eevee"],
-      [null, "family_reserved", "0133-eevee"],
+      [null, "alignment_empty", null],
     ],
   );
 });
@@ -182,7 +182,7 @@ test("family slots wrap overwide rows without dropping pokemon", async () => {
       ["0001-a", null, "f1"],
       ["0002-b", null, "f1"],
       ["0003-c", null, "f1"],
-      [null, "family_reserved", "f1"],
+      [null, "alignment_empty", null],
     ],
   );
 });
@@ -279,10 +279,10 @@ test("family block shares a partial row when all its rows still fit the page", a
     [
       ["0001-a", null, "f1", 1],
       ["0002-b", null, "f2", 1],
-      [null, "family_reserved", "f2", 1],
+      [null, "alignment_empty", null, 1],
       ["0003-c", null, "f2", 1],
-      [null, "family_reserved", "f2", 1],
-      [null, "family_reserved", "f2", 1],
+      [null, "alignment_empty", null, 1],
+      [null, "alignment_empty", null, 1],
     ],
   );
 });
@@ -378,6 +378,31 @@ test("family layout packs leftover pokemon into remaining row cells", async () =
       ["0325-spoink", null, "0325-spoink"],
       ["0326-grumpig", null, "0325-spoink"],
       ["0327-spinda", null, "0327-spinda"],
+    ],
+  );
+});
+
+test("family layout marks final generated row padding as alignment empty", async () => {
+  const api = await loadEngine();
+  const slots = api.computeBinderSlots({
+    binder: { id: "families", name: "Familles", organization: "family", rows: 3, cols: 3, sheet_count: 1 },
+    pokemon: [
+      { slug: "0001-a", number: "0001" },
+      { slug: "0002-b", number: "0002" },
+    ],
+    familyData: {
+      families: [
+        { id: "f1", layout_rows: [["0001-a", "0002-b"]] },
+      ],
+    },
+  });
+
+  assert.deepEqual(
+    slots.slice(0, 3).map((slot) => [slot.pokemon?.slug || null, slot.emptyKind, slot.familyId]),
+    [
+      ["0001-a", null, "f1"],
+      ["0002-b", null, "f1"],
+      [null, "alignment_empty", null],
     ],
   );
 });

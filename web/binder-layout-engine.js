@@ -184,7 +184,7 @@
     let currentRow = null;
     let currentFamilyId = null;
 
-    function flushCurrent(emptyKind = "family_reserved", familyId = currentFamilyId) {
+    function flushCurrent(emptyKind = "alignment_empty", familyId = null) {
       if (!currentRow) return;
       out.push(...padRowToColumns(currentRow, layout.cols, familyId, emptyKind));
       currentRow = null;
@@ -230,7 +230,7 @@
 
       for (let rowIndex = 0; rowIndex < blockRows.length; rowIndex += 1) {
         const row = blockRows[rowIndex] || [];
-        if (rowIndex > 0) flushCurrent("family_reserved", block.familyId);
+        if (rowIndex > 0) flushCurrent();
 
         if (currentRow && currentRow.length + row.length > layout.cols) {
           flushCurrent("alignment_empty", null);
@@ -244,11 +244,11 @@
 
         currentRow.push(...row);
         currentFamilyId = block.familyId;
-        if (currentRow.length >= layout.cols) flushCurrent("family_reserved", block.familyId);
+        if (currentRow.length >= layout.cols) flushCurrent();
       }
     }
 
-    flushCurrent("family_reserved", currentFamilyId);
+    flushCurrent();
     return out;
   }
 
