@@ -400,7 +400,7 @@ function renderBinderPageGrid() {
       if (makeCard) {
         const card = p
           ? makeCard(p)
-          : slot?.emptyKind === "family_reserved"
+          : slot?.emptyKind === "family_reserved" || slot?.emptyKind === "alignment_empty"
             ? createReservedSlotCard(slot)
             : makeCard(null, { empty: true });
         if (card) {
