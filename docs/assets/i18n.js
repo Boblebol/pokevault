@@ -64,7 +64,7 @@
       "features.fiches.text": "Ouvre un drawer ou une fiche complète pour l'identité, l'artwork, les actions Capturé/Double/Relâcher 1/Relâcher, les formes liées, notes, types et cartes possédées.",
       "features.cards.title": "Catalogue de cartes physiques",
       "features.cards.text": "Ajoute set, numéro, variante, langue, état, quantité, notes et image à un Pokémon, avec recherche dans l'API publique Pokémon TCG pour préremplir les métadonnées.",
-      "features.binders.title": "Physical binder planner",
+      "features.binders.title": "Planificateur de classeurs physiques",
       "features.binders.text": "Crée des classeurs locaux avec défaut 3×3 · 10 feuillets, grilles custom via Classeurs > Modifier format, sprites depuis Réglages > Images / sprites, familles compactes comme Spoink / Groret / Spinda et Petites fiches classeur imprimables en attendant les vraies cartes.",
       "features.trainers.title": "Trainer Cards",
       "features.trainers.text": "Crée une carte locale avec contacts optionnels, export fichier, import de Dresseurs reçus et carnet local qui partage uniquement tes doublons.",

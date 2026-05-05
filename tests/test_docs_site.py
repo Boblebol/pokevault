@@ -485,17 +485,37 @@ def test_configurable_binder_layouts_are_documented() -> None:
         assert "10 feuillets" in text
         assert "3×3" in text
         assert "Kanto 1" in text
-        assert "Familles" in text
         assert "Images / sprites" in text
-        assert "Petites fiches classeur" in text
-        assert "Classeurs > Modifier format" in text
-        assert "Classeurs > Réglages" not in text
+
+    assert "Familles" in readme
+    assert "Petites fiches classeur" in readme
+    assert "Classeurs > Modifier format" in readme
+    assert "Classeurs > Réglages" not in readme
+
+    assert "Binders > Edit format" in features
+    assert "Settings > Images / sprites" in features
+    assert "compact family rows such as Spoink / Grumpig / Spinda" in features
+    assert "Small binder cards" in features
+    assert "Print > Group by > Small binder cards" in features
+    for text in [
+        "Classeurs > Modifier format",
+        "Réglages > Images / sprites",
+        "Familles",
+        "Groret",
+        "Petites fiches classeur",
+    ]:
+        assert text not in features
 
     assert "Spoink" in readme
     assert "Spinda" in readme
     assert "vides discrets" in readme
 
+    assert "Planificateur de classeurs physiques" in docs_i18n
+    assert "Classeurs > Modifier format" in docs_i18n
+    assert "Réglages > Images / sprites" in docs_i18n
+    assert "Petites fiches classeur" in docs_i18n
     assert "Binders > Edit format" in docs_i18n
+    assert "Settings > Images / sprites" in docs_i18n
     assert "Print > Group by > Small binder cards" in docs_i18n
     assert "`Classeurs >" not in docs_i18n
     assert "`Réglages > Images / sprites`" not in docs_i18n
