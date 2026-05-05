@@ -1477,6 +1477,12 @@ function familyWorkspaceRangesFromEngine(selectedPokemon, familyData, layout, ca
   let index = 0;
   let gapLength = 0;
 
+  const groupingIdForSlot = (slot, fallbackId) => {
+    if (slot?.emptyKind === "capacity_empty") return null;
+    if (slot?.emptyKind === "alignment_empty") return fallbackId;
+    return String(slot?.familyId || slot?.pokemon?.slug || fallbackId);
+  };
+
   while (index < slots.length) {
     const slot = slots[index];
     if (slot?.emptyKind === "capacity_empty") {
@@ -1485,12 +1491,12 @@ function familyWorkspaceRangesFromEngine(selectedPokemon, familyData, layout, ca
       continue;
     }
 
-    const familyId = String(slot?.familyId || slot?.pokemon?.slug || `family-${index}`);
+    const familyId = groupingIdForSlot(slot, `family-${index}`);
     const familyStart = index;
     let familyLength = 0;
     while (index < slots.length) {
       const current = slots[index];
-      const currentFamilyId = String(current?.familyId || current?.pokemon?.slug || `family-${familyStart}`);
+      const currentFamilyId = groupingIdForSlot(current, familyId);
       if (current?.emptyKind === "capacity_empty" || currentFamilyId !== familyId) break;
       familyLength += 1;
       index += 1;

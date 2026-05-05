@@ -354,6 +354,56 @@ test("family binder workspace counts page-aware gaps in binder ranges", async ()
   );
 });
 
+test("family binder workspace keeps alignment empties inside compact family blocks", async () => {
+  const api = await loadModule();
+  const families = {
+    families: [
+      { id: "f1", layout_rows: [["0001-a", "0002-b", "0003-c"]] },
+      {
+        id: "f2",
+        layout_rows: [
+          ["0004-d"],
+          ["0005-e", "0006-f", "0007-g"],
+        ],
+      },
+    ],
+  };
+  const pokemon = [
+    "0001-a",
+    "0002-b",
+    "0003-c",
+    "0004-d",
+    "0005-e",
+    "0006-f",
+    "0007-g",
+  ].map((slug, idx) => ({
+    slug,
+    number: String(idx + 1).padStart(4, "0"),
+  }));
+
+  const result = api.buildFamilyBinderWorkspace(
+    {
+      name: "Familles",
+      organization: "family",
+      formScope: "base_only",
+      rows: 1,
+      cols: 3,
+      sheetCount: 1,
+    },
+    pokemon,
+    families,
+    "test",
+  );
+
+  assert.deepEqual(
+    result.configBody.binders.map((binder) => [binder.name, binder.range_start, binder.range_limit]),
+    [
+      ["Familles 1", 0, 3],
+      ["Familles 2", 3, 6],
+    ],
+  );
+});
+
 test("binder wizard form rule labels follow English i18n when available", async () => {
   const api = await loadModule();
   globalThis.PokevaultI18n = {
