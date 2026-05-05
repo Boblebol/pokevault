@@ -227,27 +227,62 @@ test("family block starts on next page when compact row would split it", async (
       { slug: "0002-b", number: "0002" },
       { slug: "0003-c", number: "0003" },
       { slug: "0004-d", number: "0004" },
+      { slug: "0005-e", number: "0005" },
+      { slug: "0006-f", number: "0006" },
+      { slug: "0007-g", number: "0007" },
     ],
     familyData: {
       families: [
-        { id: "f1", layout_rows: [["0001-a", "0002-b"]] },
-        { id: "f2", layout_rows: [["0003-c"], ["0004-d"]] },
+        { id: "f1", layout_rows: [["0001-a", "0002-b", "0003-c"]] },
+        { id: "f2", layout_rows: [["0004-d", "0005-e"]] },
+        { id: "f3", layout_rows: [["0006-f"], ["0007-g"]] },
       ],
     },
     includeCapacity: true,
   });
 
-  const f2First = slots.find((slot) => slot.pokemon?.slug === "0003-c");
-  assert.equal(f2First.page, 2);
+  const f3First = slots.find((slot) => slot.pokemon?.slug === "0006-f");
+  assert.equal(f3First.page, 2);
   assert.deepEqual(
     slots.slice(0, 6).map((slot) => [slot.pokemon?.slug || null, slot.emptyKind, slot.familyId]),
     [
       ["0001-a", null, "f1"],
       ["0002-b", null, "f1"],
+      ["0003-c", null, "f1"],
+      ["0004-d", null, "f2"],
+      ["0005-e", null, "f2"],
       [null, "alignment_empty", null],
-      [null, "capacity_empty", null],
-      [null, "capacity_empty", null],
-      [null, "capacity_empty", null],
+    ],
+  );
+});
+
+test("family block shares a partial row when all its rows still fit the page", async () => {
+  const api = await loadEngine();
+  const slots = api.computeBinderSlots({
+    binder: { id: "families", name: "Familles", organization: "family", rows: 2, cols: 3, sheet_count: 2 },
+    pokemon: [
+      { slug: "0001-a", number: "0001" },
+      { slug: "0002-b", number: "0002" },
+      { slug: "0003-c", number: "0003" },
+    ],
+    familyData: {
+      families: [
+        { id: "f1", layout_rows: [["0001-a"]] },
+        { id: "f2", layout_rows: [["0002-b"], ["0003-c"]] },
+      ],
+    },
+    includeCapacity: true,
+  });
+
+  assert.deepEqual(
+    slots.slice(0, 6).map((slot) => [slot.pokemon?.slug || null, slot.emptyKind, slot.familyId, slot.page]),
+    [
+      ["0001-a", null, "f1", 1],
+      ["0002-b", null, "f2", 1],
+      [null, "family_reserved", "f2", 1],
+      ["0003-c", null, "f2", 1],
+      [null, "family_reserved", "f2", 1],
+      [null, "family_reserved", "f2", 1],
     ],
   );
 });
@@ -317,6 +352,39 @@ test("family layout packs a complete solo family into remaining row cells", asyn
       ["0325-spoink", null],
       ["0326-grumpig", null],
       ["0327-spinda", null],
+    ],
+  );
+});
+
+test("family layout preserves explicit holes before Tarpaud as family reserved", async () => {
+  const api = await loadEngine();
+  const slots = api.computeBinderSlots({
+    binder: { id: "families", name: "Familles", organization: "family", rows: 3, cols: 3, sheet_count: 1 },
+    pokemon: [
+      { slug: "0060-ptitard", number: "0060" },
+      { slug: "0061-tetarte", number: "0061" },
+      { slug: "0062-tartard", number: "0062" },
+      { slug: "0186-tarpaud", number: "0186" },
+    ],
+    familyData: {
+      families: [
+        {
+          id: "0060-ptitard",
+          layout_rows: [
+            ["0060-ptitard", "0061-tetarte", "0062-tartard"],
+            [null, null, "0186-tarpaud"],
+          ],
+        },
+      ],
+    },
+  });
+
+  assert.deepEqual(
+    slots.slice(3, 6).map((slot) => [slot.pokemon?.slug || null, slot.emptyKind, slot.familyId]),
+    [
+      [null, "family_reserved", "0060-ptitard"],
+      [null, "family_reserved", "0060-ptitard"],
+      ["0186-tarpaud", null, "0060-ptitard"],
     ],
   );
 });

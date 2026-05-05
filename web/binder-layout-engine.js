@@ -210,12 +210,18 @@
       }
     }
 
+    function currentPageRowsNeededForBlock(blockRows) {
+      const firstRow = blockRows[0] || [];
+      const firstRowSharesCurrent = currentRow && currentRow.length + firstRow.length <= layout.cols;
+      return blockRows.length + (firstRowSharesCurrent ? 0 : 1);
+    }
+
     for (const block of blocks) {
       const blockRows = block.rows || [];
       if (
         currentRow &&
         blockRows.length <= layout.rows &&
-        rowInPage + 1 + blockRows.length > layout.rows
+        rowInPage + currentPageRowsNeededForBlock(blockRows) > layout.rows
       ) {
         flushCurrent("alignment_empty", null);
         startNextPageIfBlockWouldSplit(blockRows.length);
