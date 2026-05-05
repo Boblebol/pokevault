@@ -128,12 +128,12 @@ capacity is:
 
 `rows × columns × feuillets × 2`
 
-Collectors who use smaller or larger binders can open `Classeurs > Réglages`,
-choose a preset or custom grid, and regenerate the local binder view. The same
-settings control rows, columns and the number of physical sheets. If a region is
-too large for the selected format, Pokevault keeps every Pokemon visible by
-splitting that region into numbered binders such as Kanto 1 and Kanto 2 instead
-of hiding entries.
+Collectors who use smaller or larger binders can open
+`Classeurs > Modifier format`, choose a preset or custom grid, and regenerate
+the local binder view. The same settings control rows, columns and the number of
+physical sheets. If a region is too large for the selected format, Pokevault
+keeps every Pokemon visible by splitting that region into numbered binders such
+as Kanto 1 and Kanto 2 instead of hiding entries.
 
 Generation sprites are available from `Réglages > Images / sprites`. Print can
 also choose its own image mode, so a collector can print retro sprites without
@@ -148,9 +148,10 @@ printed as card placeholders. Manual corrections stay in
 `data/evolution-family-overrides.json`, so the app UI does not expose
 expert-only layout controls.
 
-Printable small binder cards live under `Impression > Regrouper par > Petites fiches classeur`.
-They print Pokemon slots and intentional family reservations, but skip ordinary
-capacity and alignment empties.
+Printable small binder cards live under
+`Impression > Regrouper par > Petites fiches classeur` (`Print > Group by > Small binder cards`
+in English). They print Pokemon slots and intentional family reservations, but
+skip ordinary capacity and alignment empties.
 
 ## Screenshots
 
