@@ -143,15 +143,16 @@ The optional `Familles` organization uses `data/evolution-families.json` to keep
 evolution stages readable while saving space. Short complete families can share
 a 3×3 row, for example Spoink / Groret / Spinda. Branches keep their readable
 shape: Ptitard / Têtarte / Tartard stay together, Tarpaud starts the next row,
-and the two remaining cells are discrete empties (`vides discrets`) that are not
-printed as card placeholders. Manual corrections stay in
+and generated trailing alignment gaps are not printed. The layout engine marks
+those generated fillers as `alignment_empty`; intentional family reservations use
+`family_reserved` and remain printable. Manual corrections stay in
 `data/evolution-family-overrides.json`, so the app UI does not expose
 expert-only layout controls.
 
 Printable small binder cards live under
 `Impression > Regrouper par > Petites fiches classeur` (`Print > Group by > Small binder cards`
-in English). They print Pokemon slots and intentional family reservations, but
-skip ordinary capacity and alignment empties.
+in English). They print Pokemon slots, and intentional family reservations still print as temporary placeholders.
+Ordinary capacity slots and alignment empties (`vides discrets`) are skipped.
 
 ## Screenshots
 

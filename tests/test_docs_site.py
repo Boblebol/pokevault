@@ -481,8 +481,12 @@ def test_configurable_binder_layouts_are_documented() -> None:
     docs_i18n = (DOCS / "assets" / "i18n.js").read_text(encoding="utf-8")
     web_i18n = (WEB / "i18n.js").read_text(encoding="utf-8")
 
+    assert "10 feuillets" in readme
+    assert "10 feuillets" in docs_i18n
+    assert "10 sheets" in features
+    assert "10 feuillets" not in features
+
     for text in [readme, features]:
-        assert "10 feuillets" in text
         assert "3×3" in text
         assert "Kanto 1" in text
         assert "Images / sprites" in text
@@ -509,11 +513,15 @@ def test_configurable_binder_layouts_are_documented() -> None:
     assert "Spoink" in readme
     assert "Spinda" in readme
     assert "vides discrets" in readme
+    assert "alignment_empty" in readme
+    assert "family_reserved" in readme
+    assert "generated trailing alignment gaps are not printed" in readme
+    assert "intentional family reservations still print as temporary placeholders" in readme
 
     assert "Planificateur de classeurs physiques" in docs_i18n
     assert "Classeurs > Modifier format" in docs_i18n
     assert "Réglages > Images / sprites" in docs_i18n
-    assert "Petites fiches classeur" in docs_i18n
+    assert "Impression > Regrouper par > Petites fiches classeur" in docs_i18n
     assert "Binders > Edit format" in docs_i18n
     assert "Settings > Images / sprites" in docs_i18n
     assert "Print > Group by > Small binder cards" in docs_i18n

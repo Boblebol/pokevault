@@ -65,7 +65,7 @@
       "features.cards.title": "Catalogue de cartes physiques",
       "features.cards.text": "Ajoute set, numéro, variante, langue, état, quantité, notes et image à un Pokémon, avec recherche dans l'API publique Pokémon TCG pour préremplir les métadonnées.",
       "features.binders.title": "Planificateur de classeurs physiques",
-      "features.binders.text": "Crée des classeurs locaux avec défaut 3×3 · 10 feuillets, grilles custom via Classeurs > Modifier format, sprites depuis Réglages > Images / sprites, familles compactes comme Spoink / Groret / Spinda et Petites fiches classeur imprimables en attendant les vraies cartes.",
+      "features.binders.text": "Crée des classeurs locaux avec défaut 3×3 · 10 feuillets, grilles custom via Classeurs > Modifier format, sprites depuis Réglages > Images / sprites, familles compactes comme Spoink / Groret / Spinda et Impression > Regrouper par > Petites fiches classeur imprimables en attendant les vraies cartes.",
       "features.trainers.title": "Trainer Cards",
       "features.trainers.text": "Crée une carte locale avec contacts optionnels, export fichier, import de Dresseurs reçus et carnet local qui partage uniquement tes doublons.",
       "features.badges.title": "Badges",
