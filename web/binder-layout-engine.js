@@ -212,6 +212,14 @@
 
     for (const block of blocks) {
       const blockRows = block.rows || [];
+      if (
+        currentRow &&
+        blockRows.length <= layout.rows &&
+        rowInPage + 1 + blockRows.length > layout.rows
+      ) {
+        flushCurrent("alignment_empty", null);
+        startNextPageIfBlockWouldSplit(blockRows.length);
+      }
       if (!currentRow) startNextPageIfBlockWouldSplit(blockRows.length);
 
       for (let rowIndex = 0; rowIndex < blockRows.length; rowIndex += 1) {

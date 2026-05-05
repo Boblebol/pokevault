@@ -218,6 +218,40 @@ test("family block starts on next page when remaining rows cannot fit it", async
   assert.equal(slots[5].emptyKind, "capacity_empty");
 });
 
+test("family block starts on next page when compact row would split it", async () => {
+  const api = await loadEngine();
+  const slots = api.computeBinderSlots({
+    binder: { id: "families", name: "Familles", organization: "family", rows: 2, cols: 3, sheet_count: 2 },
+    pokemon: [
+      { slug: "0001-a", number: "0001" },
+      { slug: "0002-b", number: "0002" },
+      { slug: "0003-c", number: "0003" },
+      { slug: "0004-d", number: "0004" },
+    ],
+    familyData: {
+      families: [
+        { id: "f1", layout_rows: [["0001-a", "0002-b"]] },
+        { id: "f2", layout_rows: [["0003-c"], ["0004-d"]] },
+      ],
+    },
+    includeCapacity: true,
+  });
+
+  const f2First = slots.find((slot) => slot.pokemon?.slug === "0003-c");
+  assert.equal(f2First.page, 2);
+  assert.deepEqual(
+    slots.slice(0, 6).map((slot) => [slot.pokemon?.slug || null, slot.emptyKind, slot.familyId]),
+    [
+      ["0001-a", null, "f1"],
+      ["0002-b", null, "f1"],
+      [null, "alignment_empty", null],
+      [null, "capacity_empty", null],
+      [null, "capacity_empty", null],
+      [null, "capacity_empty", null],
+    ],
+  );
+});
+
 test("orderPokemonForBinder preserves page-aware family gaps", async () => {
   const api = await loadEngine();
   const ordered = api.orderPokemonForBinder({
