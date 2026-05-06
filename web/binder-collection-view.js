@@ -133,6 +133,9 @@ function realOrderedEntries(ordered) {
 function createReservedSlotCard(slot = {}) {
   const card = document.createElement("div");
   card.className = "card card--reserved-slot binder-card";
+  if (slot?.emptyKind === "alignment_empty") {
+    card.classList.add("card--alignment-empty");
+  }
   card.dataset.emptyKind = String(slot?.emptyKind || "");
   card.dataset.familyId = String(slot?.familyId || "");
 
@@ -397,7 +400,7 @@ function renderBinderPageGrid() {
       if (makeCard) {
         const card = p
           ? makeCard(p)
-          : slot?.emptyKind === "family_reserved"
+          : slot?.emptyKind === "family_reserved" || slot?.emptyKind === "alignment_empty"
             ? createReservedSlotCard(slot)
             : makeCard(null, { empty: true });
         if (card) {

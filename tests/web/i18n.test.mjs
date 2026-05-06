@@ -97,6 +97,30 @@ test("defaults to French and falls back to French for missing English keys", asy
   assert.equal(api.t("app.nav.settings"), "Réglages");
   assert.equal(api.t("missing.key"), "missing.key");
   assert.equal(api.t("app.nav.settings", {}, "en"), "Settings");
+  assert.equal(api.t("app.settings.artwork"), "Images / sprites");
+  assert.equal(api.t("app.settings.artwork", {}, "en"), "Images / sprites");
+  assert.equal(api.t("app.print.placeholders"), "Petites fiches classeur");
+  assert.equal(api.t("app.print.placeholders", {}, "en"), "Small binder cards");
+  assert.equal(api.t("app.binders.settings"), "Modifier format");
+  assert.equal(api.t("app.binders.settings", {}, "en"), "Edit format");
+  assert.equal(
+    api.t("app.docs.binders.family"),
+    "Le mode Familles compacte les familles courtes quand elles tiennent sur la même ligne, tout en gardant les branches lisibles avec des vides discrets non imprimés.",
+  );
+  assert.equal(
+    api.t("app.docs.binders.family", {}, "en"),
+    "Family mode compacts short families when they fit on the same row, while keeping branches readable with discrete non-printable alignment empties.",
+  );
+  assert.equal(
+    api.t("binder_wizard.org.family.desc"),
+    "Familles compactes : les petites familles partagent une ligne quand elles tiennent, les branches gardent des vides discrets.",
+  );
+  assert.equal(
+    api.t("binder_wizard.org.family.desc", {}, "en"),
+    "Compact families: small families share a row when they fit, branches keep discrete empties.",
+  );
+  assert.doesNotMatch(api.t("app.docs.binders.text"), /cases vides volontaires/);
+  assert.doesNotMatch(api.t("app.docs.binders.text", {}, "en"), /intentional empty slots/);
 });
 
 test("persists English locale, interpolates values and hydrates DOM attributes", async () => {

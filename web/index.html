@@ -214,7 +214,7 @@
           <p class="collection-subtitle" data-i18n="app.binders.subtitle">Gère tes classeurs, tes pages et les placements de tes cartes.</p>
           <div class="binder-header-actions">
             <button type="button" class="binder-refresh" id="binderV2Refresh" data-i18n="app.binders.refresh">Rafraîchir</button>
-            <button type="button" class="binder-refresh binder-refresh--ghost" id="binderWizardSettings" hidden data-i18n="app.binders.settings">Réglages</button>
+            <button type="button" class="binder-refresh binder-refresh--ghost" id="binderWizardSettings" hidden data-i18n="app.binders.settings">Modifier format</button>
           </div>
           <p class="sync-hint" id="binderV2Hint" hidden></p>
           <div id="binderAdvancedPanel" class="stitch-hidden" hidden>
@@ -361,7 +361,7 @@
                         <option value="binder" data-i18n="app.print.binder_pages">Pages de classeur</option>
                         <option value="region" data-i18n="app.print.region">Région</option>
                         <option value="pocket" data-i18n="app.print.pocket">Pocket A5 (par région)</option>
-                        <option value="placeholders" data-i18n="app.print.placeholders">Placeholders cartes</option>
+                        <option value="placeholders" data-i18n="app.print.placeholders">Petites fiches classeur</option>
                       </select>
                     </div>
                     <div class="print-control-group" id="printArtworkGroup">
@@ -445,9 +445,10 @@
               <h2 data-i18n="app.docs.binders.title">Classeurs physiques</h2>
               <ul class="docs-list">
                 <li data-i18n="app.docs.binders.default">Le format par défaut est 3×3 · 10 feuillets recto-verso, soit 180 emplacements.</li>
-                <li data-i18n="app.docs.binders.custom">Les réglages permettent grilles custom, périmètre de formes et organisation nationale, régionale ou par familles.</li>
+                <li data-i18n="app.docs.binders.custom">Classeurs > Modifier format permet de modifier lignes, colonnes, feuillets, périmètre de formes et organisation.</li>
                 <li data-i18n="app.docs.binders.split">Si une région dépasse la capacité, Pokevault crée des sections comme Kanto 1 / Kanto 2.</li>
-                <li data-i18n="app.docs.binders.family">Le mode Familles garde les évolutions alignées avec des cases vides volontaires.</li>
+                <li data-i18n="app.docs.binders.family">Le mode Familles compacte les familles courtes quand elles tiennent sur la même ligne, tout en gardant les branches lisibles avec des vides discrets non imprimés.</li>
+                <li data-i18n="app.docs.print.placeholders">Impression > Regrouper par > Petites fiches classeur imprime des cartes temporaires et saute les vides d'alignement.</li>
               </ul>
             </article>
 
@@ -556,8 +557,8 @@
               <select id="settingsThemeSelect" class="region-filter" aria-label="Thème de région"></select>
             </label>
             <label class="region-filter-wrap settings-dim-label theme-choice-row">
-              <span class="region-filter-label" data-i18n="app.settings.artwork">Artwork</span>
-              <select id="settingsArtworkSelect" class="region-filter" aria-label="Source d'artwork par défaut"></select>
+              <span class="region-filter-label" data-i18n="app.settings.artwork">Images / sprites</span>
+              <select id="settingsArtworkSelect" class="region-filter" aria-label="Images / sprites"></select>
             </label>
           </div>
           <div class="stats-kpi-card">
