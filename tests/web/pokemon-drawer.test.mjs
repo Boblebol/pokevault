@@ -378,11 +378,6 @@ test("drawer ownership helper source does not receive wanted state", async () =>
       return "";
     },
   };
-  globalThis.PokevaultHunts = {
-    isWanted() {
-      return true;
-    },
-  };
   globalThis.PokevaultTrainerContacts = {
     getOwnCard() {
       return { wants: ["0025-pikachu"], for_trade: [] };

@@ -286,7 +286,6 @@ def test_in_app_docs_cover_complete_product_workflows_in_both_languages() -> Non
     for text in [
         "data/collection-progress.json",
         "data/collection-cards.json",
-        "data/hunts.json",
         "data/binder-config.json",
         "data/trainer-contacts.json",
         "/api/progress",

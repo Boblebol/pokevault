@@ -60,7 +60,6 @@ const APP_FALLBACK_I18N = {
   "app.card.state_missing": ", recherché ou manquant",
   "app.card.seen_contact": ", vu chez {count} contact",
   "app.card.action_caught": "Capturé",
-  "app.card.action_wanted": "Je cherche",
   "app.card.seen_badge": "Vu chez {count}",
   "app.card.details": "Fiche & cartes",
   "app.card.open": "Ouvrir la fiche de {name}",
@@ -807,9 +806,6 @@ function matchesFilter(p) {
   const got = status.state === "caught";
   if (filterMode === "caught") return got;
   if (filterMode === "missing") return !got;
-  if (filterMode === "seen") return status.state === "seen";
-  if (filterMode === "shiny") return got && status.shiny;
-  if (filterMode === "hunts") return Boolean(window.PokevaultHunts?.isWanted?.(k));
   return true;
 }
 
@@ -923,7 +919,6 @@ function matchesPokedexFilterState(p) {
       caughtMap,
       statusMap,
       effectiveRegion,
-      isWanted: (slug) => Boolean(window.PokevaultHunts?.isWanted?.(slug)),
       narrativeTagsFor,
     });
   }
@@ -1699,7 +1694,7 @@ function createPokemonCard(p, opts) {
     { compact: true },
   );
   if (ownershipActions) action.append(ownershipActions);
-  else action.textContent = caught ? t("app.card.action_caught") : t("app.card.action_wanted");
+  else action.textContent = t("app.card.action_caught");
   card.append(action);
 
   const exchange = document.createElement("div");
@@ -1751,26 +1746,6 @@ function hasActiveFilterExceptMissing() {
   );
 }
 
-function openRecommendedPokemon(slug, action, trigger) {
-  if (!slug) return;
-  const escaped = window.CSS?.escape ? window.CSS.escape(slug) : String(slug).replace(/["\\]/g, "\\$&");
-  const card = document.querySelector?.(`.card[data-slug="${escaped}"]`) || null;
-  if (window.PokevaultDrawer?.open) {
-    window.PokevaultDrawer.open(slug, card || trigger || null);
-    return;
-  }
-  const pokemon = action?.pokemon || allPokemon.find((p) => pokemonKey(p) === slug);
-  const input = document.getElementById("search");
-  if (input && pokemon) {
-    input.value = displayName(pokemon);
-    input.dispatchEvent(new Event("input", { bubbles: true }));
-  }
-  window.setTimeout(() => {
-    const target = document.querySelector?.(`.card[data-slug="${escaped}"]`);
-    target?.scrollIntoView?.({ block: "center", inline: "nearest", behavior: "smooth" });
-  }, 80);
-}
-
 function render() {
   const grid = document.getElementById("grid");
   const sliced = slicedVisibleList();
@@ -1797,17 +1772,6 @@ function render() {
     caughtMap,
     regionDefinitions,
     cardStats: computeCardStats(),
-  });
-  window.PokevaultNextActions?.renderFromState?.({
-    host: document.getElementById("pokedexNextActions"),
-    pool: poolForCollectionScope(),
-    caughtMap,
-    statusMap,
-    regionDefinitions,
-    activeRegionId: regionFilter,
-    nearestBadge: window.PokevaultBadges?.nearest?.(),
-    activeMissionSlugs: window.PokevaultBadgeMission?.activeTargetSlugs?.() || [],
-    onOpen: openRecommendedPokemon,
   });
   const fill = document.getElementById("progressFill");
   fill.style.width = `${pct}%`;
@@ -1837,10 +1801,9 @@ function render() {
           p.className = "empty-state";
           p.textContent = t("app.list.no_filter");
           return p;
-        })();
+    })();
     if (node) grid.append(node);
     updateListDisplayInfo({ full: sliced.full, end: 0, total: 0 });
-    window.PokevaultBadgeMission?.refresh?.();
     return;
   }
 
@@ -1850,7 +1813,6 @@ function render() {
 
   updateListDisplayInfo({ full: sliced.full, end: sliced.end, total: sliced.total });
   window.PokevaultKeyboard?.repaint?.();
-  window.PokevaultBadgeMission?.refresh?.();
 }
 
 function syncQuickFilterButtons() {
@@ -1917,11 +1879,9 @@ function setupKeyboardHelpTrigger() {
 
 let listCaughtSubscribed = false;
 let listDimSubscribed = false;
-let listHuntsSubscribed = false;
 let listCardsSubscribed = false;
 let listBadgesSubscribed = false;
 let listTrainerContactsSubscribed = false;
-let listBadgeMissionSubscribed = false;
 
 function readStoredFormFilterMode() {
   try {
@@ -1962,11 +1922,6 @@ async function startTracker() {
     return;
   }
   try {
-    await window.PokevaultHunts?.ensureLoaded?.();
-  } catch {
-    /* hunts are optional local state */
-  }
-  try {
     await window.PokevaultTrainerContacts?.ensureLoaded?.();
   } catch {
     /* trainer contacts are optional local state */
@@ -1982,13 +1937,6 @@ async function startTracker() {
     listDimSubscribed = true;
     window.PokedexCollection.subscribeDimMode(() => render());
   }
-  if (!listHuntsSubscribed) {
-    listHuntsSubscribed = true;
-    window.PokevaultHunts?.subscribe?.(() => {
-      resetDisplayedCount();
-      render();
-    });
-  }
   if (!listTrainerContactsSubscribed) {
     listTrainerContactsSubscribed = true;
     window.PokevaultTrainerContacts?.subscribe?.(() => {
@@ -2003,10 +1951,6 @@ async function startTracker() {
   if (!listBadgesSubscribed) {
     listBadgesSubscribed = true;
     window.PokevaultBadges?.subscribe?.(() => render());
-  }
-  if (!listBadgeMissionSubscribed) {
-    listBadgeMissionSubscribed = true;
-    window.PokevaultBadgeMission?.subscribe?.(() => render());
   }
   if (!window.__pokedexOnlineFlushWired) {
     window.__pokedexOnlineFlushWired = true;

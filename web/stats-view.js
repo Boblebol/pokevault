@@ -330,38 +330,6 @@ function renderStats() {
     bento.append(sec);
   }
 
-  const objective = window.PokevaultRecommendations?.rankTargets?.({
-    pool,
-    caughtMap: caught,
-    statusMap: PC?.statusMap || {},
-    huntMap: window.PokevaultHunts?.state?.hunts || {},
-    regionDefinitions: defs,
-    limit: 6,
-  }) || { targetRegion: tStats("stats.all_regions"), reason: "", rows: [] };
-  if (objective.rows.length) {
-    const sec = document.createElement("section");
-    sec.className = "stats-gaps";
-    const h = document.createElement("h2");
-    h.className = "stats-section-title";
-    h.textContent = tStats("stats.objective_title", { region: objective.targetRegion });
-    sec.append(h);
-    if (objective.reason) {
-      const why = document.createElement("p");
-      why.className = "stats-gap-line stats-gap-line--why";
-      why.textContent = tStats("stats.why", { reason: objective.reason });
-      sec.append(why);
-    }
-    for (const p of objective.rows) {
-      const line = document.createElement("p");
-      line.className = "stats-gap-line";
-      const num = String(p.number || "").replace(/^#/, "");
-      const name = p?.names?.fr || p?.names?.en || p?.slug || "?";
-      line.textContent = `#${num} · ${name}`;
-      sec.append(line);
-    }
-    bento.append(sec);
-  }
-
   const types = typeCompletionRows(pool, caught);
   if (types.length) {
     const sec = document.createElement("section");

@@ -38,7 +38,6 @@
   /** @type {Map<string, Array<object>>} */ const cardsCache = new Map();
   /** @type {{cards: number, sets: number} | null} */ let summaryCache = null;
   /** @type {Promise<object> | null} */ let summaryPromise = null;
-  let huntsSubscribed = false;
   let trainerContactsSubscribed = false;
   let localeSubscribed = false;
   let artworkSubscribed = false;
@@ -70,14 +69,8 @@
     "pokemon_drawer.card_added": "Carte ajoutée — Pokédex marqué capturé.",
     "pokemon_drawer.card_add_failed": "Ajout impossible.",
     "pokemon_drawer.full_link": "Voir fiche complète →",
-    "pokemon_drawer.legacy_seen": "Vu manuel existant; les prochains statuts passent par Cherche, Capturé ou Double.",
+    "pokemon_drawer.legacy_seen": "Vu manuel existant; les prochains statuts passent par Capturé, Double ou Relâcher.",
     "pokemon_drawer.forms_empty": "Aucune autre forme dans le Pokédex local.",
-    "pokemon_drawer.hunt.high": "Priorite haute",
-    "pokemon_drawer.hunt.active": "Recherche active",
-    "pokemon_drawer.hunt.empty": "Active Cherche pour le garder dans tes priorites personnelles.",
-    "pokemon_drawer.hunt.normal": "Priorite normale",
-    "pokemon_drawer.hunt.updated": "Recherche mise a jour.",
-    "pokemon_drawer.hunt.failed": "Recherche impossible a modifier.",
     "pokemon_drawer.cards_title": "Mes cartes",
     "pokemon_drawer.cards_empty": "Aucune carte pour l'instant. Ajoute la première ci-dessous.",
     "pokemon_drawer.unknown": "Pokémon inconnu dans le Pokédex local.",
@@ -104,12 +97,6 @@
     if (closeBtn) closeBtn.addEventListener("click", () => close());
     if (scrim) scrim.addEventListener("click", () => close());
     rootEl.addEventListener("keydown", onKeydown);
-    if (!huntsSubscribed) {
-      huntsSubscribed = true;
-      window.PokevaultHunts?.subscribe?.(() => {
-        if (currentSlug) renderAll();
-      });
-    }
     if (!trainerContactsSubscribed) {
       trainerContactsSubscribed = true;
       window.PokevaultTrainerContacts?.subscribe?.(() => {
@@ -879,36 +866,6 @@
     return section;
   }
 
-  function buildProgressSection(slug) {
-    const section = createDrawerSection("personal_progress");
-    const entry = window.PokevaultHunts?.entry?.(slug);
-    const row = document.createElement("div");
-    row.className = "drawer-status-row";
-
-    const label = document.createElement("span");
-    label.className = "drawer-status-row__label";
-    label.textContent = entry
-      ? entry.priority === "high" ? t("pokemon_drawer.hunt.high") : t("pokemon_drawer.hunt.active")
-      : t("pokemon_drawer.hunt.empty");
-    row.append(label);
-
-    const priority = document.createElement("button");
-    priority.type = "button";
-    priority.className = "drawer-status-row__btn";
-    priority.textContent = entry?.priority === "high" ? t("pokemon_drawer.hunt.normal") : t("pokemon_drawer.hunt.high");
-    priority.disabled = !entry;
-    priority.addEventListener("click", async () => {
-      await patchHunt(slug, {
-        wanted: true,
-        priority: entry?.priority === "high" ? "normal" : "high",
-        note: entry?.note || "",
-      });
-    });
-    row.append(priority);
-    section.append(row);
-    return section;
-  }
-
   function buildNotesSection(slug) {
     const section = createDrawerSection("notes");
     const note = window.PokedexCollection?.getNote?.(slug) || "";
@@ -920,16 +877,6 @@
       }));
     }
     return section;
-  }
-
-  async function patchHunt(slug, body) {
-    try {
-      await window.PokevaultHunts?.patch?.(slug, body);
-      notify(t("pokemon_drawer.hunt.updated"), "ok");
-    } catch (err) {
-      console.error("drawer: hunt patch failed", err);
-      notify(t("pokemon_drawer.hunt.failed"), "error");
-    }
   }
 
   function buildCardsSection() {
@@ -986,7 +933,6 @@
       buildHeader(p),
       buildStatusSection(currentSlug),
       buildFormsSection(p),
-      buildProgressSection(currentSlug),
       buildNotesSection(currentSlug),
       buildCardsSection(),
     );

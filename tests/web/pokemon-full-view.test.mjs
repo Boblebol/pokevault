@@ -165,12 +165,6 @@ function installBrowserStubs(root) {
       return Promise.resolve();
     },
   };
-  globalThis.PokevaultHunts = {
-    entry() {
-      return { priority: "normal", note: "A revoir dans Ecarlate." };
-    },
-    async patch() {},
-  };
 }
 
 async function loadModules(root) {
@@ -242,7 +236,6 @@ test("renderInto lays out the B1 fiche sections before secondary cards", async (
       "identity",
       "pokedex_status",
       "forms",
-      "personal_progress",
       "notes",
       "cards",
     ],
@@ -309,7 +302,6 @@ test("renderInto ownership helper source does not receive wanted state", async (
   };
   delete globalThis.PokedexCollection.ownershipStateForSlug;
   globalThis.PokedexCollection.getStatus = () => ({ state: "not_met", shiny: false });
-  globalThis.PokevaultHunts.isWanted = () => true;
   globalThis.PokevaultTrainerContacts = {
     getOwnCard() {
       return { wants: ["0001-bulbasaur"], for_trade: [] };
