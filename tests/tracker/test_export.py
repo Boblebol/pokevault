@@ -390,6 +390,32 @@ def test_import_accepts_legacy_hunts_and_drops_them_on_export(tmp_path: Path) ->
     assert "hunts" not in exported
 
 
+def test_import_filters_removed_legacy_badge_unlocks(tmp_path: Path) -> None:
+    client = _setup(tmp_path)
+    payload = {
+        "schema_version": 4,
+        "progress": {
+            "version": 1,
+            "caught": {"pikachu": True},
+            "badges_unlocked": ["first_encounter", "first_catch"],
+        },
+        "binder_config": {
+            "version": 1,
+            "convention": "sheet_recto_verso",
+            "binders": [],
+            "form_rules": [],
+        },
+        "binder_placements": {"version": 1, "by_binder": {}},
+        "cards": [],
+    }
+
+    r = client.post("/api/import", json=payload)
+
+    assert r.status_code == 200
+    exported = client.get("/api/export").json()
+    assert exported["progress"]["badges_unlocked"] == ["first_catch"]
+
+
 def test_export_import_roundtrips_pokedex_notes(tmp_path: Path) -> None:
     client = _setup(tmp_path)
     payload = {

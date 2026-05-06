@@ -23,6 +23,7 @@ from tracker.repository.base import (
     CardRepository,
     ProgressRepository,
 )
+from tracker.services.badge_service import BADGES
 
 _MEGA_FORM_RE = re.compile(r"\b(?:méga|mega)\b", re.IGNORECASE)
 
@@ -44,7 +45,7 @@ class ExportService:
 
     def export_all(self) -> ExportPayload:
         cfg = self._config.load()
-        progress = self._progress.load()
+        progress = self._sanitize_progress_badges(self._progress.load())
         placements = self._placements.load()
         cards = self._cards.load() if self._cards is not None else CardList()
         allowed = self._allowed_slug_scope(cfg)
@@ -74,7 +75,7 @@ class ExportService:
             caught=progress_in.caught,
             statuses=progress_in.statuses,
             notes=progress_in.notes,
-            badges_unlocked=progress_in.badges_unlocked,
+            badges_unlocked=self._sanitize_badge_unlocks(progress_in.badges_unlocked),
         )
         self._progress.save(progress)
 
@@ -273,6 +274,26 @@ class ExportService:
         ]
 
     @staticmethod
+    def _sanitize_badge_unlocks(badge_ids: list[str]) -> list[str]:
+        current = {badge.id for badge in BADGES}
+        seen: set[str] = set()
+        out: list[str] = []
+        for badge_id in badge_ids:
+            if badge_id in current and badge_id not in seen:
+                out.append(badge_id)
+                seen.add(badge_id)
+        return out
+
+    @classmethod
+    def _sanitize_progress_badges(
+        cls,
+        progress: CollectionProgress,
+    ) -> CollectionProgress:
+        return progress.model_copy(
+            update={"badges_unlocked": cls._sanitize_badge_unlocks(progress.badges_unlocked)}
+        )
+
+    @staticmethod
     def _sanitize_progress(progress: CollectionProgress, allowed: set[str]) -> CollectionProgress:
         filtered_caught = {
             k: bool(v) for k, v in progress.caught.items() if str(k) in allowed
@@ -291,7 +312,7 @@ class ExportService:
             caught=filtered_caught,
             statuses=filtered_statuses,
             notes=filtered_notes,
-            badges_unlocked=progress.badges_unlocked,
+            badges_unlocked=ExportService._sanitize_badge_unlocks(progress.badges_unlocked),
         )
 
     @staticmethod
