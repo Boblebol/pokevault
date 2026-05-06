@@ -36,6 +36,7 @@ def _payload(name: str = "Alex") -> dict:
         "contact_links": [{"kind": "discord", "label": "Discord", "value": "alex#0001"}],
         "wants": ["0001-bulbasaur"],
         "for_trade": ["0004-charmander"],
+        "badges": [{"id": "kanto_brock", "title": "Badge Roche"}],
         "updated_at": "2026-04-30T10:00:00+00:00",
     }
 
@@ -78,22 +79,16 @@ def test_put_own_card_accepts_social_contact_links(tmp_path: Path) -> None:
     ]
 
 
-def test_put_own_card_accepts_shared_badges(tmp_path: Path) -> None:
+def test_put_own_card_drops_legacy_wishlist_and_badges(tmp_path: Path) -> None:
     client = _client(tmp_path)
-    payload = _payload()
-    payload["badges"] = [
-        {"id": " kanto_brock ", "title": " Badge Roche "},
-        {"id": "kanto_brock", "title": "Duplicate"},
-        {"id": "kanto_misty", "title": "Badge Cascade"},
-    ]
 
-    response = client.put("/api/trainers/me", json=payload)
+    response = client.put("/api/trainers/me", json=_payload())
 
     assert response.status_code == 200
-    assert response.json()["badges"] == [
-        {"id": "kanto_brock", "title": "Badge Roche"},
-        {"id": "kanto_misty", "title": "Badge Cascade"},
-    ]
+    body = response.json()
+    assert body["for_trade"] == ["0004-charmander"]
+    assert "wants" not in body
+    assert "badges" not in body
 
 
 def test_import_card_creates_contact_then_updates(tmp_path: Path) -> None:

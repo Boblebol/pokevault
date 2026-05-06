@@ -275,19 +275,10 @@ class TrainerContactLink(BaseModel):
     value: str = Field(default="", max_length=160)
 
 
-class TrainerCardBadge(BaseModel):
-    """Compact public badge shared in a portable Trainer Card."""
-
-    model_config = ConfigDict(extra="forbid")
-
-    id: str = Field(min_length=1, max_length=80)
-    title: str = Field(min_length=1, max_length=120)
-
-
 class TrainerCard(BaseModel):
     """Portable local-first card shared manually between collectors."""
 
-    model_config = ConfigDict(extra="forbid")
+    model_config = ConfigDict(extra="ignore")
 
     schema_version: Literal[1] = 1
     app: Literal["pokevault"] = "pokevault"
@@ -298,9 +289,7 @@ class TrainerCard(BaseModel):
     favorite_pokemon_slug: str = Field(default="", max_length=80)
     public_note: str = Field(default="", max_length=280)
     contact_links: list[TrainerContactLink] = Field(default_factory=list, max_length=6)
-    wants: list[str] = Field(default_factory=list, max_length=40)
-    for_trade: list[str] = Field(default_factory=list, max_length=40)
-    badges: list[TrainerCardBadge] = Field(default_factory=list, max_length=80)
+    for_trade: list[str] = Field(default_factory=list, max_length=80)
     updated_at: str
 
 
