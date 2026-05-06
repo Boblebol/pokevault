@@ -207,30 +207,45 @@ def test_trainer_contacts_are_documented_publicly() -> None:
     assert "Instagram" in guide_text
     assert "Facebook" in guide_text
     assert "Téléphone" in guide_text
-    assert "Unlocked badges are added automatically" in guide_text
+    assert "Trainer Cards do not export a wishlist" in guide_text
+    assert "Trainer Cards also do not export" in guide_text
+    assert "badges; badge progress stays" in guide_text
     assert "Trainer Cards" in readme
     assert "data/trainer-contacts.json" in readme
     assert "/api/trainers" in readme
     assert "searchable local contact book" in readme
-    assert "automatically shared unlocked badges" in readme
+    assert "Trainer Cards share only `Double` entries" in readme
     assert "Trainer Cards" in features
     assert "searchable local contact book" in features
-    assert "automatically shared unlocked badges" in features
+    assert "Double and Vu chez context" in features
     assert "Dresseurs" in roadmap
     assert "trainer-contacts.json" in architecture
 
 
-def test_trade_state_model_is_documented_publicly() -> None:
+def test_simplified_trade_state_model_is_documented_publicly() -> None:
     guide_text = (DOCS / "TRAINER_CONTACTS.md").read_text(encoding="utf-8")
     readme = (ROOT / "README.md").read_text(encoding="utf-8")
     features = (DOCS / "features.html").read_text(encoding="utf-8")
     roadmap = (DOCS / "roadmap.html").read_text(encoding="utf-8")
 
-    for text in [guide_text, readme, features, roadmap]:
-        assert "Cherche" in text
+    for text in [readme, features, roadmap]:
+        assert "Capturé" in text or "Caught" in text
         assert "Double" in text
+        assert "Relâcher" in text or "Release" in text
+        assert "Vu chez" in text
+        assert "Match" not in text
+    assert "Capturé" in guide_text
+    assert "Double" in guide_text
+    assert "Relâcher" in guide_text
     assert "Vu chez" in guide_text
-    assert "Match" in guide_text
+    assert "There is no `Match` state" in guide_text
+    for text in [guide_text, readme, features]:
+        assert "Cherche" not in text
+        assert "Wanted" not in text
+        assert "/api/hunts" not in text
+    for text in [guide_text, features]:
+        assert "hunts" not in text
+    assert "Vu chez" in guide_text
 
 
 def test_in_app_documentation_is_documented_publicly() -> None:
@@ -241,7 +256,7 @@ def test_in_app_documentation_is_documented_publicly() -> None:
         assert "#/docs" in text
         assert "App documentation" in text
         assert "local-first data" in text
-        assert "Badge missions" in text
+        assert "badges" in text.lower()
         assert "Trainer Cards" in text
         assert "physical binder" in text.lower()
 
@@ -325,7 +340,7 @@ def test_trainer_contacts_document_local_trade_workflow() -> None:
         "Find a trade",
         "without an account",
         "`Vu chez`",
-        "`Match`",
+        "There is no `Match` state",
     ]:
         assert text in guide_text
 
@@ -362,7 +377,7 @@ def test_badge_side_quest_v1_is_documented_publicly() -> None:
     for text in [readme, features]:
         assert "badge gallery" in text
         assert "sealed badges" in text
-        assert "Trainer Card" in text
+        assert "Stat" in text
 
 
 def test_public_story_centers_exploration_trainers_and_pokedex_completion() -> None:

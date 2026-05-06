@@ -79,18 +79,19 @@ remaining active v1.1 track is carefully sourced Pokédex metadata, documented i
 ## Next Track — Dresseurs Local-First
 
 Trainer Cards add an optional local contact layer for collectors who want to
-exchange wishlists and trade lists without accounts, public profiles or server
-sync. The base Pokédex stays simple: `Cherche`, `Capturé` and `Double` are the
-visible actions, and imported contacts only add derived `Vu chez` / `Match`
-context. The first-run product tour introduces that model as a manual file
-exchange, so the feature stays visible without becoming required.
+exchange duplicate lists without accounts, public profiles or server sync. The
+base Pokédex stays simple: `Capturé`, `Double`, `Relâcher 1` and `Relâcher`
+cover local state, every uncaptured Pokemon is implicitly still needed, and
+imported contacts only add derived `Vu chez` context. The first-run product tour
+introduces that model as a manual file exchange, so the feature stays visible
+without becoming required.
 
 - v0.1: create "my Trainer Card" with optional public contact links, export it
   as a file and import a received card into `data/trainer-contacts.json`.
 - v0.2: update an existing contact by stable `trainer_id`, preserve private
   notes, search the local contact book and delete stale contacts.
-- v0.3: compare local `Cherche` and `Double` lists against received cards,
-  showing `Vu chez` and `Match` hints without mutating progress, cards or binders.
+- v0.3: compare local missing Pokemon against received `Double` lists, showing
+  `Vu chez` hints without mutating progress, cards or binders.
 
 ---
 
@@ -246,8 +247,9 @@ Optional: F13 (themes) to make step 3 richer.
 > instead of a simple on/off toggle.
 
 Current product note: the stored contract remains backward-compatible, but the
-main UI now exposes `Cherche`, `Capturé` and `Double`. Manual `seen` is legacy;
-`Vu chez` is derived from imported Trainer Cards.
+main UI is moving to `Capturé`, `Double`, `Relâcher 1` and `Relâcher`. Manual
+`seen` and explicit search lists are legacy; `Vu chez` is derived from imported
+Trainer Card duplicates.
 
 ### Acceptance
 - Click cycles: not-met → seen → caught → not-met.
