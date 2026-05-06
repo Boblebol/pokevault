@@ -6,7 +6,6 @@ function installBrowserStubs() {
   globalThis.window = globalThis;
   delete globalThis.PokedexCollection;
   delete globalThis.PokevaultArtwork;
-  delete globalThis.PokevaultBadgeMission;
   globalThis.PokevaultI18n = {
     getLocale: () => "en",
     t: (key, params = {}) => {

@@ -57,7 +57,7 @@ class JsonProgressRepository:
     def save(self, data: CollectionProgress) -> None:
         self._path.parent.mkdir(parents=True, exist_ok=True)
         badges = data.badges_unlocked
-        if not badges:
+        if not badges and "badges_unlocked" not in data.model_fields_set:
             try:
                 current = self.load()
                 badges = current.badges_unlocked
