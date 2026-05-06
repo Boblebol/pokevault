@@ -5,7 +5,7 @@ from __future__ import annotations
 from typing import Protocol
 
 from tracker.binder_models import BinderConfigPayload, BinderPlacementsPayload
-from tracker.models import CardList, CollectionProgress, HuntList, TrainerContactBook
+from tracker.models import CardList, CollectionProgress, TrainerContactBook
 
 
 class ProgressRepository(Protocol):
@@ -26,11 +26,6 @@ class BinderPlacementsRepository(Protocol):
 class CardRepository(Protocol):
     def load(self) -> CardList: ...
     def save(self, data: CardList) -> None: ...
-
-
-class HuntRepository(Protocol):
-    def load(self) -> HuntList: ...
-    def save(self, data: HuntList) -> None: ...
 
 
 class TrainerContactRepository(Protocol):

@@ -3,7 +3,6 @@ from .binder_controller import router as binder_router
 from .card_controller import router as card_router
 from .export_controller import router as export_router
 from .health_controller import router as health_router
-from .hunt_controller import router as hunt_router
 from .profile_controller import router as profile_router
 from .progress_controller import router as progress_router
 from .tcg_controller import router as tcg_router
@@ -15,7 +14,6 @@ __all__ = [
     "card_router",
     "export_router",
     "health_router",
-    "hunt_router",
     "profile_router",
     "progress_router",
     "tcg_router",

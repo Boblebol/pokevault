@@ -101,9 +101,6 @@ class ProfileService:
     def binder_placements_path(self, profile_id: str | None = None) -> Path:
         return self._path_for(profile_id, "binder-placements.json")
 
-    def hunts_path(self, profile_id: str | None = None) -> Path:
-        return self._path_for(profile_id, "hunts.json")
-
     def trainer_contacts_path(self, profile_id: str | None = None) -> Path:
         return self._path_for(profile_id, "trainer-contacts.json")
 

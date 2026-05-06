@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Any, Literal
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from tracker.binder_models import BinderConfigPayload, BinderPlacementsPayload
 
@@ -221,39 +221,6 @@ class TcgCardSearchResponse(BaseModel):
     cards: list[TcgCardSearchResult] = Field(default_factory=list)
 
 
-HuntPriority = Literal["normal", "high"]
-
-
-class HuntEntry(BaseModel):
-    """A local-first search target tracked by the user."""
-
-    model_config = ConfigDict(extra="forbid")
-
-    wanted: bool = True
-    priority: HuntPriority = "normal"
-    note: str = ""
-    updated_at: str
-
-
-class HuntList(BaseModel):
-    """Persisted shape of ``data/hunts.json``."""
-
-    model_config = ConfigDict(extra="forbid")
-
-    version: Literal[1] = 1
-    hunts: dict[str, HuntEntry] = Field(default_factory=dict)
-
-
-class HuntPatch(BaseModel):
-    """PATCH /api/hunts/{slug} — create/update or clear a hunt target."""
-
-    model_config = ConfigDict(extra="forbid")
-
-    wanted: bool = True
-    priority: HuntPriority = "normal"
-    note: str = Field(default="", max_length=280)
-
-
 TrainerContactMethod = Literal[
     "email",
     "phone",
@@ -336,33 +303,40 @@ class DeleteResponse(BaseModel):
 
 
 class ExportPayload(BaseModel):
-    """Full collection export — wraps progress + binder config + placements + cards."""
+    """Full collection export without legacy hunts."""
 
     model_config = ConfigDict(extra="forbid")
 
-    schema_version: Literal[3] = 3
+    schema_version: Literal[4] = 4
     app: str = "pokevault"
     exported_at: str
     progress: CollectionProgress
     binder_config: BinderConfigPayload
     binder_placements: BinderPlacementsPayload
     cards: list[Card] = Field(default_factory=list)
-    hunts: HuntList = Field(default_factory=HuntList)
 
 
 class ImportPayload(BaseModel):
-    """Incoming import — accepts v1 legacy, v2 cards and v3 hunts."""
+    """Incoming import accepts legacy hunt-bearing backups and ignores hunts."""
 
     model_config = ConfigDict(extra="forbid")
 
-    schema_version: Literal[1, 2, 3]
+    schema_version: Literal[1, 2, 3, 4]
     app: str | None = None
     exported_at: str | None = None
     progress: CollectionProgress
     binder_config: BinderConfigPayload
     binder_placements: BinderPlacementsPayload
     cards: list[Card] = Field(default_factory=list)
-    hunts: HuntList = Field(default_factory=HuntList)
+
+    @model_validator(mode="before")
+    @classmethod
+    def _drop_legacy_hunts(cls, data):
+        if isinstance(data, dict) and "hunts" in data:
+            cleaned = dict(data)
+            cleaned.pop("hunts", None)
+            return cleaned
+        return data
 
 
 class ImportResponse(BaseModel):
@@ -372,7 +346,6 @@ class ImportResponse(BaseModel):
     caught_count: int = Field(ge=0)
     binder_count: int = Field(ge=0)
     card_count: int = Field(default=0, ge=0)
-    hunt_count: int = Field(default=0, ge=0)
 
 
 class Profile(BaseModel):
