@@ -451,27 +451,16 @@ function ownershipStateForSlug(slug) {
   if (fiche?.ownershipStateFromSources) {
     return fiche.ownershipStateFromSources(key, {
       status: getStatus(key),
-      wanted: Boolean(window.PokevaultHunts?.isWanted?.(key)),
       ownCard: window.PokevaultTrainerContacts?.getOwnCard?.() || null,
     });
   }
   const status = getStatus(key);
-  return { wanted: false, caught: status.state === "caught", duplicate: false };
+  return { caught: status.state === "caught", duplicate: false };
 }
 
 function shouldDimCardForHighlight(mode, ownership) {
   const caught = Boolean(ownership?.caught);
   return mode === "missing" ? !caught : caught;
-}
-
-async function setHuntWanted(slug, wanted) {
-  if (!window.PokevaultHunts?.patch) return;
-  const existing = window.PokevaultHunts.entry?.(slug);
-  await window.PokevaultHunts.patch(slug, {
-    wanted: Boolean(wanted),
-    priority: wanted ? existing?.priority || "normal" : "normal",
-    note: wanted ? existing?.note || "" : "",
-  });
 }
 
 async function setTrainerListMembership(slug, listName, enabled) {
@@ -490,31 +479,20 @@ function showOwnershipSyncError(err) {
 async function setPokemonOwnershipState(slug, nextState) {
   const key = String(slug || "").trim();
   if (!key) return;
-  const next = nextState === "wanted" || nextState === "owned" || nextState === "duplicate"
+  const next = nextState === "owned" || nextState === "duplicate" || nextState === "release_one"
     ? nextState
     : "none";
   const current = getStatus(key);
   const tasks = [];
 
-  if (next === "wanted") {
-    setStatus(key, "not_met", false);
-    tasks.push(setHuntWanted(key, true));
-    tasks.push(setTrainerListMembership(key, "wants", true));
-    tasks.push(setTrainerListMembership(key, "for_trade", false));
-  } else if (next === "owned") {
+  if (next === "owned" || next === "release_one") {
     setStatus(key, "caught", current.shiny);
-    tasks.push(setHuntWanted(key, false));
-    tasks.push(setTrainerListMembership(key, "wants", false));
     tasks.push(setTrainerListMembership(key, "for_trade", false));
   } else if (next === "duplicate") {
     setStatus(key, "caught", current.shiny);
-    tasks.push(setHuntWanted(key, false));
-    tasks.push(setTrainerListMembership(key, "wants", false));
     tasks.push(setTrainerListMembership(key, "for_trade", true));
   } else {
     setStatus(key, "not_met", false);
-    tasks.push(setHuntWanted(key, false));
-    tasks.push(setTrainerListMembership(key, "wants", false));
     tasks.push(setTrainerListMembership(key, "for_trade", false));
   }
 
@@ -535,7 +513,7 @@ function cycleOwnershipBySlug(slug, opts) {
   const shift = Boolean(opts?.shift);
   const next = shift
     ? current.duplicate ? "owned" : "duplicate"
-    : current.caught && !current.duplicate && !current.wanted ? "none" : "owned";
+    : current.caught ? "none" : "owned";
   void setPokemonOwnershipState(slug, next);
 }
 
@@ -1408,7 +1386,7 @@ function setupSettingsView() {
 let pendingImportPayload = null;
 
 function isSupportedBackupSchemaVersion(value) {
-  return value === 1 || value === 2 || value === 3;
+  return value === 1 || value === 2 || value === 3 || value === 4;
 }
 
 function getCollectionScopeSlugSet() {

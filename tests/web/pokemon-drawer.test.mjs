@@ -252,7 +252,7 @@ test("drawer rerenders header artwork when artwork mode changes", async () => {
       return { state: "caught", shiny: false };
     },
     ownershipStateForSlug() {
-      return { wanted: false, caught: true, duplicate: false };
+      return { caught: true, duplicate: false };
     },
     tradeSummaryForSlug() {
       return { availableFrom: [], wantedBy: [], matchCount: 0, canHelpCount: 0 };
@@ -280,4 +280,52 @@ test("drawer rerenders header artwork when artwork mode changes", async () => {
   artworkListener();
 
   assert.equal(drawerHeaderImage(content).src, "/drawer/updated/0001-bulbasaur.png");
+});
+
+test("drawer ownership helper source does not receive wanted state", async () => {
+  await loadModule();
+  const { root } = makeDrawerRoot();
+  globalThis.__drawerRoot = root;
+  const sourceCalls = [];
+  const originalHelper = globalThis.PokevaultPokemonFiche.ownershipStateFromSources;
+  globalThis.PokevaultPokemonFiche.ownershipStateFromSources = (slug, options) => {
+    sourceCalls.push({ slug, options });
+    return originalHelper(slug, options);
+  };
+  globalThis.PokedexCollection = {
+    allPokemon: [
+      {
+        slug: "0025-pikachu",
+        number: "0025",
+        names: { fr: "Pikachu" },
+        image: "images/0025-pikachu.png",
+        types: ["Électrik"],
+        region: "kanto",
+      },
+    ],
+    getStatus() {
+      return { state: "not_met", shiny: false };
+    },
+    tradeSummaryForSlug() {
+      return { availableFrom: [], wantedBy: [], matchCount: 0, canHelpCount: 0 };
+    },
+    getNote() {
+      return "";
+    },
+  };
+  globalThis.PokevaultHunts = {
+    isWanted() {
+      return true;
+    },
+  };
+  globalThis.PokevaultTrainerContacts = {
+    getOwnCard() {
+      return { wants: ["0025-pikachu"], for_trade: [] };
+    },
+  };
+
+  globalThis.window.PokevaultDrawer.open("0025-pikachu", null);
+
+  assert.equal(sourceCalls.length, 1);
+  assert.equal(Object.hasOwn(sourceCalls[0].options, "wanted"), false);
 });

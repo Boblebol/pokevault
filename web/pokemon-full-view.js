@@ -179,12 +179,11 @@
     if (typeof helper.ownershipStateFromSources === "function") {
       return helper.ownershipStateFromSources(slug, {
         status: collection?.getStatus?.(slug),
-        wanted: Boolean(window.PokevaultHunts?.isWanted?.(slug)),
         ownCard: window.PokevaultTrainerContacts?.getOwnCard?.() || null,
       });
     }
     const status = collection?.getStatus?.(slug) || { state: "not_met" };
-    return { wanted: false, caught: status.state === "caught", duplicate: false };
+    return { caught: status.state === "caught", duplicate: false };
   }
 
   function tradeSummary(slug) {
@@ -322,11 +321,9 @@
     label.textContent = ficheHelpers().ownershipLabel?.(ownership) || statusLabel(status);
     label.dataset.state = ownership.duplicate
       ? "duplicate"
-      : ownership.wanted
-        ? "wanted"
-        : ownership.caught
-          ? "owned"
-          : "none";
+      : ownership.caught
+        ? "owned"
+        : "none";
     section.append(label);
 
     const helper = ficheHelpers();

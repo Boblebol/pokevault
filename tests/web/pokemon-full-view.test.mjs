@@ -143,7 +143,7 @@ function installBrowserStubs(root) {
       statusCalls.push({ slug, state, shiny });
     },
     ownershipStateForSlug() {
-      return { wanted: false, caught: true, duplicate: true };
+      return { caught: true, duplicate: true };
     },
     setPokemonOwnershipState(slug, state) {
       ownershipCalls.push({ slug, state });
@@ -264,11 +264,12 @@ test("renderInto shows trade-oriented ownership actions and exchange context", a
   const row = statusSection.children.find((child) => child.className === "pokemon-ownership-actions");
   const buttons = row.children;
   assert.deepEqual(buttons.map((button) => button.textContent), [
-    "Cherche",
     "Capturé",
     "Double",
+    "Relâcher 1",
+    "Relâcher",
   ]);
-  assert.equal(buttons[2].dataset.active, "true");
+  assert.equal(buttons[1].dataset.active, "true");
 
   const exchange = statusSection.children.find((child) => child.className === "pokemon-exchange-context");
   assert.equal(exchange.children[0].textContent, "Match possible avec Misty.");
@@ -280,8 +281,36 @@ test("renderInto shows trade-oriented ownership actions and exchange context", a
   });
   assert.deepEqual(globalThis.PokedexCollection.ownershipCalls.at(-1), {
     slug: "0001-bulbasaur",
-    state: "owned",
+    state: "release_one",
   });
+});
+
+test("renderInto ownership helper source does not receive wanted state", async () => {
+  const root = new FakeElement("div");
+  const api = await loadModules(root);
+  const sourceCalls = [];
+  const originalHelper = globalThis.PokevaultPokemonFiche.ownershipStateFromSources;
+  globalThis.PokevaultPokemonFiche.ownershipStateFromSources = (slug, options) => {
+    sourceCalls.push({ slug, options });
+    return originalHelper(slug, options);
+  };
+  delete globalThis.PokedexCollection.ownershipStateForSlug;
+  globalThis.PokedexCollection.getStatus = () => ({ state: "not_met", shiny: false });
+  globalThis.PokevaultHunts.isWanted = () => true;
+  globalThis.PokevaultTrainerContacts = {
+    getOwnCard() {
+      return { wants: ["0001-bulbasaur"], for_trade: [] };
+    },
+  };
+
+  api.renderInto(root, "0001-bulbasaur");
+
+  assert.equal(sourceCalls.length > 0, true);
+  assert.equal(Object.hasOwn(sourceCalls[0].options, "wanted"), false);
+  const statusSection = root.children.find((child) => child.dataset?.section === "pokedex_status");
+  const label = statusSection.children.find((child) => child.className === "fullview-hero__status-label");
+  assert.equal(label.dataset.state, "none");
+  globalThis.PokevaultPokemonFiche.ownershipStateFromSources = originalHelper;
 });
 
 test("renderInto shows B3 linked forms with independent statuses and list return", async () => {
