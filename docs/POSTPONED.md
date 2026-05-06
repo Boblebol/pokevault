@@ -17,7 +17,7 @@ Statut : repoussé.
 
 Créer une image ou une page de recap partageable peut être utile plus tard, mais
 pas avant que l'application sache produire un bilan réellement intéressant :
-progression régionale, badges, recherches, cartes cataloguées. Partager un
+progression régionale, badges, doublons disponibles, cartes cataloguées. Partager un
 pourcentage brut ou une grille vide n'apporte pas assez de valeur.
 
 ### Profil public, wishlist publique et leaderboard
@@ -34,17 +34,17 @@ cloud, pas de classement public.
 
 Statut : repoussé.
 
-Les missions badge et la progression de badges existent déjà. Les streaks et les
-badges quotidiens sont repoussés pour éviter une boucle de rétention artificielle
-avant d'avoir assez de recul sur l'usage réel.
+La progression de badges existe déjà. Les streaks et les badges quotidiens sont
+repoussés pour éviter une boucle de rétention artificielle avant d'avoir assez
+de recul sur l'usage réel.
 
 ### Constructeur de mission libre
 
 Statut : repoussé.
 
-Aujourd'hui, la mission active est volontairement centrée sur un badge. Un
-constructeur manuel par région, tag, type ou classeur sera réévalué si les
-missions badge deviennent trop limitées pour les usages avancés.
+Le produit simplifié ne garde pas de mission active. Un constructeur manuel par
+région, tag, type ou classeur sera réévalué seulement si les usages avancés ont
+besoin d'une couche d'objectifs au-delà de la capture et des badges passifs.
 
 ## Cartes TCG
 

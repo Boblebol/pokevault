@@ -68,12 +68,11 @@ App documentation: Detailed product documentation lives in the app. Run `make de
 [http://127.0.0.1:8765](http://127.0.0.1:8765/) and go to `#/docs`.
 
 That in-app guide is bilingual FR/EN and covers Collection, physical binder
-planning, Trainer Cards, Badge missions, local-first data files, profiles,
+planning, Trainer Cards, badge progress, local-first data files, profiles,
 backups, shortcuts and the local REST API. The public feature overview is
 available at [docs/features.html](docs/features.html).
 
-Product coverage includes automatically shared unlocked badges on each Trainer
-Card, Badge Side Quest V1 as a badge gallery with sealed badges, and the
+Product coverage includes a badge gallery with sealed badges in Stats and the
 nostalgia catalog: Souvenirs de Kanto for Rouge/Bleu champions d'arene,
 Conseil 4, Maitre de la Ligue and rival teams; Or/Argent for Johto, Kanto,
 Peter and Silver; then base teams sans remakes from Rubis/Saphir,
@@ -86,8 +85,9 @@ The Pokémon Company, Game Freak, Creatures, Poképédia or the Pokémon brand.
 ## Why Pokevault Exists
 
 Pokevault tries to keep the nostalgic rhythm of older Pokemon versions without
-copying their constraints: you explore your own collection, mark what is missing,
-meet other Trainers through files they chose to send, and complete your Pokedex
+copying their constraints: you explore your own collection, capture what you
+have, spot what is still missing, meet other Trainers through files they chose
+to send, and complete your Pokedex
 at your pace.
 
 The modern part is deliberately quiet. Your data stays local-first, the Dresseurs
@@ -103,19 +103,18 @@ file into your searchable local contact book.
 
 The exchange model stays close to the Pokedex:
 
-- `Cherche` marks Pokemon you want for trades and personal priorities.
-- `Capturé` marks Pokemon already in your collection.
-- `Double` marks Pokemon you own twice and can offer for trade.
+- missing Pokemon are implicit: if you have not captured it, you are still
+  looking for it;
+- `Capturé` marks Pokemon already in your collection;
+- `Double` marks Pokemon you own twice and can offer for trade;
+- `Relâcher 1` removes the duplicate copy and keeps the Pokemon captured;
+- `Relâcher` removes the last captured copy from local progress.
 - Contact lines can share Instagram, Facebook, phone, email, Discord or site
   details inside the exported card file.
-- Unlocked badges are included automatically in the exported Trainer Card, so
-  imported Dresseurs can show compact badge souvenirs without exposing locked
-  progress.
-- The shared payload stays compact with badge `id` and `title` only; imported
-  cards render current badge gallery labels when available and fall back to the
-  stored title for sealed badges or older catalogs.
-- Imported cards can add `Vu chez` when another trainer has a duplicate, and
-  `Match` when that duplicate is also on your `Cherche` list.
+- Trainer Cards share only `Double` entries. They do not publish a wishlist or
+  badge list.
+- Imported cards can add `Vu chez` when another trainer has a duplicate you have
+  not captured yet.
 
 Trainer Cards never sync automatically and never overwrite collection progress.
 The full guide lives in [Trainer Cards](docs/TRAINER_CONTACTS.md).
@@ -180,12 +179,15 @@ User state is local and ignored by Git:
 
 - `data/collection-progress.json`
 - `data/collection-cards.json`
-- `data/hunts.json`
 - `data/binder-config.json`
 - `data/binder-placements.json`
 - `data/trainer-contacts.json`
 - `data/profiles.json`
 - `data/profiles/<id>/...`
+
+Older installs may still have `data/hunts.json` from the explicit search-list
+workflow. The simplified capture/trade model treats that file as legacy local
+state and omits hunts from new backups.
 
 ## REST API
 
@@ -196,7 +198,6 @@ The local API is mounted next to the web UI:
 | `/api/health` | App/API version and liveness |
 | `/api/progress` | Collection progress |
 | `/api/cards` | Physical card catalog |
-| `/api/hunts` | Active search targets |
 | `/api/badges` | Badge catalog and progress |
 | `/api/profiles` | Local collection profiles |
 | `/api/trainers` | Optional local Trainer Cards and received contacts |
@@ -210,9 +211,9 @@ Set `TRACKER_TCG_API_KEY` if you have an API key; the local card inventory stays
 in `data/collection-cards.json`.
 
 Trainer Cards are separate from full backups and never sync automatically.
-`Double` marks a Pokemon as available in your exported Trainer Card, while
-`Cherche` keeps personal trade priorities explicit. Imported cards can show `Vu chez` and
-`Match` context without a cloud account. See [Trainer Cards](docs/TRAINER_CONTACTS.md)
+`Double` marks a Pokemon as available in your exported Trainer Card. Missing
+Pokemon stay implicit, so imported cards only need to show `Vu chez` when another
+trainer has a duplicate you still need. See [Trainer Cards](docs/TRAINER_CONTACTS.md)
 for the local exchange guide.
 
 ## Docker
