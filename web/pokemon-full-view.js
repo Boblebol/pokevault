@@ -26,15 +26,8 @@
   const FALLBACK_I18N = {
     "pokemon_full.back": "← Retour à la collection",
     "pokemon_full.name_and": "et",
-    "pokemon_full.exchange.match": "Match possible avec {names}.",
     "pokemon_full.exchange.seen": "Vu chez {names}.",
-    "pokemon_full.exchange.wanted_by": "{names} cherche ce Pokémon.",
-    "pokemon_full.legacy_seen": "Vu manuel existant; les prochains statuts passent par Cherche, Capturé ou Double.",
-    "pokemon_full.hunt.high": "Recherche prioritaire",
-    "pokemon_full.hunt.normal": "Dans mes recherches",
-    "pokemon_full.hunt.empty": "Active Cherche pour le garder dans tes priorites personnelles.",
-    "pokemon_full.hunt.priority_normal": "Priorite normale",
-    "pokemon_full.hunt.priority_high": "Priorite haute",
+    "pokemon_full.legacy_seen": "Vu manuel existant; les prochains statuts passent par Capturé, Double ou Relâcher.",
     "pokemon_full.note.empty": "Aucune note personnelle pour l'instant.",
     "pokemon_full.defense": "Efficacité défensive",
     "pokemon_full.weaknesses": "Faiblesses",
@@ -179,12 +172,11 @@
     if (typeof helper.ownershipStateFromSources === "function") {
       return helper.ownershipStateFromSources(slug, {
         status: collection?.getStatus?.(slug),
-        wanted: Boolean(window.PokevaultHunts?.isWanted?.(slug)),
         ownCard: window.PokevaultTrainerContacts?.getOwnCard?.() || null,
       });
     }
     const status = collection?.getStatus?.(slug) || { state: "not_met" };
-    return { wanted: false, caught: status.state === "caught", duplicate: false };
+    return { caught: status.state === "caught", duplicate: false };
   }
 
   function tradeSummary(slug) {
@@ -207,23 +199,12 @@
 
   function buildExchangeContext(slug) {
     const summary = tradeSummary(slug);
-    if (!summary.availableFrom.length && !summary.wantedBy.length) return null;
+    if (!summary.availableFrom.length) return null;
     const box = document.createElement("div");
     box.className = "pokemon-exchange-context";
-    if (summary.matchCount > 0) {
-      const line = document.createElement("p");
-      line.textContent = t("pokemon_full.exchange.match", { names: formatNameList(summary.availableFrom) });
-      box.append(line);
-    } else if (summary.availableFrom.length > 0) {
-      const line = document.createElement("p");
-      line.textContent = t("pokemon_full.exchange.seen", { names: formatNameList(summary.availableFrom) });
-      box.append(line);
-    }
-    if (summary.canHelpCount > 0) {
-      const line = document.createElement("p");
-      line.textContent = t("pokemon_full.exchange.wanted_by", { names: formatNameList(summary.wantedBy) });
-      box.append(line);
-    }
+    const line = document.createElement("p");
+    line.textContent = t("pokemon_full.exchange.seen", { names: formatNameList(summary.availableFrom) });
+    box.append(line);
     return box;
   }
 
@@ -322,11 +303,9 @@
     label.textContent = ficheHelpers().ownershipLabel?.(ownership) || statusLabel(status);
     label.dataset.state = ownership.duplicate
       ? "duplicate"
-      : ownership.wanted
-        ? "wanted"
-        : ownership.caught
-          ? "owned"
-          : "none";
+      : ownership.caught
+        ? "owned"
+        : "none";
     section.append(label);
 
     const helper = ficheHelpers();
@@ -342,40 +321,11 @@
       legacy.textContent = t("pokemon_full.legacy_seen");
       section.append(legacy);
     }
-    const exchange = buildExchangeContext(p.slug);
-    if (exchange) section.append(exchange);
+    if (!ownership.caught) {
+      const exchange = buildExchangeContext(p.slug);
+      if (exchange) section.append(exchange);
+    }
 
-    root.append(section);
-  }
-
-  function buildProgressSection(root, p) {
-    const section = createFullSection("personal_progress");
-    const huntBox = document.createElement("div");
-    huntBox.className = "fullview-hero__status";
-    const hunt = window.PokevaultHunts?.entry?.(p.slug);
-    const huntLabel = document.createElement("span");
-    huntLabel.className = "fullview-hero__status-label";
-    huntLabel.textContent = hunt
-      ? hunt.priority === "high" ? t("pokemon_full.hunt.high") : t("pokemon_full.hunt.normal")
-      : t("pokemon_full.hunt.empty");
-    huntLabel.dataset.state = hunt ? "seen" : "not_met";
-    huntBox.append(huntLabel);
-
-    const priorityHunt = document.createElement("button");
-    priorityHunt.type = "button";
-    priorityHunt.className = "fullview-status-btn";
-    priorityHunt.textContent = hunt?.priority === "high" ? t("pokemon_full.hunt.priority_normal") : t("pokemon_full.hunt.priority_high");
-    priorityHunt.disabled = !hunt;
-    priorityHunt.addEventListener("click", async () => {
-      await window.PokevaultHunts?.patch?.(p.slug, {
-        wanted: true,
-        priority: hunt?.priority === "high" ? "normal" : "high",
-        note: hunt?.note || "",
-      });
-      renderInto(document.getElementById("viewPokemon"), p.slug);
-    });
-    huntBox.append(priorityHunt);
-    section.append(huntBox);
     root.append(section);
   }
 
@@ -636,7 +586,6 @@
     buildHero(root, p);
     buildStatusSection(root, p);
     buildForms(root, p);
-    buildProgressSection(root, p);
     buildNotesSection(root, p);
     buildWeaknessGrid(root, p);
     void buildCardsSection(root, slug);
@@ -647,7 +596,6 @@
     if (typeof window.PokedexCollection?.ensureLoaded === "function") {
       await window.PokedexCollection.ensureLoaded();
     }
-    await window.PokevaultHunts?.ensureLoaded?.();
     await window.PokevaultTrainerContacts?.ensureLoaded?.();
     renderInto(root, slug);
     window.scrollTo({ top: 0, behavior: "instant" });

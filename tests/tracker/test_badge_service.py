@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 from pathlib import Path
 
 import pytest
@@ -34,6 +35,8 @@ def test_catalog_exposes_all_definitions(tmp_path: Path) -> None:
     state = badge_service.state()
     assert len(state.catalog) == len(BADGES)
     assert {b.id for b in state.catalog} == {b.id for b in BADGES}
+    assert "first_encounter" not in {b.id for b in state.catalog}
+    assert "first_catch" in {b.id for b in state.catalog}
     assert all(not b.unlocked for b in state.catalog)
     assert state.unlocked == []
 
@@ -161,13 +164,17 @@ def test_unlocked_badge_progress_stays_complete_if_source_drops(tmp_path: Path) 
     assert first_catch.percent == 100
 
 
-def test_sync_unlocks_first_encounter_when_something_seen(tmp_path: Path) -> None:
+def test_sync_does_not_unlock_first_encounter_when_something_seen(
+    tmp_path: Path,
+) -> None:
     badge_service, progress, _ = _wire(tmp_path)
     progress.patch_status(ProgressStatusPatch(slug="0025-pikachu", state="seen"))
     newly = badge_service.sync_unlocked()
-    assert newly == ["first_encounter"]
-    again = badge_service.sync_unlocked()
-    assert again == []
+    state = badge_service.state()
+    assert newly == []
+    assert "first_encounter" not in {badge.id for badge in state.catalog}
+    assert "first_catch" in {badge.id for badge in state.catalog}
+    assert state.unlocked == []
 
 
 def test_sync_unlocks_catch_and_shiny_thresholds(tmp_path: Path) -> None:
@@ -176,7 +183,8 @@ def test_sync_unlocks_catch_and_shiny_thresholds(tmp_path: Path) -> None:
         ProgressStatusPatch(slug="0025-pikachu", state="caught", shiny=True)
     )
     newly = set(badge_service.sync_unlocked())
-    assert {"first_encounter", "first_catch", "first_shiny"} <= newly
+    assert "first_encounter" not in newly
+    assert {"first_catch", "first_shiny"} <= newly
 
 
 def test_sync_unlocks_first_card(tmp_path: Path) -> None:
@@ -232,13 +240,40 @@ def test_dedicated_collector_looks_at_cumulative_qty(tmp_path: Path) -> None:
 
 def test_state_reports_unlocked_on_catalog_entries(tmp_path: Path) -> None:
     badge_service, progress, _ = _wire(tmp_path)
-    progress.patch_status(ProgressStatusPatch(slug="0025-pikachu", state="seen"))
+    progress.patch_status(ProgressStatusPatch(slug="0025-pikachu", state="caught"))
     badge_service.sync_unlocked()
     state = badge_service.state()
     by_id = {b.id: b for b in state.catalog}
-    assert by_id["first_encounter"].unlocked is True
-    assert by_id["first_catch"].unlocked is False
-    assert state.unlocked == ["first_encounter"]
+    assert "first_encounter" not in by_id
+    assert by_id["first_catch"].unlocked is True
+    assert state.unlocked == ["first_catch"]
+
+
+def test_state_filters_and_persists_removed_legacy_unlocked_badges(
+    tmp_path: Path,
+) -> None:
+    progress_path = tmp_path / "progress.json"
+    progress_path.write_text(
+        json.dumps(
+            {
+                "caught": {},
+                "statuses": {},
+                "badges_unlocked": ["first_encounter", "first_catch"],
+            }
+        ),
+        encoding="utf-8",
+    )
+    progress_repo = JsonProgressRepository(progress_path)
+    card_repo = JsonCardRepository(tmp_path / "cards.json")
+    badge_service = BadgeService(progress_repo, card_repo)
+
+    state = badge_service.state()
+
+    by_id = {b.id: b for b in state.catalog}
+    assert "first_encounter" not in by_id
+    assert state.unlocked == ["first_catch"]
+    assert by_id["first_catch"].unlocked is True
+    assert progress_repo.load().badges_unlocked == ["first_catch"]
 
 
 def test_metric_value_rejects_unknown_metric(tmp_path: Path) -> None:

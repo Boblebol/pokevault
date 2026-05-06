@@ -1,22 +1,23 @@
 # Trainer Cards
 
 Trainer Cards are optional local contact files for collectors who want to trade
-or compare wishlists without an account, cloud sync, public profile, or hosted
-server.
+duplicates without an account, cloud sync, public profile, or hosted server.
 
 ## What it is
 
-The core Pokedex remains the main product. The app uses three small
-Pokemon-oriented actions everywhere:
+The core Pokedex remains the main product. The simplified collection model keeps
+only the states that matter during play:
 
-- `Cherche`: this Pokemon is missing for trades and personal priorities.
-- `Capturé`: this Pokemon is owned.
-- `Double`: this Pokemon is owned twice and can be offered for trade.
+- a missing Pokemon has no local status and is implicitly still needed;
+- `Capturé` means the Pokemon is in your collection;
+- `Double` means the Pokemon is captured and can be offered for trade;
+- `Relâcher 1` removes the tradeable duplicate while keeping `Capturé`;
+- `Relâcher` removes the last local copy from progress.
 
 The `Dresseurs` tab adds a searchable local contact book on top of that model.
 Imported cards never mutate collection progress automatically. They only add
-context such as `Vu chez` when another trainer has a Pokemon in `for_trade`, or
-`Match` when that Pokemon is also in the local `Cherche` list.
+`Vu chez` when another trainer has a duplicate for a Pokemon you have not
+captured yet.
 
 ## Create your Trainer Card
 
@@ -28,21 +29,22 @@ Open the `Dresseurs` tab and fill only the public fields you want to share:
 - public note;
 - up to three optional contact lines, such as Instagram, Facebook, Téléphone,
   Email, Discord or a personal site;
-- Pokemon you are looking for;
 - Pokemon you marked as `Double` and can trade.
-
-Unlocked badges are added automatically when you export the card. Locked badge
-progress is not included.
 
 You do not need to describe the full collection. If you only want to say "I can
 trade Leviator", mark that Pokemon as `Double` and leave the rest simple.
 
+Trainer Cards share only `Double` / duplicate `for_trade` entries.
+Trainer Cards do not export a wishlist. Every Pokemon you have not captured is
+already treated as something you still need. Trainer Cards also do not export
+badges; badge progress stays in your local stats and full backups.
+
 ## Export and send it
 
 Exporting a Trainer Card does not export the full collection. It only includes
-the fields placed on the card: display name, favorite region, favorite Pokemon,
-public note, optional contact links, wishlist, trade list, and unlocked badge
-titles.
+the public fields placed on the card: display name, favorite region, favorite
+Pokemon, public note, optional contact links, duplicate trade list, and update
+timestamp.
 
 The exported file is meant to be sent manually by any channel you already use.
 Pokevault does not upload it and does not create a public profile.
@@ -52,11 +54,13 @@ Pokevault does not upload it and does not create a public profile.
 When someone sends you a Trainer Card file, import it from the `Dresseurs` tab.
 Pokevault stores the received card in the current local profile and makes it
 searchable by trainer name, region, favorite Pokemon, contact lines such as
-Instagram, Facebook or Téléphone, wishlist, trade list, shared badges, and
-private notes.
+Instagram, Facebook or Téléphone, duplicate trade list, and private notes.
 
 Private notes are attached to your local contact copy. They are never included
 when you export your own Trainer Card.
+
+Legacy Trainer Card `wants` and `badges` fields are tolerated/ignored for
+compatibility, but those fields are not written back by new exports; only `for_trade`/`Double` is shared.
 
 ## Update a contact
 
@@ -69,20 +73,16 @@ does not affect the exported card file or any other trainer.
 
 ## Find a trade
 
-Trade context is derived from both sides:
+Trade context is intentionally one-sided and conservative:
 
-- your `Cherche` list says what you want;
-- your `Double` list says what you can offer;
-- their received card says what they want and what they can offer.
+- your missing Pokemon are inferred from local progress;
+- a trainer's `Double` list says what they can offer;
+- `Vu chez` appears when a received trainer has a duplicate that you have not
+  captured yet.
 
-The UI can then show:
-
-- `Vu chez`: a received trainer has this Pokemon available in their trade list;
-- `Match`: the Pokemon is both in your `Cherche` list and in a trainer's trade
-  list.
-
-This is intentionally conservative. Pokevault points to opportunities, but the
-actual exchange remains a manual conversation between collectors.
+There is no `Match` state because the app no longer stores a manual wishlist.
+Pokevault points to opportunities, but the actual exchange remains a manual
+conversation between collectors.
 
 ## Privacy and local files
 
@@ -102,5 +102,5 @@ timestamp, and the public card fields.
 If a contact does not update, the received file may be older than the local
 copy. Ask the trainer to export a fresh card and import that file again.
 
-If no `Match` appears, verify that you marked the Pokemon as `Cherche` locally
-and that the received trainer marked the same Pokemon as available for trade.
+If no `Vu chez` appears, verify that the received trainer marked that Pokemon as
+`Double` and that you have not captured it locally.

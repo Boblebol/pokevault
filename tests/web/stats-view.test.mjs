@@ -108,6 +108,14 @@ test("renderStats follows English i18n labels when available", async () => {
       return { cards: 0, sets: 0 };
     },
   };
+  globalThis.PokevaultRecommendations = {
+    rankTargets() {
+      throw new Error("stats must not render recommendation objectives");
+    },
+  };
+  globalThis.PokevaultHunts = {
+    state: { hunts: { "002-b": { wanted: true } } },
+  };
 
   api.render();
 

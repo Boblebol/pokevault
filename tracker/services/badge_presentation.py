@@ -29,7 +29,6 @@ PREFIX_REGION: dict[str, tuple[str, str, str]] = {
 }
 
 MILESTONE_EN: dict[str, tuple[str, str]] = {
-    "first_encounter": ("First encounter", "Identify your first Pokemon."),
     "first_catch": ("First catch", "Catch your first Pokemon."),
     "first_shiny": ("First shiny", "Catch your first shiny Pokemon."),
     "century": ("Century", "Catch 100 different Pokemon."),

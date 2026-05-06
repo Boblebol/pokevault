@@ -233,6 +233,33 @@ function drawerHeaderImage(content) {
   return imageWrap.children[0];
 }
 
+function installDrawerCollection({ caught = false, availableFrom = ["Misty"] } = {}) {
+  globalThis.PokedexCollection = {
+    allPokemon: [
+      {
+        slug: "0001-bulbasaur",
+        number: "0001",
+        names: { fr: "Bulbizarre" },
+        image: "images/0001-bulbasaur.png",
+        types: ["Plante"],
+        region: "kanto",
+      },
+    ],
+    getStatus() {
+      return { state: caught ? "caught" : "not_met", shiny: false };
+    },
+    ownershipStateForSlug() {
+      return { caught, duplicate: false };
+    },
+    tradeSummaryForSlug() {
+      return { availableFrom, wantedBy: [], matchCount: 0, canHelpCount: 0 };
+    },
+    getNote() {
+      return "";
+    },
+  };
+}
+
 test("drawer rerenders header artwork when artwork mode changes", async () => {
   await loadModule();
   const { root, content } = makeDrawerRoot();
@@ -252,7 +279,7 @@ test("drawer rerenders header artwork when artwork mode changes", async () => {
       return { state: "caught", shiny: false };
     },
     ownershipStateForSlug() {
-      return { wanted: false, caught: true, duplicate: false };
+      return { caught: true, duplicate: false };
     },
     tradeSummaryForSlug() {
       return { availableFrom: [], wantedBy: [], matchCount: 0, canHelpCount: 0 };
@@ -280,4 +307,85 @@ test("drawer rerenders header artwork when artwork mode changes", async () => {
   artworkListener();
 
   assert.equal(drawerHeaderImage(content).src, "/drawer/updated/0001-bulbasaur.png");
+});
+
+test("drawer exchange context shows duplicate availability only", async () => {
+  const api = await loadModule();
+  globalThis.PokedexCollection = {
+    tradeSummaryForSlug() {
+      return {
+        availableFrom: ["Misty"],
+        wantedBy: ["Brock"],
+        matchCount: 1,
+        canHelpCount: 1,
+      };
+    },
+  };
+
+  const exchange = api.buildExchangeContext("0001-bulbasaur");
+  assert.equal(exchange.children.length, 1);
+  assert.equal(exchange.children[0].textContent, "Vu chez Misty.");
+});
+
+test("drawer status section suppresses exchange context for caught local Pokemon", async () => {
+  const api = await loadModule();
+  installDrawerCollection({ caught: true, availableFrom: ["Misty"] });
+
+  const section = api.buildStatusSection("0001-bulbasaur");
+
+  assert.equal(findInTree(section, ".pokemon-exchange-context"), null);
+});
+
+test("drawer status section shows exchange context for missing Pokemon available from contacts", async () => {
+  const api = await loadModule();
+  installDrawerCollection({ caught: false, availableFrom: ["Misty"] });
+
+  const section = api.buildStatusSection("0001-bulbasaur");
+
+  const exchange = findInTree(section, ".pokemon-exchange-context");
+  assert.equal(exchange.children.length, 1);
+  assert.equal(exchange.children[0].textContent, "Vu chez Misty.");
+});
+
+test("drawer ownership helper source does not receive wanted state", async () => {
+  await loadModule();
+  const { root } = makeDrawerRoot();
+  globalThis.__drawerRoot = root;
+  const sourceCalls = [];
+  const originalHelper = globalThis.PokevaultPokemonFiche.ownershipStateFromSources;
+  globalThis.PokevaultPokemonFiche.ownershipStateFromSources = (slug, options) => {
+    sourceCalls.push({ slug, options });
+    return originalHelper(slug, options);
+  };
+  globalThis.PokedexCollection = {
+    allPokemon: [
+      {
+        slug: "0025-pikachu",
+        number: "0025",
+        names: { fr: "Pikachu" },
+        image: "images/0025-pikachu.png",
+        types: ["Électrik"],
+        region: "kanto",
+      },
+    ],
+    getStatus() {
+      return { state: "not_met", shiny: false };
+    },
+    tradeSummaryForSlug() {
+      return { availableFrom: [], wantedBy: [], matchCount: 0, canHelpCount: 0 };
+    },
+    getNote() {
+      return "";
+    },
+  };
+  globalThis.PokevaultTrainerContacts = {
+    getOwnCard() {
+      return { wants: ["0025-pikachu"], for_trade: [] };
+    },
+  };
+
+  globalThis.window.PokevaultDrawer.open("0025-pikachu", null);
+
+  assert.equal(sourceCalls.length, 1);
+  assert.equal(Object.hasOwn(sourceCalls[0].options, "wanted"), false);
 });

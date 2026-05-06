@@ -14,8 +14,6 @@ from tracker.api.dependencies import (
     get_card_repository,
     get_card_service,
     get_export_service,
-    get_hunt_repository,
-    get_hunt_service,
     get_profile_service,
     get_progress_repository,
     get_progress_service,
@@ -27,7 +25,6 @@ from tracker.config import TrackerSettings
 from tracker.repository.json_binder_config_repository import JsonBinderConfigRepository
 from tracker.repository.json_binder_placements_repository import JsonBinderPlacementsRepository
 from tracker.repository.json_card_repository import JsonCardRepository
-from tracker.repository.json_hunt_repository import JsonHuntRepository
 from tracker.repository.json_progress_repository import JsonProgressRepository
 from tracker.repository.json_trainer_contact_repository import JsonTrainerContactRepository
 from tracker.services.badge_service import BadgeService
@@ -36,7 +33,6 @@ from tracker.services.binder_placements_service import BinderPlacementsService
 from tracker.services.binder_workspace_service import BinderWorkspaceService
 from tracker.services.card_service import CardService
 from tracker.services.export_service import ExportService
-from tracker.services.hunt_service import HuntService
 from tracker.services.profile_service import ProfileService
 from tracker.services.progress_service import ProgressService
 from tracker.services.tcg_catalog_service import TcgCatalogService
@@ -103,26 +99,14 @@ def test_get_export_service(tmp_path: Path) -> None:
     card_repo = get_card_repository(
         settings=settings, profiles=_profiles(settings)
     )
-    hunt_repo = get_hunt_repository(
-        settings=settings, profiles=_profiles(settings)
-    )
     svc = get_export_service(
         settings=settings,
         progress_repo=progress_repo,
         config_repo=cfg_repo,
         placements_repo=pl_repo,
         card_repo=card_repo,
-        hunt_repo=hunt_repo,
     )
     assert isinstance(svc, ExportService)
-
-
-def test_get_hunt_repository_and_service(tmp_path: Path) -> None:
-    settings = TrackerSettings(repo_root=tmp_path)
-    repo = get_hunt_repository(settings=settings, profiles=_profiles(settings))
-    assert isinstance(repo, JsonHuntRepository)
-    svc = get_hunt_service(repository=repo)
-    assert isinstance(svc, HuntService)
 
 
 def test_get_trainer_contact_repository_and_service(tmp_path: Path) -> None:

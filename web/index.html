@@ -78,13 +78,6 @@
                 </div>
               </section>
 
-              <section
-                class="pokedex-next-actions"
-                id="pokedexNextActions"
-                aria-label="Prochains Pokémon à compléter"
-                data-i18n-aria-label="app.collection.next_actions"
-              ></section>
-
               <div class="progress-row">
                 <div class="progress-bar" role="progressbar" aria-label="Progression de la collection" data-i18n-aria-label="app.collection.progress" aria-valuemin="0" aria-valuemax="100">
                   <div class="progress-bar-fill" id="progressFill"></div>
@@ -98,12 +91,6 @@
                   title="Raccourcis clavier (touche ?)"
                 >?</button>
               </div>
-
-              <section
-                class="badge-mission-panel"
-                id="badgeMissionPanel"
-                aria-label="Mission badge active"
-              ></section>
 
               <label class="search-wrap">
                 <span class="search-icon" aria-hidden="true">⌕</span>
@@ -127,17 +114,8 @@
                 <button type="button" class="filter-btn" data-filter="missing" aria-pressed="false">
                   <span data-i18n="app.filters.missing">Manquants</span>
                 </button>
-                <button type="button" class="filter-btn" data-filter="hunts" aria-pressed="false">
-                  <span data-i18n="app.filters.hunts">Cherche</span>
-                </button>
-                <button type="button" class="filter-btn" data-filter="seen" aria-pressed="false">
-                  <span data-i18n="app.filters.seen">Vus</span>
-                </button>
                 <button type="button" class="filter-btn" data-filter="caught" aria-pressed="false">
                   <span data-i18n="app.filters.caught">Capturés</span>
-                </button>
-                <button type="button" class="filter-btn filter-btn--bonus" data-filter="shiny" aria-pressed="false">
-                  <span data-i18n="app.filters.shiny">Shiny</span>
                 </button>
                 <button type="button" class="filter-btn" data-form-filter="regional_only" aria-pressed="false">
                   <span data-i18n="app.filters.regional">Formes régionales</span>
@@ -445,18 +423,18 @@
             <article class="docs-card">
               <h2 data-i18n="app.docs.collection.title">Collection</h2>
               <ul class="docs-list">
-                <li data-i18n="app.docs.collection.wanted">`Cherche` marque les priorités personnelles et les échanges souhaités.</li>
+                <li data-i18n="app.docs.collection.actions">`Capturé`, `Double`, `Relâcher 1` et `Relâcher` couvrent la progression locale et les doubles disponibles.</li>
                 <li data-i18n="app.docs.collection.caught">`Capturé` confirme la progression Pokédex et alimente les stats, badges et classeurs.</li>
                 <li data-i18n="app.docs.collection.double">`Double` indique ce que tu peux proposer à un autre Dresseur.</li>
-                <li data-i18n="app.docs.collection.filters">Régions, formes, types, tags narratifs, recherche floue et recommandations partagent le même état filtré.</li>
-                <li data-i18n="app.docs.collection.context">`Vu chez` et `Match` viennent des cartes reçues; ils n'écrasent jamais ta progression locale.</li>
+                <li data-i18n="app.docs.collection.filters">Régions, formes, types, tags narratifs et recherche floue partagent le même état filtré.</li>
+                <li data-i18n="app.docs.collection.context">`Vu chez` vient des doubles partagés par les cartes reçues; il n'écrase jamais ta progression locale.</li>
               </ul>
             </article>
 
             <article class="docs-card">
               <h2 data-i18n="app.docs.fiches_cards.title">Fiches Pokémon et cartes</h2>
               <ul class="docs-list">
-                <li data-i18n="app.docs.fiches_cards.drawer">Le bouton `Fiche & cartes` ouvre le drawer avec statut, formes liées, notes, recherches et cartes.</li>
+                <li data-i18n="app.docs.fiches_cards.drawer">Le bouton `Fiche & cartes` ouvre le drawer avec statut, formes liées, notes et cartes.</li>
                 <li data-i18n="app.docs.fiches_cards.full">La fiche complète ajoute l'artwork, les types, les faiblesses/résistances et les cartes repliées.</li>
                 <li data-i18n="app.docs.fiches_cards.card_fields">Chaque carte peut stocker set, numéro, variante, langue, état, quantité, image et note.</li>
                 <li data-i18n="app.docs.fiches_cards.tcg">La recherche TCG préremplit les métadonnées depuis l'API publique Pokémon TCG.</li>
@@ -478,17 +456,16 @@
               <ul class="docs-list">
                 <li data-i18n="app.docs.trainers.create">Crée ta carte avec pseudo, région favorite, note publique et jusqu'à trois contacts partageables.</li>
                 <li data-i18n="app.docs.trainers.export">Export/import se fait par fichier; aucun compte, aucun profil public et aucune sync automatique.</li>
-                <li data-i18n="app.docs.trainers.compare">Les listes `Cherche` et `Double` des contacts produisent `Vu chez` et `Match` dans ta Collection.</li>
-                <li data-i18n="app.docs.trainers.badges">Les badges débloqués sont partagés automatiquement avec `id` et `title`; les badges scellés restent privés.</li>
+                <li data-i18n="app.docs.trainers.compare">La liste `Double` des contacts produit `Vu chez` dans ta Collection.</li>
+                <li data-i18n="app.docs.trainers.badges">Les anciens champs `wants` et `badges` importés sont tolérés mais ignorés.</li>
               </ul>
             </article>
 
             <article class="docs-card">
-              <h2 data-i18n="app.docs.badges.title">Badges, missions et stats</h2>
+              <h2 data-i18n="app.docs.badges.title">Badges et stats</h2>
               <ul class="docs-list">
                 <li data-i18n="app.docs.badges.stats">Statistiques suit la complétion globale, régionale, par type et par badge.</li>
                 <li data-i18n="app.docs.badges.gallery">La galerie garde les badges verrouillés scellés jusqu'au déblocage.</li>
-                <li data-i18n="app.docs.badges.mission">Un badge d'équipe peut devenir une mission active et remonter les cibles manquantes dans Collection.</li>
                 <li data-i18n="app.docs.badges.catalog">Le catalogue couvre Kanto, Johto et les équipes de base Rubis/Saphir à Écarlate/Violet, sans remakes.</li>
               </ul>
             </article>
@@ -498,7 +475,7 @@
               <ul class="docs-list">
                 <li data-i18n="app.docs.data_files.reference">Référence versionnée: `data/pokedex.json`, `data/narrative-tags.json`, `data/evolution-families.json`.</li>
                 <li data-i18n="app.docs.data_files.progress">Progression: `data/collection-progress.json`.</li>
-                <li data-i18n="app.docs.data_files.cards">Cartes et recherches: `data/collection-cards.json`, `data/hunts.json`.</li>
+                <li data-i18n="app.docs.data_files.cards">Cartes: `data/collection-cards.json`.</li>
                 <li data-i18n="app.docs.data_files.binders">Classeurs: `data/binder-config.json`, `data/binder-placements.json`.</li>
                 <li data-i18n="app.docs.data_files.trainers">Dresseurs: `data/trainer-contacts.json`.</li>
               </ul>
@@ -520,7 +497,6 @@
                 <li data-i18n="app.docs.api.health">`/api/health`: version et état de l'API.</li>
                 <li data-i18n="app.docs.api.progress">`/api/progress`: progression, statuts, notes.</li>
                 <li data-i18n="app.docs.api.cards">`/api/cards`: cartes physiques par Pokémon.</li>
-                <li data-i18n="app.docs.api.hunts">`/api/hunts`: recherches actives.</li>
                 <li data-i18n="app.docs.api.badges">`/api/badges`: catalogue et badges débloqués.</li>
                 <li data-i18n="app.docs.api.profiles">`/api/profiles`: profils locaux.</li>
                 <li data-i18n="app.docs.api.trainers">`/api/trainers`: Cartes Dresseur et contacts reçus.</li>
@@ -751,9 +727,9 @@
             liste, les fiches et les classeurs.
           </p>
           <ul class="onboarding__bullets">
-            <li data-i18n="app.onboarding.step1.b1"><em>Cherche</em> marque ce qu'il te manque pour les échanges et les priorités personnelles.</li>
-            <li data-i18n="app.onboarding.step1.b2"><em>Capturé</em> confirme ta progression Pokédex.</li>
-            <li data-i18n="app.onboarding.step1.b3"><em>Double</em> dit que tu peux proposer ce Pokémon en échange.</li>
+            <li data-i18n="app.onboarding.step1.b1"><em>Capturé</em> confirme ta progression Pokédex.</li>
+            <li data-i18n="app.onboarding.step1.b2"><em>Double</em> dit que tu peux proposer ce Pokémon en échange.</li>
+            <li data-i18n="app.onboarding.step1.b3"><em>Relâcher 1</em> et <em>Relâcher</em> retirent un doublon ou toute la possession locale.</li>
           </ul>
         </section>
 
@@ -766,7 +742,7 @@
           </p>
           <ul class="onboarding__bullets">
             <li data-i18n="app.onboarding.step2.b1"><em>Vu chez</em> apparaît quand un Dresseur a ce Pokémon en double.</li>
-            <li data-i18n="app.onboarding.step2.b2"><em>Match</em> apparaît si ce double correspond à ton <em>Cherche</em>.</li>
+            <li data-i18n="app.onboarding.step2.b2">Les doubles restent visibles comme disponibilité chez tes contacts.</li>
             <li data-i18n="app.onboarding.step2.b3">Sa carte peut contenir Instagram, Facebook, téléphone ou un autre lien choisi.</li>
             <li data-i18n="app.onboarding.step2.b4">Les contacts restent dans ton classeur local de Dresseurs.</li>
           </ul>
@@ -801,19 +777,19 @@
           <p class="onboarding__kicker" data-i18n="app.onboarding.step4.kicker">Étape 4 · Mode de suivi</p>
           <h3 class="onboarding__step-title" data-i18n="app.onboarding.step4.title">Simple ou avancé ?</h3>
           <p class="onboarding__lede" data-i18n="app.onboarding.step4.lede">
-            Simple garde la liste concentrée sur Cherche, Capturé et Double.
-            Avancé rend les formes, shiny, notes, Dresseurs et cartes plus visibles.
+            Simple garde la liste concentrée sur Capturé, Double et Relâcher.
+            Avancé rend les formes, notes, Dresseurs et cartes plus visibles.
           </p>
           <div class="onboarding__choices" role="radiogroup" aria-label="Mode de suivi Pokédex" data-i18n-aria-label="app.onboarding.mode">
             <label class="onboarding__choice">
               <input type="radio" name="onboardingTrackingMode" value="simple" checked />
               <span class="onboarding__choice-title" data-i18n="app.onboarding.simple">Simple</span>
-              <span class="onboarding__choice-sub" data-i18n="app.onboarding.simple_sub">Cherche, Capturé, Double. Les formes régionales restent disponibles.</span>
+              <span class="onboarding__choice-sub" data-i18n="app.onboarding.simple_sub">Capturé, Double, Relâcher. Les formes régionales restent disponibles.</span>
             </label>
             <label class="onboarding__choice">
               <input type="radio" name="onboardingTrackingMode" value="advanced" />
               <span class="onboarding__choice-title" data-i18n="app.onboarding.advanced">Avancé</span>
-              <span class="onboarding__choice-sub" data-i18n="app.onboarding.advanced_sub">Shiny, formes spéciales, notes, recherches, TCG et cartes plus accessibles.</span>
+              <span class="onboarding__choice-sub" data-i18n="app.onboarding.advanced_sub">Formes spéciales, notes, Dresseurs, TCG et cartes plus accessibles.</span>
             </label>
           </div>
           <p class="onboarding__hint" data-i18n="app.onboarding.hint">
@@ -908,7 +884,6 @@
     <script src="/keyboard.js" defer></script>
     <script src="/toast.js" defer></script>
     <script src="/badges-view.js" defer></script>
-    <script src="/badge-mission.js" defer></script>
     <script src="/artwork-switcher.js" defer></script>
     <script src="/onboarding.js" defer></script>
     <script src="/type-chart.js" defer></script>
@@ -917,10 +892,7 @@
     <script src="/pokemon-full-view.js" defer></script>
     <script src="/binder-layout-engine.js" defer></script>
     <script src="/binder-v2.js" defer></script>
-    <script src="/hunt-list.js" defer></script>
     <script src="/pokedex-filters.js" defer></script>
-    <script src="/recommendations.js" defer></script>
-    <script src="/pokedex-next-actions.js" defer></script>
     <script src="/pokedex-dashboard.js" defer></script>
     <script src="/trainer-contacts.js" defer></script>
     <script src="/app.js" defer></script>

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 from pathlib import Path
 
 from fastapi import FastAPI
@@ -89,9 +90,38 @@ def test_badges_auto_sync_on_read(tmp_path: Path) -> None:
     )
     assert pr.status_code == 200
     body = client.get("/api/badges").json()
-    assert set(body["unlocked"]) >= {"first_encounter", "first_catch", "first_shiny"}
+    assert "first_encounter" not in body["unlocked"]
+    assert set(body["unlocked"]) >= {"first_catch", "first_shiny"}
     by_id = {b["id"]: b for b in body["catalog"]}
+    assert "first_encounter" not in by_id
     assert by_id["first_catch"]["unlocked"] is True
+
+
+def test_badges_endpoint_filters_removed_legacy_unlocked_ids(
+    tmp_path: Path,
+) -> None:
+    progress_path = tmp_path / "progress.json"
+    progress_path.write_text(
+        json.dumps(
+            {
+                "caught": {},
+                "statuses": {},
+                "badges_unlocked": ["first_encounter", "first_catch"],
+            }
+        ),
+        encoding="utf-8",
+    )
+    client = _build_app(tmp_path)
+
+    body = client.get("/api/badges").json()
+
+    by_id = {b["id"]: b for b in body["catalog"]}
+    assert "first_encounter" not in body["unlocked"]
+    assert "first_encounter" not in by_id
+    assert body["unlocked"] == ["first_catch"]
+    assert by_id["first_catch"]["unlocked"] is True
+    persisted = json.loads(progress_path.read_text(encoding="utf-8"))
+    assert persisted["badges_unlocked"] == ["first_catch"]
 
 
 def test_badges_first_card_triggers_unlock(tmp_path: Path) -> None:

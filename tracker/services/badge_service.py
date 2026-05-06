@@ -91,10 +91,6 @@ def _caught_slugs(progress: CollectionProgress) -> set[str]:
     }
 
 
-def _seen_count(progress: CollectionProgress) -> int:
-    return len(progress.statuses)
-
-
 def _shiny_count(progress: CollectionProgress) -> int:
     return sum(
         1 for s in progress.statuses.values() if s.state == "caught" and s.shiny
@@ -114,8 +110,6 @@ def _metric_value(
     progress: CollectionProgress,
     cards: list[Card],
 ) -> int:
-    if metric == "seen":
-        return _seen_count(progress)
     if metric == "caught":
         return _caught_count(progress)
     if metric == "shiny":
@@ -209,14 +203,6 @@ def _team_badge(
 
 
 BADGES: list[BadgeDef] = [
-    BadgeDef(
-        "first_encounter",
-        "Première rencontre",
-        "Identifier ton premier Pokémon.",
-        "seen",
-        1,
-        "Pokémon à identifier",
-    ),
     BadgeDef(
         "first_catch",
         "Premier Pokéball",
@@ -2049,19 +2035,40 @@ class BadgeService:
     ) -> set[str]:
         return {b.id for b in BADGES if b.progress(progress, cards).complete}
 
+    def _current_unlocked(self, progress: CollectionProgress) -> set[str]:
+        current_ids = {badge.id for badge in BADGES}
+        return {
+            badge_id
+            for badge_id in progress.badges_unlocked
+            if badge_id in current_ids
+        }
+
+    def _cleanup_removed_unlocked(
+        self,
+        progress: CollectionProgress,
+        unlocked: set[str],
+    ) -> None:
+        cleaned = sorted(unlocked)
+        if progress.badges_unlocked == cleaned:
+            return
+        self._progress_repo.save(
+            progress.model_copy(update={"badges_unlocked": cleaned})
+        )
+
     def sync_unlocked(self) -> list[str]:
         """Re-evaluate predicates and persist any newly unlocked badges.
 
         Returns the list of newly unlocked badge ids (empty if nothing
-        changed). Monotonic: already-unlocked ids are never removed.
+        changed). Monotonic for current catalog ids; removed catalog ids
+        are cleaned from persisted state.
         """
         progress = self._progress_repo.load()
         cards = list(self._card_repo.load().cards)
         due = self._evaluate_due(progress, cards)
-        already = set(progress.badges_unlocked)
+        already = self._current_unlocked(progress)
         merged = already | due
         newly = sorted(due - already)
-        if merged != already:
+        if sorted(progress.badges_unlocked) != sorted(merged):
             updated = progress.model_copy(
                 update={"badges_unlocked": sorted(merged)}
             )
@@ -2071,7 +2078,8 @@ class BadgeService:
     def state(self) -> BadgeState:
         """Return the full catalog + persisted unlocked ids."""
         progress = self._progress_repo.load()
-        unlocked = set(progress.badges_unlocked)
+        unlocked = self._current_unlocked(progress)
+        self._cleanup_removed_unlocked(progress, unlocked)
         cards = list(self._card_repo.load().cards)
         catalog = []
         for badge in BADGES:

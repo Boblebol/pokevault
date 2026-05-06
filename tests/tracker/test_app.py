@@ -141,6 +141,17 @@ def test_pokedex_json_absent_returns_404(tmp_path: Path) -> None:
     assert client.get("/data/pokedex.json").status_code == 404
 
 
+def test_hunts_route_is_not_mounted(tmp_path: Path) -> None:
+    _minimal_layout(tmp_path)
+    (tmp_path / "data" / "pokedex.json").write_text("[]", encoding="utf-8")
+    settings = TrackerSettings(repo_root=tmp_path)
+    application = create_app(settings)
+    paths = {route.path for route in application.routes}
+
+    assert "/api/hunts" not in paths
+    assert "/api/hunts/{slug}" not in paths
+
+
 def test_default_app_module_loads() -> None:
     assert default_app.title == "pokevault"
     assert default_app.version == APP_VERSION

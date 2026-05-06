@@ -9,7 +9,6 @@ from fastapi import HTTPException
 
 from tracker.models import (
     TrainerCard,
-    TrainerCardBadge,
     TrainerContactLink,
     TrainerContactNotePatch,
 )
@@ -24,7 +23,6 @@ def _card(trainer_id: str = "trainer-123", name: str = "Alex") -> TrainerCard:
         favorite_region="kanto",
         favorite_pokemon_slug="0025-pikachu",
         public_note="Local only",
-        wants=["0001-bulbasaur"],
         for_trade=["0004-charmander"],
         updated_at="2026-04-30T10:00:00+00:00",
     )
@@ -49,7 +47,6 @@ def test_save_own_card_cleans_links_and_lists(tmp_path: Path) -> None:
                 TrainerContactLink(kind="discord", label="Discord", value="   "),
                 TrainerContactLink(kind="email", label=" Mail ", value=" alex@example.test "),
             ],
-            "wants": [" 0001-bulbasaur ", "0001-bulbasaur", "", "0004-charmander"],
             "for_trade": [" 0007-squirtle ", "0007-squirtle"],
         },
     )
@@ -59,29 +56,31 @@ def test_save_own_card_cleans_links_and_lists(tmp_path: Path) -> None:
     assert len(saved.contact_links) == 1
     assert saved.contact_links[0].label == "Mail"
     assert saved.contact_links[0].value == "alex@example.test"
-    assert saved.wants == ["0001-bulbasaur", "0004-charmander"]
     assert saved.for_trade == ["0007-squirtle"]
 
 
-def test_save_own_card_cleans_shared_badges(tmp_path: Path) -> None:
+def test_save_own_card_ignores_legacy_wants_and_badges(tmp_path: Path) -> None:
     service = TrainerContactService(JsonTrainerContactRepository(tmp_path / "trainers.json"))
-    card = _card().model_copy(
-        update={
-            "badges": [
-                TrainerCardBadge(id=" kanto_brock ", title=" Badge Roche "),
-                TrainerCardBadge(id="kanto_brock", title="Duplicate"),
-                TrainerCardBadge(id="kanto_misty", title=" Badge Cascade "),
-                TrainerCardBadge(id="   ", title="Blank"),
-            ],
-        },
+    legacy = TrainerCard.model_validate(
+        {
+            "schema_version": 1,
+            "app": "pokevault",
+            "kind": "trainer_card",
+            "trainer_id": "trainer-123",
+            "display_name": "Alex",
+            "wants": ["0001-bulbasaur"],
+            "for_trade": ["0004-charmander", "0004-charmander", ""],
+            "badges": [{"id": "kanto_brock", "title": "Badge Roche"}],
+            "updated_at": "2026-04-30T10:00:00+00:00",
+        }
     )
 
-    saved = service.save_own_card(card)
+    saved = service.save_own_card(legacy)
+    exported = saved.model_dump()
 
-    assert [(badge.id, badge.title) for badge in saved.badges] == [
-        ("kanto_brock", "Badge Roche"),
-        ("kanto_misty", "Badge Cascade"),
-    ]
+    assert saved.for_trade == ["0004-charmander"]
+    assert "wants" not in exported
+    assert "badges" not in exported
 
 
 def test_import_card_creates_then_updates_by_trainer_id(tmp_path: Path) -> None:

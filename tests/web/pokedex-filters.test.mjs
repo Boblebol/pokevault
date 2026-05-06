@@ -61,7 +61,7 @@ test("matchesPokemonFilters combines status region type and regional forms", asy
   }), false);
 });
 
-test("matchesPokemonFilters handles seen caught and shiny status filters", async () => {
+test("matchesPokemonFilters supports only all missing and caught status filters", async () => {
   const api = await loadModule();
   const pokemon = { slug: "0025-pikachu", number: "#025", region: "kanto", types: ["electric"] };
   const statusMap = {
@@ -74,15 +74,15 @@ test("matchesPokemonFilters handles seen caught and shiny status filters", async
     statusMap,
   }), true);
   assert.equal(api.matchesPokemonFilters(pokemon, {
-    filters: { status: "shiny", region: "all", forms: "all", type: "all", tags: [] },
-    caughtMap: {},
-    statusMap,
-  }), true);
-  assert.equal(api.matchesPokemonFilters(pokemon, {
-    filters: { status: "seen", region: "all", forms: "all", type: "all", tags: [] },
+    filters: { status: "missing", region: "all", forms: "all", type: "all", tags: [] },
     caughtMap: {},
     statusMap,
   }), false);
+  assert.equal(api.matchesPokemonFilters(pokemon, {
+    filters: { status: "all", region: "all", forms: "all", type: "all", tags: [] },
+    caughtMap: {},
+    statusMap,
+  }), true);
 });
 
 test("matchesPokemonFilters exposes an empty filtered state", async () => {
@@ -93,7 +93,7 @@ test("matchesPokemonFilters exposes an empty filtered state", async () => {
   ];
 
   const rows = pool.filter((pokemon) => api.matchesPokemonFilters(pokemon, {
-    filters: { status: "shiny", region: "kanto", forms: "all", type: "fire", tags: [] },
+    filters: { status: "missing", region: "kanto", forms: "all", type: "fire", tags: [] },
     caughtMap: {},
     statusMap: {},
   }));
@@ -101,7 +101,7 @@ test("matchesPokemonFilters exposes an empty filtered state", async () => {
   assert.deepEqual(rows, []);
 });
 
-test("parseFilterHash normalizes supported filter state", async () => {
+test("parseFilterHash normalizes legacy status filters to all", async () => {
   const api = await loadModule();
 
   const parsed = api.parseFilterHash(
@@ -115,7 +115,7 @@ test("parseFilterHash normalizes supported filter state", async () => {
 
   assert.equal(parsed.view, "liste");
   assert.deepEqual(parsed.filters, {
-    status: "seen",
+    status: "all",
     region: "johto",
     forms: "regional_only",
     type: "fire",
@@ -127,7 +127,7 @@ test("buildFilterHash preserves existing route params while writing filters", as
   const api = await loadModule();
 
   const next = api.buildFilterHash("#/liste?slug=0025-pikachu&status=missing", {
-    status: "shiny",
+    status: "hunts",
     region: "kanto",
     forms: "regional_only",
     type: "electric",
@@ -138,9 +138,23 @@ test("buildFilterHash preserves existing route params while writing filters", as
 
   assert.equal(next.startsWith("#/liste?"), true);
   assert.equal(params.get("slug"), "0025-pikachu");
-  assert.equal(params.get("status"), "shiny");
+  assert.equal(params.get("status"), null);
   assert.equal(params.get("region"), "kanto");
   assert.equal(params.get("forms"), "regional");
   assert.equal(params.get("type"), "electric");
   assert.equal(params.get("tags"), "starter");
+});
+
+test("matchesPokemonFilters ignores removed hunt predicate", async () => {
+  const api = await loadModule();
+  const pokemon = { slug: "0025-pikachu", number: "#025", region: "kanto", types: ["electric"] };
+
+  assert.equal(api.matchesPokemonFilters(pokemon, {
+    filters: { status: "hunts", region: "all", forms: "all", type: "all", tags: [] },
+    caughtMap: {},
+    statusMap: {},
+    isWanted() {
+      throw new Error("hunt predicate should not be used");
+    },
+  }), true);
 });
