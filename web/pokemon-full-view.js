@@ -26,9 +26,7 @@
   const FALLBACK_I18N = {
     "pokemon_full.back": "← Retour à la collection",
     "pokemon_full.name_and": "et",
-    "pokemon_full.exchange.match": "Match possible avec {names}.",
     "pokemon_full.exchange.seen": "Vu chez {names}.",
-    "pokemon_full.exchange.wanted_by": "{names} cherche ce Pokémon.",
     "pokemon_full.legacy_seen": "Vu manuel existant; les prochains statuts passent par Cherche, Capturé ou Double.",
     "pokemon_full.hunt.high": "Recherche prioritaire",
     "pokemon_full.hunt.normal": "Dans mes recherches",
@@ -206,23 +204,12 @@
 
   function buildExchangeContext(slug) {
     const summary = tradeSummary(slug);
-    if (!summary.availableFrom.length && !summary.wantedBy.length) return null;
+    if (!summary.availableFrom.length) return null;
     const box = document.createElement("div");
     box.className = "pokemon-exchange-context";
-    if (summary.matchCount > 0) {
-      const line = document.createElement("p");
-      line.textContent = t("pokemon_full.exchange.match", { names: formatNameList(summary.availableFrom) });
-      box.append(line);
-    } else if (summary.availableFrom.length > 0) {
-      const line = document.createElement("p");
-      line.textContent = t("pokemon_full.exchange.seen", { names: formatNameList(summary.availableFrom) });
-      box.append(line);
-    }
-    if (summary.canHelpCount > 0) {
-      const line = document.createElement("p");
-      line.textContent = t("pokemon_full.exchange.wanted_by", { names: formatNameList(summary.wantedBy) });
-      box.append(line);
-    }
+    const line = document.createElement("p");
+    line.textContent = t("pokemon_full.exchange.seen", { names: formatNameList(summary.availableFrom) });
+    box.append(line);
     return box;
   }
 
@@ -339,8 +326,10 @@
       legacy.textContent = t("pokemon_full.legacy_seen");
       section.append(legacy);
     }
-    const exchange = buildExchangeContext(p.slug);
-    if (exchange) section.append(exchange);
+    if (!ownership.caught) {
+      const exchange = buildExchangeContext(p.slug);
+      if (exchange) section.append(exchange);
+    }
 
     root.append(section);
   }

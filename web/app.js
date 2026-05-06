@@ -58,11 +58,9 @@ const APP_FALLBACK_I18N = {
   "app.card.state_shiny": ", attrapé shiny",
   "app.card.state_seen": ", vu chez un dresseur",
   "app.card.state_missing": ", recherché ou manquant",
-  "app.card.match": ", {count} match échange",
   "app.card.seen_contact": ", vu chez {count} contact",
   "app.card.action_caught": "Capturé",
   "app.card.action_wanted": "Je cherche",
-  "app.card.match_badge": "Match {count}",
   "app.card.seen_badge": "Vu chez {count}",
   "app.card.details": "Fiche & cartes",
   "app.card.open": "Ouvrir la fiche de {name}",
@@ -1579,7 +1577,8 @@ function createPokemonCard(p, opts) {
   const shiny = caught && status.shiny;
   const ownership = ownershipStateForSlug(key);
   const tradeSummary = tradeSummaryForSlug(key);
-  const networkSeen = !caught && tradeSummary.availableFrom.length > 0;
+  const locallyOwned = Boolean(ownership.caught);
+  const networkSeen = !locallyOwned && tradeSummary.availableFrom.length > 0;
   const visualSeen = seen || networkSeen;
   const dim = getDimMode();
 
@@ -1590,7 +1589,7 @@ function createPokemonCard(p, opts) {
   if (shiny) classParts.push("is-shiny");
   if (ownership.duplicate) classParts.push("is-duplicate");
   card.className = classParts.join(" ");
-  if (shouldDimCardForHighlight(dim, { caught, duplicate: ownership.duplicate })) {
+  if (shouldDimCardForHighlight(dim, { caught: locallyOwned, duplicate: ownership.duplicate })) {
     card.classList.add("is-dimmed");
   }
   card.dataset.slug = key;
@@ -1601,11 +1600,9 @@ function createPokemonCard(p, opts) {
   const stateLabel = caught
     ? shiny ? t("app.card.state_shiny") : t("app.card.state_caught")
     : visualSeen ? t("app.card.state_seen") : t("app.card.state_missing");
-  const exchangeLabel = tradeSummary.matchCount > 0
-    ? t("app.card.match", { count: tradeSummary.matchCount })
-    : tradeSummary.availableFrom.length > 0
-      ? t("app.card.seen_contact", { count: tradeSummary.availableFrom.length })
-      : "";
+  const exchangeLabel = networkSeen
+    ? t("app.card.seen_contact", { count: tradeSummary.availableFrom.length })
+    : "";
   card.setAttribute(
     "aria-label",
     `${displayName(p)} ${displayNumber(p.number)}${stateLabel}${exchangeLabel}`,
@@ -1707,17 +1704,11 @@ function createPokemonCard(p, opts) {
 
   const exchange = document.createElement("div");
   exchange.className = "pokemon-network-row";
-  if (tradeSummary.matchCount > 0 || tradeSummary.availableFrom.length > 0) {
+  if (networkSeen) {
     const badge = document.createElement("span");
     badge.className = "pokemon-network-badge";
-    if (tradeSummary.matchCount > 0) {
-      badge.classList.add("is-match");
-      badge.textContent = t("app.card.match_badge", { count: tradeSummary.matchCount });
-      badge.title = `Disponible chez ${tradeSummary.availableFrom.join(", ")}`;
-    } else {
-      badge.textContent = t("app.card.seen_badge", { count: tradeSummary.availableFrom.length });
-      badge.title = tradeSummary.availableFrom.join(", ");
-    }
+    badge.textContent = t("app.card.seen_badge", { count: tradeSummary.availableFrom.length });
+    badge.title = tradeSummary.availableFrom.join(", ");
     exchange.append(badge);
   }
   card.append(exchange);

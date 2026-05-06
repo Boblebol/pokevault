@@ -178,13 +178,12 @@ def test_dimmed_cards_keep_trade_controls_readable() -> None:
     assert ".card.is-dimmed .card-action" in CSS
     assert ".card.is-dimmed .pokemon-network-row" in CSS
     assert '.card.is-dimmed .pokemon-trade-chip[data-action="duplicate"][data-active="true"]' in CSS
-    assert ".card.is-dimmed .pokemon-network-badge.is-match" in CSS
     assert ".card.is-dimmed {\n  opacity:" not in CSS
 
 
-def test_match_badge_is_visually_stronger_than_seen_badge() -> None:
-    assert ".pokemon-network-badge.is-match" in CSS
-    assert "var(--accent)" in CSS
+def test_seen_badge_keeps_duplicate_availability_styling() -> None:
+    assert ".pokemon-network-badge" in CSS
+    assert ".pokemon-network-badge.is-match" not in CSS
     assert "rgba(255, 193, 7" in CSS
 
 
@@ -207,7 +206,7 @@ def test_onboarding_product_tour_covers_local_trade_workflow() -> None:
         "Capturé",
         "Double",
         "Vu chez",
-        "Match",
+        "doubles",
         "Dresseurs",
         "Instagram",
         "sans compte",

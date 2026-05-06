@@ -2142,11 +2142,6 @@ body {
   opacity: 1;
 }
 
-.card.is-dimmed .pokemon-network-badge.is-match {
-  border-color: rgba(0, 218, 243, 0.48);
-  background: rgba(0, 218, 243, 0.16);
-}
-
 .card-num {
   font-variant-numeric: tabular-nums;
   font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
@@ -5527,12 +5522,6 @@ body {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-}
-
-.pokemon-network-badge.is-match {
-  border-color: rgba(0, 218, 243, 0.36);
-  background: rgba(0, 218, 243, 0.12);
-  color: var(--accent);
 }
 
 .pokemon-exchange-context {

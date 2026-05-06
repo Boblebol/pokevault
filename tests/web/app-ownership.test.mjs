@@ -3,6 +3,43 @@ import { test } from "node:test";
 
 let importCase = 0;
 
+class FakeElement {
+  constructor(tagName) {
+    this.tagName = tagName.toUpperCase();
+    this.children = [];
+    this.dataset = {};
+    this.className = "";
+    this.textContent = "";
+    this.type = "";
+    this.loading = "";
+    this.alt = "";
+    this.src = "";
+    this.title = "";
+    this.events = {};
+    this.classList = {
+      add: (...classes) => {
+        const existing = new Set(String(this.className || "").split(/\s+/).filter(Boolean));
+        for (const cls of classes) existing.add(cls);
+        this.className = [...existing].join(" ");
+      },
+    };
+  }
+
+  append(...nodes) {
+    for (const node of nodes) {
+      if (node) this.children.push(node);
+    }
+  }
+
+  addEventListener(type, handler) {
+    this.events[type] = handler;
+  }
+
+  setAttribute(name, value) {
+    this[name] = String(value);
+  }
+}
+
 function installBrowserStubs() {
   globalThis.__POKEVAULT_APP_TESTS__ = true;
   globalThis.window = globalThis;
@@ -27,6 +64,15 @@ function installBrowserStubs() {
     },
   };
   globalThis.addEventListener = () => {};
+}
+
+function findByClass(root, className) {
+  for (const child of root.children || []) {
+    if (String(child.className || "").split(/\s+/).includes(className)) return child;
+    const found = findByClass(child, className);
+    if (found) return found;
+  }
+  return null;
 }
 
 async function loadModule() {
@@ -192,4 +238,115 @@ test("artwork changes rerender the active Pokemon route", async () => {
   api.rerenderArtworkSurface();
 
   assert.deepEqual(rendered, ["0001-bulbasaur"]);
+});
+
+test("pokemon cards show Vu chez only for missing local Pokemon", async () => {
+  await loadModule();
+  globalThis.document.createElement = (tagName) => new FakeElement(tagName);
+  globalThis.PokevaultPokemonFiche = {
+    ownershipLabel() {
+      return "";
+    },
+    ownershipStateFromSources(slug, options = {}) {
+      const status = options.status || { state: "not_met" };
+      return { caught: status.state === "caught", duplicate: false };
+    },
+    createOwnershipActions() {
+      return null;
+    },
+  };
+  globalThis.PokevaultTrainerContacts = {
+    getOwnCard() {
+      return { for_trade: [] };
+    },
+    tradeSummary() {
+      return {
+        availableFrom: ["Misty"],
+        wantedBy: ["Brock"],
+        matchCount: 1,
+        canHelpCount: 1,
+      };
+    },
+  };
+  const collection = globalThis.window.PokedexCollection;
+  const pokemon = {
+    slug: "0001-bulbasaur",
+    number: "0001",
+    names: { fr: "Bulbizarre" },
+    image: "",
+    types: ["Plante"],
+    region: "kanto",
+  };
+
+  collection.setStatus("0001-bulbasaur", "caught", false);
+  const caughtCard = collection.createPokemonCard(pokemon);
+  assert.equal(findByClass(caughtCard, "pokemon-network-badge"), null);
+
+  collection.setStatus("0001-bulbasaur", "not_met", false);
+  const missingCard = collection.createPokemonCard(pokemon);
+  const badge = findByClass(missingCard, "pokemon-network-badge");
+  assert.equal(badge.textContent, "Vu chez 1");
+  assert.equal(String(badge.className).includes("is-match"), false);
+  assert.match(missingCard["aria-label"], /vu chez 1 contact/);
+  assert.doesNotMatch(missingCard["aria-label"], /match/);
+});
+
+test("pokemon cards suppress Vu chez for local duplicates even when raw progress is missing", async () => {
+  await loadModule();
+  globalThis.document.createElement = (tagName) => new FakeElement(tagName);
+  globalThis.PokevaultPokemonFiche = {
+    ownershipLabel(ownership) {
+      return ownership.duplicate ? "Double" : "";
+    },
+    ownershipStateFromSources(slug, options = {}) {
+      const key = String(slug || "").trim();
+      const status = options.status || { state: "not_met" };
+      const forTrade = Array.isArray(options.ownCard?.for_trade) ? options.ownCard.for_trade : [];
+      const duplicate = forTrade.includes(key);
+      return { caught: duplicate || status.state === "caught", duplicate };
+    },
+    createOwnershipActions() {
+      return null;
+    },
+  };
+  globalThis.PokevaultTrainerContacts = {
+    getOwnCard() {
+      return { for_trade: ["0001-bulbasaur"] };
+    },
+    tradeSummary() {
+      return {
+        availableFrom: ["Misty"],
+        wantedBy: [],
+        matchCount: 0,
+        canHelpCount: 0,
+      };
+    },
+  };
+  const collection = globalThis.window.PokedexCollection;
+  const storage = new Map();
+  globalThis.localStorage = {
+    getItem(key) {
+      return storage.get(key) || null;
+    },
+    setItem(key, value) {
+      storage.set(key, String(value));
+    },
+  };
+  collection.setDimMode("missing");
+  collection.setStatus("0001-bulbasaur", "not_met", false);
+  const card = collection.createPokemonCard({
+    slug: "0001-bulbasaur",
+    number: "0001",
+    names: { fr: "Bulbizarre" },
+    image: "",
+    types: ["Plante"],
+    region: "kanto",
+  });
+
+  assert.equal(findByClass(card, "pokemon-network-badge"), null);
+  assert.equal(String(card.className).includes("is-seen"), false);
+  assert.equal(String(card.className).includes("is-duplicate"), true);
+  assert.equal(String(card.className).includes("is-dimmed"), false);
+  assert.doesNotMatch(card["aria-label"], /vu chez/);
+  assert.equal(card.dataset.ownership, "Double");
 });

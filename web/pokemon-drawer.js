@@ -44,9 +44,7 @@
   let artworkSubscribed = false;
   const FALLBACK_I18N = {
     "pokemon_drawer.name_and": "et",
-    "pokemon_drawer.exchange.match": "Match possible avec {names}.",
     "pokemon_drawer.exchange.seen": "Vu chez {names}.",
-    "pokemon_drawer.exchange.wanted_by": "{names} cherche ce Pokémon.",
     "pokemon_drawer.delete": "Supprimer",
     "pokemon_drawer.delete_aria": "Supprimer la carte {card}",
     "pokemon_drawer.deleted": "Carte retirée.",
@@ -295,23 +293,12 @@
 
   function buildExchangeContext(slug) {
     const summary = tradeSummary(slug);
-    if (!summary.availableFrom.length && !summary.wantedBy.length) return null;
+    if (!summary.availableFrom.length) return null;
     const box = document.createElement("div");
     box.className = "pokemon-exchange-context";
-    if (summary.matchCount > 0) {
-      const line = document.createElement("p");
-      line.textContent = t("pokemon_drawer.exchange.match", { names: formatNameList(summary.availableFrom) });
-      box.append(line);
-    } else if (summary.availableFrom.length > 0) {
-      const line = document.createElement("p");
-      line.textContent = t("pokemon_drawer.exchange.seen", { names: formatNameList(summary.availableFrom) });
-      box.append(line);
-    }
-    if (summary.canHelpCount > 0) {
-      const line = document.createElement("p");
-      line.textContent = t("pokemon_drawer.exchange.wanted_by", { names: formatNameList(summary.wantedBy) });
-      box.append(line);
-    }
+    const line = document.createElement("p");
+    line.textContent = t("pokemon_drawer.exchange.seen", { names: formatNameList(summary.availableFrom) });
+    box.append(line);
     return box;
   }
 
@@ -825,8 +812,10 @@
       legacy.textContent = t("pokemon_drawer.legacy_seen");
       section.append(legacy);
     }
-    const exchange = buildExchangeContext(slug);
-    if (exchange) section.append(exchange);
+    if (!ownership.caught) {
+      const exchange = buildExchangeContext(slug);
+      if (exchange) section.append(exchange);
+    }
 
     return section;
   }
@@ -1107,6 +1096,8 @@
   if (window.__POKEVAULT_DRAWER_TESTS__) {
     drawerApi._test = {
       applyTcgCardToForm,
+      buildExchangeContext,
+      buildStatusSection,
       buildCardsSection,
       payloadFromFormData,
     };

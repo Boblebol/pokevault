@@ -64,7 +64,7 @@ async function loadModule() {
   return trainerApi;
 }
 
-test("normalizeBook keeps own card and contacts keyed by trainer id", async () => {
+test("normalizeBook keeps own card and contacts keyed by trainer id while ignoring legacy wants", async () => {
   const api = await loadModule();
   const book = api.normalizeBook({
     own_card: { trainer_id: "trainer-me", display_name: "Me", updated_at: "2026-04-30T10:00:00+00:00" },
@@ -86,10 +86,10 @@ test("normalizeBook keeps own card and contacts keyed by trainer id", async () =
 
   assert.equal(book.own_card.display_name, "Me");
   assert.deepEqual(Object.keys(book.contacts), ["alex"]);
-  assert.equal(book.contacts.alex.card.wants[0], "0025-pikachu");
+  assert.equal(Object.hasOwn(book.contacts.alex.card, "wants"), false);
 });
 
-test("cardFromForm trims optional lists and contact link values", async () => {
+test("cardFromForm exports duplicate list and ignores legacy wishlist values", async () => {
   const api = await loadModule();
   const card = api.cardFromForm({
     trainer_id: "trainer-123",
@@ -106,7 +106,8 @@ test("cardFromForm trims optional lists and contact link values", async () => {
 
   assert.equal(card.display_name, "Alex");
   assert.equal(card.favorite_pokemon_slug, "0025-pikachu");
-  assert.deepEqual(card.wants, ["0001-bulbasaur", "0004-charmander"]);
+  assert.equal(Object.hasOwn(card, "wants"), false);
+  assert.equal(Object.hasOwn(card, "badges"), false);
   assert.deepEqual(card.for_trade, ["0007-squirtle"]);
   assert.equal(card.contact_links[0].value, "alex#0001");
 });
@@ -131,7 +132,7 @@ test("cardFromForm keeps multiple shareable contact links", async () => {
   ]);
 });
 
-test("cardFromForm includes unlocked badges from the badge catalog", async () => {
+test("cardFromForm does not include unlocked badges from the badge catalog", async () => {
   const api = await loadModule();
   globalThis.PokevaultBadges = {
     state: {
@@ -148,15 +149,12 @@ test("cardFromForm includes unlocked badges from the badge catalog", async () =>
     display_name: "Alex",
   });
 
-  assert.deepEqual(card.badges, [
-    { id: "kanto_brock", title: "Badge Roche" },
-    { id: "kanto_misty", title: "Badge Cascade" },
-  ]);
+  assert.equal(Object.hasOwn(card, "badges"), false);
 
   delete globalThis.PokevaultBadges;
 });
 
-test("normalizeCard keeps compact shared badges and ignores invalid entries", async () => {
+test("normalizeCard ignores legacy shared badges", async () => {
   const api = await loadModule();
   const card = api.normalizeCard({
     trainer_id: "trainer-123",
@@ -170,13 +168,10 @@ test("normalizeCard keeps compact shared badges and ignores invalid entries", as
     updated_at: "2026-04-30T10:00:00+00:00",
   });
 
-  assert.deepEqual(card.badges, [
-    { id: "kanto_brock", title: "Badge Roche" },
-    { id: "kanto_misty", title: "Badge Cascade" },
-  ]);
+  assert.equal(Object.hasOwn(card, "badges"), false);
 });
 
-test("filterContacts matches local book fields and keeps display-name order", async () => {
+test("filterContacts matches active local fields and ignores legacy wants and badges", async () => {
   const api = await loadModule();
   const contacts = {
     misty: {
@@ -189,6 +184,7 @@ test("filterContacts matches local book fields and keeps display-name order", as
         contact_links: [{ kind: "discord", label: "Discord", value: "misty#0001" }],
         wants: ["0054-psyduck"],
         for_trade: ["0118-goldeen"],
+        badges: [{ id: "water", title: "Cascade" }],
         updated_at: "2026-04-30T10:00:00+00:00",
       },
       private_note: "met at local league",
@@ -218,16 +214,18 @@ test("filterContacts matches local book fields and keeps display-name order", as
     ["Brock", "Misty"],
   );
   assert.deepEqual(
-    api.filterContacts(contacts, "psyduck").map((contact) => contact.card.display_name),
+    api.filterContacts(contacts, "goldeen").map((contact) => contact.card.display_name),
     ["Misty"],
   );
+  assert.deepEqual(api.filterContacts(contacts, "psyduck"), []);
+  assert.deepEqual(api.filterContacts(contacts, "Cascade"), []);
   assert.deepEqual(
     api.filterContacts(contacts, "local league").map((contact) => contact.card.display_name),
     ["Misty"],
   );
 });
 
-test("renderContact exposes trade lists, private note controls, and delete action", async () => {
+test("renderContact exposes duplicate trade lists, private note controls, and delete action", async () => {
   const api = await loadModule();
   const article = api.renderContact({
     card: {
@@ -246,8 +244,8 @@ test("renderContact exposes trade lists, private note controls, and delete actio
     last_received_at: "2026-04-30T11:00:00+00:00",
   });
 
-  assert.match(article.innerHTML, /Cherche/);
-  assert.match(article.innerHTML, /0054-psyduck/);
+  assert.doesNotMatch(article.innerHTML, /Cherche/);
+  assert.doesNotMatch(article.innerHTML, /0054-psyduck/);
   assert.match(article.innerHTML, /Echange/);
   assert.match(article.innerHTML, /0118-goldeen/);
   assert.match(article.innerHTML, /data-trainer-note-form/);
@@ -278,7 +276,7 @@ test("renderContact exposes social contact links as clickable actions", async ()
   assert.match(article.innerHTML, /href="tel:\+33612345678"/);
 });
 
-test("renderContact exposes shared trainer badges", async () => {
+test("renderContact ignores legacy shared trainer badges", async () => {
   const api = await loadModule();
   const article = api.renderContact({
     card: {
@@ -297,12 +295,12 @@ test("renderContact exposes shared trainer badges", async () => {
     last_received_at: "2026-04-30T11:00:00+00:00",
   });
 
-  assert.match(article.innerHTML, /Badges/);
-  assert.match(article.innerHTML, /Badge Roche/);
-  assert.match(article.innerHTML, /Badge Cascade/);
+  assert.doesNotMatch(article.innerHTML, /Badges/);
+  assert.doesNotMatch(article.innerHTML, /Badge Roche/);
+  assert.doesNotMatch(article.innerHTML, /Badge Cascade/);
 });
 
-test("renderContact prefers badge catalog labels for shared trainer badges", async () => {
+test("renderContact does not consult badge catalog labels for legacy trainer badges", async () => {
   const api = await loadModule();
   globalThis.PokevaultBadges = {
     labelForId(id) {
@@ -329,32 +327,10 @@ test("renderContact prefers badge catalog labels for shared trainer badges", asy
     last_received_at: "2026-04-30T11:00:00+00:00",
   });
 
-  assert.match(article.innerHTML, /Boulder Badge/);
+  assert.doesNotMatch(article.innerHTML, /Boulder Badge/);
   assert.doesNotMatch(article.innerHTML, /Badge Roche/);
-  assert.match(article.innerHTML, /Badge Cascade/);
+  assert.doesNotMatch(article.innerHTML, /Badge Cascade/);
 
-  delete globalThis.PokevaultBadges;
-});
-
-test("subscribeBadgeCatalog refreshes Trainer Card badge labels", async () => {
-  const api = await loadModule();
-  const root = new FakeElement("div");
-  let subscribed = false;
-  globalThis.document.getElementById = (id) => (
-    id === "trainerContactsRoot" ? root : null
-  );
-  globalThis.PokevaultBadges = {
-    subscribe(fn) {
-      subscribed = true;
-      fn();
-      return () => {};
-    },
-  };
-
-  api.subscribeBadgeCatalog();
-
-  assert.equal(subscribed, true);
-  assert.equal(root.children.length, 2);
   delete globalThis.PokevaultBadges;
 });
 
@@ -363,7 +339,6 @@ test("renderContact follows English i18n labels when available", async () => {
   globalThis.PokevaultI18n = {
     t(key) {
       return {
-        "trainers.want": "Wants",
         "trainers.trade": "For trade",
         "trainers.delete": "Delete",
         "trainers.local_card": "Local Trainer Card",
@@ -391,7 +366,7 @@ test("renderContact follows English i18n labels when available", async () => {
     last_received_at: "2026-04-30T11:00:00+00:00",
   });
 
-  assert.match(article.innerHTML, /Wants/);
+  assert.doesNotMatch(article.innerHTML, /Wants/);
   assert.match(article.innerHTML, /For trade/);
   assert.match(article.innerHTML, /Received update/);
   assert.doesNotMatch(article.innerHTML, /Cherche/);
@@ -468,7 +443,7 @@ test("validateTrainerCard accepts a complete local card", async () => {
   assert.equal(api.validateTrainerCard(card), "");
 });
 
-test("updateCardListMembership toggles wants and trades without duplicates", async () => {
+test("updateCardListMembership toggles duplicate trades and ignores legacy wants", async () => {
   const api = await loadModule();
   const card = api.normalizeCard({
     trainer_id: "trainer-123",
@@ -479,10 +454,10 @@ test("updateCardListMembership toggles wants and trades without duplicates", asy
   });
 
   const wanted = api.updateCardListMembership(card, "wants", "0001-bulbasaur", true);
-  assert.deepEqual(wanted.wants, ["0001-bulbasaur"]);
+  assert.equal(Object.hasOwn(wanted, "wants"), false);
 
   const removed = api.updateCardListMembership(wanted, "wants", "0001-bulbasaur", false);
-  assert.deepEqual(removed.wants, []);
+  assert.equal(removed, wanted);
 
   const traded = api.updateCardListMembership(removed, "for_trade", "0007-squirtle", true);
   assert.deepEqual(traded.for_trade, ["0004-charmander", "0007-squirtle"]);
@@ -494,6 +469,8 @@ test("defaultOwnCard creates a valid local card for low-friction chips", async (
 
   assert.equal(card.trainer_id, "trainer-generated");
   assert.equal(card.display_name, "Dresseur local");
+  assert.equal(Object.hasOwn(card, "wants"), false);
+  assert.equal(Object.hasOwn(card, "badges"), false);
   assert.equal(api.validateTrainerCard(card), "");
 });
 
@@ -534,11 +511,11 @@ test("contactsTrading and tradeSummary find imported exchange opportunities", as
   });
 
   assert.deepEqual(api.contactsTrading(book, "0130-gyarados").map((c) => c.card.display_name), ["Misty"]);
-  assert.deepEqual(api.contactsWanting(book, "0001-bulbasaur").map((c) => c.card.display_name), ["Misty"]);
+  assert.deepEqual(api.contactsWanting(book, "0001-bulbasaur"), []);
   assert.deepEqual(api.tradeSummary(book, "0130-gyarados"), {
     availableFrom: ["Misty"],
     wantedBy: [],
-    matchCount: 1,
+    matchCount: 0,
     canHelpCount: 0,
   });
 });

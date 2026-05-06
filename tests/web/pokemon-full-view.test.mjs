@@ -251,7 +251,7 @@ test("renderInto lays out the B1 fiche sections before secondary cards", async (
   assert.equal(root.children.at(-2).children.at(-1).className, "pokemon-note-editor");
 });
 
-test("renderInto shows trade-oriented ownership actions and exchange context", async () => {
+test("renderInto shows trade-oriented ownership actions without exchange context for caught Pokemon", async () => {
   const root = new FakeElement("div");
   const api = await loadModules(root);
 
@@ -272,8 +272,7 @@ test("renderInto shows trade-oriented ownership actions and exchange context", a
   assert.equal(buttons[1].dataset.active, "true");
 
   const exchange = statusSection.children.find((child) => child.className === "pokemon-exchange-context");
-  assert.equal(exchange.children[0].textContent, "Match possible avec Misty.");
-  assert.equal(exchange.children[1].textContent, "Brock cherche ce Pokémon.");
+  assert.equal(exchange, undefined);
 
   buttons[2].events.click({
     preventDefault() {},
@@ -283,6 +282,20 @@ test("renderInto shows trade-oriented ownership actions and exchange context", a
     slug: "0001-bulbasaur",
     state: "release_one",
   });
+});
+
+test("renderInto shows exchange context for missing Pokemon available from contacts", async () => {
+  const root = new FakeElement("div");
+  const api = await loadModules(root);
+  globalThis.PokedexCollection.getStatus = () => ({ state: "not_met", shiny: false });
+  globalThis.PokedexCollection.ownershipStateForSlug = () => ({ caught: false, duplicate: false });
+
+  api.renderInto(root, "0001-bulbasaur");
+
+  const statusSection = root.children.find((child) => child.dataset?.section === "pokedex_status");
+  const exchange = statusSection.children.find((child) => child.className === "pokemon-exchange-context");
+  assert.equal(exchange.children.length, 1);
+  assert.equal(exchange.children[0].textContent, "Vu chez Misty.");
 });
 
 test("renderInto ownership helper source does not receive wanted state", async () => {
