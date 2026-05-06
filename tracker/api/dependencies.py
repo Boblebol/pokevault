@@ -10,24 +10,20 @@ from tracker.config import TrackerSettings, get_settings
 from tracker.repository.base import (
     BinderConfigRepository,
     BinderPlacementsRepository,
-    CardRepository,
     ProgressRepository,
     TrainerContactRepository,
 )
 from tracker.repository.json_binder_config_repository import JsonBinderConfigRepository
 from tracker.repository.json_binder_placements_repository import JsonBinderPlacementsRepository
-from tracker.repository.json_card_repository import JsonCardRepository
 from tracker.repository.json_progress_repository import JsonProgressRepository
 from tracker.repository.json_trainer_contact_repository import JsonTrainerContactRepository
 from tracker.services.badge_service import BadgeService
 from tracker.services.binder_config_service import BinderConfigService
 from tracker.services.binder_placements_service import BinderPlacementsService
 from tracker.services.binder_workspace_service import BinderWorkspaceService
-from tracker.services.card_service import CardService
 from tracker.services.export_service import ExportService
 from tracker.services.profile_service import ProfileService
 from tracker.services.progress_service import ProgressService
-from tracker.services.tcg_catalog_service import TcgCatalogService
 from tracker.services.trainer_contact_service import TrainerContactService
 
 
@@ -89,13 +85,6 @@ def get_binder_workspace_service(
     return BinderWorkspaceService(cfg_repo, pl_repo)
 
 
-def get_card_repository(
-    settings: Annotated[TrackerSettings, Depends(get_settings)],
-    profiles: Annotated[ProfileService, Depends(get_profile_service)],
-) -> CardRepository:
-    return JsonCardRepository(profiles.cards_path())
-
-
 def get_trainer_contact_repository(
     settings: Annotated[TrackerSettings, Depends(get_settings)],
     profiles: Annotated[ProfileService, Depends(get_profile_service)],
@@ -109,27 +98,10 @@ def get_trainer_contact_service(
     return TrainerContactService(repository)
 
 
-def get_card_service(
-    repository: Annotated[CardRepository, Depends(get_card_repository)],
-    progress_service: Annotated[ProgressService, Depends(get_progress_service)],
-) -> CardService:
-    return CardService(repository, progress_service)
-
-
-def get_tcg_catalog_service(
-    settings: Annotated[TrackerSettings, Depends(get_settings)],
-) -> TcgCatalogService:
-    return TcgCatalogService(
-        base_url=settings.tcg_api_base_url,
-        api_key=settings.tcg_api_key,
-    )
-
-
 def get_badge_service(
     progress_repo: Annotated[ProgressRepository, Depends(get_progress_repository)],
-    card_repo: Annotated[CardRepository, Depends(get_card_repository)],
 ) -> BadgeService:
-    return BadgeService(progress_repo, card_repo)
+    return BadgeService(progress_repo)
 
 
 def get_export_service(
@@ -140,12 +112,10 @@ def get_export_service(
         BinderPlacementsRepository,
         Depends(get_binder_placements_repository),
     ],
-    card_repo: Annotated[CardRepository, Depends(get_card_repository)],
 ) -> ExportService:
     return ExportService(
         progress_repo,
         config_repo,
         placements_repo,
-        card_repo,
         settings.pokedex_path,
     )

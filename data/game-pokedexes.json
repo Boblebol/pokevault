@@ -1,0 +1,212 @@
+{
+  "version": 1,
+  "description_fr": "Référence compacte des Pokédex de jeux principaux et des premières apparitions utiles à la fiche Pokémon.",
+  "description_en": "Compact reference for mainline game Pokedexes and starter appearances used by the Pokemon modal.",
+  "pokedexes": [
+    {
+      "id": "rb-kanto",
+      "generation": 1,
+      "region": "Kanto",
+      "games": ["Rouge", "Bleu"],
+      "label_fr": "Pokédex de Kanto - Rouge/Bleu",
+      "label_en": "Kanto Pokédex - Red/Blue"
+    },
+    {
+      "id": "yellow-kanto",
+      "generation": 1,
+      "region": "Kanto",
+      "games": ["Jaune"],
+      "label_fr": "Pokédex de Kanto - Jaune",
+      "label_en": "Kanto Pokédex - Yellow"
+    },
+    {
+      "id": "gsc-johto",
+      "generation": 2,
+      "region": "Johto",
+      "games": ["Or", "Argent", "Cristal"],
+      "label_fr": "Pokédex de Johto - Or/Argent/Cristal",
+      "label_en": "Johto Pokédex - Gold/Silver/Crystal"
+    },
+    {
+      "id": "rs-hoenn",
+      "generation": 3,
+      "region": "Hoenn",
+      "games": ["Rubis", "Saphir"],
+      "label_fr": "Pokédex de Hoenn - Rubis/Saphir",
+      "label_en": "Hoenn Pokédex - Ruby/Sapphire"
+    },
+    {
+      "id": "frlg-kanto",
+      "generation": 3,
+      "region": "Kanto",
+      "games": ["Rouge Feu", "Vert Feuille"],
+      "label_fr": "Pokédex de Kanto - Rouge Feu/Vert Feuille",
+      "label_en": "Kanto Pokédex - FireRed/LeafGreen"
+    },
+    {
+      "id": "dp-sinnoh",
+      "generation": 4,
+      "region": "Sinnoh",
+      "games": ["Diamant", "Perle"],
+      "label_fr": "Pokédex de Sinnoh - Diamant/Perle",
+      "label_en": "Sinnoh Pokédex - Diamond/Pearl"
+    },
+    {
+      "id": "hgss-johto",
+      "generation": 4,
+      "region": "Johto",
+      "games": ["HeartGold", "SoulSilver"],
+      "label_fr": "Pokédex de Johto - HeartGold/SoulSilver",
+      "label_en": "Johto Pokédex - HeartGold/SoulSilver"
+    },
+    {
+      "id": "bw-unova",
+      "generation": 5,
+      "region": "Unys",
+      "games": ["Noir", "Blanc"],
+      "label_fr": "Pokédex d'Unys - Noir/Blanc",
+      "label_en": "Unova Pokédex - Black/White"
+    },
+    {
+      "id": "b2w2-unova",
+      "generation": 5,
+      "region": "Unys",
+      "games": ["Noir 2", "Blanc 2"],
+      "label_fr": "Pokédex d'Unys - Noir 2/Blanc 2",
+      "label_en": "Unova Pokédex - Black 2/White 2"
+    },
+    {
+      "id": "xy-kalos-central",
+      "generation": 6,
+      "region": "Kalos",
+      "games": ["X", "Y"],
+      "label_fr": "Pokédex de Kalos Centre - X/Y",
+      "label_en": "Central Kalos Pokédex - X/Y"
+    },
+    {
+      "id": "xy-kalos-coastal",
+      "generation": 6,
+      "region": "Kalos",
+      "games": ["X", "Y"],
+      "label_fr": "Pokédex de Kalos Côtes - X/Y",
+      "label_en": "Coastal Kalos Pokédex - X/Y"
+    },
+    {
+      "id": "xy-kalos-mountain",
+      "generation": 6,
+      "region": "Kalos",
+      "games": ["X", "Y"],
+      "label_fr": "Pokédex de Kalos Monts - X/Y",
+      "label_en": "Mountain Kalos Pokédex - X/Y"
+    },
+    {
+      "id": "oras-hoenn",
+      "generation": 6,
+      "region": "Hoenn",
+      "games": ["Rubis Oméga", "Saphir Alpha"],
+      "label_fr": "Pokédex de Hoenn - Rubis Oméga/Saphir Alpha",
+      "label_en": "Hoenn Pokédex - Omega Ruby/Alpha Sapphire"
+    },
+    {
+      "id": "sm-alola",
+      "generation": 7,
+      "region": "Alola",
+      "games": ["Soleil", "Lune"],
+      "label_fr": "Pokédex d'Alola - Soleil/Lune",
+      "label_en": "Alola Pokédex - Sun/Moon"
+    },
+    {
+      "id": "usum-alola",
+      "generation": 7,
+      "region": "Alola",
+      "games": ["Ultra-Soleil", "Ultra-Lune"],
+      "label_fr": "Pokédex d'Alola - Ultra-Soleil/Ultra-Lune",
+      "label_en": "Alola Pokédex - Ultra Sun/Ultra Moon"
+    },
+    {
+      "id": "lgpe-kanto",
+      "generation": 7,
+      "region": "Kanto",
+      "games": ["Let's Go, Pikachu", "Let's Go, Évoli"],
+      "label_fr": "Pokédex de Kanto - Let's Go",
+      "label_en": "Kanto Pokédex - Let's Go"
+    },
+    {
+      "id": "swsh-galar",
+      "generation": 8,
+      "region": "Galar",
+      "games": ["Épée", "Bouclier"],
+      "label_fr": "Pokédex de Galar - Épée/Bouclier",
+      "label_en": "Galar Pokédex - Sword/Shield"
+    },
+    {
+      "id": "bdsp-sinnoh",
+      "generation": 8,
+      "region": "Sinnoh",
+      "games": ["Diamant Étincelant", "Perle Scintillante"],
+      "label_fr": "Pokédex de Sinnoh - Diamant Étincelant/Perle Scintillante",
+      "label_en": "Sinnoh Pokédex - Brilliant Diamond/Shining Pearl"
+    },
+    {
+      "id": "pla-hisui",
+      "generation": 8,
+      "region": "Hisui",
+      "games": ["Légendes Pokémon : Arceus"],
+      "label_fr": "Pokédex de Hisui - Légendes Pokémon : Arceus",
+      "label_en": "Hisui Pokédex - Pokémon Legends: Arceus"
+    },
+    {
+      "id": "sv-paldea",
+      "generation": 9,
+      "region": "Paldea",
+      "games": ["Écarlate", "Violet"],
+      "label_fr": "Pokédex de Paldea - Écarlate/Violet",
+      "label_en": "Paldea Pokédex - Scarlet/Violet"
+    },
+    {
+      "id": "sv-kitakami",
+      "generation": 9,
+      "region": "Septentria",
+      "games": ["Le trésor enfoui de la Zone Zéro : Le Masque Turquoise"],
+      "label_fr": "Pokédex de Septentria - Le Masque Turquoise",
+      "label_en": "Kitakami Pokédex - The Teal Mask"
+    },
+    {
+      "id": "sv-blueberry",
+      "generation": 9,
+      "region": "Institut Myrtille",
+      "games": ["Le trésor enfoui de la Zone Zéro : Le Disque Indigo"],
+      "label_fr": "Pokédex Myrtille - Le Disque Indigo",
+      "label_en": "Blueberry Pokédex - The Indigo Disk"
+    }
+  ],
+  "appearances_by_slug": {
+    "0001-bulbasaur": ["rb-kanto", "yellow-kanto", "frlg-kanto", "xy-kalos-central", "lgpe-kanto", "sv-blueberry"],
+    "0004-charmander": ["rb-kanto", "yellow-kanto", "frlg-kanto", "xy-kalos-central", "lgpe-kanto", "sv-blueberry"],
+    "0007-squirtle": ["rb-kanto", "yellow-kanto", "frlg-kanto", "xy-kalos-central", "lgpe-kanto", "sv-blueberry"],
+    "0152-chikorita": ["gsc-johto", "hgss-johto", "sv-blueberry"],
+    "0155-cyndaquil": ["gsc-johto", "hgss-johto", "pla-hisui", "sv-blueberry"],
+    "0158-totodile": ["gsc-johto", "hgss-johto", "sv-blueberry"],
+    "0252-treecko": ["rs-hoenn", "oras-hoenn", "sv-blueberry"],
+    "0255-torchic": ["rs-hoenn", "oras-hoenn", "sv-blueberry"],
+    "0258-mudkip": ["rs-hoenn", "oras-hoenn", "sv-blueberry"],
+    "0387-turtwig": ["dp-sinnoh", "bdsp-sinnoh", "pla-hisui", "sv-blueberry"],
+    "0390-chimchar": ["dp-sinnoh", "bdsp-sinnoh", "pla-hisui", "sv-blueberry"],
+    "0393-piplup": ["dp-sinnoh", "bdsp-sinnoh", "pla-hisui", "sv-blueberry"],
+    "0495-snivy": ["bw-unova", "b2w2-unova", "sv-blueberry"],
+    "0498-tepig": ["bw-unova", "b2w2-unova", "sv-blueberry"],
+    "0501-oshawott": ["bw-unova", "b2w2-unova", "pla-hisui", "sv-blueberry"],
+    "0650-chespin": ["xy-kalos-central", "sv-blueberry"],
+    "0653-fennekin": ["xy-kalos-central", "sv-blueberry"],
+    "0656-froakie": ["xy-kalos-central", "sv-blueberry"],
+    "0722-rowlet": ["sm-alola", "usum-alola", "pla-hisui", "sv-blueberry"],
+    "0725-litten": ["sm-alola", "usum-alola", "sv-blueberry"],
+    "0728-popplio": ["sm-alola", "usum-alola", "sv-blueberry"],
+    "0810-grookey": ["swsh-galar", "sv-blueberry"],
+    "0813-scorbunny": ["swsh-galar", "sv-blueberry"],
+    "0816-sobble": ["swsh-galar", "sv-blueberry"],
+    "0906-sprigatito": ["sv-paldea"],
+    "0909-fuecoco": ["sv-paldea"],
+    "0912-quaxly": ["sv-paldea"]
+  }
+}

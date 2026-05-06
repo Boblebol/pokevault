@@ -9,8 +9,7 @@
  *   - ``subscribe(fn)``    — subscribe to state changes.
  *
  * The first poll is ``silent`` so opening the app does not replay
- * historical unlocks; subsequent polls (triggered by progress /
- * cards mutations) surface any newly-due badges.
+ * historical unlocks; subsequent progress changes surface newly-due badges.
  */
 (function initBadges() {
   "use strict";
@@ -30,7 +29,6 @@
     "badges.filter.unlocked": "Obtenus",
     "badges.filter.locked": "Scelles",
     "badges.category.milestone": "Paliers",
-    "badges.category.card": "Cartes",
     "badges.category.gym": "Arenes",
     "badges.category.elite_four": "Conseil 4",
     "badges.category.champion": "Maitres",
@@ -62,7 +60,6 @@
     category: [
       ["all", "badges.filter.all"],
       ["milestone", "badges.category.milestone"],
-      ["card", "badges.category.card"],
       ["gym", "badges.category.gym"],
       ["elite_four", "badges.category.elite_four"],
       ["champion", "badges.category.champion"],
@@ -661,9 +658,6 @@
     start._called = true;
     void poll({ silent: true });
     window.PokedexCollection?.subscribeCaught?.(() => {
-      void poll();
-    });
-    document.addEventListener("pokevault:cards-changed", () => {
       void poll();
     });
   }

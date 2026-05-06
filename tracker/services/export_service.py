@@ -9,18 +9,10 @@ from pathlib import Path
 from typing import Any
 
 from tracker.binder_models import BinderConfigPayload, BinderPlacementsPayload
-from tracker.models import (
-    Card,
-    CardList,
-    CollectionProgress,
-    ExportPayload,
-    ImportPayload,
-    ImportResponse,
-)
+from tracker.models import CollectionProgress, ExportPayload, ImportPayload, ImportResponse
 from tracker.repository.base import (
     BinderConfigRepository,
     BinderPlacementsRepository,
-    CardRepository,
     ProgressRepository,
 )
 from tracker.services.badge_service import BADGES
@@ -34,42 +26,35 @@ class ExportService:
         progress_repo: ProgressRepository,
         config_repo: BinderConfigRepository,
         placements_repo: BinderPlacementsRepository,
-        card_repo: CardRepository | None = None,
         pokedex_path: Path | None = None,
     ) -> None:
         self._progress = progress_repo
         self._config = config_repo
         self._placements = placements_repo
-        self._cards = card_repo
         self._pokedex_path = pokedex_path
 
     def export_all(self) -> ExportPayload:
         cfg = self._config.load()
         progress = self._sanitize_progress_badges(self._progress.load())
         placements = self._placements.load()
-        cards = self._cards.load() if self._cards is not None else CardList()
         allowed = self._allowed_slug_scope(cfg)
         if allowed is not None:
             progress = self._sanitize_progress(progress, allowed)
             placements = self._sanitize_placements(placements, allowed)
-            cards = self._sanitize_cards(cards, allowed)
         return ExportPayload(
             exported_at=datetime.now(UTC).isoformat(),
             progress=progress,
             binder_config=cfg,
             binder_placements=placements,
-            cards=list(cards.cards),
         )
 
     def import_all(self, payload: ImportPayload) -> ImportResponse:
         allowed = self._allowed_slug_scope(payload.binder_config)
         progress_in = payload.progress
         placements_in = payload.binder_placements
-        cards_in = CardList(cards=list(payload.cards))
         if allowed is not None:
             progress_in = self._sanitize_progress(progress_in, allowed)
             placements_in = self._sanitize_placements(placements_in, allowed)
-            cards_in = self._sanitize_cards(cards_in, allowed)
 
         progress = CollectionProgress(
             caught=progress_in.caught,
@@ -91,15 +76,9 @@ class ExportService:
         )
         self._placements.save(placements)
 
-        card_count = 0
-        if self._cards is not None:
-            self._cards.save(cards_in)
-            card_count = len(cards_in.cards)
-
         return ImportResponse(
             caught_count=len(progress.caught),
             binder_count=len(config.binders),
-            card_count=card_count,
         )
 
     def _load_pokedex_rows(self) -> list[dict[str, Any]]:
@@ -314,11 +293,6 @@ class ExportService:
             notes=filtered_notes,
             badges_unlocked=ExportService._sanitize_badge_unlocks(progress.badges_unlocked),
         )
-
-    @staticmethod
-    def _sanitize_cards(cards: CardList, allowed: set[str]) -> CardList:
-        kept: list[Card] = [c for c in cards.cards if c.pokemon_slug in allowed]
-        return CardList(cards=kept)
 
     @staticmethod
     def _sanitize_placements(

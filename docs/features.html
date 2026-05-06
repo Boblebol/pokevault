@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Features - Pokevault</title>
-    <meta name="description" content="Explore Pokevault features for Pokedex tracking, cards, binders, stats, badges, profiles, print and export.">
+    <meta name="description" content="Explore Pokevault features for Pokedex tracking, binders, stats, badges, Trainer Cards, profiles, print and export.">
     <link rel="stylesheet" href="assets/site.css">
     <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
     <script src="assets/i18n.js" defer></script>
@@ -35,37 +35,36 @@
           <p class="eyebrow" data-i18n="features.hero.kicker">Product surface</p>
           <h1 data-i18n="features.hero.title">Features</h1>
           <p data-i18n="features.hero.text">
-            Pokevault is built around the Pokedex, then layers physical cards,
-            binders, local Trainer Cards, badges and local-first data
-            workflows on top. App documentation also lives inside the local app
-            at #/docs.
+            Pokevault is built around the Pokedex, then layers binders, local
+            Trainer Cards, badges and local-first data workflows on top. App
+            documentation also lives inside the local app at #/docs.
           </p>
         </div>
         <div class="grid grid-3">
           <article class="feature"><h3 data-i18n="features.collection.title">Collection workspace</h3><p data-i18n="features.collection.text">Browse the National Pokedex with region chips, narrative tags, fuzzy search, keyboard shortcuts and compact Caught, Double, Release 1 and Release actions backed by local progress JSON.</p></article>
-          <article class="feature"><h3 data-i18n="features.fiches.title">Pokemon fiches</h3><p data-i18n="features.fiches.text">Open a drawer or full page for identity, artwork, Caught/Double/Release 1/Release actions, linked forms, personal notes, type matchups and owned cards.</p></article>
-          <article class="feature"><h3 data-i18n="features.cards.title">Physical card catalog</h3><p data-i18n="features.cards.text">Attach set, number, variant, language, condition, quantity, notes and image URLs to a Pokemon, with public Pokemon TCG API search for metadata prefill.</p></article>
+          <article class="feature"><h3 data-i18n="features.fiches.title">Pokemon modal</h3><p data-i18n="features.fiches.text">Open one modal for identity, artwork, Caught/Double/Release 1/Release actions, linked forms, personal notes, type matchups and game Pokedex appearances from data/game-pokedexes.json.</p></article>
+          <article class="feature"><h3 data-i18n="features.cards.title">Game Pokedex appearances</h3><p data-i18n="features.cards.text">See which regional game Pokedex definitions reference a Pokemon, starting from a compact local data file that can grow without adding new user state.</p></article>
           <article class="feature"><h3 data-i18n="features.binders.title">Physical binder planner</h3><p data-i18n="features.binders.text">Create local binders with a 3×3 · 10 sheets default, custom grids through Binders > Edit format, generation sprites from Settings > Images / sprites, compact family rows such as Spoink / Grumpig / Spinda, regional splits such as Kanto 1 and Kanto 2, and printable Small binder cards from Print > Group by > Small binder cards while waiting for real cards.</p></article>
           <article class="feature"><h3 data-i18n="features.trainers.title">Trainer Cards</h3><p data-i18n="features.trainers.text">Create a local card with optional Instagram, Facebook or phone contact links, export it as a file, import received Dresseurs and keep a searchable local contact book with Double and Vu chez context, without accounts or server sync.</p></article>
           <article class="feature"><h3 data-i18n="features.badges.title">Badges</h3><p data-i18n="features.badges.text">Unlock badges as you capture Pokemon and keep the gallery in Stats, without active missions or forced focus.</p></article>
-          <article class="feature"><h3 data-i18n="features.stats.title">Badges and stats</h3><p data-i18n="features.stats.text">Track global, regional, type, card and badge progress, including Souvenirs de Kanto badges for Rouge/Bleu champions d'arene, Conseil 4 and rival teams, plus Or/Argent badges for Johto, Kanto post-game, Peter and Silver. The badge gallery keeps sealed badges until unlock with Pokemon requirement previews. The base-version nostalgia catalog continues sans remakes with Rubis/Saphir, Diamant/Perle, Noir/Blanc, Noir 2/Blanc 2, X/Y, Soleil/Lune, Epee/Bouclier and Ecarlate/Violet.</p></article>
-          <article class="feature"><h3 data-i18n="features.data.title">Profiles and local-first data</h3><p data-i18n="features.data.text">Maintain separate local Pokedex profiles for main, casual, shiny-only or other workflows, then export or import the full local collection state as versioned JSON.</p></article>
+          <article class="feature"><h3 data-i18n="features.stats.title">Badges and stats</h3><p data-i18n="features.stats.text">Track global, regional, type and badge progress, including Souvenirs de Kanto badges for Rouge/Bleu champions d'arene, Conseil 4 and rival teams, plus Or/Argent badges for Johto, Kanto post-game, Peter and Silver. The badge gallery keeps sealed badges until unlock with Pokemon requirement previews. The base-version nostalgia catalog continues sans remakes with Rubis/Saphir, Diamant/Perle, Noir/Blanc, Noir 2/Blanc 2, X/Y, Soleil/Lune, Epee/Bouclier and Ecarlate/Violet.</p></article>
+          <article class="feature"><h3 data-i18n="features.data.title">Profiles and local-first data</h3><p data-i18n="features.data.text">Maintain separate local Pokedex profiles for main, casual, living dex or other workflows, then export or import the full local collection state as versioned JSON.</p></article>
           <article class="feature"><h3 data-i18n="features.print.title">Print view</h3><p data-i18n="features.print.text">Generate printable binder, regional or pocket A5 checklists from the same collection and binder data used by the app.</p></article>
           <article class="feature"><h3 data-i18n="features.tour.title">Product tour</h3><p data-i18n="features.tour.text">Start with a compact five-step tour that explains Caught, Double, Release 1, Release, Dresseurs, manual imports and local files before asking for region and tracking density.</p></article>
           <article class="feature"><h3 data-i18n="features.docs.title">App documentation</h3><p data-i18n="features.docs.text">Open #/docs in the local app for a complete bilingual product guide to setup, workflows, local files, Trainer Cards, badges, shortcuts and API endpoints.</p></article>
-          <article class="feature"><h3 data-i18n="features.api.title">Local REST API</h3><p data-i18n="features.api.text">Use the local FastAPI surface for progress, cards, badges, profiles, trainers, binders, export and import integrations.</p></article>
+          <article class="feature"><h3 data-i18n="features.api.title">Local REST API</h3><p data-i18n="features.api.text">Use the local FastAPI surface for progress, badges, profiles, trainers, binders, export and import integrations, plus static game Pokedex reference data.</p></article>
         </div>
       </section>
 
       <section class="section">
         <div class="section-head">
           <p class="eyebrow" data-i18n="features.stance.kicker">Pokedex-first stance</p>
-          <h2 data-i18n="features.stance.title">Cards enrich Pokemon entries; they do not replace them.</h2>
+          <h2 data-i18n="features.stance.title">Pokemon entries stay centered on capture.</h2>
           <p data-i18n="features.stance.text">
-            Version 1.4.0 keeps completion workflows first: dashboard,
-            capture, duplicates, filters and Pokemon fiches all prioritize Pokedex
-            state before card inventory. Marketplace pricing, public wishlists
-            and hosted accounts remain outside the active scope.
+            Version 1.4.0 keeps completion workflows first: dashboard, capture,
+            duplicates, filters and Pokemon fiches all prioritize Pokedex state.
+            Marketplace pricing, public wishlists and hosted accounts remain
+            outside the active scope.
           </p>
         </div>
         <div class="actions">

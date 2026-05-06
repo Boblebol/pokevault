@@ -340,11 +340,11 @@ def test_in_app_docs_cover_complete_product_workflows_in_both_languages() -> Non
 
     for text in [
         "data/collection-progress.json",
-        "data/collection-cards.json",
+        "data/game-pokedexes.json",
         "data/binder-config.json",
         "data/trainer-contacts.json",
         "/api/progress",
-        "/api/cards",
+        "/data/game-pokedexes.json",
         "/api/trainers",
         "/api/export",
         "/api/import",
@@ -352,6 +352,17 @@ def test_in_app_docs_cover_complete_product_workflows_in_both_languages() -> Non
         "EN:",
     ]:
         assert text in i18n
+
+
+def test_docs_describe_single_modal_and_game_pokedex_appearances() -> None:
+    web_i18n = (WEB / "i18n.js").read_text(encoding="utf-8")
+    index = (WEB / "index.html").read_text(encoding="utf-8")
+    readme = (ROOT / "README.md").read_text(encoding="utf-8")
+    features = (DOCS / "features.html").read_text(encoding="utf-8")
+
+    for text in [web_i18n, index, readme, features]:
+        assert "modal" in text.lower()
+        assert "game-pokedexes.json" in text or "game Pokedex" in text or "Pokédex des jeux" in text
 
 
 def test_public_features_page_has_bilingual_product_copy() -> None:

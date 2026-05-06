@@ -55,11 +55,6 @@
                 <div class="list-hero-right">
                   <span id="listHeroPct" class="list-hero-pct">0%</span>
                   <p id="listHeroCount" class="list-hero-count">0 / 0 découverts</p>
-                  <p
-                    id="listHeroCards"
-                    class="list-hero-cards is-dormant"
-                    aria-live="polite"
-                  >0 carte dans 0 set</p>
                 </div>
               </div>
 
@@ -394,9 +389,9 @@
             <p class="docs-kicker" data-i18n="app.docs.kicker">Documentation intégrée</p>
             <h2 data-i18n="app.docs.hero.title">Tout garder en local, tout comprendre vite.</h2>
             <p data-i18n="app.docs.hero.text">
-              Pokevault suit ton Pokédex, tes cartes physiques, tes classeurs et
-              tes échanges Dresseur avec des fichiers JSON lisibles sur ta
-              machine. Cette page résume les workflows actifs de la version 1.4.0.
+              Pokevault suit ton Pokédex, tes classeurs et tes échanges Dresseur
+              avec des fichiers JSON lisibles sur ta machine. Cette page résume
+              les workflows actifs de la version 1.4.0.
             </p>
           </section>
 
@@ -414,8 +409,8 @@
             <article class="docs-card">
               <h2 data-i18n="app.docs.concepts.title">Concepts principaux</h2>
               <ul class="docs-list">
-                <li data-i18n="app.docs.concepts.pokedex">Pokédex-first: les cartes physiques enrichissent chaque Pokémon, elles ne remplacent pas la progression Pokédex.</li>
-                <li data-i18n="app.docs.concepts.local">Local-first: progression, cartes, profils, contacts et classeurs restent dans des fichiers JSON lisibles.</li>
+                <li data-i18n="app.docs.concepts.pokedex">Pokédex-first: chaque action part de la capture, des doubles et des manquants implicites.</li>
+                <li data-i18n="app.docs.concepts.local">Local-first: progression, profils, contacts et classeurs restent dans des fichiers JSON lisibles.</li>
                 <li data-i18n="app.docs.concepts.trade">Échanges manuels: les Cartes Dresseur sont exportées et importées par fichier, sans synchronisation serveur.</li>
               </ul>
             </article>
@@ -427,17 +422,17 @@
                 <li data-i18n="app.docs.collection.caught">`Capturé` confirme la progression Pokédex et alimente les stats, badges et classeurs.</li>
                 <li data-i18n="app.docs.collection.double">`Double` indique ce que tu peux proposer à un autre Dresseur.</li>
                 <li data-i18n="app.docs.collection.filters">Régions, formes, types, tags narratifs et recherche floue partagent le même état filtré.</li>
-                <li data-i18n="app.docs.collection.context">`Vu chez` vient des doubles partagés par les cartes reçues; il n'écrase jamais ta progression locale.</li>
+                <li data-i18n="app.docs.collection.context">`Vu chez` vient des doubles partagés par les Cartes Dresseur reçues; il n'écrase jamais ta progression locale.</li>
               </ul>
             </article>
 
             <article class="docs-card">
-              <h2 data-i18n="app.docs.fiches_cards.title">Fiches Pokémon et cartes</h2>
+              <h2 data-i18n="app.docs.fiches_cards.title">Fiches Pokémon</h2>
               <ul class="docs-list">
-                <li data-i18n="app.docs.fiches_cards.drawer">Le bouton `Fiche & cartes` ouvre le drawer avec statut, formes liées, notes et cartes.</li>
-                <li data-i18n="app.docs.fiches_cards.full">La fiche complète ajoute l'artwork, les types, les faiblesses/résistances et les cartes repliées.</li>
-                <li data-i18n="app.docs.fiches_cards.card_fields">Chaque carte peut stocker set, numéro, variante, langue, état, quantité, image et note.</li>
-                <li data-i18n="app.docs.fiches_cards.tcg">La recherche TCG préremplit les métadonnées depuis l'API publique Pokémon TCG.</li>
+                <li data-i18n="app.docs.fiches_cards.drawer">Le bouton `Fiche` ouvre la même modale depuis la liste, le clavier ou un ancien lien `#/pokemon/...`.</li>
+                <li data-i18n="app.docs.fiches_cards.full">La modale regroupe statut, formes liées, notes, types, faiblesses et résistances.</li>
+                <li data-i18n="app.docs.fiches_cards.card_fields">Les apparitions dans les Pokédex des jeux viennent de `data/game-pokedexes.json`.</li>
+                <li data-i18n="app.docs.fiches_cards.game_pokedexes">Le catalogue de cartes Pokémon est retiré; la fiche reste centrée sur le Pokédex.</li>
               </ul>
             </article>
 
@@ -474,9 +469,9 @@
             <article class="docs-card">
               <h2 data-i18n="app.docs.data_files.title">Fichiers de données</h2>
               <ul class="docs-list">
-                <li data-i18n="app.docs.data_files.reference">Référence versionnée: `data/pokedex.json`, `data/narrative-tags.json`, `data/evolution-families.json`.</li>
+                <li data-i18n="app.docs.data_files.reference">Référence versionnée: `data/pokedex.json`, `data/narrative-tags.json`, `data/evolution-families.json`, `data/game-pokedexes.json`.</li>
                 <li data-i18n="app.docs.data_files.progress">Progression: `data/collection-progress.json`.</li>
-                <li data-i18n="app.docs.data_files.cards">Cartes: `data/collection-cards.json`.</li>
+                <li data-i18n="app.docs.data_files.cards">Pokédex des jeux: `data/game-pokedexes.json`.</li>
                 <li data-i18n="app.docs.data_files.binders">Classeurs: `data/binder-config.json`, `data/binder-placements.json`.</li>
                 <li data-i18n="app.docs.data_files.trainers">Dresseurs: `data/trainer-contacts.json`.</li>
               </ul>
@@ -486,7 +481,7 @@
               <h2 data-i18n="app.docs.profiles_backup.title">Profils et sauvegardes</h2>
               <ul class="docs-list">
                 <li data-i18n="app.docs.profiles_backup.default">Le profil `default` utilise les fichiers historiques sous `data/`.</li>
-                <li data-i18n="app.docs.profiles_backup.extra">Les autres profils vivent sous `data/profiles/<id>/...` avec leur propre progression, cartes et classeurs.</li>
+                <li data-i18n="app.docs.profiles_backup.extra">Les autres profils vivent sous `data/profiles/<id>/...` avec leur propre progression et leurs classeurs.</li>
                 <li data-i18n="app.docs.profiles_backup.export">`Réglages` exporte une sauvegarde complète versionnée.</li>
                 <li data-i18n="app.docs.profiles_backup.import">L'import remplace l'état local après confirmation; les Cartes Dresseur restent un échange séparé.</li>
               </ul>
@@ -497,7 +492,7 @@
               <ul class="docs-list docs-list--columns">
                 <li data-i18n="app.docs.api.health">`/api/health`: version et état de l'API.</li>
                 <li data-i18n="app.docs.api.progress">`/api/progress`: progression, statuts, notes.</li>
-                <li data-i18n="app.docs.api.cards">`/api/cards`: cartes physiques par Pokémon.</li>
+                <li data-i18n="app.docs.api.cards">`/data/game-pokedexes.json`: définitions des Pokédex de jeux.</li>
                 <li data-i18n="app.docs.api.badges">`/api/badges`: catalogue et badges débloqués.</li>
                 <li data-i18n="app.docs.api.profiles">`/api/profiles`: profils locaux.</li>
                 <li data-i18n="app.docs.api.trainers">`/api/trainers`: Cartes Dresseur et contacts reçus.</li>
@@ -605,8 +600,8 @@
           <div class="stats-kpi-card">
             <h2 class="stats-kpi-label" data-i18n="app.settings.multi_profiles">Pokédex multi-profils</h2>
             <p class="stats-kpi-sub" data-i18n="app.settings.multi_profiles_help">
-              Chaque profil garde sa propre progression, ses cartes et ses
-              classeurs (par ex. « Hardcore », « Casual », « Shiny only »).
+              Chaque profil garde sa propre progression et ses classeurs (par
+              ex. « Hardcore », « Casual », « Living dex »).
             </p>
             <label class="region-filter-wrap settings-dim-label theme-choice-row">
               <span class="region-filter-label" data-i18n="app.settings.active_profile">Profil actif</span>
@@ -779,7 +774,7 @@
           <h3 class="onboarding__step-title" data-i18n="app.onboarding.step4.title">Simple ou avancé ?</h3>
           <p class="onboarding__lede" data-i18n="app.onboarding.step4.lede">
             Simple garde la liste concentrée sur Capturé, Double et Relâcher.
-            Avancé rend les formes, notes, Dresseurs et cartes plus visibles.
+            Avancé rend les formes, notes et Dresseurs plus visibles.
           </p>
           <div class="onboarding__choices" role="radiogroup" aria-label="Mode de suivi Pokédex" data-i18n-aria-label="app.onboarding.mode">
             <label class="onboarding__choice">
@@ -790,12 +785,12 @@
             <label class="onboarding__choice">
               <input type="radio" name="onboardingTrackingMode" value="advanced" />
               <span class="onboarding__choice-title" data-i18n="app.onboarding.advanced">Avancé</span>
-              <span class="onboarding__choice-sub" data-i18n="app.onboarding.advanced_sub">Formes spéciales, notes, Dresseurs, TCG et cartes plus accessibles.</span>
+              <span class="onboarding__choice-sub" data-i18n="app.onboarding.advanced_sub">Formes spéciales, notes et Dresseurs plus accessibles.</span>
             </label>
           </div>
           <p class="onboarding__hint" data-i18n="app.onboarding.hint">
-            Les cartes TCG restent un add-on : la fiche garde statut, formes et
-            notes en premier, puis replie les cartes longues.
+            La fiche garde statut, formes, notes et apparitions dans les
+            Pokédex des jeux au même endroit.
           </p>
         </section>
 
@@ -839,7 +834,7 @@
           <li><kbd>j</kbd> / <kbd>k</kbd><span data-i18n="app.shortcuts.next">Pokémon suivant / précédent</span></li>
           <li><kbd>c</kbd><span data-i18n="app.shortcuts.caught">Marque Capturé, ou retire Capturé si déjà actif</span></li>
           <li><kbd>Shift</kbd>+<kbd>C</kbd><span data-i18n="app.shortcuts.double">Marque Double, ou repasse à Capturé</span></li>
-          <li><kbd>i</kbd><span data-i18n="app.shortcuts.open">Ouvre la fiche complète (drawer « Mes cartes »)</span></li>
+          <li><kbd>i</kbd><span data-i18n="app.shortcuts.open">Ouvre la fiche Pokémon</span></li>
           <li><kbd>?</kbd><span data-i18n="app.shortcuts.help">Ouvre cette aide</span></li>
         </ul>
         <p class="kb-help__hint" data-i18n="app.shortcuts.hint">
@@ -850,29 +845,29 @@
     </dialog>
 
     <div
-      id="pokemonDrawer"
-      class="drawer"
+      id="pokemonModal"
+      class="pokemon-modal"
       role="dialog"
       aria-modal="true"
-      aria-labelledby="pokemonDrawerTitle"
+      aria-labelledby="pokemonModalTitle"
       hidden
     >
-      <div class="drawer__scrim" aria-hidden="true"></div>
-      <aside class="drawer__panel" tabindex="-1">
-        <header class="drawer__topbar">
-          <span class="drawer__kicker" data-i18n="app.drawer.kicker">Fiche Pokédex</span>
+      <div class="pokemon-modal__scrim" aria-hidden="true"></div>
+      <aside class="pokemon-modal__panel" tabindex="-1">
+        <header class="pokemon-modal__topbar">
+          <span class="pokemon-modal__kicker" id="pokemonModalTitle" data-i18n="app.drawer.kicker">Fiche Pokédex</span>
           <button
             type="button"
-            class="drawer__close"
-            id="pokemonDrawerClose"
+            class="pokemon-modal__close"
+            id="pokemonModalClose"
             aria-label="Fermer la fiche"
             data-i18n-aria-label="app.drawer.close"
           >×</button>
         </header>
-        <div class="drawer__content" id="pokemonDrawerContent"></div>
+        <div class="pokemon-modal__content" id="pokemonModalContent"></div>
         <p
-          class="drawer__status-message"
-          id="pokemonDrawerStatus"
+          class="pokemon-modal__status-message"
+          id="pokemonModalStatus"
           aria-live="polite"
         ></p>
       </aside>
@@ -889,8 +884,7 @@
     <script src="/onboarding.js" defer></script>
     <script src="/type-chart.js" defer></script>
     <script src="/pokemon-fiche.js" defer></script>
-    <script src="/pokemon-drawer.js" defer></script>
-    <script src="/pokemon-full-view.js" defer></script>
+    <script src="/pokemon-modal.js" defer></script>
     <script src="/binder-layout-engine.js" defer></script>
     <script src="/binder-v2.js" defer></script>
     <script src="/pokedex-filters.js" defer></script>

@@ -107,7 +107,6 @@ def test_delete_switches_active_to_default(tmp_path: Path) -> None:
 def test_paths_for_default_use_data_root(tmp_path: Path) -> None:
     svc = _make(tmp_path)
     assert svc.progress_path() == tmp_path / "collection-progress.json"
-    assert svc.cards_path() == tmp_path / "collection-cards.json"
     assert svc.binder_config_path() == tmp_path / "binder-config.json"
     assert svc.binder_placements_path() == tmp_path / "binder-placements.json"
     assert svc.trainer_contacts_path() == tmp_path / "trainer-contacts.json"
@@ -118,7 +117,6 @@ def test_paths_for_custom_profile_are_scoped(tmp_path: Path) -> None:
     p = svc.create(ProfileCreate(name="Shiny Hunt"))
     base = tmp_path / PROFILE_SUBDIR / p.id
     assert svc.progress_path(p.id) == base / "collection-progress.json"
-    assert svc.cards_path(p.id) == base / "collection-cards.json"
     assert svc.binder_config_path(p.id) == base / "binder-config.json"
     assert svc.binder_placements_path(p.id) == base / "binder-placements.json"
     assert svc.trainer_contacts_path(p.id) == base / "trainer-contacts.json"

@@ -43,11 +43,9 @@ class ProgressService:
         key = body.slug.strip()
         if body.caught:
             prev = statuses.get(key)
-            shiny = bool(prev.shiny) if prev else False
             seen_at = prev.seen_at if prev else _now_iso()
             statuses[key] = PokemonStatusEntry(
                 state="caught",
-                shiny=shiny,
                 seen_at=seen_at,
             )
         else:
@@ -60,35 +58,6 @@ class ProgressService:
         self._repository.save(to_store)
         return ProgressSaveResponse(ok=True, saved=_count_caught(statuses))
 
-    def ensure_caught(self, slug: str) -> bool:
-        """F09 — promote a slug to ``caught`` if it was not already.
-
-        Returns ``True`` when the progress file has been mutated, ``False``
-        when the slug was already caught (idempotent). Shiny flag is left
-        untouched when the entry already exists.
-        """
-        key = slug.strip()
-        if not key:
-            return False
-        current = self._repository.load()
-        prev = current.statuses.get(key)
-        if prev and prev.state == "caught":
-            return False
-        statuses = dict(current.statuses)
-        statuses[key] = PokemonStatusEntry(
-            state="caught",
-            shiny=bool(prev.shiny) if prev else False,
-            seen_at=prev.seen_at if prev and prev.seen_at else _now_iso(),
-        )
-        self._repository.save(
-            CollectionProgress(
-                statuses=statuses,
-                notes=current.notes,
-                badges_unlocked=current.badges_unlocked,
-            )
-        )
-        return True
-
     def patch_status(self, body: ProgressStatusPatch) -> ProgressSaveResponse:
         current = self._repository.load()
         statuses = dict(current.statuses)
@@ -98,10 +67,8 @@ class ProgressService:
         else:
             prev = statuses.get(key)
             seen_at = prev.seen_at if prev and prev.seen_at else _now_iso()
-            shiny = body.shiny if body.state == "caught" else False
             statuses[key] = PokemonStatusEntry(
                 state=body.state,
-                shiny=shiny,
                 seen_at=seen_at,
             )
         to_store = CollectionProgress(

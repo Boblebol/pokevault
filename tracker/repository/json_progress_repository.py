@@ -13,7 +13,7 @@ class JsonProgressRepository:
 
     Le fichier peut contenir :
     - ``caught`` : dict[str, bool] (schéma legacy, d'avant F03) ;
-    - ``statuses`` : dict[str, {state, shiny, seen_at}] (schéma F03).
+    - ``statuses`` : dict[str, {state, seen_at}] (legacy shiny is ignored).
 
     Au chargement, le format legacy est migré en vol vers
     ``statuses``. À la sauvegarde, ``caught`` est toujours recalculé
@@ -98,12 +98,10 @@ def _load_statuses(raw: object) -> dict[str, PokemonStatusEntry]:
         state = entry.get("state")
         if state not in ("seen", "caught"):
             continue
-        shiny = bool(entry.get("shiny", False)) if state == "caught" else False
         seen_at = entry.get("seen_at")
         seen_at_str = seen_at if isinstance(seen_at, str) else None
         out[slug] = PokemonStatusEntry(
             state=state,
-            shiny=shiny,
             seen_at=seen_at_str,
         )
     return out

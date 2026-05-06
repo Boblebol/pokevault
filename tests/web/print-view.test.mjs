@@ -223,7 +223,7 @@ test("print artwork default mode ignores the global artwork resolver", async () 
   });
 });
 
-test("print artwork shiny mode builds a local and CDN fallback chain", async () => {
+test("print artwork rejects removed shiny mode and keeps default artwork", async () => {
   const api = await loadModule();
   globalThis.PokevaultArtwork = {
     mode: "default",
@@ -236,11 +236,8 @@ test("print artwork shiny mode builds a local and CDN fallback chain", async () 
   const resolved = api.resolvePrintArtwork(bulbasaur());
 
   assert.deepEqual(resolved, {
-    src: "/data/images_shiny/0001-bulbasaur.png",
-    fallbacks: [
-      "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/shiny/1.png",
-      "/data/images/0001-bulbasaur.png",
-    ],
+    src: "/data/images/0001-bulbasaur.png",
+    fallbacks: [],
   });
 });
 
@@ -282,41 +279,13 @@ test("placeholder card omits image when artwork resolution has no source", async
   assert.equal(card.children.some((child) => child.tagName === "IMG"), false);
 });
 
-test("print card artwork mode uses real artwork-switcher card thumbnails without changing global mode", async () => {
-  globalThis.window = globalThis;
-  globalThis.document = createFakeDocument();
-  const storage = new Map();
-  globalThis.localStorage = {
-    getItem(key) {
-      return storage.get(key) || null;
-    },
-    setItem(key, value) {
-      storage.set(key, String(value));
-    },
-    removeItem(key) {
-      storage.delete(key);
-    },
-  };
-  globalThis.fetch = async (url) => {
-    assert.equal(url, "/api/cards");
-    return {
-      ok: true,
-      async json() {
-        return { cards: [{ pokemon_slug: "0001-bulbasaur", image_url: "/cards/bulba.png" }] };
-      },
-    };
-  };
-
-  importCase += 1;
-  await import(`../../web/artwork-switcher.js?case=${Date.now()}-${importCase}`);
-  await globalThis.PokevaultArtwork.refreshCards();
-  globalThis.PokevaultArtwork.setMode("default");
-
-  const api = await loadModule({ resetArtwork: false });
+test("print artwork rejects removed card mode and keeps default artwork", async () => {
+  const api = await loadModule();
   api.setPrintArtworkMode("card");
   const resolved = api.resolvePrintArtwork(bulbasaur());
 
-  assert.equal(globalThis.PokevaultArtwork.mode, "default");
-  assert.equal(resolved.src, "/cards/bulba.png");
-  assert.deepEqual(resolved.fallbacks, ["/data/images/0001-bulbasaur.png"]);
+  assert.deepEqual(resolved, {
+    src: "/data/images/0001-bulbasaur.png",
+    fallbacks: [],
+  });
 });

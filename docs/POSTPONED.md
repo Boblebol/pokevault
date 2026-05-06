@@ -17,8 +17,8 @@ Statut : repoussé.
 
 Créer une image ou une page de recap partageable peut être utile plus tard, mais
 pas avant que l'application sache produire un bilan réellement intéressant :
-progression régionale, badges, doublons disponibles, cartes cataloguées. Partager un
-pourcentage brut ou une grille vide n'apporte pas assez de valeur.
+progression régionale, badges, doublons disponibles et signaux `Vu chez`.
+Partager un pourcentage brut ou une grille vide n'apporte pas assez de valeur.
 
 ### Profil public, wishlist publique et leaderboard
 
@@ -52,10 +52,11 @@ besoin d'une couche d'objectifs au-delà de la capture et des badges passifs.
 
 Statut : repoussé.
 
-Le modèle de cartes actuel sert à enrichir une entrée Pokédex avec les cartes
-physiques possédées. Les prix, vendeurs, marketplaces et alertes d'achat ajoutent
-des dépendances externes et un coût de maintenance élevé. Ils restent hors scope
-tant que le produit n'a pas besoin de données marchandes.
+Un futur module TCG pourrait enrichir une entrée Pokédex avec des cartes
+physiques possédées, mais ce suivi est volontairement retiré du produit courant.
+Les prix, vendeurs, marketplaces et alertes d'achat ajoutent des dépendances
+externes et un coût de maintenance élevé. Ils restent hors scope tant que le
+produit n'a pas besoin de données marchandes.
 
 ## Données Pokédex
 
@@ -63,10 +64,10 @@ tant que le produit n'a pas besoin de données marchandes.
 
 Statut : repoussé.
 
-La fiche complète affiche déjà l'identité, les types, les faiblesses, les autres
-formes et les cartes possédées. Les descriptions longues demandent une extension
-plus fragile du scraper Poképedia. Elles restent repoussées pour ne pas mettre
-en risque la stabilité du Pokédex de référence.
+La fiche affiche déjà l'identité, les types, les faiblesses, les formes liées,
+les notes locales et les apparitions dans les Pokédex de jeux. Les descriptions
+longues demandent une extension plus fragile du scraper Poképedia. Elles restent
+repoussées pour ne pas mettre en risque la stabilité du Pokédex de référence.
 
 Les chaînes d'évolution sont sorties du backlog repoussé uniquement sous forme
 d'audit et de metadata contrôlée dans
@@ -96,9 +97,9 @@ Statut : repoussé.
 Les repositories JSON écrivent aujourd'hui des fichiers locaux profilés. Un
 suivi dédié doit remplacer les écritures directes par une stratégie temp-file
 plus `replace`, avec un verrou optionnel autour des écritures concurrentes. Le
-ticket devra couvrir au minimum les dépôts de progression, cartes, classeurs,
-profils et contacts dresseurs, puis ajouter des tests de non-corruption en cas
-d'écriture interrompue.
+ticket devra couvrir au minimum les dépôts de progression, classeurs, profils et
+contacts dresseurs, puis ajouter des tests de non-corruption en cas d'écriture
+interrompue.
 
 ### Smoke E2E Playwright
 

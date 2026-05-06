@@ -96,7 +96,7 @@ def test_load_statuses_full(tmp_path: Path) -> None:
     p.write_text(json.dumps(raw), encoding="utf-8")
     out = JsonProgressRepository(p).load()
     assert out.statuses["pikachu"].state == "caught"
-    assert out.statuses["pikachu"].shiny is True
+    assert "shiny" not in out.statuses["pikachu"].model_dump()
     assert out.statuses["pikachu"].seen_at == "2026-01-01T00:00:00Z"
     assert out.statuses["rattata"].state == "seen"
     assert out.caught == {"pikachu": True}
@@ -151,7 +151,7 @@ def test_load_statuses_skips_invalid_entries(tmp_path: Path) -> None:
     assert list(out.statuses.keys()) == ["seen_shiny_ignored"]
     entry = out.statuses["seen_shiny_ignored"]
     assert entry.state == "seen"
-    assert entry.shiny is False
+    assert "shiny" not in entry.model_dump()
     assert entry.seen_at is None
 
 

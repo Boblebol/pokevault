@@ -170,31 +170,29 @@ def test_theme_labels_match_design_language() -> None:
     assert "Google Stitch" not in design
 
 
-def test_pokemon_drawer_uses_theme_tokens() -> None:
+def test_pokemon_modal_uses_theme_tokens() -> None:
     css = STYLES.read_text(encoding="utf-8")
-    panel_blocks = _blocks(r"\.drawer__panel", css)
-    assert panel_blocks, "drawer panel styles missing"
+    panel_blocks = _blocks(r"\.pokemon-modal__panel", css)
+    assert panel_blocks, "modal panel styles missing"
     panel_css = panel_blocks[0]
 
-    assert "background: var(--card);" in panel_css
-    assert "color: var(--text);" in panel_css
+    assert "background: var(--surface);" in panel_css
+    assert "border: 1px solid var(--border);" in panel_css
     assert "--panel" not in panel_css
     assert "--ink" not in panel_css
 
     token_driven_selectors = [
-        ".drawer__topbar",
-        ".drawer__kicker",
-        ".drawer__close",
-        ".drawer-header__img",
-        ".drawer-status-row__btn",
+        ".pokemon-modal__topbar",
+        ".pokemon-modal__kicker",
+        ".pokemon-modal__close",
+        ".pokemon-modal-hero__img",
+        ".pokemon-modal-status-label",
+        ".pokemon-modal-form",
+        ".pokemon-modal-type-badge",
         ".pokemon-fiche-section__toggle",
         ".pokemon-status-action",
         ".pokemon-note-editor__input",
         ".pokemon-note-editor__save",
-        ".fullview-cards-body",
-        ".drawer-card-row",
-        ".drawer-tcg-result",
-        ".drawer-add-form__submit",
     ]
     for selector in token_driven_selectors:
         blocks = _blocks(re.escape(selector), css)
@@ -207,18 +205,17 @@ def test_mobile_fiche_css_prioritizes_primary_content() -> None:
     css = STYLES.read_text(encoding="utf-8")
     mobile = _media_block(css, "(max-width: 720px)")
     small = _media_block(css, "(max-width: 520px)")
-    narrow = _media_block(css, "(max-width: 390px)")
 
-    hero = "\n".join(_blocks(re.escape(".fullview-hero"), mobile))
-    assert "grid-template-columns: minmax(72px, 96px) minmax(0, 1fr);" in hero
-    assert "align-items: center;" in hero
+    modal = "\n".join(_blocks(re.escape(".pokemon-modal"), mobile))
+    assert "padding: 0;" in modal
+    assert "align-items: stretch;" in modal
 
-    hero_img = "\n".join(_blocks(re.escape(".fullview-hero__img"), mobile))
-    assert "max-width: 96px;" in hero_img
-    assert "margin: 0;" in hero_img
+    panel = "\n".join(_blocks(re.escape(".pokemon-modal__panel"), mobile))
+    assert "width: 100%;" in panel
+    assert "max-height: 100dvh;" in panel
 
-    title = "\n".join(_blocks(re.escape(".fullview-hero__title"), mobile))
-    assert "overflow-wrap: anywhere;" in title
+    hero = "\n".join(_blocks(re.escape(".pokemon-modal-matchups"), mobile))
+    assert "grid-template-columns: 1fr;" in hero
 
     actions = "\n".join(_blocks(re.escape(".pokemon-status-actions"), small))
     assert "display: grid;" in actions
@@ -226,16 +223,3 @@ def test_mobile_fiche_css_prioritizes_primary_content() -> None:
 
     action_button = "\n".join(_blocks(re.escape(".pokemon-status-action"), small))
     assert "width: 100%;" in action_button
-
-    forms = "\n".join(_blocks(re.escape(".fullview-forms-grid"), mobile))
-    assert "grid-template-columns: repeat(2, minmax(0, 1fr));" in forms
-
-    form_label = "\n".join(_blocks(re.escape(".fullview-form-tile__label"), mobile))
-    assert "overflow-wrap: anywhere;" in form_label
-
-    cards = "\n".join(_blocks(re.escape(".fullview-cards-body"), mobile))
-    assert "overflow-x: auto;" in cards
-
-    compact_form_image = "\n".join(_blocks(re.escape(".fullview-form-tile img"), narrow))
-    assert "width: 56px;" in compact_form_image
-    assert "height: 56px;" in compact_form_image

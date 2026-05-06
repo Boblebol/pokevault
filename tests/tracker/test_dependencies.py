@@ -11,31 +11,25 @@ from tracker.api.dependencies import (
     get_binder_placements_repository,
     get_binder_placements_service,
     get_binder_workspace_service,
-    get_card_repository,
-    get_card_service,
     get_export_service,
     get_profile_service,
     get_progress_repository,
     get_progress_service,
-    get_tcg_catalog_service,
     get_trainer_contact_repository,
     get_trainer_contact_service,
 )
 from tracker.config import TrackerSettings
 from tracker.repository.json_binder_config_repository import JsonBinderConfigRepository
 from tracker.repository.json_binder_placements_repository import JsonBinderPlacementsRepository
-from tracker.repository.json_card_repository import JsonCardRepository
 from tracker.repository.json_progress_repository import JsonProgressRepository
 from tracker.repository.json_trainer_contact_repository import JsonTrainerContactRepository
 from tracker.services.badge_service import BadgeService
 from tracker.services.binder_config_service import BinderConfigService
 from tracker.services.binder_placements_service import BinderPlacementsService
 from tracker.services.binder_workspace_service import BinderWorkspaceService
-from tracker.services.card_service import CardService
 from tracker.services.export_service import ExportService
 from tracker.services.profile_service import ProfileService
 from tracker.services.progress_service import ProgressService
-from tracker.services.tcg_catalog_service import TcgCatalogService
 from tracker.services.trainer_contact_service import TrainerContactService
 
 
@@ -96,15 +90,11 @@ def test_get_export_service(tmp_path: Path) -> None:
     pl_repo = get_binder_placements_repository(
         settings=settings, profiles=_profiles(settings)
     )
-    card_repo = get_card_repository(
-        settings=settings, profiles=_profiles(settings)
-    )
     svc = get_export_service(
         settings=settings,
         progress_repo=progress_repo,
         config_repo=cfg_repo,
         placements_repo=pl_repo,
-        card_repo=card_repo,
     )
     assert isinstance(svc, ExportService)
 
@@ -117,32 +107,10 @@ def test_get_trainer_contact_repository_and_service(tmp_path: Path) -> None:
     assert isinstance(svc, TrainerContactService)
 
 
-def test_get_card_repository_and_service(tmp_path: Path) -> None:
-    settings = TrackerSettings(repo_root=tmp_path)
-    repo = get_card_repository(settings=settings, profiles=_profiles(settings))
-    assert isinstance(repo, JsonCardRepository)
-    progress_svc = get_progress_service(
-        repository=get_progress_repository(
-            settings=settings, profiles=_profiles(settings)
-        ),
-    )
-    svc = get_card_service(repository=repo, progress_service=progress_svc)
-    assert isinstance(svc, CardService)
-
-
 def test_get_badge_service(tmp_path: Path) -> None:
     settings = TrackerSettings(repo_root=tmp_path)
     progress_repo = get_progress_repository(
         settings=settings, profiles=_profiles(settings)
     )
-    card_repo = get_card_repository(
-        settings=settings, profiles=_profiles(settings)
-    )
-    svc = get_badge_service(progress_repo=progress_repo, card_repo=card_repo)
+    svc = get_badge_service(progress_repo=progress_repo)
     assert isinstance(svc, BadgeService)
-
-
-def test_get_tcg_catalog_service(tmp_path: Path) -> None:
-    settings = TrackerSettings(repo_root=tmp_path)
-    svc = get_tcg_catalog_service(settings=settings)
-    assert isinstance(svc, TcgCatalogService)

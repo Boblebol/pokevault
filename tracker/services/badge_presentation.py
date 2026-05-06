@@ -30,22 +30,9 @@ PREFIX_REGION: dict[str, tuple[str, str, str]] = {
 
 MILESTONE_EN: dict[str, tuple[str, str]] = {
     "first_catch": ("First catch", "Catch your first Pokemon."),
-    "first_shiny": ("First shiny", "Catch your first shiny Pokemon."),
     "century": ("Century", "Catch 100 different Pokemon."),
     "five_hundred": ("Five hundred", "Catch 500 different Pokemon."),
     "thousand": ("Millennium", "Catch 1000 different Pokemon."),
-    "shiny_ten": ("Hunter", "Catch 10 shiny Pokemon."),
-    "shiny_hundred": ("Legendary hunter", "Catch 100 shiny Pokemon."),
-}
-
-CARD_EN: dict[str, tuple[str, str]] = {
-    "first_card": ("First card", "Add your first TCG card to the binder."),
-    "ten_sets": ("Across expansions", "Own cards from 10 different sets."),
-    "hundred_cards": ("TCG century", "Catalog 100 unique cards."),
-    "dedicated_collector": (
-        "Dedicated collector",
-        "Reach 500 cards in stock, counting quantities.",
-    ),
 }
 
 RIVAL_IDS = {
@@ -74,18 +61,6 @@ def presentation_for_badge(
 ) -> BadgePresentation:
     if metric == "team":
         return _team_presentation(badge_id, title, description)
-    if badge_id in CARD_EN:
-        en_title, en_description = CARD_EN[badge_id]
-        return _plain_presentation(
-            "card",
-            "global",
-            "rare",
-            "metal",
-            title,
-            description,
-            en_title,
-            en_description,
-        )
     en_title, en_description = MILESTONE_EN.get(
         badge_id,
         (title, "Advance your Pokedex collection."),

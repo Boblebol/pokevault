@@ -24,7 +24,6 @@ class PokemonStatusEntry(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     state: PokemonState
-    shiny: bool = False
     seen_at: str | None = Field(
         default=None,
         description="ISO-8601 timestamp of the first seen/catch event (optional).",
@@ -72,7 +71,7 @@ class ProgressStatusPatch(BaseModel):
     """Mise à jour enrichie du statut Pokédex (F03).
 
     ``state`` accepte ``not_met`` qui supprime l'entrée côté serveur. Le
-    flag ``shiny`` n'est conservé que lorsque ``state == "caught"``.
+    champ legacy ``shiny`` est accepté et ignoré.
     """
 
     model_config = ConfigDict(extra="forbid")
@@ -106,119 +105,6 @@ class BinderRestPutBody(BaseModel):
     binder: dict[str, Any] = Field(default_factory=dict)
     placements: dict[str, dict[str, Any]] = Field(default_factory=dict)
     form_rule: dict[str, Any] | None = None
-
-
-CardCondition = Literal["mint", "near_mint", "excellent", "good", "played", "poor"]
-"""Known card conditions — UI uses this list to populate the dropdown."""
-
-
-class Card(BaseModel):
-    """Physical TCG card tied to a Pokédex slug (roadmap F08).
-
-    All fields except ``id`` and timestamps are free text; the service
-    layer is responsible for trimming and basic sanity checks. ``id``
-    is a server-generated UUID so clients can POST without one.
-    """
-
-    model_config = ConfigDict(extra="forbid")
-
-    id: str = Field(min_length=1)
-    pokemon_slug: str = Field(min_length=1)
-    set_id: str = ""
-    num: str = ""
-    variant: str = ""
-    lang: str = ""
-    condition: CardCondition = "near_mint"
-    qty: int = Field(default=1, ge=1)
-    acquired_at: str | None = Field(default=None)
-    note: str = ""
-    tcg_api_id: str = Field(
-        default="",
-        description=(
-            "Optional Pokémon TCG API card id used to reconnect local cards "
-            "to catalog metadata."
-        ),
-    )
-    image_url: str = Field(
-        default="",
-        description="F11 — optional scan/preview URL used by the artwork switcher.",
-    )
-    created_at: str
-    updated_at: str
-
-
-class CardCreate(BaseModel):
-    """POST /api/cards — server generates id + timestamps."""
-
-    model_config = ConfigDict(extra="forbid")
-
-    pokemon_slug: str = Field(min_length=1)
-    set_id: str = ""
-    num: str = ""
-    variant: str = ""
-    lang: str = ""
-    condition: CardCondition = "near_mint"
-    qty: int = Field(default=1, ge=1)
-    acquired_at: str | None = Field(default=None)
-    note: str = ""
-    tcg_api_id: str = ""
-    image_url: str = ""
-
-
-class CardUpdate(BaseModel):
-    """PUT /api/cards/{id} — full replacement, id/timestamps preserved."""
-
-    model_config = ConfigDict(extra="forbid")
-
-    pokemon_slug: str = Field(min_length=1)
-    set_id: str = ""
-    num: str = ""
-    variant: str = ""
-    lang: str = ""
-    condition: CardCondition = "near_mint"
-    qty: int = Field(default=1, ge=1)
-    acquired_at: str | None = Field(default=None)
-    note: str = ""
-    tcg_api_id: str = ""
-    image_url: str = ""
-
-
-class CardList(BaseModel):
-    """Persisted shape of ``data/collection-cards.json``."""
-
-    model_config = ConfigDict(extra="forbid")
-
-    version: Literal[1] = 1
-    cards: list[Card] = Field(default_factory=list)
-
-
-class CardDeleteResponse(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-
-    ok: bool = True
-    deleted: int = Field(ge=0)
-
-
-class TcgCardSearchResult(BaseModel):
-    """Compact card metadata returned by the external Pokémon TCG catalog."""
-
-    model_config = ConfigDict(extra="forbid")
-
-    id: str = ""
-    name: str = ""
-    set_id: str = ""
-    set_name: str = ""
-    number: str = ""
-    rarity: str = ""
-    small_image_url: str = ""
-    large_image_url: str = ""
-    tcgplayer_url: str = ""
-
-
-class TcgCardSearchResponse(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-
-    cards: list[TcgCardSearchResult] = Field(default_factory=list)
 
 
 TrainerContactMethod = Literal[
@@ -303,38 +189,41 @@ class DeleteResponse(BaseModel):
 
 
 class ExportPayload(BaseModel):
-    """Full collection export without legacy hunts."""
+    """Full collection export without legacy hunts or removed card catalog data."""
 
     model_config = ConfigDict(extra="forbid")
 
-    schema_version: Literal[4] = 4
+    schema_version: Literal[5] = 5
     app: str = "pokevault"
     exported_at: str
     progress: CollectionProgress
     binder_config: BinderConfigPayload
     binder_placements: BinderPlacementsPayload
-    cards: list[Card] = Field(default_factory=list)
 
 
 class ImportPayload(BaseModel):
-    """Incoming import accepts legacy hunt-bearing backups and ignores hunts."""
+    """Incoming import accepts legacy hunt/card-bearing backups and ignores them."""
 
     model_config = ConfigDict(extra="forbid")
 
-    schema_version: Literal[1, 2, 3, 4]
+    schema_version: Literal[1, 2, 3, 4, 5]
     app: str | None = None
     exported_at: str | None = None
     progress: CollectionProgress
     binder_config: BinderConfigPayload
     binder_placements: BinderPlacementsPayload
-    cards: list[Card] = Field(default_factory=list)
 
     @model_validator(mode="before")
     @classmethod
-    def _drop_legacy_hunts(cls, data):
+    def _drop_legacy_hunts_and_cards(cls, data):
         if isinstance(data, dict) and "hunts" in data:
             cleaned = dict(data)
             cleaned.pop("hunts", None)
+            cleaned.pop("cards", None)
+            return cleaned
+        if isinstance(data, dict) and "cards" in data:
+            cleaned = dict(data)
+            cleaned.pop("cards", None)
             return cleaned
         return data
 
@@ -345,11 +234,10 @@ class ImportResponse(BaseModel):
     ok: bool = True
     caught_count: int = Field(ge=0)
     binder_count: int = Field(ge=0)
-    card_count: int = Field(default=0, ge=0)
 
 
 class Profile(BaseModel):
-    """Roadmap F15 — isolated Pokédex profile (progress + cards + binders)."""
+    """Roadmap F15 — isolated Pokédex profile (progress + binders)."""
 
     model_config = ConfigDict(extra="forbid")
 

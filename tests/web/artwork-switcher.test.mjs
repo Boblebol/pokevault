@@ -16,12 +16,9 @@ function installBrowserStubs() {
     setItem() {},
     removeItem() {},
   };
-  globalThis.fetch = async () => ({
-    ok: true,
-    async json() {
-      return { cards: [] };
-    },
-  });
+  globalThis.fetch = async (url) => {
+    throw new Error(`unexpected fetch ${url}`);
+  };
 }
 
 async function loadModule() {
@@ -37,6 +34,10 @@ async function loadModule() {
 test("artwork switcher exposes generation sprite modes", async () => {
   const api = await loadModule();
 
+  assert.deepEqual(
+    api.modes.map((mode) => mode.id),
+    ["default", "sprite_gen1", "sprite_gen2", "sprite_gen3", "sprite_gen4", "sprite_gen5"],
+  );
   assert.deepEqual(
     api.modes.map((mode) => mode.id).filter((id) => id.startsWith("sprite_gen")),
     ["sprite_gen1", "sprite_gen2", "sprite_gen3", "sprite_gen4", "sprite_gen5"],
