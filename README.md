@@ -187,7 +187,11 @@ User state is local and ignored by Git:
 
 Older installs may still have `data/hunts.json` from the explicit search-list
 workflow. The simplified capture/trade model treats that file as legacy local
-state and omits hunts from new backups.
+state: it is ignored by the active app and omitted from new backups.
+
+Older progress files may also contain removed `first_encounter` badge ids. Those
+ids are cleaned/ignored during active reads and imports; the badge gallery
+remains available for current progressive unlocks and Stats.
 
 ## REST API
 

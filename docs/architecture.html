@@ -75,6 +75,23 @@
           <article class="feature"><h3>Workspace</h3><p><code>/api/binder</code>, <code>/api/profiles</code>, <code>/api/trainers</code>, <code>/api/export</code>, <code>/api/import</code>.</p></article>
         </div>
       </section>
+
+      <section class="section">
+        <div class="section-head">
+          <p class="eyebrow">Legacy local files</p>
+          <h2>Simplified model migration is conservative.</h2>
+          <p>
+            Older installs may still have <code>data/hunts.json</code> from the explicit
+            search-list workflow. It is ignored by the active app and omitted from new backups.
+          </p>
+          <p>
+            Legacy Trainer Card <code>wants</code> and <code>badges</code> fields are tolerated but
+            ignored; only <code>for_trade</code>/<code>Double</code> is shared. Removed
+            <code>first_encounter</code> badge ids are cleaned/ignored while the badge
+            gallery remains available.
+          </p>
+        </div>
+      </section>
     </main>
 
     <footer class="site-footer">

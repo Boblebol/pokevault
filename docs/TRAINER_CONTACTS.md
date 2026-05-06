@@ -34,6 +34,7 @@ Open the `Dresseurs` tab and fill only the public fields you want to share:
 You do not need to describe the full collection. If you only want to say "I can
 trade Leviator", mark that Pokemon as `Double` and leave the rest simple.
 
+Trainer Cards share only `Double` / duplicate `for_trade` entries.
 Trainer Cards do not export a wishlist. Every Pokemon you have not captured is
 already treated as something you still need. Trainer Cards also do not export
 badges; badge progress stays in your local stats and full backups.
@@ -58,9 +59,8 @@ Instagram, Facebook or Téléphone, duplicate trade list, and private notes.
 Private notes are attached to your local contact copy. They are never included
 when you export your own Trainer Card.
 
-Legacy card files that still contain `wants` or `badges` can be accepted for
-compatibility, but those fields are ignored and are not written back by new
-exports.
+Legacy Trainer Card `wants` and `badges` fields are tolerated/ignored for
+compatibility, but those fields are not written back by new exports; only `for_trade`/`Double` is shared.
 
 ## Update a contact
 

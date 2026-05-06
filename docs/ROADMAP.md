@@ -224,7 +224,9 @@ None.
 - Step 2 — Favourite region: National or a specific region for the first list.
 - Step 3 — Tracking mode: simple or advanced, with cards kept as a later add-on.
   Stored in LocalStorage and used to guide the initial collection filters.
-- Unlocks a « Première rencontre » badge at completion (see F12).
+- The old `first_encounter` badge idea is not active. Removed
+  `first_encounter` badge ids are cleaned/ignored by the simplified model while
+  the badge gallery remains.
 
 ### Tech
 - `web/onboarding.js`, bootstrap-triggered when the local onboarding profile is

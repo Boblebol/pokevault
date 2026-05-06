@@ -226,16 +226,20 @@ def test_simplified_trade_state_model_is_documented_publicly() -> None:
     guide_text = (DOCS / "TRAINER_CONTACTS.md").read_text(encoding="utf-8")
     readme = (ROOT / "README.md").read_text(encoding="utf-8")
     features = (DOCS / "features.html").read_text(encoding="utf-8")
+    landing = (DOCS / "index.html").read_text(encoding="utf-8")
     roadmap = (DOCS / "roadmap.html").read_text(encoding="utf-8")
+    i18n = (DOCS / "assets" / "i18n.js").read_text(encoding="utf-8")
 
-    for text in [readme, features, roadmap]:
+    for text in [readme, features, landing, roadmap, i18n]:
         assert "Capturé" in text or "Caught" in text
         assert "Double" in text
+        assert "Relâcher 1" in text or "Release 1" in text
         assert "Relâcher" in text or "Release" in text
         assert "Vu chez" in text
         assert "Match" not in text
     assert "Capturé" in guide_text
     assert "Double" in guide_text
+    assert "Relâcher 1" in guide_text
     assert "Relâcher" in guide_text
     assert "Vu chez" in guide_text
     assert "There is no `Match` state" in guide_text
@@ -246,6 +250,57 @@ def test_simplified_trade_state_model_is_documented_publicly() -> None:
     for text in [guide_text, features]:
         assert "hunts" not in text
     assert "Vu chez" in guide_text
+
+
+def test_removed_active_hunts_missions_and_badge_sharing_copy_is_absent() -> None:
+    active_public_docs = [
+        ROOT / "README.md",
+        DOCS / "TRAINER_CONTACTS.md",
+        DOCS / "features.html",
+        DOCS / "assets" / "i18n.js",
+        DOCS / "index.html",
+        DOCS / "roadmap.html",
+        DOCS / "architecture.html",
+    ]
+    forbidden_active_copy = [
+        "Badge missions",
+        "badge missions",
+        "mission follow",
+        "mission-follow",
+        "follow missions",
+        "follow a mission",
+        "missions to follow",
+        "automatically shared on Trainer Cards",
+        "automatically share unlocked badges",
+        "unlocked badges are shared",
+        "unlocked badges on Trainer Cards",
+        "Trainer Cards share badges",
+        "Trainer Cards export badges",
+    ]
+
+    for path in active_public_docs:
+        text = path.read_text(encoding="utf-8")
+        for forbidden in forbidden_active_copy:
+            assert forbidden not in text, f"{path}: {forbidden}"
+
+
+def test_legacy_simplified_model_migration_notes_are_documented() -> None:
+    guide_text = (DOCS / "TRAINER_CONTACTS.md").read_text(encoding="utf-8")
+    readme = (ROOT / "README.md").read_text(encoding="utf-8")
+    architecture = (DOCS / "architecture.html").read_text(encoding="utf-8")
+
+    assert "Older installs may still have `data/hunts.json`" in readme
+    assert "Older installs may still have" in architecture
+    for text in [readme, architecture]:
+        assert "data/hunts.json" in text
+        assert "ignored by the active app" in text
+        assert "omitted from new backups" in text
+        assert "first_encounter" in text
+        assert "cleaned/ignored" in text
+
+    assert "Legacy Trainer Card `wants` and `badges`" in guide_text
+    assert "tolerated/ignored" in guide_text
+    assert "only `for_trade`/`Double` is shared" in guide_text
 
 
 def test_in_app_documentation_is_documented_publicly() -> None:
