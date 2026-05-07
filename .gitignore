@@ -11,6 +11,7 @@ build/
 .pytest_cache/
 .ruff_cache/
 .coverage
+coverage.xml
 htmlcov/
 
 # Data (generated at runtime or user state)
@@ -35,6 +36,7 @@ Thumbs.db
 .cursor/mcp.json
 .claude/
 .superpowers/
+docs/superpowers/
 .worktrees/
 .idea/
 .vscode/
