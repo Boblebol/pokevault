@@ -579,6 +579,53 @@ test("regional family album keeps regional forms in their form region", async ()
   );
 });
 
+test("regional family album ignores stale binder scope and range fields", async () => {
+  const api = await loadEngine();
+  const ordered = api.orderPokemonForBinder({
+    binder: {
+      id: "grand",
+      organization: "regional_family_album",
+      rows: 2,
+      cols: 2,
+      sheet_count: 2,
+      region_scope: "kanto",
+      region_id: "kanto",
+      range_start: 8,
+      range_limit: 1,
+    },
+    pokemon: [
+      { slug: "0001-bulbasaur", number: "0001", region: "kanto" },
+      { slug: "0152-chikorita", number: "0152", region: "johto" },
+    ],
+    defs: [
+      { id: "kanto", low: 1, high: 151 },
+      { id: "johto", low: 152, high: 251 },
+    ],
+    familyData: {
+      families: [
+        { id: "0001-bulbasaur", layout_rows: [["0001-bulbasaur"]] },
+        { id: "0152-chikorita", layout_rows: [["0152-chikorita"]] },
+      ],
+    },
+  });
+
+  assert.deepEqual(
+    ordered.map((p) => p?.slug || null),
+    [
+      "0001-bulbasaur",
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      "0152-chikorita",
+      null,
+    ],
+  );
+});
+
 test("regional family album drops family rows emptied by regional filtering", async () => {
   const api = await loadEngine();
   const defs = [

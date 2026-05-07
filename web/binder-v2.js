@@ -96,7 +96,7 @@ const BINDER_WIZARD_FALLBACK_I18N = {
   "binder_wizard.summary.new_note": "Les placements restent vides jusqu’à l’UI de rangement. Le périmètre des formes est enregistré dans la config classeur.",
   "binder_wizard.error.config": "Enregistrement config refusé ({status}).",
   "binder_wizard.error.placements": "Config OK mais placements refusés ({status}).",
-  "binder_wizard.error.choose_org": "Choisis une organisation : national ou par région.",
+  "binder_wizard.error.choose_org": "Choisis une organisation de classeur.",
   "binder_wizard.error.choose_format": "Choisis un format de grille (preset ou personnalisé).",
   "binder_wizard.error.choose_forms": "Choisis un périmètre de formes (base, base + région, ou complet).",
   "binder_wizard.error.family_data": "Impossible de charger les familles d'évolution pour calculer le grand classeur.",
@@ -764,9 +764,10 @@ function readFormatSelectionForTest() {
   return readFormatSelectionFromDom();
 }
 
-function applyLargeRingWizardDefaults() {
+function applyLargeRingWizardDefaults(options = {}) {
+  const resetFormScope = options.resetFormScope !== false;
   wizardDraft.organization = ORG_REGIONAL_FAMILY_ALBUM;
-  wizardDraft.formScope = "base_regional";
+  if (resetFormScope) wizardDraft.formScope = "base_regional";
   wizardDraft.formatPreset = "large-ring-3x3";
   wizardDraft.rows = 3;
   wizardDraft.cols = 3;
@@ -801,7 +802,7 @@ function readFormatSelectionFromDom() {
     return true;
   }
   if (key === "large-ring-3x3") {
-    applyLargeRingWizardDefaults();
+    applyLargeRingWizardDefaults({ resetFormScope: false });
     return true;
   }
   if (key === "custom") {
@@ -1297,7 +1298,7 @@ function renderWizardStep() {
           wizardDraft.cols = 2;
           wizardDraft.sheetCount = 10;
         } else if (key === "large-ring-3x3") {
-          applyLargeRingWizardDefaults();
+          applyLargeRingWizardDefaults({ resetFormScope: false });
         } else if (key === "custom") {
           leaveLargeRingOrganizationForStandardFormat();
         }
@@ -1509,6 +1510,15 @@ function autoSheetCountForLargeRing(selectedPokemon, defs, familyData) {
   return minimumSheets + LARGE_RING_MARGIN_SHEETS;
 }
 
+function largeRingLayoutOptions() {
+  return {
+    region_break: "new_sheet",
+    family_compact: true,
+    auto_capacity: true,
+    margin_sheets: LARGE_RING_MARGIN_SHEETS,
+  };
+}
+
 function buildLargeRingBinderWorkspace(draft, defs, pokemon, familyData, seed = Date.now().toString(36)) {
   const scope = normalizeFormScope(draft.formScope || "base_regional");
   const formRule = formRuleFromScope(scope);
@@ -1528,12 +1538,7 @@ function buildLargeRingBinderWorkspace(draft, defs, pokemon, familyData, seed = 
           sheet_count: sheetCount,
           form_rule_id: formRule.id,
           organization: ORG_REGIONAL_FAMILY_ALBUM,
-          layout_options: {
-            region_break: "new_sheet",
-            family_compact: true,
-            auto_capacity: true,
-            margin_sheets: LARGE_RING_MARGIN_SHEETS,
-          },
+          layout_options: largeRingLayoutOptions(),
         },
       ],
       form_rules: [formRule],
@@ -1849,7 +1854,7 @@ function buildPersistEditPayloads(draft, cfg, placementsPayload) {
   form_rules.push(formRule);
   const binders = (cfg.binders || []).map((b) => {
     if (!b || b.id !== binderId) return b;
-    return {
+    const next = {
       ...b,
       name: draft.name,
       cols: layout.cols,
@@ -1858,6 +1863,14 @@ function buildPersistEditPayloads(draft, cfg, placementsPayload) {
       organization: org,
       form_rule_id: formRule.id,
     };
+    if (org === ORG_REGIONAL_FAMILY_ALBUM) {
+      delete next.region_scope;
+      delete next.region_id;
+      delete next.range_start;
+      delete next.range_limit;
+      next.layout_options = largeRingLayoutOptions();
+    }
+    return next;
   });
   const configBody = {
     version: cfg.version ?? 1,

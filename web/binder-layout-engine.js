@@ -299,13 +299,14 @@
 
   function basicItemsForBinder(binder = {}, pokemon = [], defs = [], familyData = null) {
     const layout = normalizedLayout(binder);
-    const scoped = applyBinderScope(pokemon, binder, defs);
+    const regionalAlbum = isRegionalFamilyAlbum(binder);
+    const scoped = regionalAlbum ? pokemon : applyBinderScope(pokemon, binder, defs);
     const org =
       binder.organization === "by_region" || binder.organization === "family"
         ? binder.organization
         : "national";
 
-    if (isRegionalFamilyAlbum(binder)) {
+    if (regionalAlbum) {
       return regionalFamilyAlbumItems(scoped, defs, familyData, layout);
     }
 
@@ -322,7 +323,8 @@
 
   function computeBinderSlots({ binder = {}, pokemon = [], defs = [], familyData = null, includeCapacity = false } = {}) {
     const layout = normalizedLayout(binder);
-    const ranged = applyBinderRange(basicItemsForBinder(binder, pokemon, defs, familyData), binder);
+    const baseItems = basicItemsForBinder(binder, pokemon, defs, familyData);
+    const ranged = isRegionalFamilyAlbum(binder) ? baseItems : applyBinderRange(baseItems, binder);
     const items = includeCapacity ? ranged.slice(0, layout.capacity) : ranged.slice();
     if (includeCapacity) {
       while (items.length < layout.capacity) items.push(capacityItem());

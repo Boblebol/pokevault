@@ -256,7 +256,7 @@ test("wizard exposes large ring option and summary copy", async () => {
   assert.equal(api.readFormatSelectionForTest(), true);
   assert.equal(body.querySelector(".wizard-custom-panel").hidden, true);
   assert.equal(api.getWizardDraftForTest().organization, "regional_family_album");
-  assert.equal(api.getWizardDraftForTest().formScope, "base_regional");
+  assert.equal(api.getWizardDraftForTest().formScope, "full");
   assert.equal(api.getWizardDraftForTest().formatPreset, "large-ring-3x3");
   assert.equal(api.getWizardDraftForTest().rows, 3);
   assert.equal(api.getWizardDraftForTest().cols, 3);
@@ -397,7 +397,11 @@ test("large ring binder edit recomputes sheet count from family layout", async (
         {
           id: "grand",
           name: "Old",
-          organization: "regional_family_album",
+          organization: "national",
+          region_scope: "kanto",
+          region_id: "kanto",
+          range_start: 18,
+          range_limit: 18,
           rows: 3,
           cols: 3,
           sheet_count: 1,
@@ -411,6 +415,16 @@ test("large ring binder edit recomputes sheet count from family layout", async (
 
   assert.equal(result.configBody.binders[0].sheet_count, 12);
   assert.equal(result.configBody.binders[0].organization, "regional_family_album");
+  assert.equal("region_scope" in result.configBody.binders[0], false);
+  assert.equal("region_id" in result.configBody.binders[0], false);
+  assert.equal("range_start" in result.configBody.binders[0], false);
+  assert.equal("range_limit" in result.configBody.binders[0], false);
+  assert.deepEqual(result.configBody.binders[0].layout_options, {
+    region_break: "new_sheet",
+    family_compact: true,
+    auto_capacity: true,
+    margin_sheets: 10,
+  });
 });
 
 test("large ring binder edit rejects missing pokedex data before recomputing capacity", async () => {
