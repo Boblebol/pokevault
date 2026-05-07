@@ -6,6 +6,7 @@ from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
+from tracker.badge_battle_models import BadgeBattleDetail
 from tracker.binder_models import BinderConfigPayload, BinderPlacementsPayload
 
 PokemonState = Literal["seen", "caught"]
@@ -331,6 +332,7 @@ class BadgeDefinition(BaseModel):
     reveal: str = "transparent"
     i18n: dict[str, BadgeLocalizedCopy] = Field(default_factory=dict)
     requirements: list[BadgeRequirementPokemon] = Field(default_factory=list)
+    battle: BadgeBattleDetail | None = None
 
 
 class BadgeState(BaseModel):
