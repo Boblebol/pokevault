@@ -555,14 +555,26 @@ def test_large_ring_binder_mode_is_documented() -> None:
     def assert_large_binder_contract(text: str) -> None:
         normalized = " ".join(text.lower().split())
         assert "grand classeur 3" in normalized or "large 3" in normalized
-        assert "one physical binder" in normalized or "one ring binder" in normalized or "un gros classeur" in normalized
-        assert "region sections" in normalized or "internal region sections" in normalized or "régions" in normalized
+        assert (
+            "one physical binder" in normalized
+            or "one ring binder" in normalized
+            or "un gros classeur" in normalized
+        )
+        assert (
+            "region sections" in normalized
+            or "internal region sections" in normalized
+            or "régions" in normalized
+        )
         assert "3×3 recto-verso" in normalized or "3×3 front/back sheets" in normalized
         assert "recto" in normalized or "sheet front" in normalized
         assert "compact" in normalized
         assert "regional forms" in normalized or "formes régionales" in normalized
         assert "form region" in normalized or "région de leur forme" in normalized
-        assert "auto" in normalized or "calculates capacity" in normalized or "calculated capacity" in normalized
+        assert (
+            "auto" in normalized
+            or "calculates capacity" in normalized
+            or "calculated capacity" in normalized
+        )
         assert "10 spare sheets" in normalized or "10 feuillets libres" in normalized
 
     def docs_i18n_message(locale: str, key: str) -> str:
