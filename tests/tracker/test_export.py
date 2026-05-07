@@ -268,6 +268,32 @@ def test_import_restores_collection(tmp_path: Path) -> None:
     assert "charmander" in exported["binder_placements"]["by_binder"]["kanto"]
 
 
+def test_import_sanitizes_removed_badge_unlocks(tmp_path: Path) -> None:
+    client = _setup(tmp_path)
+    payload = {
+        "schema_version": 4,
+        "progress": {
+            "version": 1,
+            "caught": {},
+            "badges_unlocked": ["first_encounter", "first_catch"],
+        },
+        "binder_config": {
+            "version": 1,
+            "convention": "sheet_recto_verso",
+            "binders": [],
+            "form_rules": [],
+        },
+        "binder_placements": {"version": 1, "by_binder": {}},
+        "cards": [],
+    }
+
+    r = client.post("/api/import", json=payload)
+
+    assert r.status_code == 200
+    exported = client.get("/api/export").json()
+    assert exported["progress"]["badges_unlocked"] == ["first_catch"]
+
+
 def test_import_overwrites_existing(tmp_path: Path) -> None:
     client = _setup(tmp_path)
     client.put("/api/progress", json={"caught": {"old-pokemon": True}})

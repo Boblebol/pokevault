@@ -3,8 +3,6 @@
  */
 
 const STATS_FALLBACK_I18N = {
-  "stats.next_badge": "Prochain badge",
-  "stats.badge": "Badge",
   "stats.rail_caught": "{caught} / {total} attrapés",
   "stats.rail_missing": "{count} manquants",
   "stats.other": "Autre",
@@ -19,8 +17,6 @@ const STATS_FALLBACK_I18N = {
   "stats.kpi.missing": "Manquants",
   "stats.kpi.missing_sub": "Priorité collection",
   "stats.region_archive": "Archive régionale",
-  "stats.collection_gaps": "Lacunes de collection",
-  "stats.gap_line": "{type} · {count} spécimen(s) manquants",
   "stats.objective_title": "Objectif session — {region}",
   "stats.why": "Pourquoi ? {reason}",
   "stats.all_regions": "Toutes régions",
@@ -61,21 +57,6 @@ function filteredPoolForStats() {
   return PC?.allPokemon || [];
 }
 
-function topMissingTypes(pool, caught, limit = 3) {
-  const map = new Map();
-  for (const p of pool) {
-    if (caught[pokemonKeyStats(p)]) continue;
-    for (const t of Array.isArray(p.types) ? p.types : []) {
-      const k = String(t || "").trim();
-      if (!k) continue;
-      map.set(k, (map.get(k) || 0) + 1);
-    }
-  }
-  return [...map.entries()]
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, limit);
-}
-
 function typeCompletionRows(pool, caught) {
   const byType = new Map();
   for (const p of pool) {
@@ -98,6 +79,17 @@ function typeCompletionRows(pool, caught) {
     .sort((a, b) => b.total - a.total || a.type.localeCompare(b.type, "fr"));
 }
 
+function createStatsTypeChip(type) {
+  const helper = window.PokevaultPokemonFiche;
+  if (typeof helper?.createTypeChip === "function") {
+    return helper.createTypeChip(type, "stats-type-chip");
+  }
+  const chip = document.createElement("span");
+  chip.className = "stats-type-chip";
+  chip.textContent = String(type || "");
+  return chip;
+}
+
 function renderKpiCard(label, value, sub, modifier) {
   const item = document.createElement("article");
   item.className = "stats-kpi-card";
@@ -115,33 +107,6 @@ function renderKpiCard(label, value, sub, modifier) {
   return item;
 }
 
-function renderStatsRailBadge(badge) {
-  const host = document.getElementById("statsRailBadge");
-  if (!host) return;
-  host.replaceChildren();
-  if (!badge || badge.unlocked) {
-    host.hidden = true;
-    return;
-  }
-  host.hidden = false;
-  const title = document.createElement("p");
-  title.className = "stats-rail-badge__kicker";
-  title.textContent = tStats("stats.next_badge");
-  const name = document.createElement("p");
-  name.className = "stats-rail-badge__title";
-  name.textContent = badge.title || tStats("stats.badge");
-  const meta = document.createElement("p");
-  meta.className = "stats-rail-badge__meta";
-  meta.textContent = `${badge.current || 0} / ${badge.target || 1} · ${badge.hint || ""}`;
-  const bar = document.createElement("div");
-  bar.className = "stats-rail-badge__bar";
-  const fill = document.createElement("span");
-  fill.className = "stats-rail-badge__fill";
-  fill.style.width = `${Math.max(0, Math.min(100, Number(badge.percent) || 0))}%`;
-  bar.append(fill);
-  host.append(title, name, meta, bar);
-}
-
 function renderStatsRail(caught, total) {
   const pct = total ? Math.round((caught / total) * 100) : 0;
   const pctEl = document.getElementById("statsRailPct");
@@ -150,7 +115,11 @@ function renderStatsRail(caught, total) {
   if (pctEl) pctEl.textContent = `${pct}%`;
   if (countEl) countEl.textContent = tStats("stats.rail_caught", { caught, total });
   if (missingEl) missingEl.textContent = tStats("stats.rail_missing", { count: Math.max(0, total - caught) });
-  renderStatsRailBadge(window.PokevaultBadges?.nearest?.());
+  const badgeEl = document.getElementById("statsRailBadge");
+  if (badgeEl) {
+    badgeEl.replaceChildren();
+    badgeEl.hidden = true;
+  }
 }
 
 function renderStats() {
@@ -245,7 +214,7 @@ function renderStats() {
   host.append(kpiGrid);
 
   const bento = document.createElement("section");
-  bento.className = "stats-bento-grid";
+  bento.className = "stats-bento-grid stats-bento-grid--two";
   const regWrap = document.createElement("section");
   regWrap.className = "stats-region-wrap";
   const regTitle = document.createElement("h2");
@@ -298,24 +267,6 @@ function renderStats() {
   regWrap.hidden = !showAdvanced;
   bento.append(regWrap);
 
-  const missing = topMissingTypes(pool, caught, 3);
-  if (missing.length) {
-    const sec = document.createElement("section");
-    sec.className = "stats-gaps";
-    const h = document.createElement("h2");
-    h.className = "stats-section-title";
-    h.textContent = tStats("stats.collection_gaps");
-    sec.append(h);
-    for (const [type, count] of missing) {
-      const line = document.createElement("p");
-      line.className = "stats-gap-line";
-      line.textContent = tStats("stats.gap_line", { type, count });
-      sec.append(line);
-    }
-    sec.hidden = !showAdvanced;
-    bento.append(sec);
-  }
-
   const types = typeCompletionRows(pool, caught);
   if (types.length) {
     const sec = document.createElement("section");
@@ -330,7 +281,10 @@ function renderStats() {
       const top = document.createElement("div");
       top.className = "stats-region-top";
       const left = document.createElement("span");
-      left.textContent = `${row.type} · ${row.pct}%`;
+      left.className = "stats-type-line-label";
+      const pct = document.createElement("span");
+      pct.textContent = `${row.pct}%`;
+      left.append(createStatsTypeChip(row.type), pct);
       const right = document.createElement("span");
       right.textContent = `${row.caught} / ${row.total}`;
       top.append(left, right);

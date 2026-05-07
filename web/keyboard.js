@@ -7,7 +7,7 @@
  *   j    move keyboard focus to next visible card
  *   k    move keyboard focus to previous visible card
  *   c    toggle Capturé on focused card
- *   C    toggle Double on focused card
+ *   C    toggle multiple copies on focused card
  *   i    open the Pokémon drawer (F02) for the focused card
  *   ?    open the shortcuts help dialog
  *
