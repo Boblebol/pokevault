@@ -100,6 +100,10 @@ def test_data_static_mount_does_not_expose_user_state(tmp_path: Path) -> None:
     (data / "narrative-tags.json").write_text('{"tags":[]}', encoding="utf-8")
     (data / "evolution-families.json").write_text('{"families":[]}', encoding="utf-8")
     (data / "evolution-family-overrides.json").write_text("{}", encoding="utf-8")
+    (data / "game-pokedexes.json").write_text(
+        '{"version":1,"pokedexes":[],"appearances_by_slug":{}}',
+        encoding="utf-8",
+    )
     (data / "collection-progress.json").write_text(
         '{"caught":{"secret":true}}', encoding="utf-8"
     )
@@ -120,8 +124,9 @@ def test_data_static_mount_does_not_expose_user_state(tmp_path: Path) -> None:
     assert client.get("/data/narrative-tags.json").status_code == 200
     assert client.get("/data/evolution-families.json").status_code == 200
     assert client.get("/data/evolution-family-overrides.json").status_code == 200
+    assert client.get("/data/game-pokedexes.json").status_code == 200
     assert client.get("/data/images/bulbasaur.png").status_code == 200
-    assert client.get("/data/images_shiny/bulbasaur.png").status_code == 200
+    assert client.get("/data/images_shiny/bulbasaur.png").status_code == 404
     assert client.get("/data/collection-progress.json").status_code == 404
     assert client.get("/data/trainer-contacts.json").status_code == 404
 
@@ -141,6 +146,14 @@ def test_pokedex_json_absent_returns_404(tmp_path: Path) -> None:
     assert client.get("/data/pokedex.json").status_code == 404
 
 
+def test_game_pokedexes_json_absent_returns_404(tmp_path: Path) -> None:
+    _minimal_layout(tmp_path)
+    settings = TrackerSettings(repo_root=tmp_path)
+    application = create_app(settings)
+    client = TestClient(application)
+    assert client.get("/data/game-pokedexes.json").status_code == 404
+
+
 def test_hunts_route_is_not_mounted(tmp_path: Path) -> None:
     _minimal_layout(tmp_path)
     (tmp_path / "data" / "pokedex.json").write_text("[]", encoding="utf-8")
@@ -150,6 +163,19 @@ def test_hunts_route_is_not_mounted(tmp_path: Path) -> None:
 
     assert "/api/hunts" not in paths
     assert "/api/hunts/{slug}" not in paths
+
+
+def test_card_and_tcg_routes_are_not_mounted(tmp_path: Path) -> None:
+    _minimal_layout(tmp_path)
+    (tmp_path / "data" / "pokedex.json").write_text("[]", encoding="utf-8")
+    settings = TrackerSettings(repo_root=tmp_path)
+    application = create_app(settings)
+    paths = {route.path for route in application.routes}
+
+    assert "/api/cards" not in paths
+    assert "/api/cards/{card_id}" not in paths
+    assert "/api/cards/by-pokemon/{slug}" not in paths
+    assert "/api/tcg/cards/search" not in paths
 
 
 def test_default_app_module_loads() -> None:

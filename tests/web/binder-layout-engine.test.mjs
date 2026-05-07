@@ -485,3 +485,251 @@ test("family layout closes a short branch row when the next family row cannot fi
     ],
   );
 });
+
+test("regional family album starts each region on a new sheet recto", async () => {
+  const api = await loadEngine();
+  const defs = [
+    { id: "kanto", low: 1, high: 151 },
+    { id: "johto", low: 152, high: 251 },
+  ];
+  const pokemon = [
+    { slug: "0001-bulbasaur", number: "0001", region: "kanto" },
+    { slug: "0002-ivysaur", number: "0002", region: "kanto" },
+    { slug: "0003-venusaur", number: "0003", region: "kanto" },
+    { slug: "0152-chikorita", number: "0152", region: "johto" },
+  ];
+  const familyData = {
+    families: [
+      { id: "0001-bulbasaur", layout_rows: [["0001-bulbasaur", "0002-ivysaur", "0003-venusaur"]] },
+      { id: "0152-chikorita", layout_rows: [["0152-chikorita"]] },
+    ],
+  };
+
+  const slots = api.computeBinderSlots({
+    binder: { id: "grand", organization: "regional_family_album", rows: 2, cols: 2, sheet_count: 2 },
+    pokemon,
+    defs,
+    familyData,
+    includeCapacity: true,
+  });
+
+  assert.equal(slots.length, 16);
+  assert.deepEqual(
+    slots.map((slot) => ({
+      page: slot.page,
+      sheet: slot.sheet,
+      face: slot.face,
+      slug: slot.pokemon?.slug || null,
+      emptyKind: slot.emptyKind,
+    })),
+    [
+      { page: 1, sheet: 1, face: "R", slug: "0001-bulbasaur", emptyKind: null },
+      { page: 1, sheet: 1, face: "R", slug: "0002-ivysaur", emptyKind: null },
+      { page: 1, sheet: 1, face: "R", slug: "0003-venusaur", emptyKind: null },
+      { page: 1, sheet: 1, face: "R", slug: null, emptyKind: "alignment_empty" },
+      { page: 2, sheet: 1, face: "V", slug: null, emptyKind: "capacity_empty" },
+      { page: 2, sheet: 1, face: "V", slug: null, emptyKind: "capacity_empty" },
+      { page: 2, sheet: 1, face: "V", slug: null, emptyKind: "capacity_empty" },
+      { page: 2, sheet: 1, face: "V", slug: null, emptyKind: "capacity_empty" },
+      { page: 3, sheet: 2, face: "R", slug: "0152-chikorita", emptyKind: null },
+      { page: 3, sheet: 2, face: "R", slug: null, emptyKind: "alignment_empty" },
+      { page: 3, sheet: 2, face: "R", slug: null, emptyKind: "capacity_empty" },
+      { page: 3, sheet: 2, face: "R", slug: null, emptyKind: "capacity_empty" },
+      { page: 4, sheet: 2, face: "V", slug: null, emptyKind: "capacity_empty" },
+      { page: 4, sheet: 2, face: "V", slug: null, emptyKind: "capacity_empty" },
+      { page: 4, sheet: 2, face: "V", slug: null, emptyKind: "capacity_empty" },
+      { page: 4, sheet: 2, face: "V", slug: null, emptyKind: "capacity_empty" },
+    ],
+  );
+});
+
+test("regional family album keeps regional forms in their form region", async () => {
+  const api = await loadEngine();
+  const ordered = api.orderPokemonForBinder({
+    binder: { id: "grand", organization: "regional_family_album", rows: 2, cols: 2, sheet_count: 2 },
+    pokemon: [
+      { slug: "0019-rattata", number: "0019", region: "kanto" },
+      { slug: "0019-rattata-alola", number: "0019", region: "alola" },
+    ],
+    defs: [
+      { id: "kanto", low: 1, high: 151 },
+      { id: "alola", low: 722, high: 809 },
+    ],
+    familyData: {
+      families: [
+        { id: "0019-rattata", layout_rows: [["0019-rattata", "0019-rattata-alola"]] },
+      ],
+    },
+  });
+
+  assert.deepEqual(
+    ordered.map((p) => p?.slug || null),
+    [
+      "0019-rattata",
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      "0019-rattata-alola",
+      null,
+    ],
+  );
+});
+
+test("regional family album ignores stale binder scope and range fields", async () => {
+  const api = await loadEngine();
+  const ordered = api.orderPokemonForBinder({
+    binder: {
+      id: "grand",
+      organization: "regional_family_album",
+      rows: 2,
+      cols: 2,
+      sheet_count: 2,
+      region_scope: "kanto",
+      region_id: "kanto",
+      range_start: 8,
+      range_limit: 1,
+    },
+    pokemon: [
+      { slug: "0001-bulbasaur", number: "0001", region: "kanto" },
+      { slug: "0152-chikorita", number: "0152", region: "johto" },
+    ],
+    defs: [
+      { id: "kanto", low: 1, high: 151 },
+      { id: "johto", low: 152, high: 251 },
+    ],
+    familyData: {
+      families: [
+        { id: "0001-bulbasaur", layout_rows: [["0001-bulbasaur"]] },
+        { id: "0152-chikorita", layout_rows: [["0152-chikorita"]] },
+      ],
+    },
+  });
+
+  assert.deepEqual(
+    ordered.map((p) => p?.slug || null),
+    [
+      "0001-bulbasaur",
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      "0152-chikorita",
+      null,
+    ],
+  );
+});
+
+test("regional family album drops family rows emptied by regional filtering", async () => {
+  const api = await loadEngine();
+  const defs = [
+    { id: "kanto", low: 1, high: 151 },
+    { id: "alola", low: 722, high: 807 },
+  ];
+  const pokemon = [
+    { slug: "0019-rattata", number: "0019", region: "kanto" },
+    { slug: "0019-rattata-alola", number: "0019", region: "alola", region_native: false },
+  ];
+  const familyData = {
+    families: [
+      {
+        id: "0019-rattata",
+        layout_rows: [["0019-rattata"], ["0019-rattata-alola"]],
+      },
+    ],
+  };
+
+  const ordered = api.orderPokemonForBinder({
+    binder: {
+      id: "grand",
+      organization: "regional_family_album",
+      rows: 2,
+      cols: 2,
+      sheet_count: 2,
+    },
+    pokemon,
+    defs,
+    familyData,
+  });
+
+  assert.deepEqual(
+    ordered.map((p) => p?.slug || null),
+    [
+      "0019-rattata",
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      "0019-rattata-alola",
+      null,
+    ],
+  );
+});
+
+test("regional family album drops reserved holes when a branch row has no regional pokemon", async () => {
+  const api = await loadEngine();
+  const defs = [
+    { id: "kanto", low: 1, high: 151 },
+    { id: "johto", low: 152, high: 251 },
+  ];
+  const pokemon = [
+    { slug: "0043-oddish", number: "0043", region: "kanto" },
+    { slug: "0044-gloom", number: "0044", region: "kanto" },
+    { slug: "0045-vileplume", number: "0045", region: "kanto" },
+    { slug: "0182-bellossom", number: "0182", region: "johto" },
+  ];
+  const familyData = {
+    families: [
+      {
+        id: "0043-oddish",
+        layout_rows: [
+          ["0043-oddish", "0044-gloom", "0045-vileplume"],
+          [null, null, "0182-bellossom"],
+        ],
+      },
+    ],
+  };
+
+  const ordered = api.orderPokemonForBinder({
+    binder: {
+      id: "grand",
+      organization: "regional_family_album",
+      rows: 2,
+      cols: 3,
+      sheet_count: 2,
+    },
+    pokemon,
+    defs,
+    familyData,
+  });
+
+  assert.deepEqual(
+    ordered.map((p) => p?.slug || null),
+    [
+      "0043-oddish",
+      "0044-gloom",
+      "0045-vileplume",
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      "0182-bellossom",
+    ],
+  );
+});

@@ -340,11 +340,11 @@ def test_in_app_docs_cover_complete_product_workflows_in_both_languages() -> Non
 
     for text in [
         "data/collection-progress.json",
-        "data/collection-cards.json",
+        "data/game-pokedexes.json",
         "data/binder-config.json",
         "data/trainer-contacts.json",
         "/api/progress",
-        "/api/cards",
+        "/data/game-pokedexes.json",
         "/api/trainers",
         "/api/export",
         "/api/import",
@@ -352,6 +352,17 @@ def test_in_app_docs_cover_complete_product_workflows_in_both_languages() -> Non
         "EN:",
     ]:
         assert text in i18n
+
+
+def test_docs_describe_single_modal_and_game_pokedex_appearances() -> None:
+    web_i18n = (WEB / "i18n.js").read_text(encoding="utf-8")
+    index = (WEB / "index.html").read_text(encoding="utf-8")
+    readme = (ROOT / "README.md").read_text(encoding="utf-8")
+    features = (DOCS / "features.html").read_text(encoding="utf-8")
+
+    for text in [web_i18n, index, readme, features]:
+        assert "modal" in text.lower()
+        assert "game-pokedexes.json" in text or "game Pokedex" in text or "Pokédex des jeux" in text
 
 
 def test_public_features_page_has_bilingual_product_copy() -> None:
@@ -533,3 +544,52 @@ def test_configurable_binder_layouts_are_documented() -> None:
     assert "Impression > Regrouper par > Petites fiches classeur" in web_i18n
     assert "Binders > Edit format" in web_i18n
     assert "Print > Group by > Small binder cards" in web_i18n
+
+
+def test_large_ring_binder_mode_is_documented() -> None:
+    readme = (ROOT / "README.md").read_text(encoding="utf-8")
+    features = (DOCS / "features.html").read_text(encoding="utf-8")
+    docs_i18n = (DOCS / "assets" / "i18n.js").read_text(encoding="utf-8")
+    backlog = (DOCS / "V1_1_POKEDEX_FIRST.md").read_text(encoding="utf-8")
+
+    def assert_large_binder_contract(text: str) -> None:
+        normalized = " ".join(text.lower().split())
+        assert "grand classeur 3" in normalized or "large 3" in normalized
+        assert (
+            "one physical binder" in normalized
+            or "one ring binder" in normalized
+            or "un gros classeur" in normalized
+        )
+        assert (
+            "region sections" in normalized
+            or "internal region sections" in normalized
+            or "régions" in normalized
+        )
+        assert "3×3 recto-verso" in normalized or "3×3 front/back sheets" in normalized
+        assert "recto" in normalized or "sheet front" in normalized
+        assert "compact" in normalized
+        assert "regional forms" in normalized or "formes régionales" in normalized
+        assert "form region" in normalized or "région de leur forme" in normalized
+        assert (
+            "auto" in normalized
+            or "calculates capacity" in normalized
+            or "calculated capacity" in normalized
+        )
+        assert "10 spare sheets" in normalized or "10 feuillets libres" in normalized
+
+    def docs_i18n_message(locale: str, key: str) -> str:
+        marker = f"    {locale}: {{"
+        block = docs_i18n.split(marker, 1)[1]
+        if locale == "fr":
+            block = block.split("\n    },\n    en:", 1)[0]
+        else:
+            block = block.split("\n    }\n  };", 1)[0]
+        return block.split(f'"{key}": "', 1)[1].split('",', 1)[0]
+
+    for text in [readme, features, backlog]:
+        assert_large_binder_contract(text)
+
+    assert_large_binder_contract(docs_i18n)
+
+    assert_large_binder_contract(docs_i18n_message("fr", "features.binders.text"))
+    assert_large_binder_contract(docs_i18n_message("en", "features.binders.text"))

@@ -13,10 +13,6 @@
     "dashboard.card.seen_detail": "À capturer",
     "dashboard.card.caught": "Capturés",
     "dashboard.card.caught_detail": "{pct}% du dex",
-    "dashboard.card.shiny": "Shiny",
-    "dashboard.card.shiny_detail": "Bonus",
-    "dashboard.card.cards": "Cartes",
-    "dashboard.card.cards_detail": "{sets} set(s)",
   };
 
   function t(key, params = {}) {
@@ -50,19 +46,10 @@
   function statusForPokemon(slug, statusMap, caughtMap) {
     const status = statusMap?.[slug];
     if (status?.state === "caught" || caughtMap?.[slug]) {
-      return { state: "caught", shiny: Boolean(status?.shiny) };
+      return { state: "caught" };
     }
-    if (status?.state === "seen") return { state: "seen", shiny: false };
-    return { state: "not_met", shiny: false };
-  }
-
-  function cleanCardStats(cardStats) {
-    const cards = Number(cardStats?.cards);
-    const sets = Number(cardStats?.sets);
-    return {
-      cards: Number.isFinite(cards) ? Math.max(0, cards) : 0,
-      sets: Number.isFinite(sets) ? Math.max(0, sets) : 0,
-    };
+    if (status?.state === "seen") return { state: "seen" };
+    return { state: "not_met" };
   }
 
   function computeDashboardMetrics({
@@ -70,7 +57,6 @@
     statusMap = {},
     caughtMap = {},
     regionDefinitions = [],
-    cardStats = {},
   } = {}) {
     const regions = regionDefinitions.map((region) => ({
       id: String(region.id),
@@ -86,7 +72,6 @@
     let otherRegion = null;
     let seen = 0;
     let caught = 0;
-    let shiny = 0;
     let notMet = 0;
 
     for (const pokemon of Array.isArray(pool) ? pool : []) {
@@ -94,7 +79,6 @@
       const status = statusForPokemon(slug, statusMap, caughtMap);
       if (status.state === "caught") {
         caught += 1;
-        if (status.shiny) shiny += 1;
       } else if (status.state === "seen") {
         seen += 1;
       } else {
@@ -137,9 +121,7 @@
       notMet,
       seen,
       caught,
-      shiny,
       percentCaught: total ? Math.round((caught / total) * 100) : 0,
-      cardStats: cleanCardStats(cardStats),
       regions: regionRows,
     };
   }
@@ -185,7 +167,6 @@
 
   function renderDashboard({ cardsHost, regionsHost, metrics }) {
     if (!cardsHost || !regionsHost || !metrics) return;
-    const cardSummary = metrics.cardStats || { cards: 0, sets: 0 };
     cardsHost.replaceChildren(
       renderMetricCard({
         label: t("dashboard.card.not_met"),
@@ -205,20 +186,6 @@
         detail: t("dashboard.card.caught_detail", { pct: metrics.percentCaught }),
         metric: "caught",
       }),
-      renderMetricCard({
-        label: t("dashboard.card.shiny"),
-        value: metrics.shiny,
-        detail: t("dashboard.card.shiny_detail"),
-        metric: "shiny",
-        secondary: true,
-      }),
-      renderMetricCard({
-        label: t("dashboard.card.cards"),
-        value: cardSummary.cards,
-        detail: t("dashboard.card.cards_detail", { sets: cardSummary.sets }),
-        metric: "cards",
-        secondary: true,
-      }),
     );
 
     regionsHost.replaceChildren(...metrics.regions.map(renderRegionRow));
@@ -231,14 +198,12 @@
     statusMap,
     caughtMap,
     regionDefinitions,
-    cardStats,
   }) {
     const metrics = computeDashboardMetrics({
       pool,
       statusMap,
       caughtMap,
       regionDefinitions,
-      cardStats,
     });
     renderDashboard({ cardsHost, regionsHost, metrics });
     return metrics;

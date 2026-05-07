@@ -71,8 +71,40 @@ def test_readme_lists_all_versioned_reference_data() -> None:
         "data/narrative-tags.json",
         "data/evolution-families.json",
         "data/evolution-family-overrides.json",
+        "data/game-pokedexes.json",
     ]:
         assert reference_file in data_model
+
+
+def test_reference_data_files_are_not_ignored() -> None:
+    gitignore = (ROOT / ".gitignore").read_text(encoding="utf-8")
+
+    for reference_file in [
+        "data/pokedex.json",
+        "data/narrative-tags.json",
+        "data/evolution-families.json",
+        "data/evolution-family-overrides.json",
+        "data/game-pokedexes.json",
+    ]:
+        assert f"!{reference_file}" in gitignore
+
+
+def test_game_pokedex_reference_file_has_public_shape() -> None:
+    import json
+
+    payload = json.loads((ROOT / "data" / "game-pokedexes.json").read_text(encoding="utf-8"))
+
+    assert payload["version"] == 1
+    assert payload["pokedexes"][0] == {
+        "id": "rb-kanto",
+        "generation": 1,
+        "region": "Kanto",
+        "games": ["Rouge", "Bleu"],
+        "label_fr": "Pokédex de Kanto - Rouge/Bleu",
+        "label_en": "Kanto Pokédex - Red/Blue",
+    }
+    assert "rb-kanto" in payload["appearances_by_slug"]["0001-bulbasaur"]
+    assert "xy-kalos-central" in payload["appearances_by_slug"]["0001-bulbasaur"]
 
 
 def test_runtime_help_references_existing_dev_command() -> None:

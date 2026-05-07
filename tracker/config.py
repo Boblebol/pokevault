@@ -18,8 +18,6 @@ class TrackerSettings(BaseSettings):
 
     host: str = "127.0.0.1"
     port: int = 8765
-    tcg_api_base_url: str = "https://api.pokemontcg.io/v2"
-    tcg_api_key: str = ""
     repo_root: Path = Field(
         default_factory=lambda: Path(__file__).resolve().parent.parent,
         description="Racine du dépôt (web/, data/).",
@@ -50,11 +48,6 @@ class TrackerSettings(BaseSettings):
     @property
     def pokedex_path(self) -> Path:
         return self.data_dir / "pokedex.json"
-
-    @property
-    def cards_path(self) -> Path:
-        """F08 — carnet de cartes TCG physiques (user state)."""
-        return self.data_dir / "collection-cards.json"
 
     @property
     def trainer_contacts_path(self) -> Path:

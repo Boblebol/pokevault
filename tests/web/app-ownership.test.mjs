@@ -141,7 +141,7 @@ test("backup import accepts schema versions emitted by the backend", async () =>
   assert.equal(api.isSupportedBackupSchemaVersion(2), true);
   assert.equal(api.isSupportedBackupSchemaVersion(3), true);
   assert.equal(api.isSupportedBackupSchemaVersion(4), true);
-  assert.equal(api.isSupportedBackupSchemaVersion(5), false);
+  assert.equal(api.isSupportedBackupSchemaVersion(5), true);
   assert.equal(api.isSupportedBackupSchemaVersion(99), false);
 });
 
@@ -153,19 +153,19 @@ test("direct ownership updates map capture duplicate release-one and release-all
 
   collection.setStatus("0001-bulbasaur", "seen", false);
   await collection.setPokemonOwnershipState("0001-bulbasaur", "owned");
-  assert.deepEqual(collection.getStatus("0001-bulbasaur"), { state: "caught", shiny: false });
+  assert.deepEqual(collection.getStatus("0001-bulbasaur"), { state: "caught" });
 
   collection.setStatus("0002-ivysaur", "caught", true);
   await collection.setPokemonOwnershipState("0002-ivysaur", "duplicate");
-  assert.deepEqual(collection.getStatus("0002-ivysaur"), { state: "caught", shiny: true });
+  assert.deepEqual(collection.getStatus("0002-ivysaur"), { state: "caught" });
 
   collection.setStatus("0003-venusaur", "caught", true);
   await collection.setPokemonOwnershipState("0003-venusaur", "release_one");
-  assert.deepEqual(collection.getStatus("0003-venusaur"), { state: "caught", shiny: true });
+  assert.deepEqual(collection.getStatus("0003-venusaur"), { state: "caught" });
 
   collection.setStatus("0004-charmander", "caught", true);
   await collection.setPokemonOwnershipState("0004-charmander", "none");
-  assert.deepEqual(collection.getStatus("0004-charmander"), { state: "not_met", shiny: false });
+  assert.deepEqual(collection.getStatus("0004-charmander"), { state: "not_met" });
 
   assert.deepEqual(membershipCalls, [
     { slug: "0001-bulbasaur", listName: "for_trade", enabled: false },
@@ -192,28 +192,28 @@ test("cycleOwnershipBySlug follows simplified capture duplicate release formula"
   let membershipCalls = installTrainerContactStubs({ for_trade: [] });
   collection.cycleOwnershipBySlug("0007-squirtle", {});
   await Promise.resolve();
-  assert.deepEqual(collection.getStatus("0007-squirtle"), { state: "caught", shiny: false });
+  assert.deepEqual(collection.getStatus("0007-squirtle"), { state: "caught" });
   assert.deepEqual(membershipCalls.at(-1), { slug: "0007-squirtle", listName: "for_trade", enabled: false });
 
   membershipCalls = installTrainerContactStubs({ for_trade: [] });
   collection.setStatus("0008-wartortle", "caught", true);
   collection.cycleOwnershipBySlug("0008-wartortle", {});
   await Promise.resolve();
-  assert.deepEqual(collection.getStatus("0008-wartortle"), { state: "not_met", shiny: false });
+  assert.deepEqual(collection.getStatus("0008-wartortle"), { state: "not_met" });
   assert.deepEqual(membershipCalls.at(-1), { slug: "0008-wartortle", listName: "for_trade", enabled: false });
 
   membershipCalls = installTrainerContactStubs({ for_trade: [] });
   collection.setStatus("0009-blastoise", "caught", false);
   collection.cycleOwnershipBySlug("0009-blastoise", { shift: true });
   await Promise.resolve();
-  assert.deepEqual(collection.getStatus("0009-blastoise"), { state: "caught", shiny: false });
+  assert.deepEqual(collection.getStatus("0009-blastoise"), { state: "caught" });
   assert.deepEqual(membershipCalls.at(-1), { slug: "0009-blastoise", listName: "for_trade", enabled: true });
 
   membershipCalls = installTrainerContactStubs({ for_trade: ["0010-caterpie"] });
   collection.setStatus("0010-caterpie", "caught", true);
   collection.cycleOwnershipBySlug("0010-caterpie", { shift: true });
   await Promise.resolve();
-  assert.deepEqual(collection.getStatus("0010-caterpie"), { state: "caught", shiny: true });
+  assert.deepEqual(collection.getStatus("0010-caterpie"), { state: "caught" });
   assert.deepEqual(membershipCalls.at(-1), { slug: "0010-caterpie", listName: "for_trade", enabled: false });
 });
 
@@ -225,11 +225,11 @@ test("docs route is recognized as a first-class app view", async () => {
   assert.equal(api.currentViewFromHash(), "docs");
 });
 
-test("artwork changes rerender the active Pokemon route", async () => {
+test("artwork changes rerender the active Pokemon modal", async () => {
   const api = await loadModule();
   const rendered = [];
   globalThis.location.hash = "#/pokemon/0001-bulbasaur";
-  globalThis.PokevaultFullView = {
+  globalThis.PokevaultPokemonModal = {
     render(slug) {
       rendered.push(slug);
     },

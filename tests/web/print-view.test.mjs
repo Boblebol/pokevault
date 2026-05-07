@@ -104,6 +104,13 @@ function placeholderSlots(pokemon = bulbasaur()) {
   ];
 }
 
+test("print view family data preload predicate includes regional family albums", async () => {
+  const api = await loadModule();
+
+  assert.equal(api.configUsesEvolutionFamilies({ binders: [{ organization: "regional_family_album" }] }), true);
+  assert.equal(api.configUsesEvolutionFamilies({ binders: [{ organization: "national" }] }), false);
+});
+
 test("print view formats English summary labels through i18n", async () => {
   const api = await loadModule();
   globalThis.PokevaultI18n = {
@@ -205,6 +212,96 @@ test("placeholder section skips alignment empties", async () => {
   );
 });
 
+test("placeholder section skips large ring region sheet gaps", async () => {
+  const api = await loadModule();
+  const chikorita = {
+    slug: "0152-chikorita",
+    number: "0152",
+    image: "data/images/0152-chikorita.png",
+    names: { fr: "Germignon", en: "Chikorita" },
+  };
+  const slots = [
+    {
+      binderId: "grand",
+      binderName: "Grand classeur",
+      page: 1,
+      sheet: 1,
+      face: "R",
+      slot: 1,
+      row: 1,
+      col: 1,
+      pokemon: bulbasaur(),
+      emptyKind: null,
+      familyId: "0001-bulbasaur",
+    },
+    {
+      binderId: "grand",
+      binderName: "Grand classeur",
+      page: 1,
+      sheet: 1,
+      face: "R",
+      slot: 2,
+      row: 1,
+      col: 2,
+      pokemon: null,
+      emptyKind: "alignment_empty",
+      familyId: null,
+    },
+    {
+      binderId: "grand",
+      binderName: "Grand classeur",
+      page: 2,
+      sheet: 1,
+      face: "V",
+      slot: 1,
+      row: 1,
+      col: 1,
+      pokemon: null,
+      emptyKind: "capacity_empty",
+      familyId: null,
+    },
+    {
+      binderId: "grand",
+      binderName: "Grand classeur",
+      page: 3,
+      sheet: 2,
+      face: "R",
+      slot: 2,
+      row: 1,
+      col: 2,
+      pokemon: null,
+      emptyKind: "capacity_empty",
+      familyId: null,
+    },
+    {
+      binderId: "grand",
+      binderName: "Grand classeur",
+      page: 3,
+      sheet: 2,
+      face: "R",
+      slot: 1,
+      row: 1,
+      col: 1,
+      pokemon: chikorita,
+      emptyKind: null,
+      familyId: "0152-chikorita",
+    },
+  ];
+
+  const section = api.buildPlaceholderSection(
+    { id: "grand", name: "Grand classeur", organization: "regional_family_album", rows: 2, cols: 2, sheet_count: 2 },
+    slots,
+    {},
+    "all",
+    "",
+  );
+
+  assert.deepEqual(
+    section.pages.flatMap((page) => page.slots.map((slot) => slot.title)),
+    ["Bulbizarre", "Germignon"],
+  );
+});
+
 test("print artwork default mode ignores the global artwork resolver", async () => {
   const api = await loadModule();
   globalThis.PokevaultArtwork = {
@@ -223,7 +320,7 @@ test("print artwork default mode ignores the global artwork resolver", async () 
   });
 });
 
-test("print artwork shiny mode builds a local and CDN fallback chain", async () => {
+test("print artwork rejects removed shiny mode and keeps default artwork", async () => {
   const api = await loadModule();
   globalThis.PokevaultArtwork = {
     mode: "default",
@@ -236,11 +333,8 @@ test("print artwork shiny mode builds a local and CDN fallback chain", async () 
   const resolved = api.resolvePrintArtwork(bulbasaur());
 
   assert.deepEqual(resolved, {
-    src: "/data/images_shiny/0001-bulbasaur.png",
-    fallbacks: [
-      "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/shiny/1.png",
-      "/data/images/0001-bulbasaur.png",
-    ],
+    src: "/data/images/0001-bulbasaur.png",
+    fallbacks: [],
   });
 });
 
@@ -282,41 +376,13 @@ test("placeholder card omits image when artwork resolution has no source", async
   assert.equal(card.children.some((child) => child.tagName === "IMG"), false);
 });
 
-test("print card artwork mode uses real artwork-switcher card thumbnails without changing global mode", async () => {
-  globalThis.window = globalThis;
-  globalThis.document = createFakeDocument();
-  const storage = new Map();
-  globalThis.localStorage = {
-    getItem(key) {
-      return storage.get(key) || null;
-    },
-    setItem(key, value) {
-      storage.set(key, String(value));
-    },
-    removeItem(key) {
-      storage.delete(key);
-    },
-  };
-  globalThis.fetch = async (url) => {
-    assert.equal(url, "/api/cards");
-    return {
-      ok: true,
-      async json() {
-        return { cards: [{ pokemon_slug: "0001-bulbasaur", image_url: "/cards/bulba.png" }] };
-      },
-    };
-  };
-
-  importCase += 1;
-  await import(`../../web/artwork-switcher.js?case=${Date.now()}-${importCase}`);
-  await globalThis.PokevaultArtwork.refreshCards();
-  globalThis.PokevaultArtwork.setMode("default");
-
-  const api = await loadModule({ resetArtwork: false });
+test("print artwork rejects removed card mode and keeps default artwork", async () => {
+  const api = await loadModule();
   api.setPrintArtworkMode("card");
   const resolved = api.resolvePrintArtwork(bulbasaur());
 
-  assert.equal(globalThis.PokevaultArtwork.mode, "default");
-  assert.equal(resolved.src, "/cards/bulba.png");
-  assert.deepEqual(resolved.fallbacks, ["/data/images/0001-bulbasaur.png"]);
+  assert.deepEqual(resolved, {
+    src: "/data/images/0001-bulbasaur.png",
+    fallbacks: [],
+  });
 });

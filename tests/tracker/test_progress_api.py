@@ -99,7 +99,7 @@ def test_patch_status_endpoint(tmp_path: Path) -> None:
     assert r.status_code == 200
     body = client.get("/api/progress").json()
     assert body["statuses"]["pikachu"]["state"] == "caught"
-    assert body["statuses"]["pikachu"]["shiny"] is True
+    assert "shiny" not in body["statuses"]["pikachu"]
     assert body["caught"] == {"pikachu": True}
 
     r = client.patch(

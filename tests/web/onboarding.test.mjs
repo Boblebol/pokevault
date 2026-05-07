@@ -72,7 +72,7 @@ test("writeProfile persists Pokedex-first onboarding choices", async () => {
   assert.equal(saved.goal, "complete_pokedex");
   assert.equal(saved.favorite_region, "johto");
   assert.equal(saved.tracking_mode, "advanced");
-  assert.equal(saved.card_layer, "addon_later");
+  assert.equal(Object.hasOwn(saved, "card" + "_layer"), false);
   assert.match(saved.completed_at, /^\d{4}-\d{2}-\d{2}T/);
   assert.equal(raw.profile, undefined);
   assert.equal(raw.goal, "complete_pokedex");
@@ -97,14 +97,12 @@ test("readProfile migrates legacy collector profiles to the Pokedex-first shape"
     goal: profile.goal,
     favorite_region: profile.favorite_region,
     tracking_mode: profile.tracking_mode,
-    card_layer: profile.card_layer,
     skipped: profile.skipped,
   }, {
     version: 2,
     goal: "complete_pokedex",
     favorite_region: "all",
     tracking_mode: "advanced",
-    card_layer: "addon_later",
     skipped: false,
   });
 });
@@ -132,7 +130,6 @@ test("applyPreferences guides the first collection view from region and mode", a
     goal: "complete_pokedex",
     favorite_region: "kanto",
     tracking_mode: "simple",
-    card_layer: "addon_later",
   });
 
   assert.equal(storage.get("pokedexFormFilter"), "base_regional");
@@ -155,7 +152,7 @@ test("settings profile summary follows English i18n labels", async () => {
     t(key, params = {}) {
       const messages = {
         "onboarding.profile.undefined": "Profile: undefined — replay onboarding to customize.",
-        "onboarding.profile.summary": "Profile: Complete my Pokedex · {region} · {mode} · cards as add-on.",
+        "onboarding.profile.summary": "Profile: Complete my Pokedex · {region} · {mode} · local binders.",
         "onboarding.mode.simple": "simple mode",
         "onboarding.mode.advanced": "advanced mode",
       };
@@ -166,6 +163,6 @@ test("settings profile summary follows English i18n labels", async () => {
   assert.equal(api.formatSettingsProfileLabel(null), "Profile: undefined — replay onboarding to customize.");
   assert.equal(
     api.formatSettingsProfileLabel({ favorite_region: "kanto", tracking_mode: "advanced", skipped: false }),
-    "Profile: Complete my Pokedex · Kanto · advanced mode · cards as add-on.",
+    "Profile: Complete my Pokedex · Kanto · advanced mode · local binders.",
   );
 });

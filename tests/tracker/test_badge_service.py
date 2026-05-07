@@ -7,22 +7,18 @@ from pathlib import Path
 
 import pytest
 
-from tracker.models import CardCreate, ProgressStatusPatch
-from tracker.repository.json_card_repository import JsonCardRepository
+from tracker.models import ProgressStatusPatch
 from tracker.repository.json_progress_repository import JsonProgressRepository
 from tracker.services.badge_presentation import presentation_for_badge
 from tracker.services.badge_service import BADGES, BadgeService, _metric_value
-from tracker.services.card_service import CardService
 from tracker.services.progress_service import ProgressService
 
 
-def _wire(tmp_path: Path) -> tuple[BadgeService, ProgressService, CardService]:
+def _wire(tmp_path: Path) -> tuple[BadgeService, ProgressService]:
     progress_repo = JsonProgressRepository(tmp_path / "progress.json")
-    card_repo = JsonCardRepository(tmp_path / "cards.json")
     progress_service = ProgressService(progress_repo)
-    card_service = CardService(card_repo, progress_service)
-    badge_service = BadgeService(progress_repo, card_repo)
-    return badge_service, progress_service, card_service
+    badge_service = BadgeService(progress_repo)
+    return badge_service, progress_service
 
 
 def _catch_all(progress: ProgressService, slugs: list[str]) -> None:
@@ -36,13 +32,17 @@ def test_catalog_exposes_all_definitions(tmp_path: Path) -> None:
     assert len(state.catalog) == len(BADGES)
     assert {b.id for b in state.catalog} == {b.id for b in BADGES}
     assert "first_encounter" not in {b.id for b in state.catalog}
+    assert "first_shiny" not in {b.id for b in state.catalog}
+    assert "shiny_ten" not in {b.id for b in state.catalog}
+    assert "first_card" not in {b.id for b in state.catalog}
+    assert "hundred_cards" not in {b.id for b in state.catalog}
     assert "first_catch" in {b.id for b in state.catalog}
     assert all(not b.unlocked for b in state.catalog)
     assert state.unlocked == []
 
 
 def test_catalog_exposes_progress_metadata(tmp_path: Path) -> None:
-    badge_service, progress, _ = _wire(tmp_path)
+    badge_service, progress = _wire(tmp_path)
     for i in range(1, 4):
         progress.patch_status(
             ProgressStatusPatch(slug=f"slug-{i:04d}", state="caught")
@@ -106,7 +106,6 @@ def test_every_badge_has_required_presentation_copy(tmp_path: Path) -> None:
     for badge in badge_service.state().catalog:
         if badge.category not in {
             "milestone",
-            "card",
             "gym",
             "elite_four",
             "champion",
@@ -150,7 +149,7 @@ def test_badge_presentation_defaults_unknown_team_prefix_to_global() -> None:
 
 
 def test_unlocked_badge_progress_stays_complete_if_source_drops(tmp_path: Path) -> None:
-    badge_service, progress, _ = _wire(tmp_path)
+    badge_service, progress = _wire(tmp_path)
     progress.patch_status(ProgressStatusPatch(slug="0025-pikachu", state="caught"))
     badge_service.sync_unlocked()
     progress.patch_status(ProgressStatusPatch(slug="0025-pikachu", state="not_met"))
@@ -167,7 +166,7 @@ def test_unlocked_badge_progress_stays_complete_if_source_drops(tmp_path: Path) 
 def test_sync_does_not_unlock_first_encounter_when_something_seen(
     tmp_path: Path,
 ) -> None:
-    badge_service, progress, _ = _wire(tmp_path)
+    badge_service, progress = _wire(tmp_path)
     progress.patch_status(ProgressStatusPatch(slug="0025-pikachu", state="seen"))
     newly = badge_service.sync_unlocked()
     state = badge_service.state()
@@ -177,25 +176,18 @@ def test_sync_does_not_unlock_first_encounter_when_something_seen(
     assert state.unlocked == []
 
 
-def test_sync_unlocks_catch_and_shiny_thresholds(tmp_path: Path) -> None:
-    badge_service, progress, _ = _wire(tmp_path)
+def test_sync_unlocks_first_catch_only(tmp_path: Path) -> None:
+    badge_service, progress = _wire(tmp_path)
     progress.patch_status(
         ProgressStatusPatch(slug="0025-pikachu", state="caught", shiny=True)
     )
     newly = set(badge_service.sync_unlocked())
     assert "first_encounter" not in newly
-    assert {"first_catch", "first_shiny"} <= newly
-
-
-def test_sync_unlocks_first_card(tmp_path: Path) -> None:
-    badge_service, _, cards = _wire(tmp_path)
-    cards.create(CardCreate(pokemon_slug="0025-pikachu", set_id="sv01", num="1/1"))
-    newly = set(badge_service.sync_unlocked())
-    assert "first_card" in newly
+    assert newly == {"first_catch"}
 
 
 def test_unlocks_are_monotonic_even_if_progress_drops(tmp_path: Path) -> None:
-    badge_service, progress, _ = _wire(tmp_path)
+    badge_service, progress = _wire(tmp_path)
     progress.patch_status(ProgressStatusPatch(slug="0025-pikachu", state="caught"))
     badge_service.sync_unlocked()
     progress.patch_status(ProgressStatusPatch(slug="0025-pikachu", state="not_met"))
@@ -205,7 +197,7 @@ def test_unlocks_are_monotonic_even_if_progress_drops(tmp_path: Path) -> None:
 
 
 def test_sync_unlocks_threshold_badges(tmp_path: Path) -> None:
-    badge_service, progress, _ = _wire(tmp_path)
+    badge_service, progress = _wire(tmp_path)
     for i in range(1, 101):
         progress.patch_status(
             ProgressStatusPatch(slug=f"slug-{i:04d}", state="caught")
@@ -215,31 +207,8 @@ def test_sync_unlocks_threshold_badges(tmp_path: Path) -> None:
     assert "thousand" not in newly
 
 
-def test_card_based_thresholds(tmp_path: Path) -> None:
-    badge_service, _, cards = _wire(tmp_path)
-    for i in range(10):
-        cards.create(
-            CardCreate(
-                pokemon_slug=f"slug-{i}",
-                set_id=f"set-{i}",
-                num=str(i),
-                qty=1,
-            )
-        )
-    newly = set(badge_service.sync_unlocked())
-    assert "ten_sets" in newly
-    assert "hundred_cards" not in newly
-
-
-def test_dedicated_collector_looks_at_cumulative_qty(tmp_path: Path) -> None:
-    badge_service, _, cards = _wire(tmp_path)
-    cards.create(CardCreate(pokemon_slug="s", set_id="a", num="1", qty=500))
-    newly = set(badge_service.sync_unlocked())
-    assert "dedicated_collector" in newly
-
-
 def test_state_reports_unlocked_on_catalog_entries(tmp_path: Path) -> None:
-    badge_service, progress, _ = _wire(tmp_path)
+    badge_service, progress = _wire(tmp_path)
     progress.patch_status(ProgressStatusPatch(slug="0025-pikachu", state="caught"))
     badge_service.sync_unlocked()
     state = badge_service.state()
@@ -264,8 +233,7 @@ def test_state_filters_and_persists_removed_legacy_unlocked_badges(
         encoding="utf-8",
     )
     progress_repo = JsonProgressRepository(progress_path)
-    card_repo = JsonCardRepository(tmp_path / "cards.json")
-    badge_service = BadgeService(progress_repo, card_repo)
+    badge_service = BadgeService(progress_repo)
 
     state = badge_service.state()
 
@@ -277,10 +245,10 @@ def test_state_filters_and_persists_removed_legacy_unlocked_badges(
 
 
 def test_metric_value_rejects_unknown_metric(tmp_path: Path) -> None:
-    _, progress, cards = _wire(tmp_path)
+    _, progress = _wire(tmp_path)
 
     with pytest.raises(ValueError, match="Unknown badge metric"):
-        _metric_value("unknown", progress.get_progress(), cards.list_all().cards)
+        _metric_value("unknown", progress.get_progress())
 
 
 def test_kanto_badges_are_in_catalog(tmp_path: Path) -> None:
@@ -306,7 +274,7 @@ def test_kanto_badges_are_in_catalog(tmp_path: Path) -> None:
 
 
 def test_kanto_gym_badge_requires_full_caught_team(tmp_path: Path) -> None:
-    badge_service, progress, _ = _wire(tmp_path)
+    badge_service, progress = _wire(tmp_path)
     progress.patch_status(ProgressStatusPatch(slug="0074-geodude", state="caught"))
 
     state = badge_service.state()
@@ -326,7 +294,7 @@ def test_kanto_gym_badge_requires_full_caught_team(tmp_path: Path) -> None:
 def test_team_badge_exposes_required_pokemon_with_caught_state(
     tmp_path: Path,
 ) -> None:
-    badge_service, progress, _ = _wire(tmp_path)
+    badge_service, progress = _wire(tmp_path)
     progress.patch_status(ProgressStatusPatch(slug="0074-geodude", state="caught"))
 
     by_id = {badge.id: badge for badge in badge_service.state().catalog}
@@ -341,7 +309,7 @@ def test_team_badge_exposes_required_pokemon_with_caught_state(
 
 
 def test_kanto_team_badges_count_duplicate_species_once(tmp_path: Path) -> None:
-    badge_service, progress, _ = _wire(tmp_path)
+    badge_service, progress = _wire(tmp_path)
     _catch_all(progress, ["0109-koffing", "0089-muk"])
 
     by_id = {badge.id: badge for badge in badge_service.state().catalog}
@@ -358,7 +326,7 @@ def test_kanto_team_badges_count_duplicate_species_once(tmp_path: Path) -> None:
 def test_kanto_rival_badge_unlocks_with_any_final_team_variant(
     tmp_path: Path,
 ) -> None:
-    badge_service, progress, _ = _wire(tmp_path)
+    badge_service, progress = _wire(tmp_path)
     _catch_all(
         progress,
         [
@@ -377,7 +345,7 @@ def test_kanto_rival_badge_unlocks_with_any_final_team_variant(
 
 
 def test_kanto_rival_progress_uses_closest_variant(tmp_path: Path) -> None:
-    badge_service, progress, _ = _wire(tmp_path)
+    badge_service, progress = _wire(tmp_path)
     _catch_all(
         progress,
         [
@@ -397,7 +365,7 @@ def test_kanto_rival_progress_uses_closest_variant(tmp_path: Path) -> None:
 
 
 def test_kanto_trainer_unlocks_are_monotonic(tmp_path: Path) -> None:
-    badge_service, progress, _ = _wire(tmp_path)
+    badge_service, progress = _wire(tmp_path)
     _catch_all(progress, ["0074-geodude", "0095-onix"])
     badge_service.sync_unlocked()
     progress.patch_status(ProgressStatusPatch(slug="0095-onix", state="not_met"))
@@ -444,7 +412,7 @@ def test_gold_silver_badges_are_in_catalog(tmp_path: Path) -> None:
 def test_gold_silver_johto_gym_badge_requires_full_caught_team(
     tmp_path: Path,
 ) -> None:
-    badge_service, progress, _ = _wire(tmp_path)
+    badge_service, progress = _wire(tmp_path)
     progress.patch_status(ProgressStatusPatch(slug="0016-pidgey", state="caught"))
 
     by_id = {badge.id: badge for badge in badge_service.state().catalog}
@@ -459,7 +427,7 @@ def test_gold_silver_johto_gym_badge_requires_full_caught_team(
 
 
 def test_gold_silver_kanto_badge_uses_gold_silver_team(tmp_path: Path) -> None:
-    badge_service, progress, _ = _wire(tmp_path)
+    badge_service, progress = _wire(tmp_path)
     _catch_all(progress, ["0074-geodude", "0095-onix"])
 
     by_id = {badge.id: badge for badge in badge_service.state().catalog}
@@ -479,7 +447,7 @@ def test_gold_silver_kanto_badge_uses_gold_silver_team(tmp_path: Path) -> None:
 
 
 def test_gold_silver_lance_counts_duplicate_dragonite_once(tmp_path: Path) -> None:
-    badge_service, progress, _ = _wire(tmp_path)
+    badge_service, progress = _wire(tmp_path)
     _catch_all(progress, ["0130-gyarados", "0006-charizard", "0142-aerodactyl"])
 
     by_id = {badge.id: badge for badge in badge_service.state().catalog}
@@ -496,7 +464,7 @@ def test_gold_silver_lance_counts_duplicate_dragonite_once(tmp_path: Path) -> No
 def test_gold_silver_rival_badge_unlocks_with_any_rematch_variant(
     tmp_path: Path,
 ) -> None:
-    badge_service, progress, _ = _wire(tmp_path)
+    badge_service, progress = _wire(tmp_path)
     _catch_all(
         progress,
         [
@@ -515,7 +483,7 @@ def test_gold_silver_rival_badge_unlocks_with_any_rematch_variant(
 
 
 def test_gold_silver_rival_progress_uses_closest_variant(tmp_path: Path) -> None:
-    badge_service, progress, _ = _wire(tmp_path)
+    badge_service, progress = _wire(tmp_path)
     _catch_all(
         progress,
         [
@@ -568,7 +536,7 @@ def test_base_generation_badges_are_in_catalog(tmp_path: Path) -> None:
 
 
 def test_ruby_sapphire_gym_badge_requires_full_caught_team(tmp_path: Path) -> None:
-    badge_service, progress, _ = _wire(tmp_path)
+    badge_service, progress = _wire(tmp_path)
     progress.patch_status(ProgressStatusPatch(slug="0074-geodude", state="caught"))
 
     by_id = {badge.id: badge for badge in badge_service.state().catalog}
@@ -583,7 +551,7 @@ def test_ruby_sapphire_gym_badge_requires_full_caught_team(tmp_path: Path) -> No
 
 
 def test_ruby_sapphire_badges_count_duplicate_species_once(tmp_path: Path) -> None:
-    badge_service, progress, _ = _wire(tmp_path)
+    badge_service, progress = _wire(tmp_path)
     progress.patch_status(ProgressStatusPatch(slug="0218-slugma", state="caught"))
 
     by_id = {badge.id: badge for badge in badge_service.state().catalog}
@@ -600,7 +568,7 @@ def test_ruby_sapphire_badges_count_duplicate_species_once(tmp_path: Path) -> No
 def test_black_white_trio_badge_unlocks_with_any_starter_variant(
     tmp_path: Path,
 ) -> None:
-    badge_service, progress, _ = _wire(tmp_path)
+    badge_service, progress = _wire(tmp_path)
     _catch_all(progress, ["0506-lillipup", "0513-pansear"])
 
     newly = set(badge_service.sync_unlocked())
@@ -611,7 +579,7 @@ def test_black_white_trio_badge_unlocks_with_any_starter_variant(
 def test_black_white_n_badge_unlocks_with_either_legendary_variant(
     tmp_path: Path,
 ) -> None:
-    badge_service, progress, _ = _wire(tmp_path)
+    badge_service, progress = _wire(tmp_path)
     _catch_all(
         progress,
         [
@@ -626,7 +594,7 @@ def test_black_white_n_badge_unlocks_with_either_legendary_variant(
 
     assert "bw_n" in set(badge_service.sync_unlocked())
 
-    badge_service, progress, _ = _wire(tmp_path / "white")
+    badge_service, progress = _wire(tmp_path / "white")
     _catch_all(
         progress,
         [
@@ -645,7 +613,7 @@ def test_black_white_n_badge_unlocks_with_either_legendary_variant(
 def test_black_white_2_hugh_badge_uses_closest_starter_variant(
     tmp_path: Path,
 ) -> None:
-    badge_service, progress, _ = _wire(tmp_path)
+    badge_service, progress = _wire(tmp_path)
     _catch_all(
         progress,
         [

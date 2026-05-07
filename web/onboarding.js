@@ -16,7 +16,6 @@
  *     goal: "complete_pokedex",
  *     favorite_region: "all" | region id,
  *     tracking_mode: "simple" | "advanced",
- *     card_layer: "addon_later",
  *     skipped: boolean
  *   }
  *
@@ -46,7 +45,7 @@
   };
   const FALLBACK_I18N = {
     "onboarding.profile.undefined": "Profil : non défini — rejoue l'onboarding pour personnaliser.",
-    "onboarding.profile.summary": "Profil : Compléter mon Pokédex · {region} · {mode} · cartes en add-on.",
+    "onboarding.profile.summary": "Profil : Compléter mon Pokédex · {region} · {mode} · classeurs locaux.",
     "onboarding.mode.simple": "mode simple",
     "onboarding.mode.advanced": "mode avancé",
     "onboarding.done": "Terminer",
@@ -91,13 +90,12 @@
       goal: "complete_pokedex",
       favorite_region: "all",
       tracking_mode: trackingMode,
-      card_layer: "addon_later",
       completed_at: typeof data.completed_at === "string" ? data.completed_at : null,
       skipped: Boolean(data.skipped),
     };
   }
 
-  /** @returns {null | {version: number; goal: string; favorite_region: string; tracking_mode: string; card_layer: string; completed_at: string | null; skipped: boolean}} */
+  /** @returns {null | {version: number; goal: string; favorite_region: string; tracking_mode: string; completed_at: string | null; skipped: boolean}} */
   function readProfile() {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
@@ -110,7 +108,6 @@
         goal: normalizeGoal(data.goal),
         favorite_region: normalizeRegion(data.favorite_region),
         tracking_mode: normalizeTrackingMode(data.tracking_mode),
-        card_layer: "addon_later",
         completed_at: typeof data.completed_at === "string" ? data.completed_at : null,
         skipped: Boolean(data.skipped),
       };
@@ -125,7 +122,6 @@
       goal: normalizeGoal(payload.goal),
       favorite_region: normalizeRegion(payload.favorite_region),
       tracking_mode: normalizeTrackingMode(payload.tracking_mode),
-      card_layer: "addon_later",
       completed_at: payload.skipped ? null : new Date().toISOString(),
       skipped: Boolean(payload.skipped),
     };
@@ -186,7 +182,6 @@
       goal: normalizeGoal(profile.goal),
       favorite_region: normalizeRegion(profile.favorite_region),
       tracking_mode: normalizeTrackingMode(profile.tracking_mode),
-      card_layer: "addon_later",
     };
     const preferences = trackingPreferences(clean.tracking_mode);
     if (preferences.form_scope && preferences.form_scope !== "all") {

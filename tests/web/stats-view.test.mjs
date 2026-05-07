@@ -84,8 +84,6 @@ test("renderStats follows English i18n labels when available", async () => {
         "stats.kpi.caught_sub": "{pct}% global completion",
         "stats.kpi.missing": "Missing",
         "stats.kpi.missing_sub": "Collection priority",
-        "stats.kpi.cards": "Catalogued cards",
-        "stats.kpi.cards_empty": "Add a card to activate TCG tracking",
         "stats.region_archive": "Regional archive",
         "stats.collection_gaps": "Collection gaps",
         "stats.gap_line": "{type} · {count} missing specimen(s)",
@@ -104,9 +102,6 @@ test("renderStats follows English i18n labels when available", async () => {
     caughtMap: { "001-a": true },
     statusMap: {},
     regionDefinitions: [{ id: "kanto", label_fr: "Kanto", low: 1, high: 151 }],
-    computeCardStats() {
-      return { cards: 0, sets: 0 };
-    },
   };
   globalThis.PokevaultRecommendations = {
     rankTargets() {
@@ -125,4 +120,6 @@ test("renderStats follows English i18n labels when available", async () => {
   assert.match(textTree(elements.statsBody), /Total specimens/);
   assert.match(textTree(elements.statsBody), /Regional archive/);
   assert.match(textTree(elements.statsBody), /Completion by type/);
+  assert.doesNotMatch(textTree(elements.statsBody), /Catalogued cards/);
+  assert.doesNotMatch(textTree(elements.statsBody), /TCG/);
 });

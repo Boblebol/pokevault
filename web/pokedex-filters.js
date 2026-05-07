@@ -21,10 +21,10 @@
   function statusForPokemon(slug, caughtMap = {}, statusMap = {}) {
     const raw = statusMap?.[slug];
     if (raw?.state === "caught" || caughtMap?.[slug]) {
-      return { state: "caught", shiny: Boolean(raw?.shiny) };
+      return { state: "caught" };
     }
-    if (raw?.state === "seen") return { state: "seen", shiny: false };
-    return { state: "not_met", shiny: false };
+    if (raw?.state === "seen") return { state: "seen" };
+    return { state: "not_met" };
   }
 
   function isMegaFormPokemon(pokemon) {
