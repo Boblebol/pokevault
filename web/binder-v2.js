@@ -91,6 +91,8 @@ const BINDER_WIZARD_FALLBACK_I18N = {
   "binder_wizard.error.choose_org": "Choisis une organisation : national ou par région.",
   "binder_wizard.error.choose_format": "Choisis un format de grille (preset ou personnalisé).",
   "binder_wizard.error.choose_forms": "Choisis un périmètre de formes (base, base + région, ou complet).",
+  "binder_wizard.error.family_data": "Impossible de charger les familles d'evolution pour calculer le grand classeur.",
+  "binder_wizard.error.pokedex_data": "Impossible de charger le Pokedex pour calculer le grand classeur.",
   "binder_wizard.error.api": "Impossible de joindre l’API classeurs (réseau ou CORS).",
 };
 
@@ -106,6 +108,7 @@ function tBinderWizard(key, params = {}) {
 /** @type {"base_only" | "base_regional" | "full"} */
 const DEFAULT_FORM_SCOPE = "base_only";
 const ORG_REGIONAL_FAMILY_ALBUM = "regional_family_album";
+const LARGE_RING_MARGIN_SHEETS = 10;
 
 /** @type {{ name: string; organization: string; formScope: string; formatPreset: string; rows: number; cols: number; sheetCount: number; editBinderId: string | null }} */
 let wizardDraft = {
@@ -812,6 +815,14 @@ function setEvolutionFamilyData(data) {
   binderEvolutionFamilies = data && typeof data === "object" ? data : null;
 }
 
+function hasEvolutionFamilyData(familyData) {
+  return Array.isArray(familyData?.families) && familyData.families.length > 0;
+}
+
+function hasPokedexBinderData(defs, pokemon) {
+  return Array.isArray(defs) && defs.length > 0 && Array.isArray(pokemon) && pokemon.length > 0;
+}
+
 async function ensureEvolutionFamiliesLoaded() {
   if (binderEvolutionFamilies) return binderEvolutionFamilies;
   try {
@@ -1395,6 +1406,71 @@ function buildPersistNewPayloads(draft) {
   return { configBody, placementsBody };
 }
 
+function autoSheetCountForLargeRing(selectedPokemon, defs, familyData) {
+  const engine = window.PokevaultBinderLayout;
+  const rows = 3;
+  const cols = 3;
+  const perSheet = rows * cols * 2;
+  if (!engine?.computeBinderSlots) {
+    const selectedCount = Array.isArray(selectedPokemon) ? selectedPokemon.length : 0;
+    const minimumSheets = Math.max(1, Math.ceil(selectedCount / perSheet));
+    return minimumSheets + LARGE_RING_MARGIN_SHEETS;
+  }
+  const slots = engine.computeBinderSlots({
+    binder: {
+      organization: ORG_REGIONAL_FAMILY_ALBUM,
+      rows,
+      cols,
+      sheet_count: 1,
+    },
+    pokemon: selectedPokemon,
+    defs,
+    familyData,
+    includeCapacity: false,
+  });
+  const usedSlots = Array.isArray(slots) ? slots.length : selectedPokemon.length;
+  const minimumSheets = Math.max(1, Math.ceil(usedSlots / perSheet));
+  return minimumSheets + LARGE_RING_MARGIN_SHEETS;
+}
+
+function buildLargeRingBinderWorkspace(draft, defs, pokemon, familyData, seed = Date.now().toString(36)) {
+  const scope = normalizeFormScope(draft.formScope || "base_regional");
+  const formRule = formRuleFromScope(scope);
+  const selectedPokemon = selectBinderPokemonPool(Array.isArray(pokemon) ? pokemon : [], formRule);
+  const sheetCount = autoSheetCountForLargeRing(selectedPokemon, defs, familyData);
+  const id = `classeur-${seed}-grand-3x3`;
+  return {
+    configBody: {
+      version: 1,
+      convention: "sheet_recto_verso",
+      binders: [
+        {
+          id,
+          name: draft.name || "Grand classeur",
+          cols: 3,
+          rows: 3,
+          sheet_count: sheetCount,
+          form_rule_id: formRule.id,
+          organization: ORG_REGIONAL_FAMILY_ALBUM,
+          layout_options: {
+            region_break: "new_sheet",
+            family_compact: true,
+            auto_capacity: true,
+            margin_sheets: LARGE_RING_MARGIN_SHEETS,
+          },
+        },
+      ],
+      form_rules: [formRule],
+    },
+    placementsBody: {
+      version: 1,
+      by_binder: {
+        [id]: {},
+      },
+    },
+  };
+}
+
 /**
  * Classeurs régionaux découpés selon la capacité physique choisie.
  * Si une région dépasse rows × cols × feuillets × 2, elle devient Kanto 1, Kanto 2, etc.
@@ -1650,6 +1726,17 @@ async function buildPersistNewPayloadsMultiRegion(draft) {
  * @param {{ name: string; organization: string; formScope: string; rows: number; cols: number; sheetCount: number }} draft
  */
 async function buildPersistNewPayloadsFromDraft(draft) {
+  if (draft.organization === ORG_REGIONAL_FAMILY_ALBUM) {
+    const { defs, pokemon } = await fetchPokedexBinderData();
+    if (!hasPokedexBinderData(defs, pokemon)) {
+      throw new Error("large-ring-pokedex-data-unavailable");
+    }
+    const familyData = await ensureEvolutionFamiliesLoaded();
+    if (!hasEvolutionFamilyData(familyData)) {
+      throw new Error("large-ring-family-data-unavailable");
+    }
+    return buildLargeRingBinderWorkspace(draft, defs, pokemon, familyData);
+  }
   if (draft.organization === "by_region") {
     return buildPersistNewPayloadsMultiRegion(draft);
   }
@@ -1706,6 +1793,25 @@ function buildPersistEditPayloads(draft, cfg, placementsPayload) {
   return { configBody, placementsBody };
 }
 
+async function buildPersistEditPayloadsFromDraft(draft, cfg, placementsPayload) {
+  if (draft.organization !== ORG_REGIONAL_FAMILY_ALBUM) {
+    return buildPersistEditPayloads(draft, cfg, placementsPayload);
+  }
+  const { defs, pokemon } = await fetchPokedexBinderData();
+  if (!hasPokedexBinderData(defs, pokemon)) {
+    throw new Error("large-ring-pokedex-data-unavailable");
+  }
+  const familyData = await ensureEvolutionFamiliesLoaded();
+  if (!hasEvolutionFamilyData(familyData)) {
+    throw new Error("large-ring-family-data-unavailable");
+  }
+  const scope = normalizeFormScope(draft.formScope || "base_regional");
+  const formRule = formRuleFromScope(scope);
+  const selectedPokemon = selectBinderPokemonPool(Array.isArray(pokemon) ? pokemon : [], formRule);
+  const sheetCount = autoSheetCountForLargeRing(selectedPokemon, defs, familyData);
+  return buildPersistEditPayloads({ ...draft, rows: 3, cols: 3, sheetCount }, cfg, placementsPayload);
+}
+
 /**
  * @param {{ name: string; organization: string; formScope: string; rows: number; cols: number; sheetCount: number }} draft
  * @param {{ silent?: boolean }} [opts]
@@ -1716,15 +1822,26 @@ async function persistWizardDraft(draft, opts = {}) {
   if (!silent) setBinderHint(hint, "", true);
   let configBody;
   let placementsBody;
-  if (draft.editBinderId && lastConfigJson && lastPlacementsPayload) {
-    const merged = buildPersistEditPayloads(draft, lastConfigJson, lastPlacementsPayload);
-    configBody = merged.configBody;
-    placementsBody = merged.placementsBody;
-  } else {
-    const merged = await buildPersistNewPayloadsFromDraft(draft);
-    configBody = merged.configBody;
-    placementsBody = merged.placementsBody;
+  let merged;
+  try {
+    if (draft.editBinderId && lastConfigJson && lastPlacementsPayload) {
+      merged = await buildPersistEditPayloadsFromDraft(draft, lastConfigJson, lastPlacementsPayload);
+    } else {
+      merged = await buildPersistNewPayloadsFromDraft(draft);
+    }
+  } catch (err) {
+    if (err?.message === "large-ring-family-data-unavailable") {
+      if (!silent) setBinderHint(hint, tBinderWizard("binder_wizard.error.family_data"), false);
+      return false;
+    }
+    if (err?.message === "large-ring-pokedex-data-unavailable") {
+      if (!silent) setBinderHint(hint, tBinderWizard("binder_wizard.error.pokedex_data"), false);
+      return false;
+    }
+    throw err;
   }
+  configBody = merged.configBody;
+  placementsBody = merged.placementsBody;
 
   const cfgRes = await fetch(API_BINDER_CONFIG, {
     method: "PUT",
@@ -2005,14 +2122,20 @@ window.PokedexBinder = {
     return binderEvolutionFamilies;
   },
   _test: {
+    autoSheetCountForLargeRing,
     binderCapacity,
     binderUsesEvolutionFamilies,
     buildFamilyBinderWorkspace,
+    buildLargeRingBinderWorkspace,
     buildRegionalBinderWorkspace,
     buildPersistEditPayloads,
+    buildPersistEditPayloadsFromDraft,
     buildPersistNewPayloads,
+    buildPersistNewPayloadsFromDraft,
     configUsesEvolutionFamilies,
     draftFromConfigForTest,
+    hasEvolutionFamilyData,
+    hasPokedexBinderData,
     orderPokemonForBinder,
     readOrgSelectionForDraftForTest,
     selectBinderPokemonPool,
