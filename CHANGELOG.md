@@ -7,6 +7,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [1.5.0] — 2026-05-07
+
+### Added
+
+- Badge details now include sealed-until-unlock battle dossiers with trainer
+  history, city/arena context, exact level/move sets, type chips and matchup
+  summaries.
+- A versioned `data/badge-battles.json` catalog covers all team badges with
+  source-backed battle variants and localized move names.
+- Badge API responses now attach battle metadata for alternate frontends while
+  the built-in UI keeps locked mystery badges sealed.
+
+### Changed
+
+- Collection ownership now uses the simpler `Capturer` / `Relâcher` flow, with
+  `Plusieurs exemplaires` as the duplicate state wording.
+- Type labels now render as colored chips across cards, Pokémon fiches, stats
+  and battle dossiers.
+- Binder creation now guides users through dependent choices, with the large
+  regional family album funnel locked to the relevant form and format options.
+- Stats now place badge progress beside the core dashboard and focus on
+  regional archive plus type completion.
+
+### Fixed
+
+- Import now sanitizes obsolete badge unlock ids from older backups.
+- Locked mystery badges no longer leak team requirements through detail or tile
+  previews.
+- Runtime i18n compatibility keys are preserved for committed UI consumers.
+
 ## [1.4.0] — 2026-05-03
 
 ### Added
