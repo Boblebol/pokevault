@@ -13,6 +13,7 @@ from tracker.api.dependencies import (
     get_badge_service,
     get_progress_service,
 )
+from tracker.badge_battle_models import BadgeBattleCatalog
 from tracker.repository.json_progress_repository import JsonProgressRepository
 from tracker.services.badge_service import BadgeService
 from tracker.services.progress_service import ProgressService
@@ -73,6 +74,64 @@ def test_badges_endpoint_exposes_progress_metadata(tmp_path: Path) -> None:
     assert by_id["century"]["target"] == 100
     assert by_id["century"]["percent"] == 1
     assert by_id["century"]["hint"] == "Encore 99 Pokémon à attraper."
+
+
+def test_badges_endpoint_exposes_battle_data_when_catalog_is_configured(
+    tmp_path: Path,
+) -> None:
+    progress_repo = JsonProgressRepository(tmp_path / "progress.json")
+    progress_svc = ProgressService(progress_repo)
+    battle_catalog = BadgeBattleCatalog.model_validate(
+        {
+            "version": 1,
+            "badges": {
+                "kanto_brock": {
+                    "trainer": {
+                        "name": {"fr": "Pierre", "en": "Brock"},
+                        "role": {"fr": "Champion d'Arène", "en": "Gym Leader"},
+                        "history": {
+                            "fr": "Champion d'Argenta.",
+                            "en": "Pewter Gym Leader.",
+                        },
+                    },
+                    "location": {
+                        "region": "kanto",
+                        "city": {"fr": "Argenta", "en": "Pewter City"},
+                        "place": {"fr": "Arène d'Argenta", "en": "Pewter Gym"},
+                    },
+                    "encounters": [
+                        {
+                            "id": "red-blue",
+                            "label": {"fr": "Rouge / Bleu", "en": "Red / Blue"},
+                            "games": ["red", "blue"],
+                            "variant": {"kind": "version"},
+                            "team": [
+                                {
+                                    "slug": "0074-geodude",
+                                    "level": 12,
+                                    "moves": [{"fr": "Charge", "en": "Tackle"}],
+                                }
+                            ],
+                        }
+                    ],
+                }
+            },
+        }
+    )
+    badge_svc = BadgeService(progress_repo, battle_catalog=battle_catalog)
+    app = FastAPI()
+    app.include_router(progress_router)
+    app.include_router(badge_router)
+    app.dependency_overrides[get_progress_service] = lambda: progress_svc
+    app.dependency_overrides[get_badge_service] = lambda: badge_svc
+    client = TestClient(app)
+
+    body = client.get("/api/badges").json()
+    by_id = {badge["id"]: badge for badge in body["catalog"]}
+
+    assert by_id["kanto_brock"]["battle"]["trainer"]["name"]["en"] == "Brock"
+    assert by_id["kanto_brock"]["battle"]["encounters"][0]["team"][0]["level"] == 12
+    assert by_id["first_catch"]["battle"] is None
 
 
 def test_badges_auto_sync_on_read(tmp_path: Path) -> None:

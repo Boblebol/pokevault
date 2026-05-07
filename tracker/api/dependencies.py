@@ -17,6 +17,7 @@ from tracker.repository.json_binder_config_repository import JsonBinderConfigRep
 from tracker.repository.json_binder_placements_repository import JsonBinderPlacementsRepository
 from tracker.repository.json_progress_repository import JsonProgressRepository
 from tracker.repository.json_trainer_contact_repository import JsonTrainerContactRepository
+from tracker.services.badge_battle_catalog import load_badge_battle_catalog
 from tracker.services.badge_service import BadgeService
 from tracker.services.binder_config_service import BinderConfigService
 from tracker.services.binder_placements_service import BinderPlacementsService
@@ -99,9 +100,11 @@ def get_trainer_contact_service(
 
 
 def get_badge_service(
+    settings: Annotated[TrackerSettings, Depends(get_settings)],
     progress_repo: Annotated[ProgressRepository, Depends(get_progress_repository)],
 ) -> BadgeService:
-    return BadgeService(progress_repo)
+    battle_catalog = load_badge_battle_catalog(settings.data_dir / "badge-battles.json")
+    return BadgeService(progress_repo, battle_catalog=battle_catalog)
 
 
 def get_export_service(

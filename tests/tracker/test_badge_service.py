@@ -11,6 +11,7 @@ from pydantic import ValidationError
 from tracker.badge_battle_models import BadgeBattleCatalog
 from tracker.models import ProgressStatusPatch
 from tracker.repository.json_progress_repository import JsonProgressRepository
+from tracker.services.badge_battle_catalog import load_badge_battle_catalog
 from tracker.services.badge_presentation import presentation_for_badge
 from tracker.services.badge_service import BADGES, BadgeService, _metric_value
 from tracker.services.progress_service import ProgressService
@@ -135,6 +136,61 @@ def test_badge_battle_catalog_rejects_empty_game_entries() -> None:
                 },
             }
         )
+
+
+def test_badge_battle_catalog_loader_returns_empty_for_missing_file(tmp_path: Path) -> None:
+    catalog = load_badge_battle_catalog(tmp_path / "missing.json")
+
+    assert catalog.version == 1
+    assert catalog.badges == {}
+
+
+def test_badge_service_attaches_battle_data_to_matching_badges(tmp_path: Path) -> None:
+    progress_repo = JsonProgressRepository(tmp_path / "progress.json")
+    catalog = BadgeBattleCatalog.model_validate(
+        {
+            "version": 1,
+            "badges": {
+                "kanto_brock": {
+                    "trainer": {
+                        "name": {"fr": "Pierre", "en": "Brock"},
+                        "role": {"fr": "Champion d'Arène", "en": "Gym Leader"},
+                        "history": {
+                            "fr": "Champion d'Argenta.",
+                            "en": "Pewter Gym Leader.",
+                        },
+                    },
+                    "location": {
+                        "region": "kanto",
+                        "city": {"fr": "Argenta", "en": "Pewter City"},
+                        "place": {"fr": "Arène d'Argenta", "en": "Pewter Gym"},
+                    },
+                    "encounters": [
+                        {
+                            "id": "red-blue",
+                            "label": {"fr": "Rouge / Bleu", "en": "Red / Blue"},
+                            "games": ["red", "blue"],
+                            "variant": {"kind": "version"},
+                            "team": [
+                                {
+                                    "slug": "0074-geodude",
+                                    "level": 12,
+                                    "moves": [{"fr": "Charge", "en": "Tackle"}],
+                                }
+                            ],
+                        }
+                    ],
+                }
+            },
+        }
+    )
+    service = BadgeService(progress_repo, battle_catalog=catalog)
+
+    by_id = {badge.id: badge for badge in service.state().catalog}
+
+    assert by_id["kanto_brock"].battle is not None
+    assert by_id["kanto_brock"].battle.trainer.name.en == "Brock"
+    assert by_id["first_catch"].battle is None
 
 
 def test_catalog_exposes_all_definitions(tmp_path: Path) -> None:
