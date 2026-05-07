@@ -18,9 +18,6 @@ const STATS_FALLBACK_I18N = {
   "stats.kpi.caught_sub": "{pct}% de complétion globale",
   "stats.kpi.missing": "Manquants",
   "stats.kpi.missing_sub": "Priorité collection",
-  "stats.kpi.cards": "Cartes cataloguées",
-  "stats.kpi.cards_empty": "Ajoute une carte pour activer le suivi TCG",
-  "stats.kpi.cards_sets": "{sets} set(s) catalogué(s)",
   "stats.region_archive": "Archive régionale",
   "stats.collection_gaps": "Lacunes de collection",
   "stats.gap_line": "{type} · {count} spécimen(s) manquants",
@@ -240,21 +237,10 @@ function renderStats() {
 
   const kpiGrid = document.createElement("section");
   kpiGrid.className = "stats-kpi-grid";
-  const cardStats = PC?.computeCardStats ? PC.computeCardStats() : { cards: 0, sets: 0 };
-  const cardSub =
-    cardStats.cards === 0
-      ? tStats("stats.kpi.cards_empty")
-      : tStats("stats.kpi.cards_sets", { sets: cardStats.sets });
   kpiGrid.append(
     renderKpiCard(tStats("stats.kpi.total"), String(gTotal), tStats("stats.kpi.total_sub")),
     renderKpiCard(tStats("stats.kpi.caught"), String(gCaught), tStats("stats.kpi.caught_sub", { pct: globalPct })),
     renderKpiCard(tStats("stats.kpi.missing"), String(Math.max(0, gTotal - gCaught)), tStats("stats.kpi.missing_sub")),
-    renderKpiCard(
-      tStats("stats.kpi.cards"),
-      String(cardStats.cards),
-      cardSub,
-      cardStats.cards === 0 ? "is-dormant" : "",
-    ),
   );
   host.append(kpiGrid);
 
@@ -327,38 +313,6 @@ function renderStats() {
       sec.append(line);
     }
     sec.hidden = !showAdvanced;
-    bento.append(sec);
-  }
-
-  const objective = window.PokevaultRecommendations?.rankTargets?.({
-    pool,
-    caughtMap: caught,
-    statusMap: PC?.statusMap || {},
-    huntMap: window.PokevaultHunts?.state?.hunts || {},
-    regionDefinitions: defs,
-    limit: 6,
-  }) || { targetRegion: tStats("stats.all_regions"), reason: "", rows: [] };
-  if (objective.rows.length) {
-    const sec = document.createElement("section");
-    sec.className = "stats-gaps";
-    const h = document.createElement("h2");
-    h.className = "stats-section-title";
-    h.textContent = tStats("stats.objective_title", { region: objective.targetRegion });
-    sec.append(h);
-    if (objective.reason) {
-      const why = document.createElement("p");
-      why.className = "stats-gap-line stats-gap-line--why";
-      why.textContent = tStats("stats.why", { reason: objective.reason });
-      sec.append(why);
-    }
-    for (const p of objective.rows) {
-      const line = document.createElement("p");
-      line.className = "stats-gap-line";
-      const num = String(p.number || "").replace(/^#/, "");
-      const name = p?.names?.fr || p?.names?.en || p?.slug || "?";
-      line.textContent = `#${num} · ${name}`;
-      sec.append(line);
-    }
     bento.append(sec);
   }
 

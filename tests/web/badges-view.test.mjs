@@ -6,7 +6,6 @@ function installBrowserStubs() {
   globalThis.window = globalThis;
   delete globalThis.PokedexCollection;
   delete globalThis.PokevaultArtwork;
-  delete globalThis.PokevaultBadgeMission;
   globalThis.PokevaultI18n = {
     getLocale: () => "en",
     t: (key, params = {}) => {
@@ -14,8 +13,6 @@ function installBrowserStubs() {
         "badges.status.unlocked": "Unlocked",
         "badges.status.sealed": "{percent}%",
         "badges.toast.title": "Badge unlocked",
-        "badges.detail.follow": "Follow this badge",
-        "badges.detail.following": "Active mission",
       };
       return String(messages[key] || key).replace(/\{([a-zA-Z0-9_]+)\}/g, (_, name) => (
         Object.prototype.hasOwnProperty.call(params, name) ? String(params[name]) : `{${name}}`
@@ -82,11 +79,11 @@ test("nearestBadge chooses the locked badge closest to completion", async () => 
     catalog: [
       { id: "first_catch", title: "Premier", unlocked: true, current: 1, target: 1, percent: 100 },
       { id: "century", title: "Centenaire", unlocked: false, current: 42, target: 100, percent: 42 },
-      { id: "shiny_ten", title: "Chasseur", unlocked: false, current: 8, target: 10, percent: 80 },
+      { id: "kanto_brock", title: "Roche de Kanto", unlocked: false, current: 4, target: 5, percent: 80 },
     ],
   });
 
-  assert.equal(nearest.id, "shiny_ten");
+  assert.equal(nearest.id, "kanto_brock");
 });
 
 test("displayBadgeCopy hides mystery trainer copy while locked", async () => {
@@ -181,12 +178,12 @@ test("nearestBadge uses the smallest remaining count as tie-breaker", async () =
   const api = await loadModule();
   const nearest = api.nearestBadge({
     catalog: [
-      { id: "hundred_cards", title: "Cartes", unlocked: false, current: 50, target: 100, percent: 50 },
-      { id: "shiny_ten", title: "Shiny", unlocked: false, current: 5, target: 10, percent: 50 },
+      { id: "century", title: "Centenaire", unlocked: false, current: 50, target: 100, percent: 50 },
+      { id: "kanto_brock", title: "Roche de Kanto", unlocked: false, current: 3, target: 6, percent: 50 },
     ],
   });
 
-  assert.equal(nearest.id, "shiny_ten");
+  assert.equal(nearest.id, "kanto_brock");
 });
 
 test("buildBadgeTile previews required pokemon thumbnails", async () => {
@@ -257,16 +254,8 @@ test("buildBadgeDetail describes the pokemon required by the badge", async () =>
   assert.equal(byClass(detail, "badge-detail-requirement").length, 2);
 });
 
-test("buildBadgeDetail can start a badge mission for pokemon badges", async () => {
+test("buildBadgeDetail does not expose a badge mission follow action", async () => {
   const api = await loadModule();
-  const followed = [];
-  globalThis.PokevaultBadgeMission = {
-    activeId: "",
-    setActiveBadge(id) {
-      followed.push(id);
-      this.activeId = id;
-    },
-  };
 
   const detail = api.buildBadgeDetail({
     id: "kanto_brock",
@@ -275,10 +264,10 @@ test("buildBadgeDetail can start a badge mission for pokemon badges", async () =
     requirements: [{ slug: "0074-geodude", caught: false }],
   });
 
-  const followButton = flatten(detail).find((node) => (
-    node.tagName === "BUTTON" && /Suivre ce badge|Follow this badge/.test(String(node.textContent || ""))
-  ));
-  assert.ok(followButton);
-  followButton.listeners.click();
-  assert.deepEqual(followed, ["kanto_brock"]);
+  const nodes = flatten(detail);
+  assert.equal(nodes.some((node) => String(node.className || "").includes("badge-detail__mission-btn")), false);
+  assert.equal(nodes.some((node) => (
+    /Suivre ce badge|Follow this badge|Mission active|Active mission/.test(String(node.textContent || ""))
+  )), false);
+  assert.equal(byClass(detail, "badge-detail-requirement").length, 1);
 });

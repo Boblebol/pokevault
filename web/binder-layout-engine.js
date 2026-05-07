@@ -76,6 +76,10 @@
     return items.slice(start, start + limit);
   }
 
+  function isRegionalFamilyAlbum(binder = {}) {
+    return binder.organization === "regional_family_album";
+  }
+
   function slotMeta(index, layout) {
     const pageIndex = Math.floor(index / layout.perPage);
     const slotInPage = index % layout.perPage;
@@ -97,28 +101,41 @@
     return { pokemon: null, emptyKind: "capacity_empty", familyId: null };
   }
 
+  function padToNextSheetRecto(items, layout) {
+    const sheetSize = layout.perPage * 2;
+    while (items.length % sheetSize !== 0) items.push(capacityItem());
+    return items;
+  }
+
   function familyReservedItem(familyId) {
     return { pokemon: null, emptyKind: "family_reserved", familyId };
+  }
+
+  function alignmentEmptyItem() {
+    return { pokemon: null, emptyKind: "alignment_empty", familyId: null };
   }
 
   function padRowToColumns(row, cols, familyId, emptyKind = "family_reserved") {
     const out = row.slice(0, cols);
     while (out.length < cols) {
-      out.push(emptyKind === "capacity_empty" ? capacityItem() : familyReservedItem(familyId));
+      if (emptyKind === "capacity_empty") out.push(capacityItem());
+      else if (emptyKind === "alignment_empty") out.push(alignmentEmptyItem());
+      else out.push(familyReservedItem(familyId));
     }
     return out;
   }
 
-  function chunkRowToColumns(row, cols, familyId) {
+  function chunkRowToColumns(row, cols) {
     const chunks = [];
     const width = positiveInt(cols, 3);
     for (let start = 0; start < row.length; start += width) {
-      chunks.push(padRowToColumns(row.slice(start, start + width), width, familyId));
+      chunks.push(row.slice(start, start + width));
     }
-    return chunks.length ? chunks : [padRowToColumns([], width, familyId)];
+    return chunks.length ? chunks : [[]];
   }
 
-  function familyLayoutBlocks(pokemon = [], familyData = null, cols = 3) {
+  function familyLayoutBlocks(pokemon = [], familyData = null, cols = 3, options = {}) {
+    const reserveMissingSlugs = options.reserveMissingSlugs !== false;
     const bySlug = new Map();
     for (const p of pokemon) {
       const slug = String(p?.slug || "");
@@ -138,6 +155,7 @@
       for (const rawRow of rows) {
         if (!Array.isArray(rawRow)) continue;
         const row = [];
+        let rowHasPokemon = false;
         for (const slugRaw of rawRow) {
           if (!slugRaw) {
             row.push(familyReservedItem(familyId));
@@ -146,14 +164,15 @@
           const slug = String(slugRaw);
           const p = bySlug.get(slug);
           if (!p || emitted.has(slug)) {
-            row.push(familyReservedItem(familyId));
+            if (reserveMissingSlugs) row.push(familyReservedItem(familyId));
             continue;
           }
           row.push(pokemonItem(p, familyId));
           emitted.add(slug);
+          rowHasPokemon = true;
           hasRepresentedPokemon = true;
         }
-        blockRows.push(...chunkRowToColumns(row, cols, familyId));
+        if (rowHasPokemon || reserveMissingSlugs) blockRows.push(...chunkRowToColumns(row, cols));
       }
 
       if (hasRepresentedPokemon) blocks.push({ familyId, rows: blockRows });
@@ -163,9 +182,10 @@
       pokemon.filter((p) => p?.slug && !emitted.has(String(p.slug))),
     );
     for (const p of leftovers) {
+      const familyId = String(p.slug || "");
       blocks.push({
-        familyId: String(p.slug || ""),
-        rows: [padRowToColumns([pokemonItem(p, String(p.slug || ""))], cols, String(p.slug || ""))],
+        familyId,
+        rows: [[pokemonItem(p, familyId)]],
       });
     }
     return blocks;
@@ -174,24 +194,104 @@
   function flattenFamilyBlocksPageAware(blocks = [], layout) {
     const out = [];
     let rowInPage = 0;
+    let currentRow = null;
+    let currentFamilyId = null;
+
+    function flushCurrent(emptyKind = "alignment_empty", familyId = null) {
+      if (!currentRow) return;
+      out.push(...padRowToColumns(currentRow, layout.cols, familyId, emptyKind));
+      currentRow = null;
+      currentFamilyId = null;
+      rowInPage = (rowInPage + 1) % layout.rows;
+    }
+
+    function closePageWithCapacity() {
+      while (rowInPage < layout.rows) {
+        out.push(...padRowToColumns([], layout.cols, null, "capacity_empty"));
+        rowInPage += 1;
+      }
+      rowInPage = 0;
+    }
+
+    function startNextPageIfBlockWouldSplit(blockRowCount) {
+      if (
+        rowInPage > 0 &&
+        blockRowCount <= layout.rows &&
+        rowInPage + blockRowCount > layout.rows
+      ) {
+        closePageWithCapacity();
+      }
+    }
+
+    function currentPageRowsNeededForBlock(blockRows) {
+      const firstRow = blockRows[0] || [];
+      const firstRowSharesCurrent = currentRow && currentRow.length + firstRow.length <= layout.cols;
+      return blockRows.length + (firstRowSharesCurrent ? 0 : 1);
+    }
 
     for (const block of blocks) {
       const blockRows = block.rows || [];
       if (
-        rowInPage > 0 &&
+        currentRow &&
         blockRows.length <= layout.rows &&
-        rowInPage + blockRows.length > layout.rows
+        rowInPage + currentPageRowsNeededForBlock(blockRows) > layout.rows
       ) {
-        while (rowInPage < layout.rows) {
-          out.push(...padRowToColumns([], layout.cols, null, "capacity_empty"));
-          rowInPage += 1;
-        }
-        rowInPage = 0;
+        flushCurrent("alignment_empty", null);
+        startNextPageIfBlockWouldSplit(blockRows.length);
       }
+      if (!currentRow) startNextPageIfBlockWouldSplit(blockRows.length);
 
-      for (const row of blockRows) {
-        out.push(...padRowToColumns(row, layout.cols, block.familyId));
-        rowInPage = (rowInPage + 1) % layout.rows;
+      for (let rowIndex = 0; rowIndex < blockRows.length; rowIndex += 1) {
+        const row = blockRows[rowIndex] || [];
+        if (rowIndex > 0) flushCurrent();
+
+        if (currentRow && currentRow.length + row.length > layout.cols) {
+          flushCurrent("alignment_empty", null);
+          startNextPageIfBlockWouldSplit(blockRows.length - rowIndex);
+        }
+
+        if (!currentRow) {
+          currentRow = [];
+          currentFamilyId = block.familyId;
+        }
+
+        currentRow.push(...row);
+        currentFamilyId = block.familyId;
+        if (currentRow.length >= layout.cols) flushCurrent();
+      }
+    }
+
+    flushCurrent();
+    return out;
+  }
+
+  function regionalFamilyAlbumItems(pokemon = [], defs = [], familyData = null, layout) {
+    if (!defs.length) {
+      if (familyData && Array.isArray(familyData.families)) {
+        return flattenFamilyBlocksPageAware(
+          familyLayoutBlocks(pokemon, familyData, layout.cols),
+          layout,
+        );
+      }
+      return sortNational(pokemon).map((p) => pokemonItem(p));
+    }
+
+    const out = [];
+    for (let idx = 0; idx < defs.length; idx += 1) {
+      const regionId = defs[idx]?.id;
+      if (!regionId) continue;
+      if (idx > 0) padToNextSheetRecto(out, layout);
+
+      const regionPokemon = pokemon.filter((p) => effectiveRegionId(p, defs) === regionId);
+      if (familyData && Array.isArray(familyData.families)) {
+        out.push(
+          ...flattenFamilyBlocksPageAware(
+            familyLayoutBlocks(regionPokemon, familyData, layout.cols, { reserveMissingSlugs: false }),
+            layout,
+          ),
+        );
+      } else {
+        out.push(...sortNational(regionPokemon).map((p) => pokemonItem(p)));
       }
     }
     return out;
@@ -199,11 +299,16 @@
 
   function basicItemsForBinder(binder = {}, pokemon = [], defs = [], familyData = null) {
     const layout = normalizedLayout(binder);
-    const scoped = applyBinderScope(pokemon, binder, defs);
+    const regionalAlbum = isRegionalFamilyAlbum(binder);
+    const scoped = regionalAlbum ? pokemon : applyBinderScope(pokemon, binder, defs);
     const org =
       binder.organization === "by_region" || binder.organization === "family"
         ? binder.organization
         : "national";
+
+    if (regionalAlbum) {
+      return regionalFamilyAlbumItems(scoped, defs, familyData, layout);
+    }
 
     if (org === "family" && familyData && Array.isArray(familyData.families)) {
       return flattenFamilyBlocksPageAware(
@@ -218,7 +323,8 @@
 
   function computeBinderSlots({ binder = {}, pokemon = [], defs = [], familyData = null, includeCapacity = false } = {}) {
     const layout = normalizedLayout(binder);
-    const ranged = applyBinderRange(basicItemsForBinder(binder, pokemon, defs, familyData), binder);
+    const baseItems = basicItemsForBinder(binder, pokemon, defs, familyData);
+    const ranged = isRegionalFamilyAlbum(binder) ? baseItems : applyBinderRange(baseItems, binder);
     const items = includeCapacity ? ranged.slice(0, layout.capacity) : ranged.slice();
     if (includeCapacity) {
       while (items.length < layout.capacity) items.push(capacityItem());
@@ -235,7 +341,7 @@
 
   function orderPokemonForBinder({ binder = {}, pokemon = [], defs = [], familyData = null } = {}) {
     const slots = computeBinderSlots({ binder, pokemon, defs, familyData, includeCapacity: false });
-    if (binder.organization === "family") {
+    if (binder.organization === "family" || isRegionalFamilyAlbum(binder)) {
       return slots.map((slot) => slot.pokemon || null);
     }
     return slots
@@ -252,8 +358,11 @@
       effectiveRegionId,
       familyLayoutBlocks,
       flattenFamilyBlocksPageAware,
+      isRegionalFamilyAlbum,
       normalizedLayout,
       orderPokemonForBinder,
+      padToNextSheetRecto,
+      regionalFamilyAlbumItems,
       slotMeta,
       sortNational,
       sortRegional,

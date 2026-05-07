@@ -118,6 +118,15 @@ def test_fetch_evolutions_writes_family_layouts(
     assert "0001-bulbasaur" in output_path.read_text(encoding="utf-8")
 
 
+def test_removed_shiny_fetch_command_is_not_listed(runner: CliRunner) -> None:
+    from main import app
+
+    r = runner.invoke(app, ["--help"])
+
+    assert r.exit_code == 0
+    assert "fetch-shiny" not in r.output
+
+
 def test_view_by_number_shows_pokemon(
     tmp_path: Path,
     runner: CliRunner,

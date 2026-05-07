@@ -51,6 +51,14 @@ function formatPrintFooter(date, pocket) {
   return tPrint(pocket ? "print.footer_pocket" : "print.footer", { date });
 }
 
+function printBinderUsesEvolutionFamilies(binder) {
+  return binder?.organization === "family" || binder?.organization === "regional_family_album";
+}
+
+function configUsesEvolutionFamilies(cfg) {
+  return Array.isArray(cfg?.binders) && cfg.binders.some((b) => printBinderUsesEvolutionFamilies(b));
+}
+
 async function startPrintView() {
   if (printStarted) {
     renderPrintVaultsNav();
@@ -65,7 +73,7 @@ async function startPrintView() {
   }
   await fetchBinderConfigIfNeeded();
   const cfg = getBinderConfig();
-  if (cfg?.binders?.some((b) => b?.organization === "family")) {
+  if (configUsesEvolutionFamilies(cfg)) {
     await window.PokedexBinder?.ensureEvolutionFamiliesLoaded?.();
   }
 
@@ -314,21 +322,6 @@ function normalizedDefaultArtworkPrint(p) {
   return raw.startsWith("/") ? raw : `/${raw}`;
 }
 
-function shinyArtworkPathPrint(p) {
-  const slug = String(p?.slug || "");
-  if (!slug) return "";
-  return `/data/images_shiny/${encodeURIComponent(slug)}.png`;
-}
-
-function shinyCdnArtworkPathPrint(p) {
-  const slug = String(p?.slug || "");
-  const m = slug.match(/^(\d{1,4})/);
-  if (!m) return "";
-  const natId = Number.parseInt(m[1], 10);
-  if (!Number.isFinite(natId) || natId <= 0) return "";
-  return `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/shiny/${natId}.png`;
-}
-
 function defaultArtworkResultPrint(p) {
   return { src: normalizedDefaultArtworkPrint(p), fallbacks: [] };
 }
@@ -344,17 +337,6 @@ function resolvePrintArtwork(p, mode = printArtworkMode) {
     return A.resolveForMode(p, selected);
   }
   if (selected === "default") {
-    return defaultArtworkResultPrint(p);
-  }
-  if (selected === "shiny") {
-    const def = normalizedDefaultArtworkPrint(p);
-    const chain = [shinyArtworkPathPrint(p), shinyCdnArtworkPathPrint(p), def].filter(
-      (url, idx, arr) => url && arr.indexOf(url) === idx,
-    );
-    return { src: chain[0] || def, fallbacks: chain.slice(1) };
-  }
-  if (selected === "card") {
-    if (A?.resolve && A.mode === "card") return A.resolve(p);
     return defaultArtworkResultPrint(p);
   }
 
@@ -401,7 +383,13 @@ function buildPlaceholderSection(binder = {}, slots = [], caughtMap = {}, filter
   };
 
   for (const rawSlot of sourceSlots) {
-    if (!rawSlot || rawSlot.emptyKind === "capacity_empty") continue;
+    if (
+      !rawSlot ||
+      rawSlot.emptyKind === "capacity_empty" ||
+      rawSlot.emptyKind === "alignment_empty"
+    ) {
+      continue;
+    }
 
     const p = rawSlot.pokemon || null;
     let caught = false;
@@ -976,9 +964,15 @@ if (window.__POKEVAULT_PRINT_TESTS__) {
     formatPrintFooter,
     buildPlaceholderSection,
     buildPlaceholderCardElement,
+    configUsesEvolutionFamilies,
     resolvePrintArtwork,
     setPrintArtworkMode(mode) {
-      printArtworkMode = mode || "global";
+      const allowed = new Set([
+        "global",
+        "default",
+        ...(window.PokevaultArtwork?.modes || []).map((entry) => entry.id),
+      ]);
+      printArtworkMode = allowed.has(mode) ? mode : "default";
     },
   };
 }

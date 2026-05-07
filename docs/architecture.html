@@ -41,7 +41,7 @@
         </div>
         <div class="grid grid-2">
           <article class="panel"><h3>CLI scraper</h3><p><code>main.py</code> and <code>pokedex/</code> scrape Pokepedia, normalize forms, attach regions and export JSON/CSV/YAML/XML.</p></article>
-          <article class="panel"><h3>FastAPI tracker</h3><p><code>tracker/</code> exposes progress, cards, binders, badges, profiles, trainer contacts, backup and health endpoints.</p></article>
+          <article class="panel"><h3>FastAPI tracker</h3><p><code>tracker/</code> exposes progress, binders, badges, profiles, trainer contacts, backup and health endpoints.</p></article>
           <article class="panel"><h3>Vanilla SPA</h3><p><code>web/</code> is served directly. No framework, no frontend build step, no hosted runtime.</p></article>
           <article class="panel"><h3>JSON repositories</h3><p>Each local state surface has a small repository/service pair for predictable file persistence.</p></article>
         </div>
@@ -56,9 +56,9 @@
           <thead><tr><th>Layer</th><th>Responsibility</th><th>Key files</th></tr></thead>
           <tbody>
             <tr><td>Reference Pokedex</td><td>Stable catalog used by UI and tests.</td><td><code>data/pokedex.json</code>, <code>pokedex/</code></td></tr>
-            <tr><td>API models</td><td>Typed contracts for progress, cards, trainer contacts with public contact links, export and profiles.</td><td><code>tracker/models.py</code>, <code>tracker/binder_models.py</code></td></tr>
+            <tr><td>API models</td><td>Typed contracts for progress, trainer contacts with public contact links, export and profiles.</td><td><code>tracker/models.py</code>, <code>tracker/binder_models.py</code></td></tr>
             <tr><td>User JSON state</td><td>Profile-scoped local files, including received Trainer Cards.</td><td><code>data/trainer-contacts.json</code>, <code>data/profiles/&lt;id&gt;/trainer-contacts.json</code></td></tr>
-            <tr><td>Services</td><td>Business rules such as card-to-caught promotion and monotonic badges.</td><td><code>tracker/services/</code></td></tr>
+            <tr><td>Services</td><td>Business rules such as capture status, duplicate sharing and monotonic badges.</td><td><code>tracker/services/</code></td></tr>
             <tr><td>Frontend modules</td><td>Route rendering, badges, binders, trainer contacts and settings.</td><td><code>web/*.js</code></td></tr>
           </tbody>
         </table>
@@ -71,8 +71,25 @@
         </div>
         <div class="grid grid-3">
           <article class="feature"><h3>Progress</h3><p><code>/api/progress</code>, <code>/api/progress/status</code> and <code>/api/progress/notes</code>.</p></article>
-          <article class="feature"><h3>Cards</h3><p><code>/api/cards</code> and <code>/api/cards/by-pokemon/{slug}</code>.</p></article>
+          <article class="feature"><h3>Reference data</h3><p><code>/data/game-pokedexes.json</code> complements the local Pokedex.</p></article>
           <article class="feature"><h3>Workspace</h3><p><code>/api/binder</code>, <code>/api/profiles</code>, <code>/api/trainers</code>, <code>/api/export</code>, <code>/api/import</code>.</p></article>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-head">
+          <p class="eyebrow">Legacy local files</p>
+          <h2>Simplified model migration is conservative.</h2>
+          <p>
+            Older installs may still have <code>data/hunts.json</code> from the explicit
+            search-list workflow. It is ignored by the active app and omitted from new backups.
+          </p>
+          <p>
+            Legacy Trainer Card <code>wants</code> and <code>badges</code> fields are tolerated but
+            ignored; only <code>for_trade</code>/<code>Double</code> is shared. Removed
+            <code>first_encounter</code> badge ids are cleaned/ignored while the badge
+            gallery remains available.
+          </p>
         </div>
       </section>
     </main>

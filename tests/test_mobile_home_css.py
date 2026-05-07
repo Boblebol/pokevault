@@ -88,25 +88,40 @@ def test_badge_detail_modal_and_pokemon_preview_are_responsive() -> None:
     assert "height: 30px;" in chips
 
 
-def test_badge_mission_replaces_focus_session_panels() -> None:
-    assert 'id="badgeMissionPanel"' in HTML
-    assert 'src="/badge-mission.js"' in HTML
+def test_collection_home_has_no_focus_hunt_or_recommendation_surfaces() -> None:
     assert 'src="/focus-session.js"' not in HTML
-    assert "focusPanelList" not in HTML
-    assert "focusPanelStats" not in HTML
-    assert ".focus-panel" not in CSS
-    assert ".is-focus-target" not in CSS
+    forbidden_html = [
+        'id="pokedexNextActions"',
+        'id="badgeMissionPanel"',
+        'src="/badge-mission.js"',
+        'src="/hunt-list.js"',
+        'src="/recommendations.js"',
+        'src="/pokedex-next-actions.js"',
+        "app.filters.hunts",
+        "Cherche",
+        "Match",
+        "focusPanelList",
+        "focusPanelStats",
+    ]
+    for token in forbidden_html:
+        assert token not in HTML
+
+    forbidden_css = [
+        ".focus-panel",
+        ".is-focus-target",
+    ]
+    for token in forbidden_css:
+        assert token not in CSS
 
 
 def test_collection_home_orders_mobile_workflow_before_grid() -> None:
-    """Progression, recommendations and filters must precede the grid in HTML."""
+    """Progression and filters must precede the grid in HTML."""
 
     dashboard = HTML.index('class="pokedex-dashboard"')
-    next_actions = HTML.index('id="pokedexNextActions"')
     filters = HTML.index('class="filters"')
     grid = HTML.index('id="grid"')
 
-    assert dashboard < next_actions < filters < grid
+    assert dashboard < filters < grid
 
 
 def test_mobile_home_has_dedicated_720_layout() -> None:
@@ -132,8 +147,6 @@ def test_narrow_mobile_home_prevents_horizontal_overflow() -> None:
     expected_tokens = [
         "#viewListe .collection-rail",
         "padding: 10px",
-        "#viewListe .pokedex-next-action",
-        "grid-template-columns: minmax(0, 1fr) auto",
         "#viewListe .collection-rail .filter-btn",
         "min-width: 82px",
     ]
@@ -178,13 +191,12 @@ def test_dimmed_cards_keep_trade_controls_readable() -> None:
     assert ".card.is-dimmed .card-action" in CSS
     assert ".card.is-dimmed .pokemon-network-row" in CSS
     assert '.card.is-dimmed .pokemon-trade-chip[data-action="duplicate"][data-active="true"]' in CSS
-    assert ".card.is-dimmed .pokemon-network-badge.is-match" in CSS
     assert ".card.is-dimmed {\n  opacity:" not in CSS
 
 
-def test_match_badge_is_visually_stronger_than_seen_badge() -> None:
-    assert ".pokemon-network-badge.is-match" in CSS
-    assert "var(--accent)" in CSS
+def test_seen_badge_keeps_duplicate_availability_styling() -> None:
+    assert ".pokemon-network-badge" in CSS
+    assert ".pokemon-network-badge.is-match" not in CSS
     assert "rgba(255, 193, 7" in CSS
 
 
@@ -203,11 +215,12 @@ def test_onboarding_product_tour_covers_local_trade_workflow() -> None:
 
     assert len(re.findall(r'<section class="onboarding__step\b', block)) == 5
     for text in [
-        "Cherche",
         "Capturé",
         "Double",
+        "Relâcher 1",
+        "Relâcher",
         "Vu chez",
-        "Match",
+        "doubles",
         "Dresseurs",
         "Instagram",
         "sans compte",

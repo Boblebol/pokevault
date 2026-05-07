@@ -4,7 +4,7 @@
 (function initPokedexFilters() {
   "use strict";
 
-  const STATUS_FILTERS = new Set(["all", "missing", "seen", "caught", "shiny", "hunts"]);
+  const STATUS_FILTERS = new Set(["all", "missing", "caught"]);
   const FORM_FILTERS = new Set(["all", "base_only", "base_regional", "regional_only"]);
 
   function normText(value) {
@@ -21,10 +21,10 @@
   function statusForPokemon(slug, caughtMap = {}, statusMap = {}) {
     const raw = statusMap?.[slug];
     if (raw?.state === "caught" || caughtMap?.[slug]) {
-      return { state: "caught", shiny: Boolean(raw?.shiny) };
+      return { state: "caught" };
     }
-    if (raw?.state === "seen") return { state: "seen", shiny: false };
-    return { state: "not_met", shiny: false };
+    if (raw?.state === "seen") return { state: "seen" };
+    return { state: "not_met" };
   }
 
   function isMegaFormPokemon(pokemon) {
@@ -160,14 +160,11 @@
     return `#/${view || "liste"}${qs ? `?${qs}` : ""}`;
   }
 
-  function matchesStatus(pokemon, filters, caughtMap, statusMap, isWanted) {
+  function matchesStatus(pokemon, filters, caughtMap, statusMap) {
     const slug = slugOf(pokemon);
     const status = statusForPokemon(slug, caughtMap, statusMap);
     if (filters.status === "caught") return status.state === "caught";
     if (filters.status === "missing") return status.state !== "caught";
-    if (filters.status === "seen") return status.state === "seen";
-    if (filters.status === "shiny") return status.state === "caught" && status.shiny;
-    if (filters.status === "hunts") return Boolean(isWanted?.(slug));
     return true;
   }
 
@@ -198,7 +195,6 @@
     caughtMap = {},
     statusMap = {},
     effectiveRegion = null,
-    isWanted = null,
     narrativeTagsFor = null,
   } = {}) {
     const clean = normalizeFilterState(filters || {});
@@ -206,7 +202,7 @@
       ? effectiveRegion(pokemon)
       : String(pokemon?.region || "all");
     return (
-      matchesStatus(pokemon, clean, caughtMap, statusMap, isWanted) &&
+      matchesStatus(pokemon, clean, caughtMap, statusMap) &&
       (clean.region === "all" || region === clean.region) &&
       matchesForms(pokemon, clean.forms) &&
       matchesType(pokemon, clean.type) &&

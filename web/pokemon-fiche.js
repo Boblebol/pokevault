@@ -2,7 +2,7 @@
  * Shared helpers for Pokémon fiche surfaces.
  *
  * B1 keeps the drawer and full route on the same information architecture:
- * identity, Pokédex status, forms, personal progression, notes, then cards.
+ * identity, Pokédex status, forms, personal progression, then notes.
  */
 (function initPokemonFiche() {
   "use strict";
@@ -13,18 +13,17 @@
     { id: "forms", titleKey: "pokemon_fiche.section.forms" },
     { id: "personal_progress", titleKey: "pokemon_fiche.section.personal_progress" },
     { id: "notes", titleKey: "pokemon_fiche.section.notes" },
-    { id: "cards", titleKey: "pokemon_fiche.section.cards", secondary: true },
   ];
   const STATUS_ACTIONS = [
     { id: "not_met", labelKey: "pokemon_fiche.action.not_met", state: "not_met" },
     { id: "seen", labelKey: "pokemon_fiche.action.seen", state: "seen" },
     { id: "caught", labelKey: "pokemon_fiche.action.caught", state: "caught" },
-    { id: "shiny", labelKey: "pokemon_fiche.action.shiny" },
   ];
   const OWNERSHIP_ACTIONS = [
-    { id: "wanted", labelKey: "pokemon_fiche.ownership.wanted" },
     { id: "owned", labelKey: "pokemon_fiche.ownership.owned" },
     { id: "duplicate", labelKey: "pokemon_fiche.ownership.duplicate" },
+    { id: "release_one", labelKey: "pokemon_fiche.ownership.release_one" },
+    { id: "release", labelKey: "pokemon_fiche.ownership.release" },
   ];
   const FALLBACK_I18N = {
     "pokemon_fiche.section.identity": "Identité",
@@ -32,19 +31,17 @@
     "pokemon_fiche.section.forms": "Formes",
     "pokemon_fiche.section.personal_progress": "Progression personnelle",
     "pokemon_fiche.section.notes": "Notes",
-    "pokemon_fiche.section.cards": "Mes cartes",
     "pokemon_fiche.section.generic": "Section",
     "pokemon_fiche.action.not_met": "Non rencontré",
     "pokemon_fiche.action.seen": "Vu",
     "pokemon_fiche.action.caught": "Capturé",
-    "pokemon_fiche.action.shiny": "Shiny",
     "pokemon_fiche.status.not_met": "Non rencontré",
     "pokemon_fiche.status.seen": "Aperçu",
     "pokemon_fiche.status.caught": "Attrapé",
-    "pokemon_fiche.status.caught_shiny": "Attrapé shiny",
-    "pokemon_fiche.ownership.wanted": "Cherche",
     "pokemon_fiche.ownership.owned": "Capturé",
     "pokemon_fiche.ownership.duplicate": "Double",
+    "pokemon_fiche.ownership.release_one": "Relâcher 1",
+    "pokemon_fiche.ownership.release": "Relâcher",
     "pokemon_fiche.ownership.none": "Je n'ai pas",
     "pokemon_fiche.unknown": "Inconnu",
     "pokemon_fiche.note.placeholder": "Lieu, version, échange, objectif...",
@@ -207,7 +204,7 @@
   function statusLabel(status) {
     const clean = normalizeStatus(status);
     const state = clean.state;
-    if (state === "caught") return clean.shiny ? t("pokemon_fiche.status.caught_shiny") : t("pokemon_fiche.status.caught");
+    if (state === "caught") return t("pokemon_fiche.status.caught");
     if (state === "seen") return t("pokemon_fiche.status.seen");
     return t("pokemon_fiche.status.not_met");
   }
@@ -216,31 +213,18 @@
     const state = status?.state === "seen" || status?.state === "caught"
       ? status.state
       : "not_met";
-    return {
-      state,
-      shiny: state === "caught" && Boolean(status?.shiny),
-    };
+    return { state };
   }
 
-  function normalizeStatusPatch(state, shiny) {
+  function normalizeStatusPatch(state) {
     const cleanState = state === "seen" || state === "caught" ? state : "not_met";
-    return {
-      state: cleanState,
-      shiny: cleanState === "caught" && Boolean(shiny),
-    };
+    return { state: cleanState };
   }
 
   function buildStatusActionModel(status) {
     const clean = normalizeStatus(status);
     return STATUS_ACTIONS.map((action) => {
       const base = { ...action, label: t(action.labelKey) };
-      if (action.id === "shiny") {
-        return {
-          ...base,
-          active: clean.state === "caught" && clean.shiny,
-          disabled: clean.state !== "caught",
-        };
-      }
       return {
         ...base,
         active: clean.state === action.state,
@@ -252,30 +236,25 @@
   function statusPatchForAction(status, actionId) {
     const clean = normalizeStatus(status);
     if (actionId === "not_met" || actionId === "seen") {
-      return normalizeStatusPatch(actionId, false);
+      return normalizeStatusPatch(actionId);
     }
     if (actionId === "caught") {
-      return normalizeStatusPatch("caught", clean.state === "caught" && clean.shiny);
-    }
-    if (actionId === "shiny") {
-      if (clean.state !== "caught") return null;
-      return normalizeStatusPatch("caught", !clean.shiny);
+      return normalizeStatusPatch("caught");
     }
     return null;
   }
 
   function normalizeOwnershipState(state) {
+    const duplicate = Boolean(state?.duplicate);
     return {
-      wanted: Boolean(state?.wanted),
-      caught: Boolean(state?.caught),
-      duplicate: Boolean(state?.duplicate),
+      caught: duplicate || Boolean(state?.caught),
+      duplicate,
     };
   }
 
   function ownershipLabel(state) {
     const clean = normalizeOwnershipState(state);
     if (clean.duplicate) return t("pokemon_fiche.ownership.duplicate");
-    if (clean.wanted) return t("pokemon_fiche.ownership.wanted");
     if (clean.caught) return t("pokemon_fiche.ownership.owned");
     return t("pokemon_fiche.ownership.none");
   }
@@ -285,20 +264,17 @@
     return OWNERSHIP_ACTIONS.map((action) => ({
       ...action,
       label: t(action.labelKey),
-      active: action.id === "duplicate"
-        ? clean.duplicate
-        : action.id === "wanted"
-          ? clean.wanted && !clean.duplicate
-          : clean.caught && !clean.wanted && !clean.duplicate,
-      disabled: false,
+      active: action.id === "duplicate" ? clean.duplicate : action.id === "owned" && clean.caught && !clean.duplicate,
+      disabled: action.id === "release_one" ? !clean.duplicate : action.id === "release" ? !clean.caught : false,
     }));
   }
 
   function ownershipPatchForAction(state, actionId) {
     const clean = normalizeOwnershipState(state);
-    if (actionId === "wanted") return clean.wanted && !clean.duplicate ? "none" : "wanted";
-    if (actionId === "owned") return clean.caught && !clean.wanted && !clean.duplicate ? "none" : "owned";
-    if (actionId === "duplicate") return clean.duplicate ? "owned" : "duplicate";
+    if (actionId === "owned") return "owned";
+    if (actionId === "duplicate") return "duplicate";
+    if (actionId === "release_one") return clean.duplicate ? "release_one" : null;
+    if (actionId === "release") return clean.caught ? "none" : null;
     return null;
   }
 
@@ -311,15 +287,12 @@
   function ownershipStateFromSources(slug, options = {}) {
     const key = String(slug || "").trim();
     const status = normalizeStatus(options.status);
-    const ownCard = options.ownCard && typeof options.ownCard === "object"
-      ? options.ownCard
-      : {};
+    const ownCard = options.ownCard && typeof options.ownCard === "object" ? options.ownCard : {};
     const duplicate = listIncludesSlug(ownCard.for_trade, key);
-    const caught = duplicate || status.state === "caught";
-    const wanted = !caught && !duplicate && (
-      Boolean(options.wanted) || listIncludesSlug(ownCard.wants, key)
-    );
-    return { wanted, caught, duplicate };
+    return {
+      caught: duplicate || status.state === "caught",
+      duplicate,
+    };
   }
 
   function createOwnershipActions(state, onAction, options = {}) {

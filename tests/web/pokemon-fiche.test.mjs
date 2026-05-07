@@ -64,10 +64,8 @@ test("buildFicheSectionPlan keeps B1 sections in Pokedex-first order", async () 
     "forms",
     "personal_progress",
     "notes",
-    "cards",
   ]);
-  assert.equal(sections.at(-1).id, "cards");
-  assert.equal(sections.at(-1).secondary, true);
+  assert.equal(sections.at(-1).id, "notes");
 });
 
 test("createFicheSection renders a labelled DOM section", async () => {
@@ -83,9 +81,9 @@ test("createFicheSection renders a labelled DOM section", async () => {
   assert.equal(section.children[0].textContent, "Notes");
 });
 
-test("createCollapsibleBody collapses secondary fiche content and toggles it", async () => {
+test("createCollapsibleBody collapses fiche content and toggles it", async () => {
   const api = await loadModule();
-  const section = api.createFicheSection({ id: "cards", title: "Mes cartes" });
+  const section = api.createFicheSection({ id: "forms", title: "Formes" });
 
   const body = api.createCollapsibleBody(section, { collapsed: true });
 
@@ -105,12 +103,12 @@ test("parsePokemonRouteSlug reads hash routes for full Pokemon pages", async () 
   const api = await loadModule();
 
   assert.equal(api.parsePokemonRouteSlug("#/pokemon/0025-pikachu"), "0025-pikachu");
-  assert.equal(api.parsePokemonRouteSlug("#pokemon/0001-bulbasaur?tab=cards"), "0001-bulbasaur");
+  assert.equal(api.parsePokemonRouteSlug("#pokemon/0001-bulbasaur?tab=formes"), "0001-bulbasaur");
   assert.equal(api.parsePokemonRouteSlug("#/pokemon/mr-mime%20test"), "mr-mime test");
   assert.equal(api.parsePokemonRouteSlug("#/liste?slug=0025-pikachu"), null);
 });
 
-test("buildStatusActionModel exposes direct B2 actions with shiny gated by caught", async () => {
+test("buildStatusActionModel exposes only direct Pokedex capture actions", async () => {
   const api = await loadModule();
 
   const seenActions = api.buildStatusActionModel({ state: "seen", shiny: true });
@@ -118,93 +116,86 @@ test("buildStatusActionModel exposes direct B2 actions with shiny gated by caugh
     "not_met",
     "seen",
     "caught",
-    "shiny",
   ]);
   assert.equal(seenActions[1].active, true);
-  assert.equal(seenActions[3].disabled, true);
-  assert.equal(seenActions[3].active, false);
 
-  const shinyActions = api.buildStatusActionModel({ state: "caught", shiny: true });
-  assert.equal(shinyActions[2].active, true);
-  assert.equal(shinyActions[3].active, true);
-  assert.equal(shinyActions[3].disabled, false);
+  const caughtActions = api.buildStatusActionModel({ state: "caught", shiny: true });
+  assert.equal(caughtActions[2].active, true);
+  assert.equal(caughtActions.some((action) => action.id === "shiny"), false);
 });
 
-test("buildOwnershipActionModel exposes compact trade-oriented actions", async () => {
+test("buildOwnershipActionModel exposes capture duplicate and release actions", async () => {
   const api = await loadModule();
 
-  const empty = api.buildOwnershipActionModel({ wanted: false, caught: false, duplicate: false });
-  assert.deepEqual(empty.map((action) => action.id), ["wanted", "owned", "duplicate"]);
-  assert.deepEqual(empty.map((action) => action.label), ["Cherche", "Capturé", "Double"]);
-  assert.deepEqual(empty.map((action) => action.active), [false, false, false]);
+  const empty = api.buildOwnershipActionModel({ caught: false, duplicate: false });
+  assert.deepEqual(empty.map((action) => action.id), ["owned", "duplicate", "release_one", "release"]);
+  assert.deepEqual(empty.map((action) => action.label), ["Capturé", "Double", "Relâcher 1", "Relâcher"]);
+  assert.deepEqual(empty.map((action) => action.disabled), [false, false, true, true]);
 
-  const wanted = api.buildOwnershipActionModel({ wanted: true, caught: false, duplicate: false });
-  assert.deepEqual(wanted.map((action) => action.active), [true, false, false]);
+  const owned = api.buildOwnershipActionModel({ caught: true, duplicate: false });
+  assert.deepEqual(owned.map((action) => action.active), [true, false, false, false]);
+  assert.deepEqual(owned.map((action) => action.disabled), [false, false, true, false]);
 
-  const owned = api.buildOwnershipActionModel({ wanted: false, caught: true, duplicate: false });
-  assert.deepEqual(owned.map((action) => action.active), [false, true, false]);
-
-  const duplicate = api.buildOwnershipActionModel({ wanted: false, caught: true, duplicate: true });
-  assert.deepEqual(duplicate.map((action) => action.active), [false, false, true]);
+  const duplicate = api.buildOwnershipActionModel({ caught: true, duplicate: true });
+  assert.deepEqual(duplicate.map((action) => action.active), [false, true, false, false]);
+  assert.deepEqual(duplicate.map((action) => action.disabled), [false, false, false, false]);
 });
 
-test("ownershipPatchForAction keeps Double as a tradeable owned state", async () => {
+test("ownershipPatchForAction maps release one and release all", async () => {
   const api = await loadModule();
 
-  assert.equal(api.ownershipPatchForAction({ wanted: false, caught: false, duplicate: false }, "wanted"), "wanted");
-  assert.equal(api.ownershipPatchForAction({ wanted: true, caught: false, duplicate: false }, "wanted"), "none");
-  assert.equal(api.ownershipPatchForAction({ wanted: false, caught: true, duplicate: false }, "owned"), "none");
-  assert.equal(api.ownershipPatchForAction({ wanted: false, caught: true, duplicate: true }, "duplicate"), "owned");
-  assert.equal(api.ownershipPatchForAction({ wanted: true, caught: false, duplicate: false }, "duplicate"), "duplicate");
+  assert.equal(api.ownershipPatchForAction({ caught: false, duplicate: false }, "owned"), "owned");
+  assert.equal(api.ownershipPatchForAction({ caught: false, duplicate: false }, "duplicate"), "duplicate");
+  assert.equal(api.ownershipPatchForAction({ caught: true, duplicate: true }, "release_one"), "release_one");
+  assert.equal(api.ownershipPatchForAction({ caught: true, duplicate: true }, "release"), "none");
+  assert.equal(api.ownershipPatchForAction({ caught: true, duplicate: false }, "release"), "none");
+  assert.equal(api.ownershipPatchForAction({ caught: false, duplicate: false }, "release"), null);
 });
 
-test("ownershipStateFromSources prioritizes Double and owned over searches", async () => {
+test("ownershipStateFromSources derives duplicate from local Trainer Card only", async () => {
   const api = await loadModule();
 
   assert.deepEqual(
     api.ownershipStateFromSources("0130-gyarados", {
-      status: { state: "not_met", shiny: false },
-      wanted: true,
-      ownCard: { wants: ["0130-gyarados"], for_trade: [] },
+      status: { state: "not_met" },
+      ownCard: { for_trade: [] },
     }),
-    { wanted: true, caught: false, duplicate: false },
+    { caught: false, duplicate: false },
   );
 
   assert.deepEqual(
     api.ownershipStateFromSources("0130-gyarados", {
-      status: { state: "caught", shiny: false },
-      wanted: true,
-      ownCard: { wants: ["0130-gyarados"], for_trade: [] },
+      status: { state: "caught" },
+      ownCard: { for_trade: [] },
     }),
-    { wanted: false, caught: true, duplicate: false },
+    { caught: true, duplicate: false },
   );
 
   assert.deepEqual(
     api.ownershipStateFromSources("0130-gyarados", {
-      status: { state: "seen", shiny: false },
-      wanted: true,
-      ownCard: { wants: ["0130-gyarados"], for_trade: ["0130-gyarados"] },
+      status: { state: "not_met" },
+      ownCard: { for_trade: ["0130-gyarados"] },
     }),
-    { wanted: false, caught: true, duplicate: true },
+    { caught: true, duplicate: true },
   );
 });
 
-test("statusPatchForAction prevents shiny from surviving non-caught states", async () => {
+test("statusPatchForAction ignores legacy shiny inputs", async () => {
   const api = await loadModule();
 
   assert.deepEqual(
     api.statusPatchForAction({ state: "caught", shiny: true }, "seen"),
-    { state: "seen", shiny: false },
+    { state: "seen" },
   );
   assert.deepEqual(
     api.statusPatchForAction({ state: "caught", shiny: true }, "not_met"),
-    { state: "not_met", shiny: false },
+    { state: "not_met" },
   );
   assert.deepEqual(
-    api.statusPatchForAction({ state: "caught", shiny: false }, "shiny"),
-    { state: "caught", shiny: true },
+    api.statusPatchForAction({ state: "seen", shiny: true }, "caught"),
+    { state: "caught" },
   );
-  assert.equal(api.statusPatchForAction({ state: "seen", shiny: false }, "shiny"), null);
+  assert.equal(api.statusPatchForAction({ state: "seen" }, "shiny"), null);
 });
 
 test("buildFormEntries keeps each regional and special form status independent", async () => {
@@ -218,12 +209,12 @@ test("buildFormEntries keeps each regional and special form status independent",
     { slug: "0003-venusaur-paldea", number: "0003", names: { fr: "Florizarre de Paldea" }, form: "Forme de Paldea" },
   ];
   const statusBySlug = {
-    "0003-venusaur": { state: "caught", shiny: false },
-    "0003-venusaur-mega": { state: "seen", shiny: false },
+    "0003-venusaur": { state: "caught" },
+    "0003-venusaur-mega": { state: "seen" },
     "0003-venusaur-alola": { state: "caught", shiny: true },
-    "0003-venusaur-galar": { state: "not_met", shiny: false },
+    "0003-venusaur-galar": { state: "not_met" },
     "0003-venusaur-hisui": { state: "seen", shiny: true },
-    "0003-venusaur-paldea": { state: "caught", shiny: false },
+    "0003-venusaur-paldea": { state: "caught" },
   };
 
   const entries = api.buildFormEntries(forms[0], forms, (slug) => statusBySlug[slug]);
@@ -231,8 +222,8 @@ test("buildFormEntries keeps each regional and special form status independent",
   assert.deepEqual(entries.map((entry) => entry.slug), forms.map((form) => form.slug));
   assert.equal(entries[0].current, true);
   assert.equal(entries[1].statusLabel, "Aperçu");
-  assert.equal(entries[2].statusLabel, "Attrapé shiny");
-  assert.equal(entries[4].status.shiny, false);
+  assert.equal(entries[2].statusLabel, "Attrapé");
+  assert.equal("shiny" in entries[4].status, false);
   assert.equal(entries[5].label, "Forme de Paldea");
 });
 
@@ -267,22 +258,23 @@ test("fiche labels follow English i18n when available", async () => {
   globalThis.PokevaultI18n = {
     t(key) {
       return {
-        "pokemon_fiche.ownership.wanted": "Wanted",
         "pokemon_fiche.ownership.owned": "Caught",
         "pokemon_fiche.ownership.duplicate": "Double",
+        "pokemon_fiche.ownership.release_one": "Release 1",
+        "pokemon_fiche.ownership.release": "Release",
         "pokemon_fiche.status.not_met": "Not met",
         "pokemon_fiche.status.seen": "Seen",
         "pokemon_fiche.status.caught": "Caught",
-        "pokemon_fiche.status.caught_shiny": "Shiny caught",
       }[key] || key;
     },
   };
 
   assert.deepEqual(api.buildOwnershipActionModel({}).map((action) => action.label), [
-    "Wanted",
     "Caught",
     "Double",
+    "Release 1",
+    "Release",
   ]);
   assert.equal(api.statusLabel({ state: "seen", shiny: false }), "Seen");
-  assert.equal(api.statusLabel({ state: "caught", shiny: true }), "Shiny caught");
+  assert.equal(api.statusLabel({ state: "caught", shiny: true }), "Caught");
 });

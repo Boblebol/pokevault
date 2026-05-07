@@ -115,6 +115,70 @@ test("binder shell creates a visible family reserved card", async () => {
   assert.equal(card.textContent.includes("Reserve famille"), true);
 });
 
+test("binder grid renders alignment empty as quiet empty slot", async () => {
+  const api = await loadModule();
+  const card = api.createReservedSlotCard({
+    emptyKind: "alignment_empty",
+    familyId: null,
+    slot: 2,
+  });
+
+  assert.equal(card.dataset.emptyKind, "alignment_empty");
+  assert.equal(card.dataset.familyId, "");
+  assert.equal(card.className.split(/\s+/).includes("card--alignment-empty"), true);
+  assert.ok(String(card.textContent || "").includes("Emplacement vide"));
+  assert.equal(String(card.textContent || "").includes("Reserve famille"), false);
+});
+
+test("binder grid renders production alignment empty slots with quiet styling", async () => {
+  await loadModule({
+    document: createFakeDocument({
+      binderPagesHost: createFakeElement("div"),
+      binderShellHint: createFakeElement("p"),
+      binderMetrics: createFakeElement("div"),
+      binderVaultsNav: createFakeElement("nav"),
+    }),
+  });
+
+  const pokemon = [{ slug: "0001-bulbasaur", number: "0001" }];
+  globalThis.PokedexCollection = {
+    allPokemon: pokemon,
+    caughtMap: {},
+    regionDefinitions: [],
+    createPokemonCard(entry, opts = {}) {
+      const card = createFakeElement("article");
+      card.className = opts.empty ? "card card--empty-slot" : "card";
+      card.textContent = entry ? entry.slug : "Emplacement vide";
+      return card;
+    },
+  };
+  globalThis.PokevaultBinderLayout = {
+    computeBinderSlots() {
+      return [
+        { slot: 1, pokemon: pokemon[0], emptyKind: null, familyId: "0001-bulbasaur" },
+        { slot: 2, pokemon: null, emptyKind: "alignment_empty", familyId: null },
+      ];
+    },
+  };
+  globalThis.PokedexBinder = {
+    orderPokemonForBinder() {
+      return pokemon;
+    },
+  };
+
+  globalThis.PokedexBinderShell.syncFromConfig({
+    binders: [{ id: "tiny", name: "Tiny", rows: 1, cols: 2, sheet_count: 1 }],
+  });
+
+  const pagesHost = globalThis.document.getElementById("binderPagesHost");
+  const grid = pagesHost.children[0].children.find((child) => child.className.includes("binder-page-grid"));
+  const alignmentCard = grid.children[1];
+
+  assert.equal(alignmentCard.className.split(/\s+/).includes("card--alignment-empty"), true);
+  assert.ok(String(alignmentCard.textContent || "").includes("Emplacement vide"));
+  assert.equal(String(alignmentCard.textContent || "").includes("Reserve famille"), false);
+});
+
 test("binder shell renders physical slots while nav metrics use logical binder totals", async () => {
   await loadModule({
     document: createFakeDocument({

@@ -73,8 +73,8 @@ test("computeDashboardMetrics prioritizes Pokedex status over add-ons", async ()
   ];
   const statusMap = {
     "001-a": { state: "caught", shiny: true },
-    "002-b": { state: "seen", shiny: false },
-    "152-c": { state: "caught", shiny: false },
+    "002-b": { state: "seen" },
+    "152-c": { state: "caught" },
   };
   const regions = [
     { id: "kanto", label_fr: "Kanto", low: 1, high: 151 },
@@ -94,20 +94,14 @@ test("computeDashboardMetrics prioritizes Pokedex status over add-ons", async ()
       notMet: metrics.notMet,
       seen: metrics.seen,
       caught: metrics.caught,
-      shiny: metrics.shiny,
       percentCaught: metrics.percentCaught,
-      cards: metrics.cardStats.cards,
-      sets: metrics.cardStats.sets,
     },
     {
       total: 4,
       notMet: 1,
       seen: 1,
       caught: 2,
-      shiny: 1,
       percentCaught: 50,
-      cards: 3,
-      sets: 2,
     },
   );
 });
@@ -120,8 +114,8 @@ test("computeDashboardMetrics returns region progress in roadmap order", async (
     { slug: "002-b", number: "#002", region: "kanto" },
   ];
   const statusMap = {
-    "001-a": { state: "caught", shiny: false },
-    "152-c": { state: "seen", shiny: false },
+    "001-a": { state: "caught" },
+    "152-c": { state: "seen" },
   };
   const regions = [
     { id: "kanto", label_fr: "Kanto", low: 1, high: 151 },
@@ -146,7 +140,7 @@ test("computeDashboardMetrics returns region progress in roadmap order", async (
   ]);
 });
 
-test("renderDashboard puts core Pokedex cards before secondary add-ons", async () => {
+test("renderDashboard renders only core Pokedex cards", async () => {
   const api = await loadModule();
   const cardsHost = new FakeElement("div");
   const regionsHost = new FakeElement("div");
@@ -159,9 +153,7 @@ test("renderDashboard puts core Pokedex cards before secondary add-ons", async (
       notMet: 1,
       seen: 1,
       caught: 2,
-      shiny: 1,
       percentCaught: 50,
-      cardStats: { cards: 3, sets: 2 },
       regions: [
         { id: "kanto", label: "Kanto", caught: 1, seen: 0, total: 2, percentCaught: 50 },
         { id: "johto", label: "Johto", caught: 1, seen: 1, total: 2, percentCaught: 50 },
@@ -171,10 +163,8 @@ test("renderDashboard puts core Pokedex cards before secondary add-ons", async (
 
   assert.deepEqual(
     cardsHost.children.map((child) => child.dataset.metric),
-    ["missing", "seen", "caught", "shiny", "cards"],
+    ["missing", "seen", "caught"],
   );
-  assert.equal(cardsHost.children[3].classList.contains("is-secondary"), true);
-  assert.equal(cardsHost.children[4].classList.contains("is-secondary"), true);
   assert.equal(regionsHost.children.length, 2);
   assert.match(regionsHost.children[0].textContent, /Kanto/);
   assert.match(regionsHost.children[0].textContent, /1 \/ 2/);
@@ -191,10 +181,6 @@ test("renderDashboard follows English i18n labels when available", async () => {
         "dashboard.card.seen_detail": "To catch",
         "dashboard.card.caught": "Caught",
         "dashboard.card.caught_detail": "{pct}% of the dex",
-        "dashboard.card.shiny": "Shiny",
-        "dashboard.card.shiny_detail": "Bonus",
-        "dashboard.card.cards": "Cards",
-        "dashboard.card.cards_detail": "{sets} set(s)",
         "dashboard.region.aria": "{region}: {caught} of {total}",
       };
       return (messages[key] || key).replace(/\{([a-zA-Z0-9_]+)\}/g, (_, name) => String(params[name]));
@@ -211,9 +197,7 @@ test("renderDashboard follows English i18n labels when available", async () => {
       notMet: 1,
       seen: 1,
       caught: 2,
-      shiny: 1,
       percentCaught: 50,
-      cardStats: { cards: 3, sets: 2 },
       regions: [
         { id: "kanto", label: "Kanto", caught: 1, seen: 0, total: 2, percentCaught: 50 },
       ],
@@ -223,6 +207,5 @@ test("renderDashboard follows English i18n labels when available", async () => {
   assert.equal(cardsHost.children[0].children[0].textContent, "Not met");
   assert.equal(cardsHost.children[1].children[2].textContent, "To catch");
   assert.equal(cardsHost.children[2].children[2].textContent, "50% of the dex");
-  assert.equal(cardsHost.children[4].children[2].textContent, "2 set(s)");
   assert.equal(regionsHost.children[0].attributes["aria-label"], "Kanto: 1 of 2");
 });

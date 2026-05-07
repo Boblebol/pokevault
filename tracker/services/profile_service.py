@@ -2,8 +2,7 @@
 
 Each profile has an isolated set of JSON files. The **default**
 profile keeps the historical layout (``data/collection-progress.json``,
-``data/collection-cards.json``, ``data/binder-config.json``,
-``data/binder-placements.json``) so existing installs transparently
+``data/binder-config.json``, ``data/binder-placements.json``) so existing installs transparently
 become the first profile. Additional profiles live under
 ``data/profiles/<id>/...``.
 
@@ -92,17 +91,11 @@ class ProfileService:
     def progress_path(self, profile_id: str | None = None) -> Path:
         return self._path_for(profile_id, "collection-progress.json")
 
-    def cards_path(self, profile_id: str | None = None) -> Path:
-        return self._path_for(profile_id, "collection-cards.json")
-
     def binder_config_path(self, profile_id: str | None = None) -> Path:
         return self._path_for(profile_id, "binder-config.json")
 
     def binder_placements_path(self, profile_id: str | None = None) -> Path:
         return self._path_for(profile_id, "binder-placements.json")
-
-    def hunts_path(self, profile_id: str | None = None) -> Path:
-        return self._path_for(profile_id, "hunts.json")
 
     def trainer_contacts_path(self, profile_id: str | None = None) -> Path:
         return self._path_for(profile_id, "trainer-contacts.json")

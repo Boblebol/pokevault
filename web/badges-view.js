@@ -9,8 +9,7 @@
  *   - ``subscribe(fn)``    — subscribe to state changes.
  *
  * The first poll is ``silent`` so opening the app does not replay
- * historical unlocks; subsequent polls (triggered by progress /
- * cards mutations) surface any newly-due badges.
+ * historical unlocks; subsequent progress changes surface newly-due badges.
  */
 (function initBadges() {
   "use strict";
@@ -30,7 +29,6 @@
     "badges.filter.unlocked": "Obtenus",
     "badges.filter.locked": "Scelles",
     "badges.category.milestone": "Paliers",
-    "badges.category.card": "Cartes",
     "badges.category.gym": "Arenes",
     "badges.category.elite_four": "Conseil 4",
     "badges.category.champion": "Maitres",
@@ -52,8 +50,6 @@
     "badges.detail.caught": "Capture",
     "badges.detail.missing": "A chercher",
     "badges.detail.more": "+{count}",
-    "badges.detail.follow": "Suivre ce badge",
-    "badges.detail.following": "Mission active",
   };
   const FILTER_OPTIONS = {
     status: [
@@ -64,7 +60,6 @@
     category: [
       ["all", "badges.filter.all"],
       ["milestone", "badges.category.milestone"],
-      ["card", "badges.category.card"],
       ["gym", "badges.category.gym"],
       ["elite_four", "badges.category.elite_four"],
       ["champion", "badges.category.champion"],
@@ -550,22 +545,6 @@
 
     const requirements = badgeRequirements(badge);
     if (requirements.length) {
-      const actions = document.createElement("div");
-      actions.className = "badge-detail__actions";
-      const follow = document.createElement("button");
-      follow.type = "button";
-      follow.className = "badge-detail__mission-btn";
-      const following = window.PokevaultBadgeMission?.activeId === badge?.id;
-      follow.textContent = following ? tr("badges.detail.following") : tr("badges.detail.follow");
-      follow.disabled = following;
-      follow.addEventListener("click", () => {
-        window.PokevaultBadgeMission?.setActiveBadge?.(badge.id);
-        follow.textContent = tr("badges.detail.following");
-        follow.disabled = true;
-      });
-      actions.append(follow);
-      detail.append(actions);
-
       const section = document.createElement("section");
       section.className = "badge-detail__requirements-section";
       const subtitle = document.createElement("h3");
@@ -679,9 +658,6 @@
     start._called = true;
     void poll({ silent: true });
     window.PokedexCollection?.subscribeCaught?.(() => {
-      void poll();
-    });
-    document.addEventListener("pokevault:cards-changed", () => {
       void poll();
     });
   }

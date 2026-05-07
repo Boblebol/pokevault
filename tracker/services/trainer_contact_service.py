@@ -8,7 +8,6 @@ from fastapi import HTTPException
 
 from tracker.models import (
     TrainerCard,
-    TrainerCardBadge,
     TrainerContact,
     TrainerContactBook,
     TrainerContactImportResponse,
@@ -96,9 +95,7 @@ class TrainerContactService:
                 "favorite_pokemon_slug": card.favorite_pokemon_slug.strip(),
                 "public_note": card.public_note.strip(),
                 "contact_links": links,
-                "wants": _clean_list(card.wants),
                 "for_trade": _clean_list(card.for_trade),
-                "badges": _clean_badges(card.badges),
                 "updated_at": _now_iso() if stamp else card.updated_at,
             },
         )
@@ -113,19 +110,6 @@ def _clean_list(values: list[str]) -> list[str]:
             continue
         seen.add(item)
         out.append(item)
-    return out
-
-
-def _clean_badges(values: list[TrainerCardBadge]) -> list[TrainerCardBadge]:
-    out: list[TrainerCardBadge] = []
-    seen: set[str] = set()
-    for badge in values:
-        badge_id = str(badge.id or "").strip()
-        title = str(badge.title or "").strip()
-        if not badge_id or not title or badge_id in seen:
-            continue
-        seen.add(badge_id)
-        out.append(badge.model_copy(update={"id": badge_id, "title": title}))
     return out
 
 

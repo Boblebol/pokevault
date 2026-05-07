@@ -13,7 +13,7 @@
 
 **pokevault** is a local-first Pokemon collection tracker for exploring a
 Pokedex, meeting other Trainers through exchanged local cards, and organizing
-physical cards, binders, badges and printable checklists.
+physical binders, badges and printable checklists.
 
 No account. No cloud database. No hosted live demo yet. Run it locally and keep
 your collection data in readable JSON files.
@@ -72,6 +72,10 @@ planning, Trainer Cards, badge progress, local-first data files, profiles,
 backups, shortcuts and the local REST API. The public feature overview is
 available at [docs/features.html](docs/features.html).
 
+Pokemon details open in one modal across the app. That modal keeps capture
+actions, forms, notes, type matchups and game Pokedex appearances from
+`data/game-pokedexes.json` in the same place.
+
 Product coverage includes a badge gallery with sealed badges in Stats and the
 nostalgia catalog: Souvenirs de Kanto for Rouge/Bleu champions d'arene,
 Conseil 4, Maitre de la Ligue and rival teams; Or/Argent for Johto, Kanto,
@@ -122,23 +126,44 @@ The full guide lives in [Trainer Cards](docs/TRAINER_CONTACTS.md).
 ## Physical Binder Layouts
 
 The binder tab keeps the base workflow automatic: without any settings, it
-creates regional binders in the classic 3×3 · 10 feuillets format. A feuillet is
-treated like a real plastic sheet with recto and verso, so capacity is:
+creates regional binders in the classic 3×3 · 10 sheets (`10 feuillets`) format.
+A feuillet is treated like a real plastic sheet with recto and verso, so
+capacity is:
 
 `rows × columns × feuillets × 2`
 
-Collectors who use smaller or larger binders can open `Réglages`, choose a
-preset or custom grid, and regenerate the local binder view. If a region is too
-large for the selected format, Pokevault keeps every Pokemon visible by splitting
-that region into numbered binders such as Kanto 1 and Kanto 2 instead of hiding
-entries.
+Collectors who use smaller or larger binders can open
+`Classeurs > Modifier format`, choose a preset or custom grid, and regenerate
+the local binder view. The same settings control rows, columns and the number of
+physical sheets. If a region is too large for the selected format, Pokevault
+keeps every Pokemon visible by splitting that region into numbered binders such
+as Kanto 1 and Kanto 2 instead of hiding entries.
+
+`Grand classeur 3x3` is the large ring binder mode for collectors who want one
+physical binder instead of one binder per region. It keeps the 3×3 front/back
+sheets model, groups entries into internal region sections, starts each region
+on a new sheet front (recto), compacts evolution families within that region,
+keeps regional forms in their form region, and auto-calculates the needed sheet
+count with 10 spare sheets.
+
+Generation sprites are available from `Réglages > Images / sprites`. Print can
+also choose its own image mode, so a collector can print retro sprites without
+changing the main collection view.
 
 The optional `Familles` organization uses `data/evolution-families.json` to keep
-evolution stages on the same line when the binder has enough columns. Branching
-families deliberately leave empty slots, for example Wurmple / Silcoon /
-Beautifly on one line and an empty first slot before Cascoon / Dustox on the
-next. Manual corrections stay in `data/evolution-family-overrides.json`, so the
-app UI does not expose expert-only layout controls.
+evolution stages readable while saving space. Short complete families can share
+a 3×3 row, for example Spoink / Groret / Spinda. Branches keep their readable
+shape: Ptitard / Têtarte / Tartard stay together, Tarpaud starts the next row,
+and generated trailing alignment gaps are not printed. The layout engine marks
+those generated fillers as `alignment_empty`; intentional family reservations use
+`family_reserved` and remain printable. Manual corrections stay in
+`data/evolution-family-overrides.json`, so the app UI does not expose
+expert-only layout controls.
+
+Printable small binder cards live under
+`Impression > Regrouper par > Petites fiches classeur` (`Print > Group by > Small binder cards`
+in English). They print Pokemon slots, and intentional family reservations still print as temporary placeholders.
+Ordinary capacity slots and alignment empties (`vides discrets`) are skipped.
 
 ## Screenshots
 
@@ -158,7 +183,6 @@ make dev          # Start local server
 make open         # Open local web UI
 make fetch        # Full Pokepedia scrape
 make fetch-test   # Small scrape for development
-make fetch-shiny  # Download shiny artworks locally
 make fetch-evolutions # Generate evolution-family binder layout data
 make check        # Lint + tests + tracker coverage + web tests
 make docker-up    # Pull and start the published Docker image
@@ -174,11 +198,11 @@ Only reference data is versioned:
 - `data/narrative-tags.json`
 - `data/evolution-families.json`
 - `data/evolution-family-overrides.json`
+- `data/game-pokedexes.json`
 
 User state is local and ignored by Git:
 
 - `data/collection-progress.json`
-- `data/collection-cards.json`
 - `data/binder-config.json`
 - `data/binder-placements.json`
 - `data/trainer-contacts.json`
@@ -187,7 +211,15 @@ User state is local and ignored by Git:
 
 Older installs may still have `data/hunts.json` from the explicit search-list
 workflow. The simplified capture/trade model treats that file as legacy local
-state and omits hunts from new backups.
+state: it is ignored by the active app and omitted from new backups.
+
+Older installs may also still have the removed physical Pokemon card catalog
+file. The current app ignores that legacy local file, omits it from new backups,
+and keeps Pokemon card collection management outside the active scope.
+
+Older progress files may also contain removed `first_encounter` badge ids. Those
+ids are cleaned/ignored during active reads and imports; the badge gallery
+remains available for current progressive unlocks and Stats.
 
 ## REST API
 
@@ -197,18 +229,13 @@ The local API is mounted next to the web UI:
 |----------|---------|
 | `/api/health` | App/API version and liveness |
 | `/api/progress` | Collection progress |
-| `/api/cards` | Physical card catalog |
 | `/api/badges` | Badge catalog and progress |
 | `/api/profiles` | Local collection profiles |
 | `/api/trainers` | Optional local Trainer Cards and received contacts |
 | `/api/binder/*` | Binder configuration and placements |
-| `/api/tcg/cards/search` | Pokemon TCG catalog search for card prefill |
+| `/data/game-pokedexes.json` | Game Pokedex definitions and known appearances |
 | `/api/export` | Full backup export |
 | `/api/import` | Full backup restore |
-
-The TCG catalog lookup uses the public [Pokemon TCG API](https://docs.pokemontcg.io/).
-Set `TRACKER_TCG_API_KEY` if you have an API key; the local card inventory stays
-in `data/collection-cards.json`.
 
 Trainer Cards are separate from full backups and never sync automatically.
 `Double` marks a Pokemon as available in your exported Trainer Card. Missing

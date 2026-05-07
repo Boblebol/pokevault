@@ -15,11 +15,6 @@ const APP_FALLBACK_I18N = {
   "app.sync.pending": "{count} modification(s) en attente de synchro…",
   "app.sync.offline": "Hors ligne ou serveur indisponible — synchro différée.",
   "app.sync.exchange_failed": "Action d'échange non synchronisée : {message}.",
-  "app.card_summary.one": "1 carte",
-  "app.card_summary.many": "{count} cartes",
-  "app.card_summary.set_one": "1 set",
-  "app.card_summary.set_many": "{count} sets",
-  "app.card_summary.full": "{cards} dans {sets}",
   "app.filters.all_regions": "Toutes les régions",
   "app.filters.all_types": "Tous les types",
   "app.narrative.clear": "Tout réinitialiser",
@@ -55,16 +50,12 @@ const APP_FALLBACK_I18N = {
   "app.card.unknown": "Inconnu",
   "app.card.region_form": "{region} · forme",
   "app.card.state_caught": ", attrapé",
-  "app.card.state_shiny": ", attrapé shiny",
   "app.card.state_seen": ", vu chez un dresseur",
   "app.card.state_missing": ", recherché ou manquant",
-  "app.card.match": ", {count} match échange",
   "app.card.seen_contact": ", vu chez {count} contact",
   "app.card.action_caught": "Capturé",
-  "app.card.action_wanted": "Je cherche",
-  "app.card.match_badge": "Match {count}",
   "app.card.seen_badge": "Vu chez {count}",
-  "app.card.details": "Fiche & cartes",
+  "app.card.details": "Fiche",
   "app.card.open": "Ouvrir la fiche de {name}",
   "app.nav.docs": "Docs",
   "app.title.settings": "pokevault — Réglages",
@@ -81,7 +72,7 @@ let allPokemon = [];
 /**
  * Source of truth for the enriched Pokédex status (F03).
  * Keys are Pokémon slugs. Absence means `not_met`.
- * @type {Record<string, { state: "seen" | "caught"; shiny: boolean; seen_at?: string | null }>}
+ * @type {Record<string, { state: "seen" | "caught"; seen_at?: string | null }>}
  */
 let statusMap = Object.create(null);
 /** Derived mirror kept in sync with `statusMap` for legacy consumers. */
@@ -261,7 +252,7 @@ function endpointForQueueItem(item) {
 
 function bodyForQueueItem(item) {
   if (item && item.kind === "status") {
-    return { slug: item.slug, state: item.state, shiny: Boolean(item.shiny) };
+    return { slug: item.slug, state: item.state };
   }
   if (item && item.kind === "note") {
     return { slug: item.slug, note: String(item.note || "") };
@@ -269,20 +260,20 @@ function bodyForQueueItem(item) {
   return { slug: item.slug, caught: Boolean(item.caught) };
 }
 
-async function persistStatusPatch(slug, state, shiny) {
+async function persistStatusPatch(slug, state) {
   const hint = document.getElementById("syncHint");
   try {
     const res = await fetch(`${API_PROGRESS}/status`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ slug, state, shiny: Boolean(shiny) }),
+      body: JSON.stringify({ slug, state }),
     });
     if (!res.ok) throw new Error(String(res.status));
     await flushOfflineProgressQueue();
     if (hint) hint.hidden = true;
   } catch {
     const q = loadProgressQueue();
-    q.push({ kind: "status", slug, state, shiny: Boolean(shiny), ts: Date.now() });
+    q.push({ kind: "status", slug, state, ts: Date.now() });
     saveProgressQueue(q);
     if (hint) {
       hint.textContent = t("app.sync.offline");
@@ -337,9 +328,8 @@ function hydrateProgressMaps(payload) {
       if (!slug || !raw || typeof raw !== "object") continue;
       const state = raw.state === "seen" || raw.state === "caught" ? raw.state : null;
       if (!state) continue;
-      const shiny = state === "caught" && Boolean(raw.shiny);
       const seenAt = typeof raw.seen_at === "string" ? raw.seen_at : null;
-      statusMap[slug] = { state, shiny, seen_at: seenAt };
+      statusMap[slug] = { state, seen_at: seenAt };
       if (state === "caught") caughtMap[slug] = true;
     }
     return;
@@ -347,16 +337,16 @@ function hydrateProgressMaps(payload) {
   const rawCaught = payload && typeof payload.caught === "object" ? payload.caught : {};
   for (const [k, v] of Object.entries(rawCaught)) {
     if (!v) continue;
-    statusMap[k] = { state: "caught", shiny: false, seen_at: null };
+    statusMap[k] = { state: "caught", seen_at: null };
     caughtMap[k] = true;
   }
 }
 
-/** @returns {{ state: "not_met" | "seen" | "caught"; shiny: boolean }} */
+/** @returns {{ state: "not_met" | "seen" | "caught" }} */
 function getStatus(slug) {
   const s = statusMap[slug];
-  if (!s) return { state: "not_met", shiny: false };
-  return { state: s.state, shiny: Boolean(s.shiny) };
+  if (!s) return { state: "not_met" };
+  return { state: s.state };
 }
 
 function normalizeNoteText(value) {
@@ -385,22 +375,20 @@ function setNote(slug, note) {
  *
  * @param {string} slug
  * @param {"not_met" | "seen" | "caught"} state
- * @param {boolean} [shiny]
  */
-function setStatus(slug, state, shiny = false) {
+function setStatus(slug, state) {
   if (!slug) return;
-  const effectiveShiny = state === "caught" ? Boolean(shiny) : false;
   if (state === "not_met") {
     delete statusMap[slug];
     delete caughtMap[slug];
   } else {
     const prev = statusMap[slug];
     const seenAt = prev?.seen_at || new Date().toISOString();
-    statusMap[slug] = { state, shiny: effectiveShiny, seen_at: seenAt };
+    statusMap[slug] = { state, seen_at: seenAt };
     if (state === "caught") caughtMap[slug] = true;
     else delete caughtMap[slug];
   }
-  void persistStatusPatch(slug, state, effectiveShiny);
+  void persistStatusPatch(slug, state);
   for (const cb of caughtUiListeners) {
     try {
       cb();
@@ -429,7 +417,7 @@ function toggleCaughtBySlug(slug) {
   if (current.state === "caught") {
     setStatus(slug, "not_met");
   } else {
-    setStatus(slug, "caught", current.shiny);
+    setStatus(slug, "caught");
   }
 }
 
@@ -451,27 +439,16 @@ function ownershipStateForSlug(slug) {
   if (fiche?.ownershipStateFromSources) {
     return fiche.ownershipStateFromSources(key, {
       status: getStatus(key),
-      wanted: Boolean(window.PokevaultHunts?.isWanted?.(key)),
       ownCard: window.PokevaultTrainerContacts?.getOwnCard?.() || null,
     });
   }
   const status = getStatus(key);
-  return { wanted: false, caught: status.state === "caught", duplicate: false };
+  return { caught: status.state === "caught", duplicate: false };
 }
 
 function shouldDimCardForHighlight(mode, ownership) {
   const caught = Boolean(ownership?.caught);
   return mode === "missing" ? !caught : caught;
-}
-
-async function setHuntWanted(slug, wanted) {
-  if (!window.PokevaultHunts?.patch) return;
-  const existing = window.PokevaultHunts.entry?.(slug);
-  await window.PokevaultHunts.patch(slug, {
-    wanted: Boolean(wanted),
-    priority: wanted ? existing?.priority || "normal" : "normal",
-    note: wanted ? existing?.note || "" : "",
-  });
 }
 
 async function setTrainerListMembership(slug, listName, enabled) {
@@ -490,31 +467,20 @@ function showOwnershipSyncError(err) {
 async function setPokemonOwnershipState(slug, nextState) {
   const key = String(slug || "").trim();
   if (!key) return;
-  const next = nextState === "wanted" || nextState === "owned" || nextState === "duplicate"
+  const next = nextState === "owned" || nextState === "duplicate" || nextState === "release_one"
     ? nextState
     : "none";
   const current = getStatus(key);
   const tasks = [];
 
-  if (next === "wanted") {
-    setStatus(key, "not_met", false);
-    tasks.push(setHuntWanted(key, true));
-    tasks.push(setTrainerListMembership(key, "wants", true));
-    tasks.push(setTrainerListMembership(key, "for_trade", false));
-  } else if (next === "owned") {
-    setStatus(key, "caught", current.shiny);
-    tasks.push(setHuntWanted(key, false));
-    tasks.push(setTrainerListMembership(key, "wants", false));
+  if (next === "owned" || next === "release_one") {
+    setStatus(key, "caught");
     tasks.push(setTrainerListMembership(key, "for_trade", false));
   } else if (next === "duplicate") {
-    setStatus(key, "caught", current.shiny);
-    tasks.push(setHuntWanted(key, false));
-    tasks.push(setTrainerListMembership(key, "wants", false));
+    setStatus(key, "caught");
     tasks.push(setTrainerListMembership(key, "for_trade", true));
   } else {
-    setStatus(key, "not_met", false);
-    tasks.push(setHuntWanted(key, false));
-    tasks.push(setTrainerListMembership(key, "wants", false));
+    setStatus(key, "not_met");
     tasks.push(setTrainerListMembership(key, "for_trade", false));
   }
 
@@ -535,44 +501,8 @@ function cycleOwnershipBySlug(slug, opts) {
   const shift = Boolean(opts?.shift);
   const next = shift
     ? current.duplicate ? "owned" : "duplicate"
-    : current.caught && !current.duplicate && !current.wanted ? "none" : "owned";
+    : current.caught ? "none" : "owned";
   void setPokemonOwnershipState(slug, next);
-}
-
-/**
- * Contract-first card stats (F01 ↔ F08).
- *
- * Returns the aggregate number of catalogued cards and the count of distinct
- * sets those cards belong to. Until F08 ships the real Card model, we return
- * zeroes — but downstream views already render the secondary progression
- * line so the UI contract is frozen.
- *
- * @returns {{ cards: number; sets: number }}
- */
-function computeCardStats() {
-  const src = window.PokevaultCards;
-  if (src && typeof src.summary === "function") {
-    try {
-      const s = src.summary();
-      if (s && typeof s === "object") {
-        const cards = Number(s.cards);
-        const sets = Number(s.sets);
-        return {
-          cards: Number.isFinite(cards) ? cards : 0,
-          sets: Number.isFinite(sets) ? sets : 0,
-        };
-      }
-    } catch {
-      /* tolerate incomplete provider */
-    }
-  }
-  return { cards: 0, sets: 0 };
-}
-
-function formatCardSummary({ cards, sets }) {
-  const c = cards === 1 ? t("app.card_summary.one") : t("app.card_summary.many", { count: cards });
-  const s = sets === 1 ? t("app.card_summary.set_one") : t("app.card_summary.set_many", { count: sets });
-  return t("app.card_summary.full", { cards: c, sets: s });
 }
 
 function availableTypeIds() {
@@ -826,14 +756,10 @@ function matchesFilter(p) {
   const k = pokemonKey(p);
   const status = window.PokevaultFilters?.statusForPokemon?.(k, caughtMap, statusMap) || {
     state: caughtMap[k] ? "caught" : "not_met",
-    shiny: false,
   };
   const got = status.state === "caught";
   if (filterMode === "caught") return got;
   if (filterMode === "missing") return !got;
-  if (filterMode === "seen") return status.state === "seen";
-  if (filterMode === "shiny") return got && status.shiny;
-  if (filterMode === "hunts") return Boolean(window.PokevaultHunts?.isWanted?.(k));
   return true;
 }
 
@@ -947,7 +873,6 @@ function matchesPokedexFilterState(p) {
       caughtMap,
       statusMap,
       effectiveRegion,
-      isWanted: (slug) => Boolean(window.PokevaultHunts?.isWanted?.(slug)),
       narrativeTagsFor,
     });
   }
@@ -1280,8 +1205,13 @@ function setupArtworkSelect() {
 }
 
 function rerenderArtworkSurface() {
-  if (currentViewFromHash() === "pokemon" && typeof window.PokevaultFullView?.render === "function") {
-    window.PokevaultFullView.render(currentPokemonSlugFromHash());
+  const routeSlug = currentPokemonSlugFromHash();
+  if (routeSlug && typeof window.PokevaultPokemonModal?.render === "function") {
+    window.PokevaultPokemonModal.render(routeSlug);
+    return;
+  }
+  if (typeof window.PokevaultPokemonModal?.render === "function") {
+    window.PokevaultPokemonModal.render();
     return;
   }
   if (typeof render === "function") render();
@@ -1408,7 +1338,7 @@ function setupSettingsView() {
 let pendingImportPayload = null;
 
 function isSupportedBackupSchemaVersion(value) {
-  return value === 1 || value === 2 || value === 3;
+  return value === 1 || value === 2 || value === 3 || value === 4 || value === 5;
 }
 
 function getCollectionScopeSlugSet() {
@@ -1598,10 +1528,10 @@ function createPokemonCard(p, opts) {
   const status = getStatus(key);
   const caught = status.state === "caught";
   const seen = status.state === "seen";
-  const shiny = caught && status.shiny;
   const ownership = ownershipStateForSlug(key);
   const tradeSummary = tradeSummaryForSlug(key);
-  const networkSeen = !caught && tradeSummary.availableFrom.length > 0;
+  const locallyOwned = Boolean(ownership.caught);
+  const networkSeen = !locallyOwned && tradeSummary.availableFrom.length > 0;
   const visualSeen = seen || networkSeen;
   const dim = getDimMode();
 
@@ -1609,25 +1539,21 @@ function createPokemonCard(p, opts) {
   const classParts = ["card"];
   if (caught) classParts.push("is-caught");
   if (visualSeen) classParts.push("is-seen");
-  if (shiny) classParts.push("is-shiny");
   if (ownership.duplicate) classParts.push("is-duplicate");
   card.className = classParts.join(" ");
-  if (shouldDimCardForHighlight(dim, { caught, duplicate: ownership.duplicate })) {
+  if (shouldDimCardForHighlight(dim, { caught: locallyOwned, duplicate: ownership.duplicate })) {
     card.classList.add("is-dimmed");
   }
   card.dataset.slug = key;
   card.dataset.status = status.state;
   card.dataset.ownership = window.PokevaultPokemonFiche?.ownershipLabel?.(ownership) || "";
-  if (shiny) card.dataset.shiny = "1";
   card.setAttribute("role", "group");
   const stateLabel = caught
-    ? shiny ? t("app.card.state_shiny") : t("app.card.state_caught")
+    ? t("app.card.state_caught")
     : visualSeen ? t("app.card.state_seen") : t("app.card.state_missing");
-  const exchangeLabel = tradeSummary.matchCount > 0
-    ? t("app.card.match", { count: tradeSummary.matchCount })
-    : tradeSummary.availableFrom.length > 0
-      ? t("app.card.seen_contact", { count: tradeSummary.availableFrom.length })
-      : "";
+  const exchangeLabel = networkSeen
+    ? t("app.card.seen_contact", { count: tradeSummary.availableFrom.length })
+    : "";
   card.setAttribute(
     "aria-label",
     `${displayName(p)} ${displayNumber(p.number)}${stateLabel}${exchangeLabel}`,
@@ -1642,7 +1568,7 @@ function createPokemonCard(p, opts) {
   const statusClass = caught ? "is-caught" : visualSeen ? "is-seen" : "is-missing";
   statusIcon.className = `card-status-icon ${statusClass}`;
   statusIcon.textContent = caught
-    ? (shiny ? "✦" : "✓")
+    ? "✓"
     : visualSeen
       ? "◉"
       : "○";
@@ -1724,22 +1650,16 @@ function createPokemonCard(p, opts) {
     { compact: true },
   );
   if (ownershipActions) action.append(ownershipActions);
-  else action.textContent = caught ? t("app.card.action_caught") : t("app.card.action_wanted");
+  else action.textContent = t("app.card.action_caught");
   card.append(action);
 
   const exchange = document.createElement("div");
   exchange.className = "pokemon-network-row";
-  if (tradeSummary.matchCount > 0 || tradeSummary.availableFrom.length > 0) {
+  if (networkSeen) {
     const badge = document.createElement("span");
     badge.className = "pokemon-network-badge";
-    if (tradeSummary.matchCount > 0) {
-      badge.classList.add("is-match");
-      badge.textContent = t("app.card.match_badge", { count: tradeSummary.matchCount });
-      badge.title = `Disponible chez ${tradeSummary.availableFrom.join(", ")}`;
-    } else {
-      badge.textContent = t("app.card.seen_badge", { count: tradeSummary.availableFrom.length });
-      badge.title = tradeSummary.availableFrom.join(", ");
-    }
+    badge.textContent = t("app.card.seen_badge", { count: tradeSummary.availableFrom.length });
+    badge.title = tradeSummary.availableFrom.join(", ");
     exchange.append(badge);
   }
   card.append(exchange);
@@ -1752,7 +1672,7 @@ function createPokemonCard(p, opts) {
   details.addEventListener("click", (event) => {
     event.preventDefault();
     event.stopPropagation();
-    window.PokevaultDrawer?.open(key, card);
+    window.PokevaultPokemonModal?.open?.(key, card);
   });
   card.append(details);
 
@@ -1761,7 +1681,6 @@ function createPokemonCard(p, opts) {
 
 window.PokedexCollection.createPokemonCard = createPokemonCard;
 window.PokedexCollection.poolForCollectionScope = poolForCollectionScope;
-window.PokedexCollection.computeCardStats = computeCardStats;
 if (window.__POKEVAULT_APP_TESTS__) {
   window.PokedexCollection._test = {
     currentViewFromHash,
@@ -1770,7 +1689,6 @@ if (window.__POKEVAULT_APP_TESTS__) {
     shouldDimCardForHighlight,
   };
 }
-window.PokedexCollection.formatCardSummary = formatCardSummary;
 
 function hasActiveFilterExceptMissing() {
   return (
@@ -1780,26 +1698,6 @@ function hasActiveFilterExceptMissing() {
     formFilterMode !== "all" ||
     narrativeTagFilter.size > 0
   );
-}
-
-function openRecommendedPokemon(slug, action, trigger) {
-  if (!slug) return;
-  const escaped = window.CSS?.escape ? window.CSS.escape(slug) : String(slug).replace(/["\\]/g, "\\$&");
-  const card = document.querySelector?.(`.card[data-slug="${escaped}"]`) || null;
-  if (window.PokevaultDrawer?.open) {
-    window.PokevaultDrawer.open(slug, card || trigger || null);
-    return;
-  }
-  const pokemon = action?.pokemon || allPokemon.find((p) => pokemonKey(p) === slug);
-  const input = document.getElementById("search");
-  if (input && pokemon) {
-    input.value = displayName(pokemon);
-    input.dispatchEvent(new Event("input", { bubbles: true }));
-  }
-  window.setTimeout(() => {
-    const target = document.querySelector?.(`.card[data-slug="${escaped}"]`);
-    target?.scrollIntoView?.({ block: "center", inline: "nearest", behavior: "smooth" });
-  }, 80);
 }
 
 function render() {
@@ -1812,14 +1710,8 @@ function render() {
   const pct = barTotal ? Math.round((caughtCount / barTotal) * 100) : 0;
   const heroPct = document.getElementById("listHeroPct");
   const heroCount = document.getElementById("listHeroCount");
-  const heroCards = document.getElementById("listHeroCards");
   if (heroPct) heroPct.textContent = `${pct}%`;
   if (heroCount) heroCount.textContent = t("app.collection.discovered", { caught: caughtCount, total: barTotal });
-  if (heroCards) {
-    const stats = computeCardStats();
-    heroCards.textContent = formatCardSummary(stats);
-    heroCards.classList.toggle("is-dormant", stats.cards === 0);
-  }
   window.PokevaultDashboard?.renderFromState?.({
     cardsHost: document.getElementById("pokedexDashboardCards"),
     regionsHost: document.getElementById("pokedexDashboardRegions"),
@@ -1827,18 +1719,6 @@ function render() {
     statusMap,
     caughtMap,
     regionDefinitions,
-    cardStats: computeCardStats(),
-  });
-  window.PokevaultNextActions?.renderFromState?.({
-    host: document.getElementById("pokedexNextActions"),
-    pool: poolForCollectionScope(),
-    caughtMap,
-    statusMap,
-    regionDefinitions,
-    activeRegionId: regionFilter,
-    nearestBadge: window.PokevaultBadges?.nearest?.(),
-    activeMissionSlugs: window.PokevaultBadgeMission?.activeTargetSlugs?.() || [],
-    onOpen: openRecommendedPokemon,
   });
   const fill = document.getElementById("progressFill");
   fill.style.width = `${pct}%`;
@@ -1868,10 +1748,9 @@ function render() {
           p.className = "empty-state";
           p.textContent = t("app.list.no_filter");
           return p;
-        })();
+    })();
     if (node) grid.append(node);
     updateListDisplayInfo({ full: sliced.full, end: 0, total: 0 });
-    window.PokevaultBadgeMission?.refresh?.();
     return;
   }
 
@@ -1881,7 +1760,6 @@ function render() {
 
   updateListDisplayInfo({ full: sliced.full, end: sliced.end, total: sliced.total });
   window.PokevaultKeyboard?.repaint?.();
-  window.PokevaultBadgeMission?.refresh?.();
 }
 
 function syncQuickFilterButtons() {
@@ -1948,11 +1826,8 @@ function setupKeyboardHelpTrigger() {
 
 let listCaughtSubscribed = false;
 let listDimSubscribed = false;
-let listHuntsSubscribed = false;
-let listCardsSubscribed = false;
 let listBadgesSubscribed = false;
 let listTrainerContactsSubscribed = false;
-let listBadgeMissionSubscribed = false;
 
 function readStoredFormFilterMode() {
   try {
@@ -1993,11 +1868,6 @@ async function startTracker() {
     return;
   }
   try {
-    await window.PokevaultHunts?.ensureLoaded?.();
-  } catch {
-    /* hunts are optional local state */
-  }
-  try {
     await window.PokevaultTrainerContacts?.ensureLoaded?.();
   } catch {
     /* trainer contacts are optional local state */
@@ -2013,13 +1883,6 @@ async function startTracker() {
     listDimSubscribed = true;
     window.PokedexCollection.subscribeDimMode(() => render());
   }
-  if (!listHuntsSubscribed) {
-    listHuntsSubscribed = true;
-    window.PokevaultHunts?.subscribe?.(() => {
-      resetDisplayedCount();
-      render();
-    });
-  }
   if (!listTrainerContactsSubscribed) {
     listTrainerContactsSubscribed = true;
     window.PokevaultTrainerContacts?.subscribe?.(() => {
@@ -2027,17 +1890,9 @@ async function startTracker() {
       render();
     });
   }
-  if (!listCardsSubscribed) {
-    listCardsSubscribed = true;
-    document.addEventListener("pokevault:cards-changed", () => render());
-  }
   if (!listBadgesSubscribed) {
     listBadgesSubscribed = true;
     window.PokevaultBadges?.subscribe?.(() => render());
-  }
-  if (!listBadgeMissionSubscribed) {
-    listBadgeMissionSubscribed = true;
-    window.PokevaultBadgeMission?.subscribe?.(() => render());
   }
   if (!window.__pokedexOnlineFlushWired) {
     window.__pokedexOnlineFlushWired = true;
@@ -2050,13 +1905,13 @@ async function startTracker() {
 function currentViewFromHash() {
   const rawFull = (location.hash || "#/liste").replace(/^#/, "").replace(/^\//, "");
   const raw = rawFull.split("?")[0];
+  if (raw.startsWith("pokemon/")) return "liste";
   if (raw === "stats") return "stats";
   if (raw === "classeur") return "classeur";
   if (raw === "dresseurs") return "dresseurs";
   if (raw === "settings") return "settings";
   if (raw === "print") return "print";
   if (raw === "docs") return "docs";
-  if (raw.startsWith("pokemon/")) return "pokemon";
   if (raw === "liste" || raw === "") return "liste";
   return "liste";
 }
@@ -2083,6 +1938,7 @@ function updateAppSwitchNav(view) {
 }
 
 function applyAppRoute() {
+  const routePokemonSlug = currentPokemonSlugFromHash();
   const view = currentViewFromHash();
   const elListe = document.getElementById("viewListe");
   const elClasseur = document.getElementById("viewClasseur");
@@ -2091,7 +1947,6 @@ function applyAppRoute() {
   const elSettings = document.getElementById("viewSettings");
   const elPrint = document.getElementById("viewPrint");
   const elDocs = document.getElementById("viewDocs");
-  const elPokemon = document.getElementById("viewPokemon");
   if (elListe) elListe.hidden = view !== "liste";
   if (elClasseur) elClasseur.hidden = view !== "classeur";
   if (elDresseurs) elDresseurs.hidden = view !== "dresseurs";
@@ -2099,7 +1954,6 @@ function applyAppRoute() {
   if (elSettings) elSettings.hidden = view !== "settings";
   if (elPrint) elPrint.hidden = view !== "print";
   if (elDocs) elDocs.hidden = view !== "docs";
-  if (elPokemon) elPokemon.hidden = view !== "pokemon";
   updateAppSwitchNav(view);
   const titles = {
     liste: `pokevault — ${t("app.nav.collection")}`,
@@ -2109,7 +1963,6 @@ function applyAppRoute() {
     docs: `pokevault — ${t("app.nav.docs")}`,
     classeur: `pokevault — ${t("app.nav.binders")}`,
     dresseurs: `pokevault — ${t("app.nav.trainers")}`,
-    pokemon: `pokevault — ${t("app.drawer.kicker")}`,
   };
   document.title = titles[view] || "pokevault";
   if (view === "liste" && !listViewStarted) {
@@ -2133,8 +1986,11 @@ function applyAppRoute() {
   if (view === "print" && typeof window.PokedexPrint?.start === "function") {
     window.PokedexPrint.start();
   }
-  if (view === "pokemon" && typeof window.PokevaultFullView?.render === "function") {
-    window.PokevaultFullView.render(currentPokemonSlugFromHash());
+  if (routePokemonSlug && typeof window.PokevaultPokemonModal?.open === "function") {
+    window.PokevaultPokemonModal.open(routePokemonSlug, null);
+    const back = window.PokevaultPokemonFiche?.listReturnHash?.(location.hash || "") || "#/liste";
+    if (window.history?.replaceState) window.history.replaceState(null, "", back);
+    location.hash = back;
   }
 }
 

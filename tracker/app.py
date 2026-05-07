@@ -9,13 +9,10 @@ from fastapi.staticfiles import StaticFiles
 from tracker.api.controllers import (
     badge_router,
     binder_router,
-    card_router,
     export_router,
     health_router,
-    hunt_router,
     profile_router,
     progress_router,
-    tcg_router,
     trainer_contact_router,
 )
 from tracker.config import TrackerSettings, get_settings
@@ -32,12 +29,9 @@ def create_app(settings: TrackerSettings | None = None) -> FastAPI:
 
     app.include_router(progress_router)
     app.include_router(binder_router)
-    app.include_router(card_router)
     app.include_router(badge_router)
     app.include_router(profile_router)
-    app.include_router(hunt_router)
     app.include_router(trainer_contact_router)
-    app.include_router(tcg_router)
     app.include_router(export_router)
     app.include_router(health_router)
 
@@ -52,6 +46,7 @@ def create_app(settings: TrackerSettings | None = None) -> FastAPI:
         "narrative-tags.json": data_dir / "narrative-tags.json",
         "evolution-families.json": data_dir / "evolution-families.json",
         "evolution-family-overrides.json": data_dir / "evolution-family-overrides.json",
+        "game-pokedexes.json": data_dir / "game-pokedexes.json",
     }
 
     def serve_public_json(filename: str) -> FileResponse:
@@ -80,6 +75,10 @@ def create_app(settings: TrackerSettings | None = None) -> FastAPI:
     def serve_evolution_family_overrides_json() -> FileResponse:
         return serve_public_json("evolution-family-overrides.json")
 
+    @app.get("/data/game-pokedexes.json")
+    def serve_game_pokedexes_json() -> FileResponse:
+        return serve_public_json("game-pokedexes.json")
+
     @app.middleware("http")
     async def disable_web_cache(request, call_next):
         """Toujours servir la derniere version des assets web en local."""
@@ -98,14 +97,6 @@ def create_app(settings: TrackerSettings | None = None) -> FastAPI:
             "/data/images",
             StaticFiles(directory=str(images_dir), check_dir=True),
             name="data-images",
-        )
-
-    shiny_images_dir = data_dir / "images_shiny"
-    if shiny_images_dir.is_dir():
-        app.mount(
-            "/data/images_shiny",
-            StaticFiles(directory=str(shiny_images_dir), check_dir=True),
-            name="data-images-shiny",
         )
 
     app.mount(

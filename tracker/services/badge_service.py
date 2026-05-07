@@ -1,9 +1,9 @@
 """Logique métier — badges Pokédex (roadmap F12).
 
 Badges are evaluated server-side from the current
-:class:`~tracker.models.CollectionProgress` + :class:`~tracker.models.CardList`
-state. Rules are **monotonic**: once unlocked, a badge stays unlocked even if
-the underlying count later drops (e.g. the user uncatches a Pokémon).
+:class:`~tracker.models.CollectionProgress` state. Rules are **monotonic**:
+once unlocked, a badge stays unlocked even if the underlying count later drops
+(e.g. the user uncatches a Pokémon).
 
 Persisted as ``badges_unlocked: list[str]`` inside
 ``data/collection-progress.json``.
@@ -17,10 +17,9 @@ from tracker.models import (
     BadgeDefinition,
     BadgeRequirementPokemon,
     BadgeState,
-    Card,
     CollectionProgress,
 )
-from tracker.repository.base import CardRepository, ProgressRepository
+from tracker.repository.base import ProgressRepository
 from tracker.services.badge_presentation import presentation_for_badge
 
 
@@ -63,7 +62,6 @@ class BadgeDef:
     def progress(
         self,
         progress: CollectionProgress,
-        cards: list[Card],
     ) -> BadgeProgress:
         if self.required_slug_sets:
             return _team_badge_progress(
@@ -71,7 +69,7 @@ class BadgeDef:
                 progress,
                 self.hint_unit,
             )
-        current = _metric_value(self.metric, progress, cards)
+        current = _metric_value(self.metric, progress)
         return BadgeProgress(
             current=max(0, min(current, self.target)),
             target=self.target,
@@ -91,41 +89,12 @@ def _caught_slugs(progress: CollectionProgress) -> set[str]:
     }
 
 
-def _seen_count(progress: CollectionProgress) -> int:
-    return len(progress.statuses)
-
-
-def _shiny_count(progress: CollectionProgress) -> int:
-    return sum(
-        1 for s in progress.statuses.values() if s.state == "caught" and s.shiny
-    )
-
-
-def _unique_sets(cards: list[Card]) -> int:
-    return len({c.set_id.strip() for c in cards if c.set_id.strip()})
-
-
-def _card_total_qty(cards: list[Card]) -> int:
-    return sum(int(c.qty) for c in cards)
-
-
 def _metric_value(
     metric: str,
     progress: CollectionProgress,
-    cards: list[Card],
 ) -> int:
-    if metric == "seen":
-        return _seen_count(progress)
     if metric == "caught":
         return _caught_count(progress)
-    if metric == "shiny":
-        return _shiny_count(progress)
-    if metric == "cards":
-        return len(cards)
-    if metric == "sets":
-        return _unique_sets(cards)
-    if metric == "card_qty":
-        return _card_total_qty(cards)
     raise ValueError(f"Unknown badge metric: {metric}")
 
 
@@ -210,36 +179,12 @@ def _team_badge(
 
 BADGES: list[BadgeDef] = [
     BadgeDef(
-        "first_encounter",
-        "Première rencontre",
-        "Identifier ton premier Pokémon.",
-        "seen",
-        1,
-        "Pokémon à identifier",
-    ),
-    BadgeDef(
         "first_catch",
         "Premier Pokéball",
         "Attraper ton premier Pokémon.",
         "caught",
         1,
         "Pokémon à attraper",
-    ),
-    BadgeDef(
-        "first_shiny",
-        "Premier chromatique",
-        "Attraper ton premier Pokémon shiny.",
-        "shiny",
-        1,
-        "Pokémon shiny à attraper",
-    ),
-    BadgeDef(
-        "first_card",
-        "Première carte",
-        "Ajouter ta première carte TCG au carnet.",
-        "cards",
-        1,
-        "carte TCG à ajouter",
     ),
     BadgeDef(
         "century",
@@ -264,46 +209,6 @@ BADGES: list[BadgeDef] = [
         "caught",
         1000,
         "Pokémon à attraper",
-    ),
-    BadgeDef(
-        "shiny_ten",
-        "Chasseur",
-        "Attraper 10 Pokémon chromatiques.",
-        "shiny",
-        10,
-        "Pokémon shiny à attraper",
-    ),
-    BadgeDef(
-        "shiny_hundred",
-        "Chasseur légendaire",
-        "Attraper 100 Pokémon chromatiques.",
-        "shiny",
-        100,
-        "Pokémon shiny à attraper",
-    ),
-    BadgeDef(
-        "ten_sets",
-        "Inter-extensions",
-        "Posséder des cartes de 10 sets différents.",
-        "sets",
-        10,
-        "set TCG à cataloguer",
-    ),
-    BadgeDef(
-        "hundred_cards",
-        "Centenaire TCG",
-        "Catalogue de 100 cartes uniques.",
-        "cards",
-        100,
-        "carte TCG à cataloguer",
-    ),
-    BadgeDef(
-        "dedicated_collector",
-        "Collectionneur dévoué",
-        "500 cartes en stock (cumul des quantités).",
-        "card_qty",
-        500,
-        "carte en stock à ajouter",
     ),
     _team_badge(
         "kanto_brock",
@@ -2030,38 +1935,54 @@ class BadgeService:
     """Evaluates + persists badge unlocks.
 
     ``progress_repo`` is the source of truth for both progress state and
-    the ``badges_unlocked`` sub-key; ``card_repo`` feeds the card-based
-    predicates.
+    the ``badges_unlocked`` sub-key.
     """
 
     def __init__(
         self,
         progress_repo: ProgressRepository,
-        card_repo: CardRepository,
     ) -> None:
         self._progress_repo = progress_repo
-        self._card_repo = card_repo
 
     def _evaluate_due(
         self,
         progress: CollectionProgress,
-        cards: list[Card],
     ) -> set[str]:
-        return {b.id for b in BADGES if b.progress(progress, cards).complete}
+        return {b.id for b in BADGES if b.progress(progress).complete}
+
+    def _current_unlocked(self, progress: CollectionProgress) -> set[str]:
+        current_ids = {badge.id for badge in BADGES}
+        return {
+            badge_id
+            for badge_id in progress.badges_unlocked
+            if badge_id in current_ids
+        }
+
+    def _cleanup_removed_unlocked(
+        self,
+        progress: CollectionProgress,
+        unlocked: set[str],
+    ) -> None:
+        cleaned = sorted(unlocked)
+        if progress.badges_unlocked == cleaned:
+            return
+        self._progress_repo.save(
+            progress.model_copy(update={"badges_unlocked": cleaned})
+        )
 
     def sync_unlocked(self) -> list[str]:
         """Re-evaluate predicates and persist any newly unlocked badges.
 
         Returns the list of newly unlocked badge ids (empty if nothing
-        changed). Monotonic: already-unlocked ids are never removed.
+        changed). Monotonic for current catalog ids; removed catalog ids
+        are cleaned from persisted state.
         """
         progress = self._progress_repo.load()
-        cards = list(self._card_repo.load().cards)
-        due = self._evaluate_due(progress, cards)
-        already = set(progress.badges_unlocked)
+        due = self._evaluate_due(progress)
+        already = self._current_unlocked(progress)
         merged = already | due
         newly = sorted(due - already)
-        if merged != already:
+        if sorted(progress.badges_unlocked) != sorted(merged):
             updated = progress.model_copy(
                 update={"badges_unlocked": sorted(merged)}
             )
@@ -2071,14 +1992,13 @@ class BadgeService:
     def state(self) -> BadgeState:
         """Return the full catalog + persisted unlocked ids."""
         progress = self._progress_repo.load()
-        unlocked = set(progress.badges_unlocked)
-        cards = list(self._card_repo.load().cards)
+        unlocked = self._current_unlocked(progress)
+        self._cleanup_removed_unlocked(progress, unlocked)
         catalog = []
         for badge in BADGES:
             badge_progress = self._definition_progress(
                 badge,
                 progress,
-                cards,
                 unlocked,
             )
             presentation = presentation_for_badge(
@@ -2121,10 +2041,9 @@ class BadgeService:
         self,
         badge: BadgeDef,
         progress: CollectionProgress,
-        cards: list[Card],
         unlocked: set[str],
     ) -> BadgeProgress:
-        current = badge.progress(progress, cards)
+        current = badge.progress(progress)
         if badge.id not in unlocked or current.complete:
             return current
         return BadgeProgress(

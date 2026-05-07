@@ -207,11 +207,11 @@
       case "i":
       case "I":
         e.preventDefault();
-        if (currentFocusSlug && window.PokevaultDrawer?.open) {
+        if (currentFocusSlug && window.PokevaultPokemonModal?.open) {
           const trigger = document
             .getElementById("grid")
             ?.querySelector(`.card[data-slug="${currentFocusSlug}"]`);
-          window.PokevaultDrawer.open(currentFocusSlug, trigger || null);
+          window.PokevaultPokemonModal.open(currentFocusSlug, trigger || null);
         }
         return;
       default:

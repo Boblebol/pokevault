@@ -17,8 +17,6 @@ from tracker.repository.json_binder_config_repository import JsonBinderConfigRep
 from tracker.repository.json_binder_placements_repository import (
     JsonBinderPlacementsRepository,
 )
-from tracker.repository.json_card_repository import JsonCardRepository
-from tracker.repository.json_hunt_repository import JsonHuntRepository
 from tracker.repository.json_progress_repository import JsonProgressRepository
 from tracker.services.export_service import ExportService
 from tracker.services.progress_service import ProgressService
@@ -195,9 +193,6 @@ def _setup(tmp_path: Path, pokedex_rows: list[dict] | None = None) -> TestClient
     progress_repo = JsonProgressRepository(prog)
     config_repo = JsonBinderConfigRepository(cfg)
     placements_repo = JsonBinderPlacementsRepository(pl)
-    cards_path = tmp_path / "data" / "collection-cards.json"
-    card_repo = JsonCardRepository(cards_path)
-    hunt_repo = JsonHuntRepository(tmp_path / "data" / "hunts.json")
 
     def progress_override() -> ProgressService:
         return ProgressService(progress_repo)
@@ -207,8 +202,6 @@ def _setup(tmp_path: Path, pokedex_rows: list[dict] | None = None) -> TestClient
             progress_repo,
             config_repo,
             placements_repo,
-            card_repo,
-            hunt_repo,
             pokedex_path=pokedex,
         )
 
@@ -225,14 +218,14 @@ def test_export_empty_collection(tmp_path: Path) -> None:
     r = client.get("/api/export")
     assert r.status_code == 200
     data = r.json()
-    assert data["schema_version"] == 3
+    assert data["schema_version"] == 5
     assert data["app"] == "pokevault"
     assert "exported_at" in data
     assert data["progress"]["caught"] == {}
     assert data["binder_config"]["binders"] == []
     assert data["binder_placements"]["by_binder"] == {}
-    assert data["cards"] == []
-    assert data["hunts"]["hunts"] == {}
+    assert "cards" not in data
+    assert "hunts" not in data
 
 
 def test_export_with_data(tmp_path: Path) -> None:
@@ -315,7 +308,41 @@ def test_import_accepts_v1_legacy_payload(tmp_path: Path) -> None:
     assert r.status_code == 200
     body = r.json()
     assert body["caught_count"] == 1
-    assert body["card_count"] == 0
+    assert "card_count" not in body
+
+
+def test_import_accepts_legacy_cards_and_drops_them_on_export(tmp_path: Path) -> None:
+    client = _setup(tmp_path)
+    payload = {
+        "schema_version": 4,
+        "progress": {"version": 1, "caught": {"pichu": True}},
+        "binder_config": {
+            "version": 1,
+            "convention": "sheet_recto_verso",
+            "binders": [],
+            "form_rules": [],
+        },
+        "binder_placements": {"version": 1, "by_binder": {}},
+        "cards": [
+            {
+                "id": "legacy-card",
+                "pokemon_slug": "pichu",
+                "condition": "near_mint",
+                "qty": 1,
+                "created_at": "2026-01-01T00:00:00+00:00",
+                "updated_at": "2026-01-01T00:00:00+00:00",
+            }
+        ],
+    }
+
+    r = client.post("/api/import", json=payload)
+
+    assert r.status_code == 200
+    body = r.json()
+    assert "card_count" not in body
+    exported = client.get("/api/export").json()
+    assert exported["schema_version"] == 5
+    assert "cards" not in exported
 
 
 def test_import_rejects_bad_schema_version(tmp_path: Path) -> None:
@@ -335,7 +362,28 @@ def test_import_rejects_bad_schema_version(tmp_path: Path) -> None:
     assert r.status_code == 422
 
 
-def test_export_import_roundtrips_hunts(tmp_path: Path) -> None:
+def test_import_rejects_unknown_top_level_fields_except_legacy_hunts(tmp_path: Path) -> None:
+    client = _setup(tmp_path)
+    payload = {
+        "schema_version": 4,
+        "progress": {"version": 1, "caught": {}},
+        "binder_config": {
+            "version": 1,
+            "convention": "sheet_recto_verso",
+            "binders": [],
+            "form_rules": [],
+        },
+        "binder_placements": {"version": 1, "by_binder": {}},
+        "cards": [],
+        "cardz": [],
+    }
+
+    response = client.post("/api/import", json=payload)
+
+    assert response.status_code == 422
+
+
+def test_import_accepts_legacy_hunts_and_drops_them_on_export(tmp_path: Path) -> None:
     client = _setup(tmp_path)
     payload = {
         "schema_version": 3,
@@ -360,12 +408,47 @@ def test_export_import_roundtrips_hunts(tmp_path: Path) -> None:
             },
         },
     }
-    r = client.post("/api/import", json=payload)
-    assert r.status_code == 200
 
+    r = client.post("/api/import", json=payload)
+
+    assert r.status_code == 200
+    body = r.json()
+    assert body["caught_count"] == 1
+    assert "hunt_count" not in body
     exported = client.get("/api/export").json()
-    assert exported["schema_version"] == 3
-    assert exported["hunts"]["hunts"]["0025-pikachu"]["priority"] == "high"
+    assert exported["schema_version"] == 5
+    assert "hunts" not in exported
+
+
+def test_import_filters_removed_legacy_badge_unlocks(tmp_path: Path) -> None:
+    client = _setup(tmp_path)
+    payload = {
+        "schema_version": 4,
+        "progress": {
+            "version": 1,
+            "caught": {"pikachu": True},
+            "badges_unlocked": [
+                "first_encounter",
+                "first_shiny",
+                "first_card",
+                "first_catch",
+            ],
+        },
+        "binder_config": {
+            "version": 1,
+            "convention": "sheet_recto_verso",
+            "binders": [],
+            "form_rules": [],
+        },
+        "binder_placements": {"version": 1, "by_binder": {}},
+        "cards": [],
+    }
+
+    r = client.post("/api/import", json=payload)
+
+    assert r.status_code == 200
+    exported = client.get("/api/export").json()
+    assert exported["progress"]["badges_unlocked"] == ["first_catch"]
 
 
 def test_export_import_roundtrips_pokedex_notes(tmp_path: Path) -> None:
@@ -390,7 +473,6 @@ def test_export_import_roundtrips_pokedex_notes(tmp_path: Path) -> None:
         },
         "binder_placements": {"version": 1, "by_binder": {}},
         "cards": [],
-        "hunts": {"version": 1, "hunts": {}},
     }
     r = client.post("/api/import", json=payload)
     assert r.status_code == 200

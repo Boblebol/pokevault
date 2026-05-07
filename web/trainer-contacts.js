@@ -20,11 +20,10 @@
   let started = false;
   let hasLoaded = false;
   let inflight = null;
-  let badgeCatalogUnsubscribe = null;
   const listeners = new Set();
   const FALLBACK_I18N = {
     "trainers.mine.title": "Ma carte dresseur",
-    "trainers.mine.help": "Choisis tes infos publiques. Les badges obtenus sont inclus automatiquement.",
+    "trainers.mine.help": "Choisis tes infos publiques et les Pokémon disponibles en double.",
     "trainers.export": "Exporter",
     "trainers.import": "Importer",
     "trainers.id": "Identifiant stable",
@@ -35,7 +34,6 @@
     "trainers.contact": "Contact partageable",
     "trainers.contact_type": "Type de contact {index}",
     "trainers.contact_value": "Lien, @pseudo, téléphone...",
-    "trainers.wants_placeholder": "Je cherche (un slug par ligne)",
     "trainers.trade_placeholder": "Je peux échanger (un slug par ligne)",
     "trainers.save": "Enregistrer",
     "trainers.contacts.title": "Contacts dresseurs",
@@ -44,9 +42,7 @@
     "trainers.search_placeholder": "Pseudo, région, note, Pokémon...",
     "trainers.empty_filtered": "Aucun contact ne correspond à cette recherche.",
     "trainers.empty": "Aucune carte reçue pour le moment.",
-    "trainers.want": "Cherche",
     "trainers.trade": "Echange",
-    "trainers.badges": "Badges",
     "trainers.delete": "Supprimer",
     "trainers.local_card": "Carte dresseur locale",
     "trainers.received_update": "MAJ reçue",
@@ -79,30 +75,6 @@
     return raw.map((x) => String(x || "").trim()).filter(Boolean).slice(0, 40);
   }
 
-  function normalizeBadges(raw) {
-    if (!Array.isArray(raw)) return [];
-    const seen = new Set();
-    const out = [];
-    for (const badge of raw) {
-      const id = String(badge?.id || "").trim();
-      const title = String(badge?.title || "").trim();
-      if (!id || !title || seen.has(id)) continue;
-      seen.add(id);
-      out.push({ id, title });
-      if (out.length >= 80) break;
-    }
-    return out;
-  }
-
-  function sharedBadgesFromState(state = window.PokevaultBadges?.state) {
-    const catalog = Array.isArray(state?.catalog) ? state.catalog : [];
-    return normalizeBadges(
-      catalog
-        .filter((badge) => badge?.unlocked)
-        .map((badge) => ({ id: badge.id, title: badge.title })),
-    );
-  }
-
   function normalizeCard(raw) {
     if (!raw || typeof raw !== "object") return null;
     const trainerId = String(raw.trainer_id || "").trim();
@@ -129,9 +101,7 @@
         })
         .filter((link) => link.value)
         .slice(0, 6),
-      wants: normalizeList(raw.wants),
       for_trade: normalizeList(raw.for_trade),
-      badges: normalizeBadges(raw.badges),
       updated_at: String(raw.updated_at || new Date().toISOString()),
     };
   }
@@ -176,9 +146,7 @@
       favorite_pokemon_slug: String(values.favorite_pokemon_slug || "").trim(),
       public_note: String(values.public_note || "").trim(),
       contact_links: contactLinksFromForm(values),
-      wants: splitLines(values.wants),
       for_trade: splitLines(values.for_trade),
-      badges: sharedBadgesFromState(),
       updated_at: new Date().toISOString(),
     };
   }
@@ -312,9 +280,7 @@
       favorite_pokemon_slug: "",
       public_note: "",
       contact_links: [],
-      wants: [],
       for_trade: [],
-      badges: [],
       updated_at: new Date().toISOString(),
     };
   }
@@ -325,7 +291,7 @@
 
   function updateCardListMembership(card, listName, slug, enabled) {
     const key = String(slug || "").trim();
-    if (!key || (listName !== "wants" && listName !== "for_trade")) return card;
+    if (!key || listName !== "for_trade") return card;
     const current = normalizeList(card?.[listName]);
     const next = enabled
       ? [...current.filter((item) => item !== key), key]
@@ -354,14 +320,8 @@
       .sort((a, b) => a.card.display_name.localeCompare(b.card.display_name, "fr"));
   }
 
-  function contactsWanting(bookOrSlug, maybeSlug) {
-    const book = typeof bookOrSlug === "string" ? cachedBook : normalizeBook(bookOrSlug);
-    const slug = typeof bookOrSlug === "string" ? bookOrSlug : maybeSlug;
-    const key = String(slug || "").trim();
-    if (!key) return [];
-    return Object.values(book.contacts || {})
-      .filter((contact) => (contact.card.wants || []).includes(key))
-      .sort((a, b) => a.card.display_name.localeCompare(b.card.display_name, "fr"));
+  function contactsWanting() {
+    return [];
   }
 
   function tradeSummary(bookOrSlug, maybeSlug) {
@@ -369,14 +329,11 @@
     const slug = typeof bookOrSlug === "string" ? bookOrSlug : maybeSlug;
     const key = String(slug || "").trim();
     const availableFrom = contactsTrading(book, key).map((contact) => contact.card.display_name);
-    const wantedBy = contactsWanting(book, key).map((contact) => contact.card.display_name);
-    const ownWants = new Set(book.own_card?.wants || []);
-    const ownTrades = new Set(book.own_card?.for_trade || []);
     return {
       availableFrom,
-      wantedBy,
-      matchCount: ownWants.has(key) ? availableFrom.length : 0,
-      canHelpCount: ownTrades.has(key) ? wantedBy.length : 0,
+      wantedBy: [],
+      matchCount: 0,
+      canHelpCount: 0,
     };
   }
 
@@ -389,9 +346,7 @@
       card.public_note,
       contact?.private_note,
       ...(card.contact_links || []).flatMap((link) => [link.label, link.value]),
-      ...(card.wants || []),
       ...(card.for_trade || []),
-      ...(card.badges || []).flatMap((badge) => [badge.id, badge.title]),
     ].join(" ").toLowerCase();
   }
 
@@ -466,7 +421,6 @@
         <input name="favorite_pokemon_slug" class="search-input" placeholder="${escapeAttr(tr("trainers.favorite_pokemon"))}" value="${escapeAttr(cachedBook.own_card?.favorite_pokemon_slug || "")}">
         <textarea name="public_note" class="search-input" placeholder="${escapeAttr(tr("trainers.public_note"))}">${escapeText(cachedBook.own_card?.public_note || "")}</textarea>
         ${renderOwnContactFields(contactLinks)}
-        <textarea name="wants" class="search-input" placeholder="${escapeAttr(tr("trainers.wants_placeholder"))}">${escapeText((cachedBook.own_card?.wants || []).join("\n"))}</textarea>
         <textarea name="for_trade" class="search-input" placeholder="${escapeAttr(tr("trainers.trade_placeholder"))}">${escapeText((cachedBook.own_card?.for_trade || []).join("\n"))}</textarea>
         <button type="submit" class="settings-action-btn settings-action-btn--confirm">
           <span class="app-icon" aria-hidden="true">✓</span>
@@ -477,15 +431,6 @@
     `;
     root.append(own, renderContactList());
     wire(root);
-  }
-
-  function subscribeBadgeCatalog() {
-    if (badgeCatalogUnsubscribe) return;
-    const subscribeBadges = window.PokevaultBadges?.subscribe;
-    if (typeof subscribeBadges !== "function") return;
-    badgeCatalogUnsubscribe = subscribeBadges(() => {
-      render();
-    });
   }
 
   function renderOwnContactFields(contactLinks) {
@@ -552,9 +497,7 @@
   function renderContact(contact) {
     const article = document.createElement("article");
     article.className = "trainer-contact-card";
-    const wants = renderTagGroup(tr("trainers.want"), contact.card.wants);
     const trades = renderTagGroup(tr("trainers.trade"), contact.card.for_trade);
-    const badges = renderBadgeGroup(contact.card.badges);
     const links = renderContactLinks(contact.card.contact_links);
     article.innerHTML = `
       <div class="trainer-contact-card-head">
@@ -574,8 +517,6 @@
       </dl>
       ${links}
       <div class="trainer-list-groups">
-        ${badges}
-        ${wants}
         ${trades}
       </div>
       <form class="trainer-note-form" data-trainer-note-form data-trainer-id="${escapeAttr(contact.card.trainer_id)}">
@@ -601,21 +542,6 @@
       <div class="trainer-tag-group">
         <h3>${escapeText(title)}</h3>
         <ul>${clean.map((item) => `<li>${escapeText(item)}</li>`).join("")}</ul>
-      </div>
-    `;
-  }
-
-  function renderBadgeGroup(items) {
-    const badges = normalizeBadges(items);
-    if (!badges.length) return "";
-    const labelForBadge = (badge) => {
-      const catalogLabel = window.PokevaultBadges?.labelForId?.(badge.id);
-      return String(catalogLabel || badge.title).trim() || badge.title;
-    };
-    return `
-      <div class="trainer-tag-group trainer-tag-group--badges">
-        <h3>${escapeText(tr("trainers.badges"))}</h3>
-        <ul>${badges.map((badge) => `<li>${escapeText(labelForBadge(badge))}</li>`).join("")}</ul>
       </div>
     `;
   }
@@ -734,12 +660,8 @@
       render(tr("trainers.create_before_export"));
       return;
     }
-    if (!window.PokevaultBadges?.state && typeof window.PokevaultBadges?.poll === "function") {
-      await window.PokevaultBadges.poll({ silent: true });
-    }
     const card = {
       ...cachedBook.own_card,
-      badges: sharedBadgesFromState(),
       updated_at: new Date().toISOString(),
     };
     const blob = new Blob([JSON.stringify(card, null, 2)], {
@@ -784,7 +706,6 @@
     try {
       await ensureLoaded({ force: true });
       render();
-      subscribeBadgeCatalog();
     } catch (err) {
       render(tr("trainers.api_error", { message: err.message }));
     }
@@ -837,8 +758,6 @@
   if (window.__POKEVAULT_TRAINERS_TESTS__) {
     api._test = {
       normalizeCard,
-      normalizeBadges,
-      sharedBadgesFromState,
       normalizeBook,
       cardFromForm,
       validateTrainerCard,
@@ -849,7 +768,6 @@
       tradeSummary,
       filterContacts,
       renderContact,
-      subscribeBadgeCatalog,
       notePatchRequest,
       deleteContactRequest,
       shouldDeleteContact,

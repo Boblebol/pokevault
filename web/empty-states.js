@@ -74,7 +74,7 @@ const COPY = {
       title: "You caught everything in these filters.",
       body:
         "Remove the missing filter to admire your collection, " +
-        "or go hunt another region.",
+        "or try another region.",
     },
     printEmpty: {
       title: "Nothing to print in this scope.",

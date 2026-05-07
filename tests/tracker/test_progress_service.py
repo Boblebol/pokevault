@@ -58,17 +58,16 @@ def test_replace_caught_seeds_statuses(tmp_path: Path) -> None:
     svc.replace_caught(ProgressPutBody(caught={"pikachu": True}))
     loaded = repo.load()
     assert loaded.statuses["pikachu"].state == "caught"
-    assert loaded.statuses["pikachu"].shiny is False
 
 
-def test_patch_caught_preserves_shiny_flag(tmp_path: Path) -> None:
+def test_patch_caught_discards_legacy_shiny_flag(tmp_path: Path) -> None:
     repo = JsonProgressRepository(tmp_path / "p.json")
     svc = ProgressService(repo)
     svc.patch_status(ProgressStatusPatch(slug="pikachu", state="caught", shiny=True))
     svc.patch_caught(ProgressPatch(slug="pikachu", caught=True))
     loaded = repo.load()
     assert loaded.statuses["pikachu"].state == "caught"
-    assert loaded.statuses["pikachu"].shiny is True
+    assert "shiny" not in loaded.statuses["pikachu"].model_dump()
 
 
 def test_patch_status_cycle(tmp_path: Path) -> None:
@@ -82,7 +81,7 @@ def test_patch_status_cycle(tmp_path: Path) -> None:
     svc.patch_status(ProgressStatusPatch(slug="bulbi", state="caught", shiny=True))
     loaded = repo.load()
     assert loaded.statuses["bulbi"].state == "caught"
-    assert loaded.statuses["bulbi"].shiny is True
+    assert "shiny" not in loaded.statuses["bulbi"].model_dump()
     assert loaded.caught == {"bulbi": True}
 
     svc.patch_status(ProgressStatusPatch(slug="bulbi", state="not_met"))
@@ -91,13 +90,28 @@ def test_patch_status_cycle(tmp_path: Path) -> None:
     assert final.caught == {}
 
 
-def test_patch_status_shiny_ignored_for_seen(tmp_path: Path) -> None:
+def test_patch_status_shiny_is_legacy_input_only(tmp_path: Path) -> None:
     repo = JsonProgressRepository(tmp_path / "p.json")
     svc = ProgressService(repo)
     svc.patch_status(ProgressStatusPatch(slug="x", state="seen", shiny=True))
     entry = repo.load().statuses["x"]
     assert entry.state == "seen"
-    assert entry.shiny is False
+    assert "shiny" not in entry.model_dump()
+
+
+def test_repository_loads_legacy_shiny_without_re_emitting_it(tmp_path: Path) -> None:
+    path = tmp_path / "legacy.json"
+    path.write_text(
+        '{"version":1,"statuses":{"pikachu":{"state":"caught","shiny":true,"seen_at":"2026"}}}',
+        encoding="utf-8",
+    )
+    repo = JsonProgressRepository(path)
+
+    loaded = repo.load()
+    repo.save(loaded)
+
+    assert loaded.statuses["pikachu"].state == "caught"
+    assert "shiny" not in path.read_text(encoding="utf-8")
 
 
 def test_patch_status_preserves_seen_at(tmp_path: Path) -> None:

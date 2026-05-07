@@ -226,16 +226,20 @@ def test_simplified_trade_state_model_is_documented_publicly() -> None:
     guide_text = (DOCS / "TRAINER_CONTACTS.md").read_text(encoding="utf-8")
     readme = (ROOT / "README.md").read_text(encoding="utf-8")
     features = (DOCS / "features.html").read_text(encoding="utf-8")
+    landing = (DOCS / "index.html").read_text(encoding="utf-8")
     roadmap = (DOCS / "roadmap.html").read_text(encoding="utf-8")
+    i18n = (DOCS / "assets" / "i18n.js").read_text(encoding="utf-8")
 
-    for text in [readme, features, roadmap]:
+    for text in [readme, features, landing, roadmap, i18n]:
         assert "Capturé" in text or "Caught" in text
         assert "Double" in text
+        assert "Relâcher 1" in text or "Release 1" in text
         assert "Relâcher" in text or "Release" in text
         assert "Vu chez" in text
         assert "Match" not in text
     assert "Capturé" in guide_text
     assert "Double" in guide_text
+    assert "Relâcher 1" in guide_text
     assert "Relâcher" in guide_text
     assert "Vu chez" in guide_text
     assert "There is no `Match` state" in guide_text
@@ -246,6 +250,57 @@ def test_simplified_trade_state_model_is_documented_publicly() -> None:
     for text in [guide_text, features]:
         assert "hunts" not in text
     assert "Vu chez" in guide_text
+
+
+def test_removed_active_hunts_missions_and_badge_sharing_copy_is_absent() -> None:
+    active_public_docs = [
+        ROOT / "README.md",
+        DOCS / "TRAINER_CONTACTS.md",
+        DOCS / "features.html",
+        DOCS / "assets" / "i18n.js",
+        DOCS / "index.html",
+        DOCS / "roadmap.html",
+        DOCS / "architecture.html",
+    ]
+    forbidden_active_copy = [
+        "Badge missions",
+        "badge missions",
+        "mission follow",
+        "mission-follow",
+        "follow missions",
+        "follow a mission",
+        "missions to follow",
+        "automatically shared on Trainer Cards",
+        "automatically share unlocked badges",
+        "unlocked badges are shared",
+        "unlocked badges on Trainer Cards",
+        "Trainer Cards share badges",
+        "Trainer Cards export badges",
+    ]
+
+    for path in active_public_docs:
+        text = path.read_text(encoding="utf-8")
+        for forbidden in forbidden_active_copy:
+            assert forbidden not in text, f"{path}: {forbidden}"
+
+
+def test_legacy_simplified_model_migration_notes_are_documented() -> None:
+    guide_text = (DOCS / "TRAINER_CONTACTS.md").read_text(encoding="utf-8")
+    readme = (ROOT / "README.md").read_text(encoding="utf-8")
+    architecture = (DOCS / "architecture.html").read_text(encoding="utf-8")
+
+    assert "Older installs may still have `data/hunts.json`" in readme
+    assert "Older installs may still have" in architecture
+    for text in [readme, architecture]:
+        assert "data/hunts.json" in text
+        assert "ignored by the active app" in text
+        assert "omitted from new backups" in text
+        assert "first_encounter" in text
+        assert "cleaned/ignored" in text
+
+    assert "Legacy Trainer Card `wants` and `badges`" in guide_text
+    assert "tolerated/ignored" in guide_text
+    assert "only `for_trade`/`Double` is shared" in guide_text
 
 
 def test_in_app_documentation_is_documented_publicly() -> None:
@@ -285,12 +340,11 @@ def test_in_app_docs_cover_complete_product_workflows_in_both_languages() -> Non
 
     for text in [
         "data/collection-progress.json",
-        "data/collection-cards.json",
-        "data/hunts.json",
+        "data/game-pokedexes.json",
         "data/binder-config.json",
         "data/trainer-contacts.json",
         "/api/progress",
-        "/api/cards",
+        "/data/game-pokedexes.json",
         "/api/trainers",
         "/api/export",
         "/api/import",
@@ -298,6 +352,17 @@ def test_in_app_docs_cover_complete_product_workflows_in_both_languages() -> Non
         "EN:",
     ]:
         assert text in i18n
+
+
+def test_docs_describe_single_modal_and_game_pokedex_appearances() -> None:
+    web_i18n = (WEB / "i18n.js").read_text(encoding="utf-8")
+    index = (WEB / "index.html").read_text(encoding="utf-8")
+    readme = (ROOT / "README.md").read_text(encoding="utf-8")
+    features = (DOCS / "features.html").read_text(encoding="utf-8")
+
+    for text in [web_i18n, index, readme, features]:
+        assert "modal" in text.lower()
+        assert "game-pokedexes.json" in text or "game Pokedex" in text or "Pokédex des jeux" in text
 
 
 def test_public_features_page_has_bilingual_product_copy() -> None:
@@ -424,9 +489,107 @@ def test_readme_documents_language_switch() -> None:
 def test_configurable_binder_layouts_are_documented() -> None:
     readme = (ROOT / "README.md").read_text(encoding="utf-8")
     features = (DOCS / "features.html").read_text(encoding="utf-8")
+    docs_i18n = (DOCS / "assets" / "i18n.js").read_text(encoding="utf-8")
+    web_i18n = (WEB / "i18n.js").read_text(encoding="utf-8")
+
+    assert "10 feuillets" in readme
+    assert "10 feuillets" in docs_i18n
+    assert "10 sheets" in features
+    assert "10 feuillets" not in features
 
     for text in [readme, features]:
-        assert "10 feuillets" in text
         assert "3×3" in text
         assert "Kanto 1" in text
-        assert "Familles" in text
+        assert "Images / sprites" in text
+
+    assert "Familles" in readme
+    assert "Petites fiches classeur" in readme
+    assert "Classeurs > Modifier format" in readme
+    assert "Classeurs > Réglages" not in readme
+
+    assert "Binders > Edit format" in features
+    assert "Settings > Images / sprites" in features
+    assert "compact family rows such as Spoink / Grumpig / Spinda" in features
+    assert "Small binder cards" in features
+    assert "Print > Group by > Small binder cards" in features
+    for text in [
+        "Classeurs > Modifier format",
+        "Réglages > Images / sprites",
+        "Familles",
+        "Groret",
+        "Petites fiches classeur",
+    ]:
+        assert text not in features
+
+    assert "Spoink" in readme
+    assert "Spinda" in readme
+    assert "vides discrets" in readme
+    assert "alignment_empty" in readme
+    assert "family_reserved" in readme
+    assert "generated trailing alignment gaps are not printed" in readme
+    assert "intentional family reservations still print as temporary placeholders" in readme
+
+    assert "Planificateur de classeurs physiques" in docs_i18n
+    assert "Classeurs > Modifier format" in docs_i18n
+    assert "Réglages > Images / sprites" in docs_i18n
+    assert "Impression > Regrouper par > Petites fiches classeur" in docs_i18n
+    assert "Binders > Edit format" in docs_i18n
+    assert "Settings > Images / sprites" in docs_i18n
+    assert "Print > Group by > Small binder cards" in docs_i18n
+    assert "`Classeurs >" not in docs_i18n
+    assert "`Réglages > Images / sprites`" not in docs_i18n
+    assert "`Petites fiches classeur`" not in docs_i18n
+
+    assert "Classeurs > Modifier format" in web_i18n
+    assert "Impression > Regrouper par > Petites fiches classeur" in web_i18n
+    assert "Binders > Edit format" in web_i18n
+    assert "Print > Group by > Small binder cards" in web_i18n
+
+
+def test_large_ring_binder_mode_is_documented() -> None:
+    readme = (ROOT / "README.md").read_text(encoding="utf-8")
+    features = (DOCS / "features.html").read_text(encoding="utf-8")
+    docs_i18n = (DOCS / "assets" / "i18n.js").read_text(encoding="utf-8")
+    backlog = (DOCS / "V1_1_POKEDEX_FIRST.md").read_text(encoding="utf-8")
+
+    def assert_large_binder_contract(text: str) -> None:
+        normalized = " ".join(text.lower().split())
+        assert "grand classeur 3" in normalized or "large 3" in normalized
+        assert (
+            "one physical binder" in normalized
+            or "one ring binder" in normalized
+            or "un gros classeur" in normalized
+        )
+        assert (
+            "region sections" in normalized
+            or "internal region sections" in normalized
+            or "régions" in normalized
+        )
+        assert "3×3 recto-verso" in normalized or "3×3 front/back sheets" in normalized
+        assert "recto" in normalized or "sheet front" in normalized
+        assert "compact" in normalized
+        assert "regional forms" in normalized or "formes régionales" in normalized
+        assert "form region" in normalized or "région de leur forme" in normalized
+        assert (
+            "auto" in normalized
+            or "calculates capacity" in normalized
+            or "calculated capacity" in normalized
+        )
+        assert "10 spare sheets" in normalized or "10 feuillets libres" in normalized
+
+    def docs_i18n_message(locale: str, key: str) -> str:
+        marker = f"    {locale}: {{"
+        block = docs_i18n.split(marker, 1)[1]
+        if locale == "fr":
+            block = block.split("\n    },\n    en:", 1)[0]
+        else:
+            block = block.split("\n    }\n  };", 1)[0]
+        return block.split(f'"{key}": "', 1)[1].split('",', 1)[0]
+
+    for text in [readme, features, backlog]:
+        assert_large_binder_contract(text)
+
+    assert_large_binder_contract(docs_i18n)
+
+    assert_large_binder_contract(docs_i18n_message("fr", "features.binders.text"))
+    assert_large_binder_contract(docs_i18n_message("en", "features.binders.text"))
