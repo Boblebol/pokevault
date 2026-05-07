@@ -46,6 +46,8 @@ const BINDER_WIZARD_FALLBACK_I18N = {
   "binder_wizard.org.by_region.desc": "Blocs par région : espèces natives d’abord, puis formes « importées » en fin de section.",
   "binder_wizard.org.family.title": "Familles",
   "binder_wizard.org.family.desc": "Familles compactes : les petites familles partagent une ligne quand elles tiennent, les branches gardent des vides discrets.",
+  "binder_wizard.org.large_ring.title": "Grand classeur 3x3",
+  "binder_wizard.org.large_ring.desc": "Un seul classeur à anneaux : régions au recto d’un nouveau feuillet, familles compactes, capacité calculée.",
   "binder_wizard.form.lead": "Les séries de cartes ne couvrent pas tout (Méga, Gigamax, Pikachu déguisé…). Choisis un périmètre réaliste pour ton suivi ; tu pourras l’éditer dans le JSON plus tard.",
   "binder_wizard.form.base_only.choice_title": "Base seule",
   "binder_wizard.form.base_only.desc": "Une entrée par forme « principale » du Pokédex, sans variantes régionales.",
@@ -58,6 +60,8 @@ const BINDER_WIZARD_FALLBACK_I18N = {
   "binder_wizard.format.3x3.desc": "9 cases par page · 10 feuillets (recto + verso).",
   "binder_wizard.format.2x2.title": "2 × 2",
   "binder_wizard.format.2x2.desc": "4 cases par page · 10 feuillets.",
+  "binder_wizard.format.large_ring.title": "Auto 3 x 3",
+  "binder_wizard.format.large_ring.desc": "3 × 3 recto-verso, feuillets calculés pour tout faire rentrer + 10 feuillets libres.",
   "binder_wizard.format.custom.title": "Personnalisé",
   "binder_wizard.format.custom.desc": "Lignes, colonnes (1–12) et feuillets (1–200) au choix.",
   "binder_wizard.format.rows": "Lignes par page",
@@ -72,17 +76,21 @@ const BINDER_WIZARD_FALLBACK_I18N = {
   "binder_wizard.summary.name": "Nom du classeur",
   "binder_wizard.summary.org_family": "Familles d'évolution compactes",
   "binder_wizard.summary.org_region": "Par région (natives puis formes importées en fin de bloc)",
+  "binder_wizard.summary.org_large_ring": "Grand classeur 3x3 : régions au recto, familles compactes",
   "binder_wizard.summary.org_national": "National (ordre du Pokédex)",
   "binder_wizard.summary.preset_3x3": "Preset 3 × 3 · 10 feuillets",
   "binder_wizard.summary.preset_2x2": "Preset 2 × 2 · 10 feuillets",
+  "binder_wizard.summary.preset_large_ring": "3 × 3 auto + 10 feuillets libres",
   "binder_wizard.summary.preset_custom": "Grille et feuillets personnalisés",
   "binder_wizard.summary.scope_base": "Base seule",
   "binder_wizard.summary.scope_full": "Complet (Méga, Gigamax, formes nommées)",
   "binder_wizard.summary.scope_regional": "Base + formes régionales",
   "binder_wizard.summary.grid_value": "{rows} × {cols} — {slots} cases par page",
   "binder_wizard.summary.capacity_value": "{sheets} feuillets → {pages} pages, {slots} emplacements au total",
+  "binder_wizard.summary.capacity_large_ring": "Capacité calculée automatiquement (+ 10 feuillets libres)",
   "binder_wizard.summary.family_name": "Un ou plusieurs classeurs Familles : les familles courtes économisent des lignes, les branches restent lisibles.",
   "binder_wizard.summary.region_name": "Un ou plusieurs classeurs par région : si le format est trop petit, les sections sont nommées Kanto 1, Kanto 2, etc.",
+  "binder_wizard.summary.large_ring_name": "Un seul grand classeur physique, organisé par régions internes.",
   "binder_wizard.summary.default_name": "{name} (modifiable plus tard dans le fichier JSON)",
   "binder_wizard.summary.edit_note": "Enregistrement : le classeur existant et la règle de formes associée sont mis à jour dans binder-config.json.",
   "binder_wizard.summary.new_note": "Les placements restent vides jusqu’à l’UI de rangement. Le périmètre des formes est enregistré dans la config classeur.",
@@ -91,8 +99,8 @@ const BINDER_WIZARD_FALLBACK_I18N = {
   "binder_wizard.error.choose_org": "Choisis une organisation : national ou par région.",
   "binder_wizard.error.choose_format": "Choisis un format de grille (preset ou personnalisé).",
   "binder_wizard.error.choose_forms": "Choisis un périmètre de formes (base, base + région, ou complet).",
-  "binder_wizard.error.family_data": "Impossible de charger les familles d'evolution pour calculer le grand classeur.",
-  "binder_wizard.error.pokedex_data": "Impossible de charger le Pokedex pour calculer le grand classeur.",
+  "binder_wizard.error.family_data": "Impossible de charger les familles d'évolution pour calculer le grand classeur.",
+  "binder_wizard.error.pokedex_data": "Impossible de charger le Pokédex pour calculer le grand classeur.",
   "binder_wizard.error.api": "Impossible de joindre l’API classeurs (réseau ou CORS).",
 };
 
@@ -397,7 +405,7 @@ function readOrgSelectionFromDom() {
     return null;
   }
   const org = sel.dataset.org || "";
-  if (org === "by_region" || org === "family") return org;
+  if (org === "by_region" || org === "family" || org === ORG_REGIONAL_FAMILY_ALBUM) return org;
   return "national";
 }
 
@@ -700,7 +708,7 @@ function prefillWizardDraftFromConfig(cfg, binderIdOpt) {
     name: String(b.name || tBinderWizard("binder_wizard.default_name")),
     organization: org,
     formScope: inferFormScopeFromRule(rule),
-    formatPreset: inferFormatPreset(rows, cols, sheetCount),
+    formatPreset: org === ORG_REGIONAL_FAMILY_ALBUM ? "large-ring-3x3" : inferFormatPreset(rows, cols, sheetCount),
     rows,
     cols,
     sheetCount,
@@ -738,6 +746,38 @@ function readOrgSelectionForDraftForTest(draft) {
   return out;
 }
 
+function renderWizardStepForTest(step, draft = {}) {
+  const previousStep = wizardStep;
+  wizardStep = step;
+  wizardDraft = { ...wizardDraft, ...draft };
+  renderWizardStep();
+  const out = { ...wizardDraft };
+  wizardStep = previousStep;
+  return out;
+}
+
+function getWizardDraftForTest() {
+  return { ...wizardDraft };
+}
+
+function readFormatSelectionForTest() {
+  return readFormatSelectionFromDom();
+}
+
+function applyLargeRingWizardDefaults() {
+  wizardDraft.organization = ORG_REGIONAL_FAMILY_ALBUM;
+  wizardDraft.formScope = "base_regional";
+  wizardDraft.formatPreset = "large-ring-3x3";
+  wizardDraft.rows = 3;
+  wizardDraft.cols = 3;
+}
+
+function leaveLargeRingOrganizationForStandardFormat() {
+  if (wizardDraft.organization === ORG_REGIONAL_FAMILY_ALBUM) {
+    wizardDraft.organization = "national";
+  }
+}
+
 /**
  * @returns {boolean} false si rien n’est sélectionné ou custom invalide
  */
@@ -747,18 +787,25 @@ function readFormatSelectionFromDom() {
   const key = sel.dataset.formatKey || "";
   wizardDraft.formatPreset = key;
   if (key === "3x3-10") {
+    leaveLargeRingOrganizationForStandardFormat();
     wizardDraft.rows = 3;
     wizardDraft.cols = 3;
     wizardDraft.sheetCount = 10;
     return true;
   }
   if (key === "2x2-10") {
+    leaveLargeRingOrganizationForStandardFormat();
     wizardDraft.rows = 2;
     wizardDraft.cols = 2;
     wizardDraft.sheetCount = 10;
     return true;
   }
+  if (key === "large-ring-3x3") {
+    applyLargeRingWizardDefaults();
+    return true;
+  }
   if (key === "custom") {
+    leaveLargeRingOrganizationForStandardFormat();
     const r = document.getElementById("wizardRows");
     const c = document.getElementById("wizardCols");
     const s = document.getElementById("wizardSheets");
@@ -1131,6 +1178,9 @@ function renderWizardStep() {
         grid.querySelectorAll(".wizard-org-card").forEach((b) => b.classList.remove("is-selected"));
         btn.classList.add("is-selected");
         wizardDraft.organization = org;
+        if (org === ORG_REGIONAL_FAMILY_ALBUM) {
+          applyLargeRingWizardDefaults();
+        }
       });
       return btn;
     };
@@ -1150,6 +1200,11 @@ function renderWizardStep() {
         "family",
         tBinderWizard("binder_wizard.org.family.title"),
         tBinderWizard("binder_wizard.org.family.desc"),
+      ),
+      mkOrg(
+        ORG_REGIONAL_FAMILY_ALBUM,
+        tBinderWizard("binder_wizard.org.large_ring.title"),
+        tBinderWizard("binder_wizard.org.large_ring.desc"),
       ),
     );
     body.append(grid);
@@ -1232,13 +1287,19 @@ function renderWizardStep() {
         btn.classList.add("is-selected");
         wizardDraft.formatPreset = key;
         if (key === "3x3-10") {
+          leaveLargeRingOrganizationForStandardFormat();
           wizardDraft.rows = 3;
           wizardDraft.cols = 3;
           wizardDraft.sheetCount = 10;
         } else if (key === "2x2-10") {
+          leaveLargeRingOrganizationForStandardFormat();
           wizardDraft.rows = 2;
           wizardDraft.cols = 2;
           wizardDraft.sheetCount = 10;
+        } else if (key === "large-ring-3x3") {
+          applyLargeRingWizardDefaults();
+        } else if (key === "custom") {
+          leaveLargeRingOrganizationForStandardFormat();
         }
         syncCustomPanelVisibility(body);
       });
@@ -1248,6 +1309,11 @@ function renderWizardStep() {
     fmtGrid.append(
       mkFmt("3x3-10", tBinderWizard("binder_wizard.format.3x3.title"), tBinderWizard("binder_wizard.format.3x3.desc")),
       mkFmt("2x2-10", tBinderWizard("binder_wizard.format.2x2.title"), tBinderWizard("binder_wizard.format.2x2.desc")),
+      mkFmt(
+        "large-ring-3x3",
+        tBinderWizard("binder_wizard.format.large_ring.title"),
+        tBinderWizard("binder_wizard.format.large_ring.desc"),
+      ),
       mkFmt("custom", tBinderWizard("binder_wizard.format.custom.title"), tBinderWizard("binder_wizard.format.custom.desc")),
     );
     body.append(fmtGrid);
@@ -1292,17 +1358,23 @@ function renderWizardStep() {
     const slots = wizardDraft.rows * wizardDraft.cols;
     const pages = 2 * wizardDraft.sheetCount;
     const totalSlots = slots * pages;
+    const isLargeRingAuto =
+      wizardDraft.organization === ORG_REGIONAL_FAMILY_ALBUM && wizardDraft.formatPreset === "large-ring-3x3";
     const orgLabel =
       wizardDraft.organization === "family"
         ? tBinderWizard("binder_wizard.summary.org_family")
         : wizardDraft.organization === "by_region"
         ? tBinderWizard("binder_wizard.summary.org_region")
+        : wizardDraft.organization === ORG_REGIONAL_FAMILY_ALBUM
+        ? tBinderWizard("binder_wizard.summary.org_large_ring")
         : tBinderWizard("binder_wizard.summary.org_national");
     const presetLabel =
       wizardDraft.formatPreset === "3x3-10"
         ? tBinderWizard("binder_wizard.summary.preset_3x3")
         : wizardDraft.formatPreset === "2x2-10"
           ? tBinderWizard("binder_wizard.summary.preset_2x2")
+          : wizardDraft.formatPreset === "large-ring-3x3"
+            ? tBinderWizard("binder_wizard.summary.preset_large_ring")
           : tBinderWizard("binder_wizard.summary.preset_custom");
     const scopeLabel =
       wizardDraft.formScope === "base_only"
@@ -1328,17 +1400,21 @@ function renderWizardStep() {
     appendRecapLine(
       div,
       tBinderWizard("binder_wizard.summary.capacity"),
-      tBinderWizard("binder_wizard.summary.capacity_value", {
-        sheets: wizardDraft.sheetCount,
-        pages,
-        slots: totalSlots,
-      }),
+      isLargeRingAuto
+        ? tBinderWizard("binder_wizard.summary.capacity_large_ring")
+        : tBinderWizard("binder_wizard.summary.capacity_value", {
+            sheets: wizardDraft.sheetCount,
+            pages,
+            slots: totalSlots,
+          }),
     );
     const nameRecap =
       wizardDraft.organization === "family" && !wizardDraft.editBinderId
         ? tBinderWizard("binder_wizard.summary.family_name")
         : wizardDraft.organization === "by_region" && !wizardDraft.editBinderId
         ? tBinderWizard("binder_wizard.summary.region_name")
+        : wizardDraft.organization === ORG_REGIONAL_FAMILY_ALBUM && !wizardDraft.editBinderId
+        ? tBinderWizard("binder_wizard.summary.large_ring_name")
         : tBinderWizard("binder_wizard.summary.default_name", { name: wizardDraft.name });
     appendRecapLine(div, tBinderWizard("binder_wizard.summary.name"), nameRecap);
     const note = document.createElement("p");
@@ -2134,10 +2210,13 @@ window.PokedexBinder = {
     buildPersistNewPayloadsFromDraft,
     configUsesEvolutionFamilies,
     draftFromConfigForTest,
+    getWizardDraftForTest,
     hasEvolutionFamilyData,
     hasPokedexBinderData,
     orderPokemonForBinder,
+    readFormatSelectionForTest,
     readOrgSelectionForDraftForTest,
+    renderWizardStepForTest,
     selectBinderPokemonPool,
     setEvolutionFamilyData,
     shouldEnsureDefaultWorkspace,

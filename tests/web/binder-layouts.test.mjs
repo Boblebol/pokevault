@@ -38,6 +38,96 @@ function installBrowserStubs() {
   };
 }
 
+function makeInteractiveElement(tagName) {
+  const el = {
+    tagName,
+    children: [],
+    className: "",
+    dataset: {},
+    hidden: false,
+    _textContent: "",
+    value: "",
+    listeners: {},
+    classList: {
+      add(...names) {
+        const classes = new Set(String(el.className || "").split(/\s+/).filter(Boolean));
+        for (const name of names) classes.add(name);
+        el.className = [...classes].join(" ");
+      },
+      remove(...names) {
+        const remove = new Set(names);
+        el.className = String(el.className || "")
+          .split(/\s+/)
+          .filter((name) => name && !remove.has(name))
+          .join(" ");
+      },
+      contains(name) {
+        return String(el.className || "").split(/\s+/).includes(name);
+      },
+    },
+    append(...nodes) {
+      this.children.push(...nodes);
+    },
+    replaceChildren(...nodes) {
+      this.children = [...nodes];
+    },
+    addEventListener(type, fn) {
+      this.listeners[type] = fn;
+    },
+    setAttribute(name, value) {
+      this[name] = value;
+    },
+    click() {
+      this.listeners.click?.();
+    },
+    querySelector(selector) {
+      return this.querySelectorAll(selector)[0] || null;
+    },
+    querySelectorAll(selector) {
+      const classes = selector
+        .split(".")
+        .map((part) => part.trim())
+        .filter(Boolean);
+      const out = [];
+      const visit = (node) => {
+        if (!node || typeof node !== "object") return;
+        const nodeClasses = String(node.className || "").split(/\s+/).filter(Boolean);
+        if (classes.length && classes.every((cls) => nodeClasses.includes(cls))) out.push(node);
+        for (const child of node.children || []) visit(child);
+      };
+      visit(this);
+      return out;
+    },
+  };
+  Object.defineProperty(el, "textContent", {
+    get() {
+      return [
+        this._textContent,
+        ...this.children.map((child) => (child && typeof child === "object" ? child.textContent : String(child))),
+      ].join("");
+    },
+    set(value) {
+      this._textContent = String(value);
+    },
+  });
+  return el;
+}
+
+function installInteractiveWizardDom() {
+  const body = makeInteractiveElement("div");
+  body.id = "binderWizardBody";
+  globalThis.document = {
+    createElement: makeInteractiveElement,
+    getElementById(id) {
+      return id === "binderWizardBody" ? body : null;
+    },
+    querySelector(selector) {
+      return body.querySelector(selector);
+    },
+  };
+  return body;
+}
+
 async function loadModule() {
   if (!binderApi) {
     installBrowserStubs();
@@ -92,6 +182,129 @@ test("wizard draft prefill preserves regional family album organization", async 
   );
 
   assert.equal(draft.organization, "regional_family_album");
+  assert.equal(draft.formatPreset, "large-ring-3x3");
+  assert.equal(draft.formScope, "base_regional");
+  assert.equal(draft.rows, 3);
+  assert.equal(draft.cols, 3);
+
+  const ordinaryThreeByThree = api.draftFromConfigForTest(
+    {
+      binders: [
+        {
+          id: "ordinary",
+          name: "Ordinary",
+          organization: "national",
+          rows: 3,
+          cols: 3,
+          sheet_count: 42,
+          form_rule_id: "wizard-forms-base_regional",
+        },
+      ],
+      form_rules: [api.formRuleFromScope("base_regional")],
+    },
+    "ordinary",
+  );
+
+  assert.equal(ordinaryThreeByThree.organization, "national");
+  assert.notEqual(ordinaryThreeByThree.formatPreset, "large-ring-3x3");
+});
+
+test("wizard exposes large ring option and summary copy", async () => {
+  const api = await loadModule();
+
+  let body = installInteractiveWizardDom();
+  api.renderWizardStepForTest(0, {
+    organization: "national",
+    formScope: "full",
+    formatPreset: "custom",
+    rows: 4,
+    cols: 4,
+    sheetCount: 12,
+  });
+  const largeRingOrg = body
+    .querySelectorAll(".wizard-org-card")
+    .find((el) => el.dataset.org === "regional_family_album");
+
+  assert.ok(largeRingOrg);
+  largeRingOrg.click();
+  assert.deepEqual(api.getWizardDraftForTest(), {
+    name: "Principal",
+    organization: "regional_family_album",
+    formScope: "base_regional",
+    formatPreset: "large-ring-3x3",
+    rows: 3,
+    cols: 3,
+    sheetCount: 12,
+    editBinderId: null,
+  });
+
+  body = installInteractiveWizardDom();
+  api.renderWizardStepForTest(2, {
+    organization: "national",
+    formScope: "full",
+    formatPreset: "custom",
+    rows: 5,
+    cols: 5,
+    sheetCount: 20,
+  });
+  const largeRingFormat = body
+    .querySelectorAll(".wizard-format-card")
+    .find((el) => el.dataset.formatKey === "large-ring-3x3");
+
+  assert.ok(largeRingFormat);
+  largeRingFormat.click();
+  assert.equal(api.readFormatSelectionForTest(), true);
+  assert.equal(body.querySelector(".wizard-custom-panel").hidden, true);
+  assert.equal(api.getWizardDraftForTest().organization, "regional_family_album");
+  assert.equal(api.getWizardDraftForTest().formScope, "base_regional");
+  assert.equal(api.getWizardDraftForTest().formatPreset, "large-ring-3x3");
+  assert.equal(api.getWizardDraftForTest().rows, 3);
+  assert.equal(api.getWizardDraftForTest().cols, 3);
+
+  body = installInteractiveWizardDom();
+  api.renderWizardStepForTest(3, {
+    organization: "regional_family_album",
+    formScope: "base_regional",
+    formatPreset: "large-ring-3x3",
+    rows: 3,
+    cols: 3,
+    sheetCount: 42,
+  });
+
+  const recapText = body.querySelector(".wizard-recap").textContent;
+  assert.match(recapText, /Grand classeur 3x3 : régions au recto, familles compactes/);
+  assert.match(recapText, /3 × 3 auto \+ 10 feuillets libres/);
+  assert.match(recapText, /Capacité calculée automatiquement \(\+ 10 feuillets libres\)/);
+  assert.doesNotMatch(recapText, /42 feuillets/);
+  assert.match(recapText, /Un seul grand classeur physique, organisé par régions internes\./);
+});
+
+test("wizard normal format selection leaves large ring organization", async () => {
+  const api = await loadModule();
+
+  const body = installInteractiveWizardDom();
+  api.renderWizardStepForTest(2, {
+    organization: "regional_family_album",
+    formScope: "base_regional",
+    formatPreset: "large-ring-3x3",
+    rows: 3,
+    cols: 3,
+    sheetCount: 42,
+  });
+  const standardFormat = body
+    .querySelectorAll(".wizard-format-card")
+    .find((el) => el.dataset.formatKey === "3x3-10");
+
+  assert.ok(standardFormat);
+  standardFormat.click();
+  assert.equal(api.readFormatSelectionForTest(), true);
+
+  const draft = api.getWizardDraftForTest();
+  assert.equal(draft.organization, "national");
+  assert.equal(draft.formatPreset, "3x3-10");
+  assert.equal(draft.rows, 3);
+  assert.equal(draft.cols, 3);
+  assert.equal(draft.sheetCount, 10);
 });
 
 test("wizard edit payload preserves regional family album organization", async () => {
@@ -460,7 +673,7 @@ test("persistWizardDraft reports family data errors before persisting large ring
 
     assert.equal(ok, false);
     assert.equal(hint.hidden, false);
-    assert.match(hint.textContent, /familles d'evolution/);
+    assert.match(hint.textContent, /familles d'évolution/);
     assert.deepEqual(calls, [
       ["/data/pokedex.json", "GET"],
       ["/data/evolution-families.json", "GET"],
@@ -495,7 +708,7 @@ test("persistWizardDraft reports pokedex data errors before persisting large rin
 
     assert.equal(ok, false);
     assert.equal(hint.hidden, false);
-    assert.match(hint.textContent, /Pokedex/);
+    assert.match(hint.textContent, /Pokédex/);
     assert.deepEqual(calls, [["/data/pokedex.json", "GET"]]);
   } finally {
     globalThis.document.getElementById = originalGetElementById;
