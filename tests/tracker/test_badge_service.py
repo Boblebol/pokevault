@@ -100,6 +100,43 @@ def test_badge_battle_catalog_rejects_empty_encounters() -> None:
         )
 
 
+def test_badge_battle_catalog_rejects_empty_game_entries() -> None:
+    with pytest.raises(ValidationError, match="games"):
+        BadgeBattleCatalog.model_validate(
+            {
+                "version": 1,
+                "badges": {
+                    "kanto_brock": {
+                        "trainer": {
+                            "name": {"fr": "Pierre", "en": "Brock"},
+                            "role": {"fr": "Champion d'Arène", "en": "Gym Leader"},
+                            "history": {"fr": "Histoire", "en": "History"},
+                        },
+                        "location": {
+                            "region": "kanto",
+                            "city": {"fr": "Argenta", "en": "Pewter City"},
+                            "place": {"fr": "Arène", "en": "Gym"},
+                        },
+                        "encounters": [
+                            {
+                                "id": "red-blue",
+                                "label": {"fr": "Rouge / Bleu", "en": "Red / Blue"},
+                                "games": ["red", ""],
+                                "team": [
+                                    {
+                                        "slug": "0074-geodude",
+                                        "level": 12,
+                                        "moves": [{"fr": "Charge", "en": "Tackle"}],
+                                    }
+                                ],
+                            }
+                        ],
+                    }
+                },
+            }
+        )
+
+
 def test_catalog_exposes_all_definitions(tmp_path: Path) -> None:
     badge_service, *_ = _wire(tmp_path)
     state = badge_service.state()

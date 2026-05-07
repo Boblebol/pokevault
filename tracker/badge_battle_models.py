@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Literal
+from typing import Annotated, Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -50,7 +50,7 @@ class BadgeBattleEncounter(BaseModel):
 
     id: str = Field(min_length=1)
     label: LocalizedText
-    games: list[str] = Field(min_length=1)
+    games: list[Annotated[str, Field(min_length=1)]] = Field(min_length=1)
     variant: BadgeBattleVariant = Field(default_factory=BadgeBattleVariant)
     team: list[BadgeBattlePokemon] = Field(min_length=1)
 
