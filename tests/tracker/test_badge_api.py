@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+from typing import Any
 
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
@@ -78,46 +79,11 @@ def test_badges_endpoint_exposes_progress_metadata(tmp_path: Path) -> None:
 
 def test_badges_endpoint_exposes_battle_data_when_catalog_is_configured(
     tmp_path: Path,
+    brock_battle_catalog_data: dict[str, Any],
 ) -> None:
     progress_repo = JsonProgressRepository(tmp_path / "progress.json")
     progress_svc = ProgressService(progress_repo)
-    battle_catalog = BadgeBattleCatalog.model_validate(
-        {
-            "version": 1,
-            "badges": {
-                "kanto_brock": {
-                    "trainer": {
-                        "name": {"fr": "Pierre", "en": "Brock"},
-                        "role": {"fr": "Champion d'Arène", "en": "Gym Leader"},
-                        "history": {
-                            "fr": "Champion d'Argenta.",
-                            "en": "Pewter Gym Leader.",
-                        },
-                    },
-                    "location": {
-                        "region": "kanto",
-                        "city": {"fr": "Argenta", "en": "Pewter City"},
-                        "place": {"fr": "Arène d'Argenta", "en": "Pewter Gym"},
-                    },
-                    "encounters": [
-                        {
-                            "id": "red-blue",
-                            "label": {"fr": "Rouge / Bleu", "en": "Red / Blue"},
-                            "games": ["red", "blue"],
-                            "variant": {"kind": "version"},
-                            "team": [
-                                {
-                                    "slug": "0074-geodude",
-                                    "level": 12,
-                                    "moves": [{"fr": "Charge", "en": "Tackle"}],
-                                }
-                            ],
-                        }
-                    ],
-                }
-            },
-        }
-    )
+    battle_catalog = BadgeBattleCatalog.model_validate(brock_battle_catalog_data)
     badge_svc = BadgeService(progress_repo, battle_catalog=battle_catalog)
     app = FastAPI()
     app.include_router(progress_router)

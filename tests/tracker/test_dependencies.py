@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
+import json
 from pathlib import Path
+from typing import Any
 
 from tracker.api.dependencies import (
     get_badge_service,
@@ -112,5 +114,27 @@ def test_get_badge_service(tmp_path: Path) -> None:
     progress_repo = get_progress_repository(
         settings=settings, profiles=_profiles(settings)
     )
-    svc = get_badge_service(progress_repo=progress_repo)
+    svc = get_badge_service(settings=settings, progress_repo=progress_repo)
     assert isinstance(svc, BadgeService)
+
+
+def test_get_badge_service_loads_battle_catalog_from_settings_data_dir(
+    tmp_path: Path,
+    brock_battle_catalog_data: dict[str, Any],
+) -> None:
+    settings = TrackerSettings(repo_root=tmp_path)
+    settings.data_dir.mkdir(parents=True)
+    (settings.data_dir / "badge-battles.json").write_text(
+        json.dumps(brock_battle_catalog_data, ensure_ascii=False),
+        encoding="utf-8",
+    )
+    progress_repo = get_progress_repository(
+        settings=settings, profiles=_profiles(settings)
+    )
+
+    service = get_badge_service(settings=settings, progress_repo=progress_repo)
+
+    by_id = {badge.id: badge for badge in service.state().catalog}
+    assert by_id["kanto_brock"].battle is not None
+    assert by_id["kanto_brock"].battle.trainer.name.en == "Brock"
+    assert by_id["first_catch"].battle is None
