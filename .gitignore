@@ -21,6 +21,7 @@ data/*
 !data/evolution-families.json
 !data/evolution-family-overrides.json
 !data/game-pokedexes.json
+!data/badge-battles.json
 
 # Legacy
 outputs/

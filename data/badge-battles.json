@@ -10566,16 +10566,16 @@
     "bw_opelucid": {
       "trainer": {
         "name": {
-          "fr": "Watson/Iris",
-          "en": "Drayden"
+          "fr": "Watson / Iris",
+          "en": "Drayden / Iris"
         },
         "role": {
           "fr": "Gym Leader",
           "en": "Gym Leader"
         },
         "history": {
-          "fr": "Battle data for Drayden with exact levels and moves from source trainer data.",
-          "en": "Battle data for Drayden with exact levels and moves from source trainer data."
+          "fr": "Battle data for Drayden and Iris with exact levels and moves from source trainer data.",
+          "en": "Battle data for Drayden and Iris with exact levels and moves from source trainer data."
         }
       },
       "location": {
@@ -21149,16 +21149,16 @@
     "xy_rival": {
       "trainer": {
         "name": {
-          "fr": "Rival Kalos",
-          "en": "Calem"
+          "fr": "Calem / Serena",
+          "en": "Calem / Serena"
         },
         "role": {
           "fr": "Rival",
           "en": "Rival"
         },
         "history": {
-          "fr": "Battle data for Calem with exact levels and moves from source trainer data.",
-          "en": "Battle data for Calem with exact levels and moves from source trainer data."
+          "fr": "Battle data for Calem and Serena with exact levels and moves from source trainer data.",
+          "en": "Battle data for Calem and Serena with exact levels and moves from source trainer data."
         }
       },
       "location": {
@@ -21176,8 +21176,8 @@
         {
           "id": "calem-x-y-chespin",
           "label": {
-            "fr": "X / Y - Chespin",
-            "en": "X / Y - Chespin"
+            "fr": "X / Y - Calem - Chespin",
+            "en": "X / Y - Calem - Chespin"
           },
           "games": [
             "x",
@@ -21185,7 +21185,7 @@
           ],
           "variant": {
             "kind": "starter",
-            "value": "Chespin"
+            "value": "calem-chespin"
           },
           "team": [
             {
@@ -21313,8 +21313,8 @@
         {
           "id": "calem-x-y-fennekin",
           "label": {
-            "fr": "X / Y - Fennekin",
-            "en": "X / Y - Fennekin"
+            "fr": "X / Y - Calem - Fennekin",
+            "en": "X / Y - Calem - Fennekin"
           },
           "games": [
             "x",
@@ -21322,7 +21322,7 @@
           ],
           "variant": {
             "kind": "starter",
-            "value": "Fennekin"
+            "value": "calem-fennekin"
           },
           "team": [
             {
@@ -21450,8 +21450,8 @@
         {
           "id": "calem-x-y-froakie",
           "label": {
-            "fr": "X / Y - Froakie",
-            "en": "X / Y - Froakie"
+            "fr": "X / Y - Calem - Froakie",
+            "en": "X / Y - Calem - Froakie"
           },
           "games": [
             "x",
@@ -21459,7 +21459,7 @@
           ],
           "variant": {
             "kind": "starter",
-            "value": "Froakie"
+            "value": "calem-froakie"
           },
           "team": [
             {
@@ -21587,8 +21587,8 @@
         {
           "id": "serena-x-y-chespin",
           "label": {
-            "fr": "X / Y - Chespin",
-            "en": "X / Y - Chespin"
+            "fr": "X / Y - Serena - Chespin",
+            "en": "X / Y - Serena - Chespin"
           },
           "games": [
             "x",
@@ -21596,7 +21596,7 @@
           ],
           "variant": {
             "kind": "starter",
-            "value": "Chespin"
+            "value": "serena-chespin"
           },
           "team": [
             {
@@ -21724,8 +21724,8 @@
         {
           "id": "serena-x-y-fennekin",
           "label": {
-            "fr": "X / Y - Fennekin",
-            "en": "X / Y - Fennekin"
+            "fr": "X / Y - Serena - Fennekin",
+            "en": "X / Y - Serena - Fennekin"
           },
           "games": [
             "x",
@@ -21733,7 +21733,7 @@
           ],
           "variant": {
             "kind": "starter",
-            "value": "Fennekin"
+            "value": "serena-fennekin"
           },
           "team": [
             {
@@ -21861,8 +21861,8 @@
         {
           "id": "serena-x-y-froakie",
           "label": {
-            "fr": "X / Y - Froakie",
-            "en": "X / Y - Froakie"
+            "fr": "X / Y - Serena - Froakie",
+            "en": "X / Y - Serena - Froakie"
           },
           "games": [
             "x",
@@ -21870,7 +21870,7 @@
           ],
           "variant": {
             "kind": "starter",
-            "value": "Froakie"
+            "value": "serena-froakie"
           },
           "team": [
             {
