@@ -212,6 +212,96 @@ test("placeholder section skips alignment empties", async () => {
   );
 });
 
+test("placeholder section skips large ring region sheet gaps", async () => {
+  const api = await loadModule();
+  const chikorita = {
+    slug: "0152-chikorita",
+    number: "0152",
+    image: "data/images/0152-chikorita.png",
+    names: { fr: "Germignon", en: "Chikorita" },
+  };
+  const slots = [
+    {
+      binderId: "grand",
+      binderName: "Grand classeur",
+      page: 1,
+      sheet: 1,
+      face: "R",
+      slot: 1,
+      row: 1,
+      col: 1,
+      pokemon: bulbasaur(),
+      emptyKind: null,
+      familyId: "0001-bulbasaur",
+    },
+    {
+      binderId: "grand",
+      binderName: "Grand classeur",
+      page: 1,
+      sheet: 1,
+      face: "R",
+      slot: 2,
+      row: 1,
+      col: 2,
+      pokemon: null,
+      emptyKind: "alignment_empty",
+      familyId: null,
+    },
+    {
+      binderId: "grand",
+      binderName: "Grand classeur",
+      page: 2,
+      sheet: 1,
+      face: "V",
+      slot: 1,
+      row: 1,
+      col: 1,
+      pokemon: null,
+      emptyKind: "capacity_empty",
+      familyId: null,
+    },
+    {
+      binderId: "grand",
+      binderName: "Grand classeur",
+      page: 3,
+      sheet: 2,
+      face: "R",
+      slot: 2,
+      row: 1,
+      col: 2,
+      pokemon: null,
+      emptyKind: "capacity_empty",
+      familyId: null,
+    },
+    {
+      binderId: "grand",
+      binderName: "Grand classeur",
+      page: 3,
+      sheet: 2,
+      face: "R",
+      slot: 1,
+      row: 1,
+      col: 1,
+      pokemon: chikorita,
+      emptyKind: null,
+      familyId: "0152-chikorita",
+    },
+  ];
+
+  const section = api.buildPlaceholderSection(
+    { id: "grand", name: "Grand classeur", organization: "regional_family_album", rows: 2, cols: 2, sheet_count: 2 },
+    slots,
+    {},
+    "all",
+    "",
+  );
+
+  assert.deepEqual(
+    section.pages.flatMap((page) => page.slots.map((slot) => slot.title)),
+    ["Bulbizarre", "Germignon"],
+  );
+});
+
 test("print artwork default mode ignores the global artwork resolver", async () => {
   const api = await loadModule();
   globalThis.PokevaultArtwork = {
