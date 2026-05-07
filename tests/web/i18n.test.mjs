@@ -123,6 +123,21 @@ test("defaults to French and falls back to French for missing English keys", asy
   assert.doesNotMatch(api.t("app.docs.binders.text", {}, "en"), /intentional empty slots/);
 });
 
+test("keeps compatibility strings for committed UI consumers", async () => {
+  const { api } = await loadI18n();
+
+  assert.equal(api.t("pokemon_fiche.ownership.release_one"), "Relâcher un exemplaire");
+  assert.equal(api.t("pokemon_fiche.ownership.release_one", {}, "en"), "Release one copy");
+  assert.equal(api.t("stats.next_badge"), "Prochain badge");
+  assert.equal(api.t("stats.next_badge", {}, "en"), "Next badge");
+  assert.equal(api.t("stats.badge"), "Badge");
+  assert.equal(api.t("stats.badge", {}, "en"), "Badge");
+  assert.equal(api.t("stats.collection_gaps"), "Lacunes de collection");
+  assert.equal(api.t("stats.collection_gaps", {}, "en"), "Collection gaps");
+  assert.equal(api.t("stats.gap_line", { type: "Eau", count: 3 }), "Eau · 3 spécimen(s) manquants");
+  assert.equal(api.t("stats.gap_line", { type: "Water", count: 3 }, "en"), "Water · 3 missing specimen(s)");
+});
+
 test("persists English locale, interpolates values and hydrates DOM attributes", async () => {
   const { api, storage, textNode, placeholderNode, ariaNode, frButton, enButton } = await loadI18n({
     pokevault_locale: "en",
