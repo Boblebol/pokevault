@@ -13,6 +13,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
+from tracker.badge_battle_models import BadgeBattleCatalog
 from tracker.models import (
     BadgeDefinition,
     BadgeRequirementPokemon,
@@ -1941,8 +1942,10 @@ class BadgeService:
     def __init__(
         self,
         progress_repo: ProgressRepository,
+        battle_catalog: BadgeBattleCatalog | None = None,
     ) -> None:
         self._progress_repo = progress_repo
+        self._battle_catalog = battle_catalog or BadgeBattleCatalog()
 
     def _evaluate_due(
         self,
@@ -2016,6 +2019,7 @@ class BadgeService:
                 if badge.required_slug_sets
                 else []
             )
+            battle = self._battle_catalog.badges.get(badge.id)
             catalog.append(
                 BadgeDefinition(
                     id=badge.id,
@@ -2033,6 +2037,7 @@ class BadgeService:
                     reveal=presentation.reveal,
                     i18n=presentation.i18n,
                     requirements=requirements,
+                    battle=battle,
                 )
             )
         return BadgeState(catalog=catalog, unlocked=sorted(unlocked))

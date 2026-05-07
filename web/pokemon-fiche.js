@@ -20,11 +20,44 @@
     { id: "caught", labelKey: "pokemon_fiche.action.caught", state: "caught" },
   ];
   const OWNERSHIP_ACTIONS = [
-    { id: "owned", labelKey: "pokemon_fiche.ownership.owned" },
-    { id: "duplicate", labelKey: "pokemon_fiche.ownership.duplicate" },
-    { id: "release_one", labelKey: "pokemon_fiche.ownership.release_one" },
+    { id: "capture", labelKey: "pokemon_fiche.ownership.capture" },
     { id: "release", labelKey: "pokemon_fiche.ownership.release" },
   ];
+  const TYPE_ALIASES = {
+    acier: "steel",
+    bug: "bug",
+    combat: "fighting",
+    dark: "dark",
+    dragon: "dragon",
+    eau: "water",
+    electric: "electric",
+    electrik: "electric",
+    fairy: "fairy",
+    fee: "fairy",
+    feu: "fire",
+    fighting: "fighting",
+    fire: "fire",
+    flying: "flying",
+    ghost: "ghost",
+    glace: "ice",
+    grass: "grass",
+    ground: "ground",
+    ice: "ice",
+    insecte: "bug",
+    normal: "normal",
+    plante: "grass",
+    poison: "poison",
+    psychic: "psychic",
+    psy: "psychic",
+    roche: "rock",
+    rock: "rock",
+    sol: "ground",
+    spectre: "ghost",
+    steel: "steel",
+    tenebres: "dark",
+    vol: "flying",
+    water: "water",
+  };
   const FALLBACK_I18N = {
     "pokemon_fiche.section.identity": "Identité",
     "pokemon_fiche.section.pokedex_status": "Statut Pokédex",
@@ -38,11 +71,11 @@
     "pokemon_fiche.status.not_met": "Non rencontré",
     "pokemon_fiche.status.seen": "Aperçu",
     "pokemon_fiche.status.caught": "Attrapé",
+    "pokemon_fiche.ownership.capture": "Capturer",
     "pokemon_fiche.ownership.owned": "Capturé",
-    "pokemon_fiche.ownership.duplicate": "Double",
-    "pokemon_fiche.ownership.release_one": "Relâcher 1",
+    "pokemon_fiche.ownership.duplicate": "Plusieurs exemplaires",
     "pokemon_fiche.ownership.release": "Relâcher",
-    "pokemon_fiche.ownership.none": "Je n'ai pas",
+    "pokemon_fiche.ownership.none": "À attraper",
     "pokemon_fiche.unknown": "Inconnu",
     "pokemon_fiche.note.placeholder": "Lieu, version, échange, objectif...",
     "pokemon_fiche.note.save": "Sauver la note",
@@ -261,21 +294,59 @@
 
   function buildOwnershipActionModel(state) {
     const clean = normalizeOwnershipState(state);
-    return OWNERSHIP_ACTIONS.map((action) => ({
-      ...action,
-      label: t(action.labelKey),
-      active: action.id === "duplicate" ? clean.duplicate : action.id === "owned" && clean.caught && !clean.duplicate,
-      disabled: action.id === "release_one" ? !clean.duplicate : action.id === "release" ? !clean.caught : false,
-    }));
+    const capture = OWNERSHIP_ACTIONS[0];
+    const release = OWNERSHIP_ACTIONS[1];
+    const actions = [
+      {
+        ...capture,
+        label: t(capture.labelKey),
+        active: false,
+        disabled: false,
+        patch: clean.caught ? "duplicate" : "owned",
+      },
+    ];
+    if (clean.caught) {
+      actions.push({
+        ...release,
+        label: t(release.labelKey),
+        active: false,
+        disabled: false,
+        patch: clean.duplicate ? "release_one" : "none",
+      });
+    }
+    return actions;
   }
 
   function ownershipPatchForAction(state, actionId) {
-    const clean = normalizeOwnershipState(state);
-    if (actionId === "owned") return "owned";
-    if (actionId === "duplicate") return "duplicate";
-    if (actionId === "release_one") return clean.duplicate ? "release_one" : null;
-    if (actionId === "release") return clean.caught ? "none" : null;
-    return null;
+    const action = buildOwnershipActionModel(state).find((item) => item.id === actionId);
+    return action && !action.disabled ? action.patch : null;
+  }
+
+  function normalizeTypeId(type) {
+    const raw = String(type || "").trim();
+    if (!raw) return "unknown";
+    const key = raw
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .toLowerCase()
+      .replace(/[’']/g, "")
+      .replace(/[^a-z0-9]+/g, "_")
+      .replace(/^_+|_+$/g, "");
+    return TYPE_ALIASES[key] || key || "unknown";
+  }
+
+  function decorateTypeChip(element, type, className = "") {
+    if (!element) return element;
+    element.className = joinClasses(element.className, "pokemon-type-chip", className);
+    element.dataset.type = normalizeTypeId(type);
+    if (!element.textContent) element.textContent = String(type || t("pokemon_fiche.unknown"));
+    return element;
+  }
+
+  function createTypeChip(type, className = "") {
+    const chip = document.createElement("span");
+    chip.textContent = String(type || t("pokemon_fiche.unknown"));
+    return decorateTypeChip(chip, type, className);
   }
 
   function listIncludesSlug(list, slug) {
@@ -303,14 +374,16 @@
       button.type = "button";
       button.className = "pokemon-trade-chip";
       button.dataset.action = action.id;
+      button.dataset.patch = action.patch || "";
       button.dataset.active = action.active ? "true" : "false";
+      button.disabled = Boolean(action.disabled);
       button.setAttribute("aria-pressed", action.active ? "true" : "false");
       button.textContent = action.label;
       button.addEventListener("click", (event) => {
         event.preventDefault();
         event.stopPropagation();
         const next = ownershipPatchForAction(state, action.id);
-        if (!next) return;
+        if (!next || action.disabled) return;
         if (typeof onAction === "function") onAction(next, action);
       });
       row.append(button);
@@ -464,6 +537,7 @@
     createCollapsibleBody,
     createNoteEditor,
     decorateFicheSection,
+    decorateTypeChip,
     displayName,
     displayNumber,
     findForms,
@@ -476,6 +550,8 @@
     parsePokemonRouteSlug,
     pokemonRouteHref,
     sectionDefinition,
+    createTypeChip,
+    normalizeTypeId,
     statusLabel,
     statusPatchForAction,
     subtitleName,

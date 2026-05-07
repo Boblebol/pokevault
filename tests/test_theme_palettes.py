@@ -172,14 +172,26 @@ def test_theme_labels_match_design_language() -> None:
 
 def test_pokemon_modal_uses_theme_tokens() -> None:
     css = STYLES.read_text(encoding="utf-8")
+    modal_css = css.split("/* ── Pokémon modal", 1)[1].split("/* ── Pokémon list details", 1)[0]
     panel_blocks = _blocks(r"\.pokemon-modal__panel", css)
     assert panel_blocks, "modal panel styles missing"
     panel_css = panel_blocks[0]
 
-    assert "background: var(--surface);" in panel_css
-    assert "border: 1px solid var(--border);" in panel_css
-    assert "--panel" not in panel_css
-    assert "--ink" not in panel_css
+    assert "background:" in panel_css
+    assert "var(--card)" in panel_css
+    assert "var(--outline-soft)" in panel_css
+    assert "animation: pokemon-modal-panel-in" in modal_css
+    assert "animation: pokemon-modal-scrim-in" in modal_css
+    assert "backdrop-filter: blur(" in modal_css
+    assert "scrollbar-gutter: stable;" in css
+    for legacy_ref in [
+        "var(--surface)",
+        "var(--surface-2)",
+        "var(--ink)",
+        "var(--border)",
+        "var(--shadow-lg)",
+    ]:
+        assert legacy_ref not in modal_css
 
     token_driven_selectors = [
         ".pokemon-modal__topbar",

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+from typing import Any
 
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
@@ -13,6 +14,7 @@ from tracker.api.dependencies import (
     get_badge_service,
     get_progress_service,
 )
+from tracker.badge_battle_models import BadgeBattleCatalog
 from tracker.repository.json_progress_repository import JsonProgressRepository
 from tracker.services.badge_service import BadgeService
 from tracker.services.progress_service import ProgressService
@@ -73,6 +75,29 @@ def test_badges_endpoint_exposes_progress_metadata(tmp_path: Path) -> None:
     assert by_id["century"]["target"] == 100
     assert by_id["century"]["percent"] == 1
     assert by_id["century"]["hint"] == "Encore 99 Pokémon à attraper."
+
+
+def test_badges_endpoint_exposes_battle_data_when_catalog_is_configured(
+    tmp_path: Path,
+    brock_battle_catalog_data: dict[str, Any],
+) -> None:
+    progress_repo = JsonProgressRepository(tmp_path / "progress.json")
+    progress_svc = ProgressService(progress_repo)
+    battle_catalog = BadgeBattleCatalog.model_validate(brock_battle_catalog_data)
+    badge_svc = BadgeService(progress_repo, battle_catalog=battle_catalog)
+    app = FastAPI()
+    app.include_router(progress_router)
+    app.include_router(badge_router)
+    app.dependency_overrides[get_progress_service] = lambda: progress_svc
+    app.dependency_overrides[get_badge_service] = lambda: badge_svc
+    client = TestClient(app)
+
+    body = client.get("/api/badges").json()
+    by_id = {badge["id"]: badge for badge in body["catalog"]}
+
+    assert by_id["kanto_brock"]["battle"]["trainer"]["name"]["en"] == "Brock"
+    assert by_id["kanto_brock"]["battle"]["encounters"][0]["team"][0]["level"] == 12
+    assert by_id["first_catch"]["battle"] is None
 
 
 def test_badges_auto_sync_on_read(tmp_path: Path) -> None:

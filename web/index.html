@@ -194,11 +194,10 @@
             <div class="stats-rail-note" data-i18n="app.stats.scope_note">
               Les statistiques suivent le même périmètre de formes que la collection.
             </div>
-            <div class="stats-rail-badge" id="statsRailBadge" hidden></div>
           </aside>
-          <main class="stats-content">
-            <section class="stats-main" id="statsBody"></section>
-            <section class="stats-main" id="statsBadges"></section>
+          <main class="stats-content stats-content--dashboard">
+            <section class="stats-main stats-main--overview" id="statsBody"></section>
+            <section class="stats-main stats-main--badges" id="statsBadges"></section>
           </main>
         </section>
       </div>
@@ -391,7 +390,7 @@
             <p data-i18n="app.docs.hero.text">
               Pokevault suit ton Pokédex, tes classeurs et tes échanges Dresseur
               avec des fichiers JSON lisibles sur ta machine. Cette page résume
-              les workflows actifs de la version 1.4.0.
+              les workflows actifs de la version 1.5.0.
             </p>
           </section>
 
@@ -418,9 +417,9 @@
             <article class="docs-card">
               <h2 data-i18n="app.docs.collection.title">Collection</h2>
               <ul class="docs-list">
-                <li data-i18n="app.docs.collection.actions">`Capturé`, `Double`, `Relâcher 1` et `Relâcher` couvrent la progression locale et les doubles disponibles.</li>
+                <li data-i18n="app.docs.collection.actions">`Capturer` ajoute un exemplaire, `Relâcher` en retire un; les états restent `À attraper`, `Capturé` ou `Plusieurs exemplaires`.</li>
                 <li data-i18n="app.docs.collection.caught">`Capturé` confirme la progression Pokédex et alimente les stats, badges et classeurs.</li>
-                <li data-i18n="app.docs.collection.double">`Double` indique ce que tu peux proposer à un autre Dresseur.</li>
+                <li data-i18n="app.docs.collection.double">`Plusieurs exemplaires` indique ce que tu peux proposer à un autre Dresseur.</li>
                 <li data-i18n="app.docs.collection.filters">Régions, formes, types, tags narratifs et recherche floue partagent le même état filtré.</li>
                 <li data-i18n="app.docs.collection.context">`Vu chez` vient des doubles partagés par les Cartes Dresseur reçues; il n'écrase jamais ta progression locale.</li>
               </ul>
@@ -452,7 +451,7 @@
               <ul class="docs-list">
                 <li data-i18n="app.docs.trainers.create">Crée ta carte avec pseudo, région favorite, note publique et jusqu'à trois contacts partageables.</li>
                 <li data-i18n="app.docs.trainers.export">Export/import se fait par fichier; aucun compte, aucun profil public et aucune sync automatique.</li>
-                <li data-i18n="app.docs.trainers.compare">La liste `Double` des contacts produit `Vu chez` dans ta Collection.</li>
+                <li data-i18n="app.docs.trainers.compare">La liste `Plusieurs exemplaires` des contacts produit `Vu chez` dans ta Collection.</li>
                 <li data-i18n="app.docs.trainers.badges">Les anciens champs `wants` et `badges` importés sont tolérés mais ignorés.</li>
               </ul>
             </article>
@@ -506,7 +505,7 @@
               <ul class="docs-list">
                 <li data-i18n="app.docs.shortcuts.search">`/` focus recherche, `Esc` efface ou quitte.</li>
                 <li data-i18n="app.docs.shortcuts.nav">`j` / `k` déplacent la sélection.</li>
-                <li data-i18n="app.docs.shortcuts.status">`c` marque Capturé, `Shift+C` marque Double.</li>
+                <li data-i18n="app.docs.shortcuts.status">`c` marque Capturé, `Shift+C` marque Plusieurs exemplaires.</li>
                 <li data-i18n="app.docs.shortcuts.open">`i` ouvre la fiche; `?` affiche l'aide clavier.</li>
               </ul>
             </article>
@@ -724,8 +723,8 @@
           </p>
           <ul class="onboarding__bullets">
             <li data-i18n="app.onboarding.step1.b1"><em>Capturé</em> confirme ta progression Pokédex.</li>
-            <li data-i18n="app.onboarding.step1.b2"><em>Double</em> dit que tu peux proposer ce Pokémon en échange.</li>
-            <li data-i18n="app.onboarding.step1.b3"><em>Relâcher 1</em> et <em>Relâcher</em> retirent un doublon ou toute la possession locale.</li>
+            <li data-i18n="app.onboarding.step1.b2"><em>Plusieurs exemplaires</em> dit que tu peux proposer ce Pokémon en échange.</li>
+            <li data-i18n="app.onboarding.step1.b3"><em>Capturer</em> ajoute un exemplaire; <em>Relâcher</em> en retire un.</li>
           </ul>
         </section>
 
@@ -773,14 +772,14 @@
           <p class="onboarding__kicker" data-i18n="app.onboarding.step4.kicker">Étape 4 · Mode de suivi</p>
           <h3 class="onboarding__step-title" data-i18n="app.onboarding.step4.title">Simple ou avancé ?</h3>
           <p class="onboarding__lede" data-i18n="app.onboarding.step4.lede">
-            Simple garde la liste concentrée sur Capturé, Double et Relâcher.
+            Simple garde la liste concentrée sur À attraper, Capturé, Plusieurs exemplaires et les actions Capturer / Relâcher.
             Avancé rend les formes, notes et Dresseurs plus visibles.
           </p>
           <div class="onboarding__choices" role="radiogroup" aria-label="Mode de suivi Pokédex" data-i18n-aria-label="app.onboarding.mode">
             <label class="onboarding__choice">
               <input type="radio" name="onboardingTrackingMode" value="simple" checked />
               <span class="onboarding__choice-title" data-i18n="app.onboarding.simple">Simple</span>
-              <span class="onboarding__choice-sub" data-i18n="app.onboarding.simple_sub">Capturé, Double, Relâcher. Les formes régionales restent disponibles.</span>
+              <span class="onboarding__choice-sub" data-i18n="app.onboarding.simple_sub">Capturer, Relâcher et états clairs. Les formes régionales restent disponibles.</span>
             </label>
             <label class="onboarding__choice">
               <input type="radio" name="onboardingTrackingMode" value="advanced" />
@@ -833,7 +832,7 @@
           <li><kbd>Esc</kbd><span data-i18n="app.shortcuts.clear">Vide / quitte la recherche ou la sélection</span></li>
           <li><kbd>j</kbd> / <kbd>k</kbd><span data-i18n="app.shortcuts.next">Pokémon suivant / précédent</span></li>
           <li><kbd>c</kbd><span data-i18n="app.shortcuts.caught">Marque Capturé, ou retire Capturé si déjà actif</span></li>
-          <li><kbd>Shift</kbd>+<kbd>C</kbd><span data-i18n="app.shortcuts.double">Marque Double, ou repasse à Capturé</span></li>
+          <li><kbd>Shift</kbd>+<kbd>C</kbd><span data-i18n="app.shortcuts.double">Marque Plusieurs exemplaires, ou repasse à Capturé</span></li>
           <li><kbd>i</kbd><span data-i18n="app.shortcuts.open">Ouvre la fiche Pokémon</span></li>
           <li><kbd>?</kbd><span data-i18n="app.shortcuts.help">Ouvre cette aide</span></li>
         </ul>

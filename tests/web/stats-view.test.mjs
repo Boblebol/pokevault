@@ -45,6 +45,17 @@ function textTree(node) {
   ].join(" ");
 }
 
+function findByClass(node, className) {
+  if (!node || typeof node !== "object") return null;
+  const classes = String(node.className || "").split(/\s+/).filter(Boolean);
+  if (classes.includes(className)) return node;
+  for (const child of node.children || []) {
+    const found = findByClass(child, className);
+    if (found) return found;
+  }
+  return null;
+}
+
 async function loadModule(elements) {
   globalThis.window = globalThis;
   globalThis.document = {
@@ -66,6 +77,7 @@ test("renderStats follows English i18n labels when available", async () => {
     statsRailCount: new FakeElement("span"),
     statsRailMissing: new FakeElement("span"),
     statsRailBadge: new FakeElement("div"),
+    statsBadges: new FakeElement("section"),
   };
   const api = await loadModule(elements);
   globalThis.PokevaultI18n = {
@@ -85,8 +97,6 @@ test("renderStats follows English i18n labels when available", async () => {
         "stats.kpi.missing": "Missing",
         "stats.kpi.missing_sub": "Collection priority",
         "stats.region_archive": "Regional archive",
-        "stats.collection_gaps": "Collection gaps",
-        "stats.gap_line": "{type} · {count} missing specimen(s)",
         "stats.type_completion": "Completion by type",
       };
       return (messages[key] || key).replace(/\{([a-zA-Z0-9_]+)\}/g, (_, name) => String(params[name]));
@@ -111,15 +121,38 @@ test("renderStats follows English i18n labels when available", async () => {
   globalThis.PokevaultHunts = {
     state: { hunts: { "002-b": { wanted: true } } },
   };
+  globalThis.PokevaultBadges = {
+    nearest() {
+      return {
+        title: "Sabrina - Marsh",
+        current: 1,
+        target: 2,
+        percent: 50,
+        unlocked: false,
+      };
+    },
+  };
 
   api.render();
 
+  const bodyText = textTree(elements.statsBody);
   assert.equal(elements.statsRailCount.textContent, "1 / 2 caught");
   assert.equal(elements.statsRailMissing.textContent, "1 missing");
-  assert.match(textTree(elements.statsBody), /Global completion state/);
-  assert.match(textTree(elements.statsBody), /Total specimens/);
-  assert.match(textTree(elements.statsBody), /Regional archive/);
-  assert.match(textTree(elements.statsBody), /Completion by type/);
-  assert.doesNotMatch(textTree(elements.statsBody), /Catalogued cards/);
-  assert.doesNotMatch(textTree(elements.statsBody), /TCG/);
+  assert.equal(elements.statsRailBadge.hidden, true);
+  assert.match(bodyText, /Global completion state/);
+  assert.match(bodyText, /Total specimens/);
+  assert.match(bodyText, /Regional archive/);
+  assert.match(bodyText, /Completion by type/);
+  assert.doesNotMatch(bodyText, /Collection gaps/);
+  assert.doesNotMatch(textTree(elements.statsRailBadge), /Next badge/);
+  assert.doesNotMatch(textTree(elements.statsRailBadge), /Sabrina - Marsh/);
+  assert.doesNotMatch(bodyText, /Catalogued cards/);
+  assert.doesNotMatch(bodyText, /TCG/);
+
+  const bento = findByClass(elements.statsBody, "stats-bento-grid--two");
+  assert.ok(bento);
+  assert.equal(
+    bento.children.filter((child) => String(child.className).includes("stats-region-wrap")).length,
+    2,
+  );
 });

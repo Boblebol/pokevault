@@ -3,7 +3,7 @@
 [![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![Tests](https://img.shields.io/badge/tracker_coverage-100%25-brightgreen.svg)](#quality)
-[![Version: 1.4.0](https://img.shields.io/badge/version-1.4.0-00daf3.svg)](CHANGELOG.md)
+[![Version: 1.5.0](https://img.shields.io/badge/version-1.5.0-00daf3.svg)](CHANGELOG.md)
 
 <p align="center">
   <img src="docs/assets/logo.svg" alt="pokevault logo" width="140">

@@ -49,6 +49,7 @@ const BINDER_WIZARD_FALLBACK_I18N = {
   "binder_wizard.org.large_ring.title": "Grand classeur 3x3",
   "binder_wizard.org.large_ring.desc": "Un seul classeur à anneaux : régions au recto d’un nouveau feuillet, familles compactes, capacité calculée.",
   "binder_wizard.form.lead": "Les séries de cartes ne couvrent pas tout (Méga, Gigamax, Pikachu déguisé…). Choisis un périmètre réaliste pour ton suivi ; tu pourras l’éditer dans le JSON plus tard.",
+  "binder_wizard.form.lead.large_ring": "Pour le grand classeur, garde les espèces de base avec les formes régionales, ou passe en complet si tu veux aussi suivre Méga, Gigamax et formes nommées.",
   "binder_wizard.form.base_only.choice_title": "Base seule",
   "binder_wizard.form.base_only.desc": "Une entrée par forme « principale » du Pokédex, sans variantes régionales.",
   "binder_wizard.form.base_regional.choice_title": "Base + régionales",
@@ -56,6 +57,7 @@ const BINDER_WIZARD_FALLBACK_I18N = {
   "binder_wizard.form.full.choice_title": "Complet",
   "binder_wizard.form.full.desc": "Méga, Gigamax et autres formes nommées : plus de lignes, beaucoup de cartes n’existent pas pour tout le monde.",
   "binder_wizard.format.lead": "Même nombre de pochettes sur chaque face (recto / verso). Presets 3×3 ou 2×2 avec 10 feuillets, ou grille personnalisée.",
+  "binder_wizard.format.lead.large_ring": "Le grand classeur verrouille la grille en 3×3 recto-verso. Le nombre de feuillets est calculé automatiquement selon les régions et familles.",
   "binder_wizard.format.3x3.title": "3 × 3",
   "binder_wizard.format.3x3.desc": "9 cases par page · 10 feuillets (recto + verso).",
   "binder_wizard.format.2x2.title": "2 × 2",
@@ -779,10 +781,44 @@ function leaveLargeRingOrganizationForStandardFormat() {
   }
 }
 
+function formScopesForOrganization(org) {
+  return org === ORG_REGIONAL_FAMILY_ALBUM
+    ? ["base_regional", "full"]
+    : ["base_only", "base_regional", "full"];
+}
+
+function formatPresetsForOrganization(org) {
+  return org === ORG_REGIONAL_FAMILY_ALBUM
+    ? ["large-ring-3x3"]
+    : ["3x3-10", "2x2-10", "custom"];
+}
+
+function normalizeWizardDraftForOrganization() {
+  if (wizardDraft.organization === ORG_REGIONAL_FAMILY_ALBUM) {
+    if (!formScopesForOrganization(wizardDraft.organization).includes(wizardDraft.formScope)) {
+      wizardDraft.formScope = "base_regional";
+    }
+    wizardDraft.formatPreset = "large-ring-3x3";
+    wizardDraft.rows = 3;
+    wizardDraft.cols = 3;
+    return;
+  }
+  if (!formatPresetsForOrganization(wizardDraft.organization).includes(wizardDraft.formatPreset)) {
+    wizardDraft.formatPreset = "3x3-10";
+    wizardDraft.rows = 3;
+    wizardDraft.cols = 3;
+    wizardDraft.sheetCount = 10;
+  }
+}
+
 /**
  * @returns {boolean} false si rien n’est sélectionné ou custom invalide
  */
 function readFormatSelectionFromDom() {
+  if (wizardDraft.organization === ORG_REGIONAL_FAMILY_ALBUM) {
+    applyLargeRingWizardDefaults({ resetFormScope: false });
+    return true;
+  }
   const sel = document.querySelector(".wizard-format-card.is-selected");
   if (!sel) return false;
   const key = sel.dataset.formatKey || "";
@@ -1151,6 +1187,7 @@ function syncCustomPanelVisibility(body) {
 function renderWizardStep() {
   const body = document.getElementById("binderWizardBody");
   if (!body) return;
+  normalizeWizardDraftForOrganization();
   clearEl(body);
 
   if (wizardStep === 0) {
@@ -1214,7 +1251,11 @@ function renderWizardStep() {
   if (wizardStep === 1) {
     const lead = document.createElement("p");
     lead.className = "wizard-lead";
-    lead.textContent = tBinderWizard("binder_wizard.form.lead");
+    lead.textContent = tBinderWizard(
+      wizardDraft.organization === ORG_REGIONAL_FAMILY_ALBUM
+        ? "binder_wizard.form.lead.large_ring"
+        : "binder_wizard.form.lead",
+    );
     body.append(lead);
 
     const grid = document.createElement("div");
@@ -1241,22 +1282,23 @@ function renderWizardStep() {
       return btn;
     };
 
-    grid.append(
-      mkForm(
-        "base_only",
+    const formCopy = {
+      base_only: [
         tBinderWizard("binder_wizard.form.base_only.choice_title"),
         tBinderWizard("binder_wizard.form.base_only.desc"),
-      ),
-      mkForm(
-        "base_regional",
+      ],
+      base_regional: [
         tBinderWizard("binder_wizard.form.base_regional.choice_title"),
         tBinderWizard("binder_wizard.form.base_regional.desc"),
-      ),
-      mkForm(
-        "full",
+      ],
+      full: [
         tBinderWizard("binder_wizard.form.full.choice_title"),
         tBinderWizard("binder_wizard.form.full.desc"),
-      ),
+      ],
+    };
+    grid.append(
+      ...formScopesForOrganization(wizardDraft.organization).map((scope) =>
+        mkForm(scope, formCopy[scope][0], formCopy[scope][1])),
     );
     body.append(grid);
   }
@@ -1264,7 +1306,11 @@ function renderWizardStep() {
   if (wizardStep === 2) {
     const lead = document.createElement("p");
     lead.className = "wizard-lead";
-    lead.textContent = tBinderWizard("binder_wizard.format.lead");
+    lead.textContent = tBinderWizard(
+      wizardDraft.organization === ORG_REGIONAL_FAMILY_ALBUM
+        ? "binder_wizard.format.lead.large_ring"
+        : "binder_wizard.format.lead",
+    );
     body.append(lead);
 
     const fmtGrid = document.createElement("div");
@@ -1307,17 +1353,37 @@ function renderWizardStep() {
       return btn;
     };
 
-    fmtGrid.append(
-      mkFmt("3x3-10", tBinderWizard("binder_wizard.format.3x3.title"), tBinderWizard("binder_wizard.format.3x3.desc")),
-      mkFmt("2x2-10", tBinderWizard("binder_wizard.format.2x2.title"), tBinderWizard("binder_wizard.format.2x2.desc")),
-      mkFmt(
-        "large-ring-3x3",
+    const formatCopy = {
+      "3x3-10": [
+        tBinderWizard("binder_wizard.format.3x3.title"),
+        tBinderWizard("binder_wizard.format.3x3.desc"),
+      ],
+      "2x2-10": [
+        tBinderWizard("binder_wizard.format.2x2.title"),
+        tBinderWizard("binder_wizard.format.2x2.desc"),
+      ],
+      "large-ring-3x3": [
         tBinderWizard("binder_wizard.format.large_ring.title"),
         tBinderWizard("binder_wizard.format.large_ring.desc"),
-      ),
-      mkFmt("custom", tBinderWizard("binder_wizard.format.custom.title"), tBinderWizard("binder_wizard.format.custom.desc")),
+      ],
+      custom: [
+        tBinderWizard("binder_wizard.format.custom.title"),
+        tBinderWizard("binder_wizard.format.custom.desc"),
+      ],
+    };
+
+    fmtGrid.append(
+      ...formatPresetsForOrganization(wizardDraft.organization).map((key) =>
+        mkFmt(key, formatCopy[key][0], formatCopy[key][1])),
     );
     body.append(fmtGrid);
+
+    if (!formatPresetsForOrganization(wizardDraft.organization).includes("custom")) {
+      syncCustomPanelVisibility(body);
+      syncWizardChrome();
+      syncWizardBinderBar();
+      return;
+    }
 
     const panel = document.createElement("div");
     panel.className = "wizard-custom-panel";

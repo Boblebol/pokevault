@@ -5,7 +5,7 @@
 
 const API_PROGRESS = "/api/progress";
 const API_HEALTH = "/api/health";
-const APP_VERSION = "1.4.0";
+const APP_VERSION = "1.5.0";
 const PROGRESS_QUEUE_KEY = "pokedex_progress_queue";
 const FORM_FILTER_STORAGE_KEY = "pokedexFormFilter";
 const TYPE_FILTER_STORAGE_KEY = "pokedexTypeFilter";
@@ -400,7 +400,7 @@ function setStatus(slug, state) {
 
 /**
  * Backward-compatible shortcut entry point.
- * Plain `c` toggles `Capturé`; Shift+C toggles `Double`.
+ * Plain `c` toggles `Capturé`; Shift+C toggles `Plusieurs exemplaires`.
  *
  * @param {string} slug
  * @param {{ shift?: boolean }} [opts]
@@ -1618,16 +1618,21 @@ function createPokemonCard(p, opts) {
   const types = document.createElement("div");
   types.className = "card-types";
   const typeList = Array.isArray(p.types) ? p.types.filter(Boolean).slice(0, 2) : [];
+  const fiche = window.PokevaultPokemonFiche;
   if (!typeList.length) {
-    const unknown = document.createElement("span");
-    unknown.className = "card-type-badge";
-    unknown.textContent = t("app.card.unknown");
+    const unknown = fiche?.createTypeChip
+      ? fiche.createTypeChip(t("app.card.unknown"), "card-type-badge")
+      : document.createElement("span");
+    if (!unknown.className) unknown.className = "card-type-badge";
+    if (!unknown.textContent) unknown.textContent = t("app.card.unknown");
     types.append(unknown);
   } else {
-    for (const t of typeList) {
-      const badge = document.createElement("span");
-      badge.className = "card-type-badge";
-      badge.textContent = String(t);
+    for (const typeName of typeList) {
+      const badge = fiche?.createTypeChip
+        ? fiche.createTypeChip(typeName, "card-type-badge")
+        : document.createElement("span");
+      if (!badge.className) badge.className = "card-type-badge";
+      if (!badge.textContent) badge.textContent = String(typeName);
       types.append(badge);
     }
   }

@@ -155,6 +155,17 @@
     return section;
   }
 
+  function createTypeChip(type, className = "pokemon-modal-type-badge") {
+    const helper = ficheHelpers();
+    if (typeof helper.createTypeChip === "function") {
+      return helper.createTypeChip(type, className);
+    }
+    const badge = document.createElement("span");
+    badge.className = className;
+    badge.textContent = String(type);
+    return badge;
+  }
+
   function ownershipState(slug) {
     const collection = window.PokedexCollection;
     if (typeof collection?.ownershipStateForSlug === "function") {
@@ -201,10 +212,7 @@
     const types = document.createElement("div");
     types.className = "pokemon-modal-hero__types";
     for (const type of Array.isArray(pokemon.types) ? pokemon.types.filter(Boolean) : []) {
-      const badge = document.createElement("span");
-      badge.className = "pokemon-modal-type-badge";
-      badge.textContent = String(type);
-      types.append(badge);
+      types.append(createTypeChip(type));
     }
     if (types.children.length) meta.append(types);
     section.append(meta);
@@ -218,7 +226,7 @@
     label.className = "pokemon-modal-status-label";
     label.dataset.state = ownership.duplicate ? "duplicate" : ownership.caught ? "owned" : "none";
     label.textContent = ficheHelpers().ownershipLabel?.(ownership)
-      || (ownership.duplicate ? "Double" : ownership.caught ? "Capturé" : "Je n'ai pas");
+      || (ownership.duplicate ? "Plusieurs exemplaires" : ownership.caught ? "Capturé" : "À attraper");
     section.append(label);
     const actions = ficheHelpers().createOwnershipActions?.(ownership, async (next) => {
       await window.PokedexCollection?.setPokemonOwnershipState?.(pokemon.slug, next);
@@ -274,10 +282,7 @@
       const row = document.createElement("div");
       row.className = "pokemon-modal-types";
       for (const type of types) {
-        const badge = document.createElement("span");
-        badge.className = "pokemon-modal-type-badge";
-        badge.textContent = String(type);
-        row.append(badge);
+        row.append(createTypeChip(type));
       }
       if (!row.children.length) row.textContent = "—";
       section.append(row);
@@ -307,7 +312,12 @@
         const list = document.createElement("ul");
         for (const row of bucket) {
           const item = document.createElement("li");
-          item.textContent = `${row.type} ${formatMult(row.mult)}`;
+          item.className = "pokemon-modal-matchup";
+          const chip = createTypeChip(row.type);
+          const mult = document.createElement("span");
+          mult.className = "pokemon-modal-matchup__mult";
+          mult.textContent = formatMult(row.mult);
+          item.append(chip, mult);
           list.append(item);
         }
         block.append(list);

@@ -88,6 +88,22 @@ def test_badge_detail_modal_and_pokemon_preview_are_responsive() -> None:
     assert "height: 30px;" in chips
 
 
+def test_badge_battle_dossier_layout_is_responsive() -> None:
+    for selector in [
+        ".badge-battle-dossier",
+        ".badge-battle-layout",
+        ".badge-battle-context",
+        ".badge-battle-variants",
+        ".badge-battle-card",
+        ".badge-battle-matchups",
+    ]:
+        assert selector in CSS
+
+    mobile = _media_block(720)
+    assert ".badge-battle-layout" in mobile
+    assert "grid-template-columns: 1fr" in mobile
+
+
 def test_collection_home_has_no_focus_hunt_or_recommendation_surfaces() -> None:
     assert 'src="/focus-session.js"' not in HTML
     forbidden_html = [
@@ -216,8 +232,8 @@ def test_onboarding_product_tour_covers_local_trade_workflow() -> None:
     assert len(re.findall(r'<section class="onboarding__step\b', block)) == 5
     for text in [
         "Capturé",
-        "Double",
-        "Relâcher 1",
+        "Plusieurs exemplaires",
+        "Capturer",
         "Relâcher",
         "Vu chez",
         "doubles",

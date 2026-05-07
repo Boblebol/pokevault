@@ -296,7 +296,7 @@ test("pokemon cards suppress Vu chez for local duplicates even when raw progress
   globalThis.document.createElement = (tagName) => new FakeElement(tagName);
   globalThis.PokevaultPokemonFiche = {
     ownershipLabel(ownership) {
-      return ownership.duplicate ? "Double" : "";
+      return ownership.duplicate ? "Plusieurs exemplaires" : "";
     },
     ownershipStateFromSources(slug, options = {}) {
       const key = String(slug || "").trim();
@@ -348,5 +348,5 @@ test("pokemon cards suppress Vu chez for local duplicates even when raw progress
   assert.equal(String(card.className).includes("is-duplicate"), true);
   assert.equal(String(card.className).includes("is-dimmed"), false);
   assert.doesNotMatch(card["aria-label"], /vu chez/);
-  assert.equal(card.dataset.ownership, "Double");
+  assert.equal(card.dataset.ownership, "Plusieurs exemplaires");
 });

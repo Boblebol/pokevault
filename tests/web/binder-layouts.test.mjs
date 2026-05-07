@@ -239,27 +239,18 @@ test("wizard exposes large ring option and summary copy", async () => {
   });
 
   body = installInteractiveWizardDom();
-  api.renderWizardStepForTest(2, {
-    organization: "national",
-    formScope: "full",
-    formatPreset: "custom",
-    rows: 5,
-    cols: 5,
-    sheetCount: 20,
+  api.renderWizardStepForTest(1, {
+    organization: "regional_family_album",
+    formScope: "base_regional",
+    formatPreset: "large-ring-3x3",
+    rows: 3,
+    cols: 3,
+    sheetCount: 12,
   });
-  const largeRingFormat = body
-    .querySelectorAll(".wizard-format-card")
-    .find((el) => el.dataset.formatKey === "large-ring-3x3");
 
-  assert.ok(largeRingFormat);
-  largeRingFormat.click();
-  assert.equal(api.readFormatSelectionForTest(), true);
-  assert.equal(body.querySelector(".wizard-custom-panel").hidden, true);
-  assert.equal(api.getWizardDraftForTest().organization, "regional_family_album");
-  assert.equal(api.getWizardDraftForTest().formScope, "full");
-  assert.equal(api.getWizardDraftForTest().formatPreset, "large-ring-3x3");
-  assert.equal(api.getWizardDraftForTest().rows, 3);
-  assert.equal(api.getWizardDraftForTest().cols, 3);
+  const largeRingForms = body.querySelectorAll(".wizard-form-card");
+  assert.deepEqual(largeRingForms.map((el) => el.dataset.formScope), ["base_regional", "full"]);
+  assert.doesNotMatch(body.textContent, /Base seule/);
 
   body = installInteractiveWizardDom();
   api.renderWizardStepForTest(3, {
@@ -279,10 +270,24 @@ test("wizard exposes large ring option and summary copy", async () => {
   assert.match(recapText, /Un seul grand classeur physique, organisé par régions internes\./);
 });
 
-test("wizard normal format selection leaves large ring organization", async () => {
+test("wizard format choices depend on the previous organization", async () => {
   const api = await loadModule();
 
-  const body = installInteractiveWizardDom();
+  let body = installInteractiveWizardDom();
+  api.renderWizardStepForTest(2, {
+    organization: "national",
+    formScope: "full",
+    formatPreset: "custom",
+    rows: 5,
+    cols: 5,
+    sheetCount: 20,
+  });
+  assert.deepEqual(
+    body.querySelectorAll(".wizard-format-card").map((el) => el.dataset.formatKey),
+    ["3x3-10", "2x2-10", "custom"],
+  );
+
+  body = installInteractiveWizardDom();
   api.renderWizardStepForTest(2, {
     organization: "regional_family_album",
     formScope: "base_regional",
@@ -291,20 +296,18 @@ test("wizard normal format selection leaves large ring organization", async () =
     cols: 3,
     sheetCount: 42,
   });
-  const standardFormat = body
-    .querySelectorAll(".wizard-format-card")
-    .find((el) => el.dataset.formatKey === "3x3-10");
+  assert.deepEqual(
+    body.querySelectorAll(".wizard-format-card").map((el) => el.dataset.formatKey),
+    ["large-ring-3x3"],
+  );
+  assert.equal(body.querySelector(".wizard-custom-panel"), null);
 
-  assert.ok(standardFormat);
-  standardFormat.click();
   assert.equal(api.readFormatSelectionForTest(), true);
-
   const draft = api.getWizardDraftForTest();
-  assert.equal(draft.organization, "national");
-  assert.equal(draft.formatPreset, "3x3-10");
+  assert.equal(draft.organization, "regional_family_album");
+  assert.equal(draft.formatPreset, "large-ring-3x3");
   assert.equal(draft.rows, 3);
   assert.equal(draft.cols, 3);
-  assert.equal(draft.sheetCount, 10);
 });
 
 test("wizard edit payload preserves regional family album organization", async () => {

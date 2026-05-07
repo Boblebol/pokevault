@@ -4,11 +4,15 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+from typing import Any
 
 import pytest
+from pydantic import ValidationError
 
+from tracker.badge_battle_models import BadgeBattleCatalog
 from tracker.models import ProgressStatusPatch
 from tracker.repository.json_progress_repository import JsonProgressRepository
+from tracker.services.badge_battle_catalog import load_badge_battle_catalog
 from tracker.services.badge_presentation import presentation_for_badge
 from tracker.services.badge_service import BADGES, BadgeService, _metric_value
 from tracker.services.progress_service import ProgressService
@@ -24,6 +28,131 @@ def _wire(tmp_path: Path) -> tuple[BadgeService, ProgressService]:
 def _catch_all(progress: ProgressService, slugs: list[str]) -> None:
     for slug in slugs:
         progress.patch_status(ProgressStatusPatch(slug=slug, state="caught"))
+
+
+def test_badge_battle_catalog_accepts_exact_battle_metadata(
+    brock_battle_catalog_data: dict[str, Any],
+) -> None:
+    catalog = BadgeBattleCatalog.model_validate(brock_battle_catalog_data)
+
+    battle = catalog.badges["kanto_brock"]
+    assert battle.trainer.name.fr == "Pierre"
+    assert battle.location.city.en == "Pewter City"
+    assert battle.encounters[0].team[0].moves[1].en == "Defense Curl"
+
+
+def test_badge_battle_catalog_rejects_empty_encounters() -> None:
+    with pytest.raises(ValidationError, match="encounters"):
+        BadgeBattleCatalog.model_validate(
+            {
+                "version": 1,
+                "badges": {
+                    "kanto_brock": {
+                        "trainer": {
+                            "name": {"fr": "Pierre", "en": "Brock"},
+                            "role": {"fr": "Champion d'Arène", "en": "Gym Leader"},
+                            "history": {"fr": "Histoire", "en": "History"},
+                        },
+                        "location": {
+                            "region": "kanto",
+                            "city": {"fr": "Argenta", "en": "Pewter City"},
+                            "place": {"fr": "Arène", "en": "Gym"},
+                        },
+                        "encounters": [],
+                    }
+                },
+            }
+        )
+
+
+def test_badge_battle_catalog_rejects_empty_game_entries() -> None:
+    with pytest.raises(ValidationError, match="games"):
+        BadgeBattleCatalog.model_validate(
+            {
+                "version": 1,
+                "badges": {
+                    "kanto_brock": {
+                        "trainer": {
+                            "name": {"fr": "Pierre", "en": "Brock"},
+                            "role": {"fr": "Champion d'Arène", "en": "Gym Leader"},
+                            "history": {"fr": "Histoire", "en": "History"},
+                        },
+                        "location": {
+                            "region": "kanto",
+                            "city": {"fr": "Argenta", "en": "Pewter City"},
+                            "place": {"fr": "Arène", "en": "Gym"},
+                        },
+                        "encounters": [
+                            {
+                                "id": "red-blue",
+                                "label": {"fr": "Rouge / Bleu", "en": "Red / Blue"},
+                                "games": ["red", ""],
+                                "team": [
+                                    {
+                                        "slug": "0074-geodude",
+                                        "level": 12,
+                                        "moves": [{"fr": "Charge", "en": "Tackle"}],
+                                    }
+                                ],
+                            }
+                        ],
+                    }
+                },
+            }
+        )
+
+
+def test_badge_battle_catalog_loader_returns_empty_for_missing_file(tmp_path: Path) -> None:
+    catalog = load_badge_battle_catalog(tmp_path / "missing.json")
+
+    assert catalog.version == 1
+    assert catalog.badges == {}
+
+
+def test_badge_battle_catalog_loader_returns_empty_for_directory(tmp_path: Path) -> None:
+    path = tmp_path / "badge-battles.json"
+    path.mkdir()
+
+    catalog = load_badge_battle_catalog(path)
+
+    assert catalog.version == 1
+    assert catalog.badges == {}
+
+
+def test_badge_battle_catalog_loader_reads_utf8_json_file(
+    tmp_path: Path,
+    brock_battle_catalog_data: dict[str, Any],
+) -> None:
+    path = tmp_path / "badge-battles.json"
+    path.write_text(
+        json.dumps(brock_battle_catalog_data, ensure_ascii=False),
+        encoding="utf-8",
+    )
+
+    catalog = load_badge_battle_catalog(path)
+
+    brock = catalog.badges["kanto_brock"]
+    assert brock.trainer.role.fr == "Champion d'Arène"
+    assert (
+        brock.trainer.history.fr
+        == "Champion d'Argenta, spécialiste des Pokémon Roche."
+    )
+    assert brock.encounters[0].team[0].moves[1].en == "Defense Curl"
+
+
+def test_badge_service_attaches_battle_data_to_matching_badges(
+    tmp_path: Path,
+    brock_battle_catalog_data: dict[str, Any],
+) -> None:
+    progress_repo = JsonProgressRepository(tmp_path / "progress.json")
+    catalog = BadgeBattleCatalog.model_validate(brock_battle_catalog_data)
+    service = BadgeService(progress_repo, battle_catalog=catalog)
+
+    by_id = {badge.id: badge for badge in service.state().catalog}
+
+    assert by_id["kanto_brock"].battle is not None
+    assert by_id["kanto_brock"].battle.trainer.name.en == "Brock"
+    assert by_id["first_catch"].battle is None
 
 
 def test_catalog_exposes_all_definitions(tmp_path: Path) -> None:
