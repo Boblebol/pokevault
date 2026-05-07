@@ -6,6 +6,7 @@ function installBrowserStubs() {
   globalThis.window = globalThis;
   delete globalThis.PokedexCollection;
   delete globalThis.PokevaultArtwork;
+  delete globalThis.PokevaultTypeChart;
   globalThis.PokevaultI18n = {
     getLocale: () => "en",
     t: (key, params = {}) => {
@@ -13,6 +14,14 @@ function installBrowserStubs() {
         "badges.status.unlocked": "Unlocked",
         "badges.status.sealed": "{percent}%",
         "badges.toast.title": "Badge unlocked",
+        "badges.battle.trainer": "Trainer",
+        "badges.battle.location": "Location",
+        "badges.battle.team": "Team",
+        "badges.battle.level": "Lv. {level}",
+        "badges.battle.moves": "Moves",
+        "badges.battle.weaknesses": "Weaknesses",
+        "badges.battle.resistances": "Resistances",
+        "badges.battle.immunities": "Immunities",
       };
       return String(messages[key] || key).replace(/\{([a-zA-Z0-9_]+)\}/g, (_, name) => (
         Object.prototype.hasOwnProperty.call(params, name) ? String(params[name]) : `{${name}}`
@@ -28,6 +37,7 @@ function installBrowserStubs() {
         attrs: {},
         children: [],
         className: "",
+        dataset: {},
         listeners: {},
         tagName: String(tagName).toUpperCase(),
         append(...children) {
@@ -50,6 +60,15 @@ function installBrowserStubs() {
         style: { setProperty() {} },
       };
       return element;
+    },
+  };
+  globalThis.PokevaultPokemonFiche = {
+    createTypeChip(type, className = "") {
+      const chip = globalThis.document.createElement("span");
+      chip.className = ["pokemon-type-chip", className].filter(Boolean).join(" ");
+      chip.dataset.type = String(type).toLowerCase();
+      chip.textContent = String(type);
+      return chip;
     },
   };
 }
@@ -270,4 +289,204 @@ test("buildBadgeDetail does not expose a badge mission follow action", async () 
     /Suivre ce badge|Follow this badge|Mission active|Active mission/.test(String(node.textContent || ""))
   )), false);
   assert.equal(byClass(detail, "badge-detail-requirement").length, 1);
+});
+
+test("locked badge detail keeps battle dossier sealed and does not reveal battle data", async () => {
+  const api = await loadModule();
+  globalThis.PokedexCollection = {
+    allPokemon: [
+      { slug: "0074-geodude", number: "0074", names: { en: "Geodude" }, types: ["Rock", "Ground"] },
+    ],
+  };
+
+  const detail = api.buildBadgeDetail({
+    id: "kanto_brock",
+    title: "Brock - Badge",
+    description: "Capture Brock's team.",
+    unlocked: false,
+    reveal: "mystery",
+    i18n: {
+      en: {
+        title: "Brock - Badge",
+        description: "Capture Brock's team.",
+        mystery_title: "Sealed badge",
+        mystery_hint: "A team from Pokemon Red/Blue is waiting.",
+      },
+    },
+    battle: {
+      trainer: {
+        name: { fr: "Pierre", en: "Brock" },
+        role: { fr: "Champion d'Arène", en: "Gym Leader" },
+        history: { fr: "Champion d'Argenta.", en: "Pewter Gym Leader." },
+      },
+      location: {
+        region: "kanto",
+        city: { fr: "Argenta", en: "Pewter City" },
+        place: { fr: "Arène d'Argenta", en: "Pewter Gym" },
+      },
+      encounters: [
+        {
+          id: "red-blue",
+          label: { fr: "Rouge / Bleu", en: "Red / Blue" },
+          games: ["red", "blue"],
+          team: [{ slug: "0074-geodude", level: 12, moves: [{ fr: "Charge", en: "Tackle" }] }],
+        },
+      ],
+    },
+  });
+
+  const text = textTree(detail);
+  assert.match(text, /Sealed badge/);
+  assert.doesNotMatch(text, /Brock/);
+  assert.doesNotMatch(text, /Gym Leader/);
+  assert.doesNotMatch(text, /Pewter City/);
+  assert.doesNotMatch(text, /Pewter Gym/);
+  assert.doesNotMatch(text, /Geodude/);
+  assert.doesNotMatch(text, /Tackle/);
+  assert.doesNotMatch(text, /Team/);
+  assert.equal(byClass(detail, "badge-battle-dossier").length, 0);
+});
+
+test("unlocked badge detail renders battle dossier with moves and matchups", async () => {
+  const api = await loadModule();
+  globalThis.PokedexCollection = {
+    allPokemon: [
+      { slug: "0074-geodude", number: "0074", names: { en: "Geodude" }, types: ["Rock", "Ground"] },
+      { slug: "0095-onix", number: "0095", names: { en: "Onix" }, types: ["Rock", "Ground"] },
+    ],
+  };
+  globalThis.PokevaultTypeChart = {
+    computeWeaknesses(types) {
+      assert.deepEqual(types, ["Rock", "Ground"]);
+      return [
+        { type: "Water", mult: 4 },
+        { type: "Electric", mult: 0 },
+        { type: "Normal", mult: 0.5 },
+      ];
+    },
+  };
+
+  const detail = api.buildBadgeDetail({
+    id: "kanto_brock",
+    title: "Brock - Badge",
+    description: "Capture Brock's team.",
+    unlocked: true,
+    battle: {
+      trainer: {
+        name: { fr: "Pierre", en: "Brock" },
+        role: { fr: "Champion d'Arène", en: "Gym Leader" },
+        history: { fr: "Champion d'Argenta.", en: "Pewter Gym Leader." },
+      },
+      location: {
+        region: "kanto",
+        city: { fr: "Argenta", en: "Pewter City" },
+        place: { fr: "Arène d'Argenta", en: "Pewter Gym" },
+      },
+      encounters: [
+        {
+          id: "red-blue",
+          label: { fr: "Rouge / Bleu", en: "Red / Blue" },
+          games: ["red", "blue"],
+          team: [
+            { slug: "0074-geodude", level: 12, moves: [{ fr: "Charge", en: "Tackle" }] },
+            { slug: "0095-onix", level: 14, moves: [{ fr: "Étreinte", en: "Bind" }] },
+          ],
+        },
+      ],
+    },
+  });
+
+  const text = textTree(detail);
+  assert.match(text, /Brock/);
+  assert.match(text, /Pewter City/);
+  assert.match(text, /Pewter Gym/);
+  assert.match(text, /Geodude/);
+  assert.match(text, /Lv\. 12/);
+  assert.match(text, /Tackle/);
+  assert.match(text, /Weaknesses/);
+  assert.match(text, /Water/);
+  assert.match(text, /Resistances/);
+  assert.match(text, /Normal/);
+  assert.match(text, /Immunities/);
+  assert.match(text, /Electric/);
+  assert.equal(byClass(detail, "badge-battle-dossier").length, 1);
+  assert.equal(byClass(detail, "badge-battle-card").length, 2);
+});
+
+test("battle variant selector appears only when multiple encounters exist and switches encounter", async () => {
+  const api = await loadModule();
+  globalThis.PokedexCollection = {
+    allPokemon: [
+      { slug: "0018-pidgeot", number: "0018", names: { en: "Pidgeot" }, types: ["Normal", "Flying"] },
+      { slug: "0006-charizard", number: "0006", names: { en: "Charizard" }, types: ["Fire", "Flying"] },
+      { slug: "0009-blastoise", number: "0009", names: { en: "Blastoise" }, types: ["Water"] },
+    ],
+  };
+  const battleBase = {
+    trainer: {
+      name: { fr: "Rival", en: "Rival" },
+      role: { fr: "Maître de la Ligue", en: "Champion" },
+      history: { fr: "Dernier combat.", en: "Final battle." },
+    },
+    location: {
+      region: "kanto",
+      city: { fr: "Plateau Indigo", en: "Indigo Plateau" },
+      place: { fr: "Ligue Pokémon", en: "Pokemon League" },
+    },
+  };
+
+  const singleDetail = api.buildBadgeDetail({
+    id: "kanto_rival_champion_single",
+    title: "Rival Champion",
+    description: "Capture a final rival team.",
+    unlocked: true,
+    battle: {
+      ...battleBase,
+      encounters: [
+        {
+          id: "red-blue",
+          label: { fr: "Rouge / Bleu", en: "Red / Blue" },
+          games: ["red", "blue"],
+          team: [{ slug: "0018-pidgeot", level: 61, moves: [{ fr: "Tornade", en: "Gust" }] }],
+        },
+      ],
+    },
+  });
+
+  assert.equal(byClass(singleDetail, "badge-battle-variant").length, 0);
+
+  const detail = api.buildBadgeDetail({
+    id: "kanto_rival_champion",
+    title: "Rival Champion",
+    description: "Capture a final rival team.",
+    unlocked: true,
+    battle: {
+      ...battleBase,
+      encounters: [
+        {
+          id: "starter-bulbasaur",
+          label: { fr: "Starter Bulbizarre", en: "Bulbasaur starter" },
+          games: ["red", "blue"],
+          variant: { kind: "starter", value: "bulbasaur" },
+          team: [{ slug: "0006-charizard", level: 65, moves: [{ fr: "Lance-Flammes", en: "Flamethrower" }] }],
+        },
+        {
+          id: "starter-charmander",
+          label: { fr: "Starter Salamèche", en: "Charmander starter" },
+          games: ["red", "blue"],
+          variant: { kind: "starter", value: "charmander" },
+          team: [{ slug: "0009-blastoise", level: 65, moves: [{ fr: "Hydrocanon", en: "Hydro Pump" }] }],
+        },
+      ],
+    },
+  });
+
+  assert.equal(byClass(detail, "badge-battle-variant").length, 2);
+  assert.match(textTree(detail), /Bulbasaur starter/);
+  assert.match(textTree(detail), /Charizard/);
+
+  byClass(detail, "badge-battle-variant")[1].listeners.click();
+
+  assert.match(textTree(detail), /Blastoise/);
+  assert.doesNotMatch(textTree(detail), /Charizard/);
 });

@@ -50,6 +50,15 @@
     "badges.detail.caught": "Capture",
     "badges.detail.missing": "A chercher",
     "badges.detail.more": "+{count}",
+    "badges.battle.trainer": "Dresseur",
+    "badges.battle.location": "Lieu",
+    "badges.battle.team": "Equipe",
+    "badges.battle.level": "Niv. {level}",
+    "badges.battle.moves": "Capacites",
+    "badges.battle.weaknesses": "Faiblesses",
+    "badges.battle.resistances": "Resistances",
+    "badges.battle.immunities": "Immunites",
+    "badges.battle.unavailable": "Indisponible",
   };
   const FILTER_OPTIONS = {
     status: [
@@ -100,6 +109,15 @@
   function localizedBadgeEntry(badge) {
     const i18n = badge?.i18n && typeof badge.i18n === "object" ? badge.i18n : {};
     return i18n[activeLocale()] || i18n.fr || i18n.en || null;
+  }
+
+  function localizedText(value) {
+    if (value == null) return "";
+    if (typeof value === "string" || typeof value === "number") return String(value);
+    if (typeof value !== "object") return "";
+    const locale = activeLocale();
+    const language = String(locale).split("-")[0];
+    return value[locale] || value[language] || value.fr || value.en || "";
   }
 
   function displayBadgeCopy(badge, { forceReveal = false } = {}) {
@@ -179,6 +197,19 @@
         return slug ? { slug, caught: Boolean(item?.caught) } : null;
       })
       .filter(Boolean);
+  }
+
+  function battleData(badge) {
+    const battle = badge?.battle && typeof badge.battle === "object" ? badge.battle : null;
+    if (!battle) return null;
+    const encounters = Array.isArray(battle.encounters)
+      ? battle.encounters.filter((encounter) => encounter && typeof encounter === "object")
+      : [];
+    return encounters.length ? { ...battle, encounters } : null;
+  }
+
+  function isBattleVisible(badge) {
+    return Boolean(badge?.unlocked && battleData(badge));
   }
 
   function pokemonBySlug(slug) {
@@ -269,6 +300,275 @@
       preview.append(more);
     }
     return preview;
+  }
+
+  function createBattleTypeChip(type) {
+    const label = String(type || "").trim();
+    const helper = window.PokevaultPokemonFiche;
+    if (typeof helper?.createTypeChip === "function") {
+      return helper.createTypeChip(label, "badge-battle-type-chip");
+    }
+    const chip = document.createElement("span");
+    chip.className = "badge-battle-type-chip";
+    chip.dataset.type = label.toLowerCase();
+    chip.textContent = label;
+    return chip;
+  }
+
+  function formatMultiplier(mult) {
+    if (mult === 0) return "0x";
+    if (mult === 0.25) return "1/4x";
+    if (mult === 0.5) return "1/2x";
+    return `${mult}x`;
+  }
+
+  function typeMatchupGroups(types) {
+    const cleanTypes = Array.isArray(types) ? types.filter(Boolean) : [];
+    const chart = window.PokevaultTypeChart;
+    const rows = cleanTypes.length && typeof chart?.computeWeaknesses === "function"
+      ? chart.computeWeaknesses(cleanTypes)
+      : [];
+    const matchups = Array.isArray(rows) ? rows : [];
+    return {
+      weaknesses: matchups.filter((row) => Number(row?.mult) > 1),
+      resistances: matchups.filter((row) => Number(row?.mult) < 1 && Number(row?.mult) > 0),
+      immunities: matchups.filter((row) => Number(row?.mult) === 0),
+    };
+  }
+
+  function buildBattleContext(battle, encounter) {
+    const trainer = battle?.trainer || {};
+    const location = battle?.location || {};
+    const context = document.createElement("div");
+    context.className = "badge-battle-context";
+
+    const trainerName = localizedText(trainer.name);
+    const trainerRole = localizedText(trainer.role);
+    const trainerLine = [trainerName, trainerRole].filter(Boolean).join(" · ");
+    if (trainerLine) {
+      const block = document.createElement("p");
+      block.className = "badge-battle-context__line";
+      const label = document.createElement("span");
+      label.className = "badge-battle-context__label";
+      label.textContent = tr("badges.battle.trainer");
+      const value = document.createElement("span");
+      value.className = "badge-battle-context__value";
+      value.textContent = trainerLine;
+      block.append(label, value);
+      context.append(block);
+    }
+
+    const locationLine = [
+      localizedText(location.city),
+      localizedText(location.place),
+      localizedText(encounter?.label),
+    ].filter(Boolean).join(" · ");
+    if (locationLine) {
+      const block = document.createElement("p");
+      block.className = "badge-battle-context__line";
+      const label = document.createElement("span");
+      label.className = "badge-battle-context__label";
+      label.textContent = tr("badges.battle.location");
+      const value = document.createElement("span");
+      value.className = "badge-battle-context__value";
+      value.textContent = locationLine;
+      block.append(label, value);
+      context.append(block);
+    }
+
+    const history = localizedText(trainer.history);
+    if (history) {
+      const note = document.createElement("p");
+      note.className = "badge-battle-context__history";
+      note.textContent = history;
+      context.append(note);
+    }
+
+    return context;
+  }
+
+  function buildMatchupLine(labelKey, rows) {
+    const line = document.createElement("div");
+    line.className = "badge-battle-matchup";
+    const label = document.createElement("span");
+    label.className = "badge-battle-matchup__label";
+    label.textContent = tr(labelKey);
+    line.append(label);
+
+    const chips = document.createElement("span");
+    chips.className = "badge-battle-matchup__chips";
+    for (const row of Array.isArray(rows) ? rows : []) {
+      const item = document.createElement("span");
+      item.className = "badge-battle-matchup__item";
+      item.append(createBattleTypeChip(row?.type));
+      if (row?.mult != null) {
+        const mult = document.createElement("span");
+        mult.className = "badge-battle-matchup__mult";
+        mult.textContent = formatMultiplier(Number(row.mult));
+        item.append(mult);
+      }
+      chips.append(item);
+    }
+    if (!chips.children.length) {
+      const empty = document.createElement("span");
+      empty.className = "badge-battle-matchup__empty";
+      empty.textContent = tr("badges.battle.unavailable");
+      chips.append(empty);
+    }
+    line.append(chips);
+    return line;
+  }
+
+  function battleMemberName(member, pokemon) {
+    return localizedText(member?.name)
+      || localizedText(pokemon?.names)
+      || displayPokemonName(pokemon, member?.slug);
+  }
+
+  function buildBattlePokemonCard(member) {
+    const pokemon = pokemonBySlug(member?.slug);
+    const types = Array.isArray(member?.types) && member.types.length
+      ? member.types.filter(Boolean)
+      : (Array.isArray(pokemon?.types) ? pokemon.types.filter(Boolean) : []);
+    const card = document.createElement("article");
+    card.className = "badge-battle-card";
+
+    const header = document.createElement("div");
+    header.className = "badge-battle-card__header";
+    const thumb = document.createElement("span");
+    thumb.className = "badge-battle-card__thumb";
+    const img = document.createElement("img");
+    img.className = "badge-battle-card__img";
+    img.alt = "";
+    img.loading = "lazy";
+    if (attachRequirementImage(img, pokemon)) {
+      thumb.append(img);
+    } else {
+      thumb.textContent = displayPokemonNumber(pokemon) || "?";
+    }
+
+    const identity = document.createElement("div");
+    identity.className = "badge-battle-card__identity";
+    const title = document.createElement("h4");
+    title.className = "badge-battle-card__name";
+    title.textContent = battleMemberName(member, pokemon);
+    const meta = document.createElement("p");
+    meta.className = "badge-battle-card__meta";
+    const level = member?.level != null ? tr("badges.battle.level", { level: member.level }) : "";
+    meta.textContent = [displayPokemonNumber(pokemon), level].filter(Boolean).join(" · ");
+    identity.append(title, meta);
+    header.append(thumb, identity);
+    card.append(header);
+
+    if (types.length) {
+      const typeRow = document.createElement("div");
+      typeRow.className = "badge-battle-card__types";
+      for (const type of types) {
+        typeRow.append(createBattleTypeChip(type));
+      }
+      card.append(typeRow);
+    }
+
+    const moves = Array.isArray(member?.moves)
+      ? member.moves.map((move) => localizedText(move?.name || move)).filter(Boolean)
+      : [];
+    if (moves.length) {
+      const moveBlock = document.createElement("div");
+      moveBlock.className = "badge-battle-card__moves";
+      const moveTitle = document.createElement("h5");
+      moveTitle.className = "badge-battle-card__moves-title";
+      moveTitle.textContent = tr("badges.battle.moves");
+      const list = document.createElement("ul");
+      list.className = "badge-battle-card__move-list";
+      for (const move of moves) {
+        const item = document.createElement("li");
+        item.textContent = move;
+        list.append(item);
+      }
+      moveBlock.append(moveTitle, list);
+      card.append(moveBlock);
+    }
+
+    const groups = typeMatchupGroups(types);
+    const matchupBlock = document.createElement("div");
+    matchupBlock.className = "badge-battle-card__matchups";
+    matchupBlock.append(
+      buildMatchupLine("badges.battle.weaknesses", groups.weaknesses),
+      buildMatchupLine("badges.battle.resistances", groups.resistances),
+      buildMatchupLine("badges.battle.immunities", groups.immunities),
+    );
+    card.append(matchupBlock);
+    return card;
+  }
+
+  function buildBattleDossier(badge) {
+    const battle = battleData(badge);
+    if (!battle) return null;
+    const encounters = battle.encounters;
+    let selectedIndex = 0;
+    const dossier = document.createElement("section");
+    dossier.className = "badge-battle-dossier";
+
+    const body = document.createElement("div");
+    body.className = "badge-battle-dossier__body";
+    const buttons = [];
+
+    function setActiveVariant() {
+      for (let index = 0; index < buttons.length; index += 1) {
+        const button = buttons[index];
+        const active = index === selectedIndex;
+        button.dataset.active = active ? "true" : "false";
+        button.className = active ? "badge-battle-variant is-active" : "badge-battle-variant";
+        button.setAttribute("aria-pressed", active ? "true" : "false");
+      }
+    }
+
+    function renderEncounter(index) {
+      selectedIndex = Math.max(0, Math.min(index, encounters.length - 1));
+      setActiveVariant();
+      const encounter = encounters[selectedIndex];
+      const team = Array.isArray(encounter?.team) ? encounter.team : [];
+      const teamSection = document.createElement("div");
+      teamSection.className = "badge-battle-team";
+      const title = document.createElement("h3");
+      title.className = "badge-battle-team__title";
+      title.textContent = tr("badges.battle.team");
+      teamSection.append(title);
+      if (team.length) {
+        for (const member of team) {
+          teamSection.append(buildBattlePokemonCard(member));
+        }
+      } else {
+        const empty = document.createElement("p");
+        empty.className = "badge-battle-team__empty";
+        empty.textContent = tr("badges.battle.unavailable");
+        teamSection.append(empty);
+      }
+      body.replaceChildren(buildBattleContext(battle, encounter), teamSection);
+    }
+
+    if (encounters.length > 1) {
+      const variants = document.createElement("div");
+      variants.className = "badge-battle-variants";
+      variants.setAttribute("role", "group");
+      variants.setAttribute("aria-label", tr("badges.battle.location"));
+      encounters.forEach((encounter, index) => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "badge-battle-variant";
+        button.textContent = localizedText(encounter?.label) || String(encounter?.id || index + 1);
+        button.addEventListener("click", () => {
+          renderEncounter(index);
+        });
+        buttons.push(button);
+        variants.append(button);
+      });
+      dossier.append(variants);
+    }
+
+    dossier.append(body);
+    renderEncounter(0);
+    return dossier;
   }
 
   function nearestBadge(state = cachedState) {
@@ -543,6 +843,11 @@
     progressBlock.append(progressText, meter);
     detail.append(progressBlock);
 
+    if (isBattleVisible(badge)) {
+      const dossier = buildBattleDossier(badge);
+      if (dossier) detail.append(dossier);
+    }
+
     const requirements = badgeRequirements(badge);
     if (requirements.length) {
       const section = document.createElement("section");
@@ -701,6 +1006,10 @@
       buildRequirementChip,
       buildBadgeTile,
       buildBadgeDetail,
+      buildBattleDossier,
+      buildBattlePokemonCard,
+      localizedText,
+      typeMatchupGroups,
       buildSegmentedFilter,
     };
   }
