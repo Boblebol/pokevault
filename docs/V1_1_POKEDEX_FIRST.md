@@ -61,6 +61,10 @@ Binders remain a core workflow:
 
 - default 3×3 · 10-sheet layout;
 - configurable rows, columns and sheet count;
+- Grand classeur 3x3 / large 3x3 ring binder mode uses one ring binder with
+  3×3 front/back sheets, internal region sections, starts each region on a
+  sheet front (recto), keeps families compact per region, keeps regional forms
+  in their form region, and calculates capacity with 10 spare sheets;
 - compact evolution-family ordering;
 - `alignment_empty` gaps are not printed;
 - intentional `family_reserved` placeholders still print as temporary small

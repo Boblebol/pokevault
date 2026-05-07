@@ -139,6 +139,13 @@ physical sheets. If a region is too large for the selected format, Pokevault
 keeps every Pokemon visible by splitting that region into numbered binders such
 as Kanto 1 and Kanto 2 instead of hiding entries.
 
+`Grand classeur 3x3` is the large ring binder mode for collectors who want one
+physical binder instead of one binder per region. It keeps the 3×3 front/back
+sheets model, groups entries into internal region sections, starts each region
+on a new sheet front (recto), compacts evolution families within that region,
+keeps regional forms in their form region, and auto-calculates the needed sheet
+count with 10 spare sheets.
+
 Generation sprites are available from `Réglages > Images / sprites`. Print can
 also choose its own image mode, so a collector can print retro sprites without
 changing the main collection view.
