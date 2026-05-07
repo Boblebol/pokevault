@@ -296,6 +296,7 @@ test("locked badge detail keeps battle dossier sealed and does not reveal battle
   globalThis.PokedexCollection = {
     allPokemon: [
       { slug: "0074-geodude", number: "0074", names: { en: "Geodude" }, types: ["Rock", "Ground"] },
+      { slug: "0095-onix", number: "0095", names: { en: "Onix" }, types: ["Rock", "Ground"] },
     ],
   };
 
@@ -313,6 +314,10 @@ test("locked badge detail keeps battle dossier sealed and does not reveal battle
         mystery_hint: "A team from Pokemon Red/Blue is waiting.",
       },
     },
+    requirements: [
+      { slug: "0074-geodude", caught: false },
+      { slug: "0095-onix", caught: false },
+    ],
     battle: {
       trainer: {
         name: { fr: "Pierre", en: "Brock" },
@@ -329,7 +334,10 @@ test("locked badge detail keeps battle dossier sealed and does not reveal battle
           id: "red-blue",
           label: { fr: "Rouge / Bleu", en: "Red / Blue" },
           games: ["red", "blue"],
-          team: [{ slug: "0074-geodude", level: 12, moves: [{ fr: "Charge", en: "Tackle" }] }],
+          team: [
+            { slug: "0074-geodude", level: 12, moves: [{ fr: "Charge", en: "Tackle" }] },
+            { slug: "0095-onix", level: 14, moves: [{ fr: "Étreinte", en: "Bind" }] },
+          ],
         },
       ],
     },
@@ -342,7 +350,9 @@ test("locked badge detail keeps battle dossier sealed and does not reveal battle
   assert.doesNotMatch(text, /Pewter City/);
   assert.doesNotMatch(text, /Pewter Gym/);
   assert.doesNotMatch(text, /Geodude/);
+  assert.doesNotMatch(text, /Onix/);
   assert.doesNotMatch(text, /Tackle/);
+  assert.doesNotMatch(text, /Bind/);
   assert.doesNotMatch(text, /Team/);
   assert.equal(byClass(detail, "badge-battle-dossier").length, 0);
 });

@@ -848,7 +848,8 @@
       if (dossier) detail.append(dossier);
     }
 
-    const requirements = badgeRequirements(badge);
+    const hideRequirements = !badge?.unlocked && badge?.reveal === "mystery";
+    const requirements = hideRequirements ? [] : badgeRequirements(badge);
     if (requirements.length) {
       const section = document.createElement("section");
       section.className = "badge-detail__requirements-section";
