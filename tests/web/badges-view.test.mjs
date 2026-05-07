@@ -237,6 +237,43 @@ test("buildBadgeTile previews required pokemon thumbnails", async () => {
   assert.match(textTree(tile), /Onix/);
 });
 
+test("buildBadgeTile keeps locked mystery badge requirements sealed", async () => {
+  const api = await loadModule();
+  globalThis.PokedexCollection = {
+    allPokemon: [
+      { slug: "0074-geodude", number: "0074", names: { en: "Geodude" }, image: "data/images/0074-geodude.png" },
+      { slug: "0095-onix", number: "0095", names: { en: "Onix" }, image: "data/images/0095-onix.png" },
+    ],
+  };
+
+  const tile = api.buildBadgeTile({
+    id: "kanto_brock",
+    title: "Brock - Badge",
+    description: "Capture Brock's team.",
+    unlocked: false,
+    reveal: "mystery",
+    i18n: {
+      en: {
+        title: "Brock - Badge",
+        description: "Capture Brock's team.",
+        mystery_title: "Sealed badge",
+        mystery_hint: "A team from Pokemon Red/Blue is waiting.",
+      },
+    },
+    current: 0,
+    target: 2,
+    percent: 0,
+    requirements: [
+      { slug: "0074-geodude", caught: false },
+      { slug: "0095-onix", caught: false },
+    ],
+  });
+
+  assert.equal(byClass(tile, "badge-requirement-chip").length, 0);
+  assert.doesNotMatch(textTree(tile), /Geodude/);
+  assert.doesNotMatch(textTree(tile), /Onix/);
+});
+
 test("buildBadgeDetail describes the pokemon required by the badge", async () => {
   const api = await loadModule();
   globalThis.PokedexCollection = {

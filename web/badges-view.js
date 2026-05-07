@@ -928,7 +928,9 @@
     d.className = "badge-tile__desc";
     d.textContent = copy.description;
     body.append(t, d);
-    const preview = buildRequirementsPreview(badge);
+    const preview = !badge?.unlocked && badge?.reveal === "mystery"
+      ? null
+      : buildRequirementsPreview(badge);
     if (preview) body.append(preview);
     if (!badge.unlocked) {
       const meter = document.createElement("div");
