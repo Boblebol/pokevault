@@ -62,6 +62,98 @@ function makePokemon(count, region = "kanto") {
   });
 }
 
+test("binder family data preload predicates include regional family albums", async () => {
+  const api = await loadModule();
+
+  assert.equal(api.binderUsesEvolutionFamilies({ organization: "family" }), true);
+  assert.equal(api.binderUsesEvolutionFamilies({ organization: "regional_family_album" }), true);
+  assert.equal(api.binderUsesEvolutionFamilies({ organization: "national" }), false);
+  assert.equal(api.configUsesEvolutionFamilies({ binders: [{ organization: "regional_family_album" }] }), true);
+});
+
+test("wizard draft prefill preserves regional family album organization", async () => {
+  const api = await loadModule();
+  const draft = api.draftFromConfigForTest(
+    {
+      binders: [
+        {
+          id: "grand",
+          name: "Grand",
+          organization: "regional_family_album",
+          rows: 3,
+          cols: 3,
+          sheet_count: 42,
+          form_rule_id: "wizard-forms-base_regional",
+        },
+      ],
+      form_rules: [api.formRuleFromScope("base_regional")],
+    },
+    "grand",
+  );
+
+  assert.equal(draft.organization, "regional_family_album");
+});
+
+test("wizard edit payload preserves regional family album organization", async () => {
+  const api = await loadModule();
+  const result = api.buildPersistEditPayloads(
+    {
+      editBinderId: "grand",
+      name: "Grand",
+      organization: "regional_family_album",
+      formScope: "base_regional",
+      rows: 3,
+      cols: 3,
+      sheetCount: 42,
+    },
+    {
+      version: 1,
+      convention: "sheet_recto_verso",
+      binders: [
+        {
+          id: "grand",
+          name: "Old",
+          organization: "regional_family_album",
+          rows: 3,
+          cols: 3,
+          sheet_count: 40,
+          form_rule_id: "wizard-forms-base_regional",
+        },
+      ],
+      form_rules: [api.formRuleFromScope("base_regional")],
+    },
+    { version: 1, by_binder: { grand: {} } },
+  );
+
+  assert.equal(result.configBody.binders[0].organization, "regional_family_album");
+});
+
+test("wizard org selection preserves hidden regional family album edit drafts", async () => {
+  const api = await loadModule();
+
+  assert.equal(
+    api.readOrgSelectionForDraftForTest({
+      editBinderId: "grand",
+      organization: "regional_family_album",
+    }),
+    "regional_family_album",
+  );
+});
+
+test("new workspace payloads do not create regional family albums before Task 2", async () => {
+  const api = await loadModule();
+  const result = api.buildPersistNewPayloads({
+    name: "Grand",
+    organization: "regional_family_album",
+    formScope: "base_regional",
+    rows: 3,
+    cols: 3,
+    sheetCount: 42,
+  });
+
+  assert.equal(result.configBody.binders[0].organization, "national");
+});
+
 test("regional binder builder keeps the default 3x3 ten-sheet Kanto binder together", async () => {
   const api = await loadModule();
   const defs = [{ id: "kanto", label_fr: "Kanto", low: 1, high: 151 }];
@@ -185,6 +277,44 @@ test("orderPokemonForBinder delegates non-null binders to the layout engine", as
   } finally {
     engine.orderPokemonForBinder = original;
   }
+});
+
+test("regional family album pool keeps base and regional forms for layout", async () => {
+  const api = await loadModule();
+  api.setEvolutionFamilyData({
+    families: [
+      { id: "0019-rattata", layout_rows: [["0019-rattata", "0019-rattata-alola"]] },
+    ],
+  });
+  const rule = api.formRuleFromScope("base_regional");
+  const pokemon = [
+    { slug: "0019-rattata", number: "0019", region: "kanto", names: { fr: "Rattata" } },
+    { slug: "0019-rattata-alola", number: "0019", region: "alola", form: "Forme d'Alola", names: { fr: "Rattata d'Alola" } },
+  ];
+  const pool = api.selectBinderPokemonPool(pokemon, rule);
+  const ordered = api.orderPokemonForBinder(
+    {
+      id: "grand",
+      organization: "regional_family_album",
+      rows: 2,
+      cols: 2,
+      sheet_count: 2,
+    },
+    pool,
+    [
+      { id: "kanto", low: 1, high: 151 },
+      { id: "alola", low: 722, high: 807 },
+    ],
+  );
+
+  assert.deepEqual(
+    pool.map((p) => p.slug),
+    ["0019-rattata", "0019-rattata-alola"],
+  );
+  assert.deepEqual(
+    ordered.map((p) => p?.slug || null),
+    ["0019-rattata", null, null, null, null, null, null, null, "0019-rattata-alola", null],
+  );
 });
 
 test("default workspace is only created for empty configs", async () => {

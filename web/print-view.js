@@ -51,6 +51,14 @@ function formatPrintFooter(date, pocket) {
   return tPrint(pocket ? "print.footer_pocket" : "print.footer", { date });
 }
 
+function printBinderUsesEvolutionFamilies(binder) {
+  return binder?.organization === "family" || binder?.organization === "regional_family_album";
+}
+
+function configUsesEvolutionFamilies(cfg) {
+  return Array.isArray(cfg?.binders) && cfg.binders.some((b) => printBinderUsesEvolutionFamilies(b));
+}
+
 async function startPrintView() {
   if (printStarted) {
     renderPrintVaultsNav();
@@ -65,7 +73,7 @@ async function startPrintView() {
   }
   await fetchBinderConfigIfNeeded();
   const cfg = getBinderConfig();
-  if (cfg?.binders?.some((b) => b?.organization === "family")) {
+  if (configUsesEvolutionFamilies(cfg)) {
     await window.PokedexBinder?.ensureEvolutionFamiliesLoaded?.();
   }
 
@@ -956,6 +964,7 @@ if (window.__POKEVAULT_PRINT_TESTS__) {
     formatPrintFooter,
     buildPlaceholderSection,
     buildPlaceholderCardElement,
+    configUsesEvolutionFamilies,
     resolvePrintArtwork,
     setPrintArtworkMode(mode) {
       const allowed = new Set([

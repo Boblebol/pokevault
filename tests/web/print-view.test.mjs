@@ -104,6 +104,13 @@ function placeholderSlots(pokemon = bulbasaur()) {
   ];
 }
 
+test("print view family data preload predicate includes regional family albums", async () => {
+  const api = await loadModule();
+
+  assert.equal(api.configUsesEvolutionFamilies({ binders: [{ organization: "regional_family_album" }] }), true);
+  assert.equal(api.configUsesEvolutionFamilies({ binders: [{ organization: "national" }] }), false);
+});
+
 test("print view formats English summary labels through i18n", async () => {
   const api = await loadModule();
   globalThis.PokevaultI18n = {

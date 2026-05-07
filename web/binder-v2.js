@@ -105,6 +105,7 @@ function tBinderWizard(key, params = {}) {
 
 /** @type {"base_only" | "base_regional" | "full"} */
 const DEFAULT_FORM_SCOPE = "base_only";
+const ORG_REGIONAL_FAMILY_ALBUM = "regional_family_album";
 
 /** @type {{ name: string; organization: string; formScope: string; formatPreset: string; rows: number; cols: number; sheetCount: number; editBinderId: string | null }} */
 let wizardDraft = {
@@ -386,7 +387,12 @@ function clearEl(el) {
 
 function readOrgSelectionFromDom() {
   const sel = document.querySelector(".wizard-org-card.is-selected");
-  if (!sel) return null;
+  if (!sel) {
+    if (wizardDraft.editBinderId && wizardDraft.organization === ORG_REGIONAL_FAMILY_ALBUM) {
+      return ORG_REGIONAL_FAMILY_ALBUM;
+    }
+    return null;
+  }
   const org = sel.dataset.org || "";
   if (org === "by_region" || org === "family") return org;
   return "national";
@@ -571,9 +577,21 @@ function keepSingleClassicFormPerNumber(pokemon) {
   return out;
 }
 
+function keepClassicAndRegionalFormsPerNumber(pokemon, rule) {
+  if (rule?.include_regional === false) return keepSingleClassicFormPerNumber(pokemon);
+  const classic = keepSingleClassicFormPerNumber(
+    pokemon.filter((p) => !isRegionalFormPokemon(p)),
+  );
+  const classicSet = new Set(classic);
+  return pokemon.filter((p) => isRegionalFormPokemon(p) || classicSet.has(p));
+}
+
 function selectBinderPokemonPool(pokemon, rule) {
   const scoped = pokemon.filter((p) => pokemonMatchesBinderRule(p, rule));
-  return keepSingleClassicFormPerNumber(scoped);
+  if (rule?.include_mega || rule?.include_gigamax || rule?.include_other_named_forms) {
+    return scoped;
+  }
+  return keepClassicAndRegionalFormsPerNumber(scoped, rule);
 }
 
 /**
@@ -672,7 +690,9 @@ function prefillWizardDraftFromConfig(cfg, binderIdOpt) {
       ? "national"
       : b.organization === "by_region"
         ? "by_region"
-        : "national";
+        : b.organization === ORG_REGIONAL_FAMILY_ALBUM
+          ? ORG_REGIONAL_FAMILY_ALBUM
+          : "national";
   wizardDraft = {
     name: String(b.name || tBinderWizard("binder_wizard.default_name")),
     organization: org,
@@ -697,6 +717,22 @@ function prefillWizardDraftForRebuild(cfg, binderIdOpt) {
   if (configUsesRegionalBinders(cfg)) {
     wizardDraft.organization = "by_region";
   }
+}
+
+function draftFromConfigForTest(cfg, binderIdOpt = null) {
+  const previous = { ...wizardDraft };
+  prefillWizardDraftFromConfig(cfg, binderIdOpt);
+  const out = { ...wizardDraft };
+  wizardDraft = previous;
+  return out;
+}
+
+function readOrgSelectionForDraftForTest(draft) {
+  const previous = { ...wizardDraft };
+  wizardDraft = { ...wizardDraft, ...draft };
+  const out = readOrgSelectionFromDom();
+  wizardDraft = previous;
+  return out;
 }
 
 /**
@@ -1637,7 +1673,9 @@ function buildPersistEditPayloads(draft, cfg, placementsPayload) {
   const layout = normalizedBinderLayout(draft);
   const formRule = formRuleFromScope(scope);
   const org =
-    draft.organization === "by_region" || draft.organization === "family"
+    draft.organization === "by_region" ||
+    draft.organization === "family" ||
+    draft.organization === ORG_REGIONAL_FAMILY_ALBUM
       ? draft.organization
       : "national";
   const oldBinder = (cfg.binders || []).find((x) => x && x.id === binderId);
@@ -1840,7 +1878,7 @@ async function refreshBinderV2() {
     setConfigCache(cfg);
     lastPlacementsPayload = pl;
     trackerUiCache.file_exists = !isBinderConfigEmpty(cfg);
-    if (Array.isArray(cfg.binders) && cfg.binders.some((b) => b?.organization === "family")) {
+    if (configUsesEvolutionFamilies(cfg)) {
       await ensureEvolutionFamiliesLoaded();
     }
     preConfig.textContent = JSON.stringify(cfg, null, 2);
@@ -1858,6 +1896,14 @@ async function refreshBinderV2() {
       false,
     );
   }
+}
+
+function binderUsesEvolutionFamilies(binder) {
+  return binder?.organization === "family" || binder?.organization === ORG_REGIONAL_FAMILY_ALBUM;
+}
+
+function configUsesEvolutionFamilies(cfg) {
+  return Array.isArray(cfg?.binders) && cfg.binders.some((b) => binderUsesEvolutionFamilies(b));
 }
 
 function wireWizardOnce() {
@@ -1942,6 +1988,7 @@ window.PokedexBinder = {
   setWizardSkipped,
   setConfigCache,
   DEFAULT_FORM_SCOPE,
+  ORG_REGIONAL_FAMILY_ALBUM,
   orderPokemonForBinder,
   ensureEvolutionFamiliesLoaded,
   setEvolutionFamilyData,
@@ -1959,9 +2006,16 @@ window.PokedexBinder = {
   },
   _test: {
     binderCapacity,
+    binderUsesEvolutionFamilies,
     buildFamilyBinderWorkspace,
     buildRegionalBinderWorkspace,
+    buildPersistEditPayloads,
+    buildPersistNewPayloads,
+    configUsesEvolutionFamilies,
+    draftFromConfigForTest,
     orderPokemonForBinder,
+    readOrgSelectionForDraftForTest,
+    selectBinderPokemonPool,
     setEvolutionFamilyData,
     shouldEnsureDefaultWorkspace,
     formRuleFromScope,

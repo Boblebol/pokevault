@@ -76,6 +76,10 @@
     return items.slice(start, start + limit);
   }
 
+  function isRegionalFamilyAlbum(binder = {}) {
+    return binder.organization === "regional_family_album";
+  }
+
   function slotMeta(index, layout) {
     const pageIndex = Math.floor(index / layout.perPage);
     const slotInPage = index % layout.perPage;
@@ -95,6 +99,12 @@
 
   function capacityItem() {
     return { pokemon: null, emptyKind: "capacity_empty", familyId: null };
+  }
+
+  function padToNextSheetRecto(items, layout) {
+    const sheetSize = layout.perPage * 2;
+    while (items.length % sheetSize !== 0) items.push(capacityItem());
+    return items;
   }
 
   function familyReservedItem(familyId) {
@@ -124,7 +134,8 @@
     return chunks.length ? chunks : [[]];
   }
 
-  function familyLayoutBlocks(pokemon = [], familyData = null, cols = 3) {
+  function familyLayoutBlocks(pokemon = [], familyData = null, cols = 3, options = {}) {
+    const reserveMissingSlugs = options.reserveMissingSlugs !== false;
     const bySlug = new Map();
     for (const p of pokemon) {
       const slug = String(p?.slug || "");
@@ -144,6 +155,7 @@
       for (const rawRow of rows) {
         if (!Array.isArray(rawRow)) continue;
         const row = [];
+        let rowHasPokemon = false;
         for (const slugRaw of rawRow) {
           if (!slugRaw) {
             row.push(familyReservedItem(familyId));
@@ -152,14 +164,15 @@
           const slug = String(slugRaw);
           const p = bySlug.get(slug);
           if (!p || emitted.has(slug)) {
-            row.push(familyReservedItem(familyId));
+            if (reserveMissingSlugs) row.push(familyReservedItem(familyId));
             continue;
           }
           row.push(pokemonItem(p, familyId));
           emitted.add(slug);
+          rowHasPokemon = true;
           hasRepresentedPokemon = true;
         }
-        blockRows.push(...chunkRowToColumns(row, cols));
+        if (rowHasPokemon || reserveMissingSlugs) blockRows.push(...chunkRowToColumns(row, cols));
       }
 
       if (hasRepresentedPokemon) blocks.push({ familyId, rows: blockRows });
@@ -252,6 +265,38 @@
     return out;
   }
 
+  function regionalFamilyAlbumItems(pokemon = [], defs = [], familyData = null, layout) {
+    if (!defs.length) {
+      if (familyData && Array.isArray(familyData.families)) {
+        return flattenFamilyBlocksPageAware(
+          familyLayoutBlocks(pokemon, familyData, layout.cols),
+          layout,
+        );
+      }
+      return sortNational(pokemon).map((p) => pokemonItem(p));
+    }
+
+    const out = [];
+    for (let idx = 0; idx < defs.length; idx += 1) {
+      const regionId = defs[idx]?.id;
+      if (!regionId) continue;
+      if (idx > 0) padToNextSheetRecto(out, layout);
+
+      const regionPokemon = pokemon.filter((p) => effectiveRegionId(p, defs) === regionId);
+      if (familyData && Array.isArray(familyData.families)) {
+        out.push(
+          ...flattenFamilyBlocksPageAware(
+            familyLayoutBlocks(regionPokemon, familyData, layout.cols, { reserveMissingSlugs: false }),
+            layout,
+          ),
+        );
+      } else {
+        out.push(...sortNational(regionPokemon).map((p) => pokemonItem(p)));
+      }
+    }
+    return out;
+  }
+
   function basicItemsForBinder(binder = {}, pokemon = [], defs = [], familyData = null) {
     const layout = normalizedLayout(binder);
     const scoped = applyBinderScope(pokemon, binder, defs);
@@ -259,6 +304,10 @@
       binder.organization === "by_region" || binder.organization === "family"
         ? binder.organization
         : "national";
+
+    if (isRegionalFamilyAlbum(binder)) {
+      return regionalFamilyAlbumItems(scoped, defs, familyData, layout);
+    }
 
     if (org === "family" && familyData && Array.isArray(familyData.families)) {
       return flattenFamilyBlocksPageAware(
@@ -290,7 +339,7 @@
 
   function orderPokemonForBinder({ binder = {}, pokemon = [], defs = [], familyData = null } = {}) {
     const slots = computeBinderSlots({ binder, pokemon, defs, familyData, includeCapacity: false });
-    if (binder.organization === "family") {
+    if (binder.organization === "family" || isRegionalFamilyAlbum(binder)) {
       return slots.map((slot) => slot.pokemon || null);
     }
     return slots
@@ -307,8 +356,11 @@
       effectiveRegionId,
       familyLayoutBlocks,
       flattenFamilyBlocksPageAware,
+      isRegionalFamilyAlbum,
       normalizedLayout,
       orderPokemonForBinder,
+      padToNextSheetRecto,
+      regionalFamilyAlbumItems,
       slotMeta,
       sortNational,
       sortRegional,
