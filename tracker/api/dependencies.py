@@ -23,25 +23,14 @@ from tracker.services.binder_config_service import BinderConfigService
 from tracker.services.binder_placements_service import BinderPlacementsService
 from tracker.services.binder_workspace_service import BinderWorkspaceService
 from tracker.services.export_service import ExportService
-from tracker.services.profile_service import ProfileService
 from tracker.services.progress_service import ProgressService
 from tracker.services.trainer_contact_service import TrainerContactService
 
 
-def get_profile_service(
-    settings: Annotated[TrackerSettings, Depends(get_settings)],
-) -> ProfileService:
-    return ProfileService(
-        data_root=settings.data_dir,
-        registry_path=settings.profiles_registry_path,
-    )
-
-
 def get_progress_repository(
     settings: Annotated[TrackerSettings, Depends(get_settings)],
-    profiles: Annotated[ProfileService, Depends(get_profile_service)],
 ) -> ProgressRepository:
-    return JsonProgressRepository(profiles.progress_path())
+    return JsonProgressRepository(settings.progress_path)
 
 
 def get_progress_service(
@@ -52,9 +41,8 @@ def get_progress_service(
 
 def get_binder_config_repository(
     settings: Annotated[TrackerSettings, Depends(get_settings)],
-    profiles: Annotated[ProfileService, Depends(get_profile_service)],
 ) -> BinderConfigRepository:
-    return JsonBinderConfigRepository(profiles.binder_config_path())
+    return JsonBinderConfigRepository(settings.binder_config_path)
 
 
 def get_binder_config_service(
@@ -65,9 +53,8 @@ def get_binder_config_service(
 
 def get_binder_placements_repository(
     settings: Annotated[TrackerSettings, Depends(get_settings)],
-    profiles: Annotated[ProfileService, Depends(get_profile_service)],
 ) -> BinderPlacementsRepository:
-    return JsonBinderPlacementsRepository(profiles.binder_placements_path())
+    return JsonBinderPlacementsRepository(settings.binder_placements_path)
 
 
 def get_binder_placements_service(
@@ -88,9 +75,8 @@ def get_binder_workspace_service(
 
 def get_trainer_contact_repository(
     settings: Annotated[TrackerSettings, Depends(get_settings)],
-    profiles: Annotated[ProfileService, Depends(get_profile_service)],
 ) -> TrainerContactRepository:
-    return JsonTrainerContactRepository(profiles.trainer_contacts_path())
+    return JsonTrainerContactRepository(settings.trainer_contacts_path)
 
 
 def get_trainer_contact_service(

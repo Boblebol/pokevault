@@ -18,16 +18,6 @@ const APP_FALLBACK_I18N = {
   "app.filters.all_regions": "Toutes les régions",
   "app.filters.all_types": "Tous les types",
   "app.narrative.clear": "Tout réinitialiser",
-  "app.profile.default": "{name} (défaut)",
-  "app.profile.label": "Profil : {name}",
-  "app.profile.switching": "Bascule de profil…",
-  "app.profile.active_reload": "Profil actif. Rechargement…",
-  "app.profile.name_required": "Donne un nom au nouveau profil.",
-  "app.profile.created": "Profil « {name} » créé.",
-  "app.profile.create_error": "Erreur création : {message}",
-  "app.profile.delete_confirm": "Supprimer le profil « {id} » ? Les fichiers JSON associés resteront sur disque (data/profiles/{id}/), tu peux les effacer à la main si besoin.",
-  "app.profile.deleted": "Profil « {id} » supprimé. Bascule sur défaut…",
-  "app.profile.delete_error": "Erreur suppression : {message}",
   "app.health.checking": "Application {version} · API vérification...",
   "app.health.status_checking": "État API : vérification...",
   "app.health.version_ok": "Application {version} · {apiStatus}",
@@ -1217,90 +1207,6 @@ function rerenderArtworkSurface() {
   if (typeof render === "function") render();
 }
 
-function setupProfileSwitcher() {
-  const sel = document.getElementById("settingsProfileSelect");
-  const nameInput = document.getElementById("settingsProfileNewName");
-  const createBtn = document.getElementById("settingsProfileCreateBtn");
-  const deleteBtn = document.getElementById("settingsProfileDeleteBtn");
-  const hint = document.getElementById("settingsProfileHint");
-  const label = document.getElementById("settingsProfileLabel");
-  const P = window.PokevaultProfiles;
-  if (!sel || !P || sel.dataset.wired) return;
-  sel.dataset.wired = "1";
-
-  function showHint(text, variant) {
-    if (!hint) return;
-    hint.textContent = text || "";
-    hint.classList.toggle("sync-hint--err", variant === "err");
-    hint.hidden = !text;
-  }
-
-  function paint(state) {
-    sel.replaceChildren();
-    const profiles = state?.profiles || [];
-    for (const p of profiles) {
-      const opt = document.createElement("option");
-      opt.value = p.id;
-      opt.textContent = p.id === "default" ? t("app.profile.default", { name: p.name }) : p.name;
-      sel.append(opt);
-    }
-    sel.value = state?.active_id || "default";
-    if (deleteBtn) deleteBtn.disabled = sel.value === "default";
-    if (label) {
-      const active = profiles.find((p) => p.id === state?.active_id);
-      label.textContent = t("app.profile.label", { name: active ? active.name : "—" });
-    }
-  }
-
-  P.subscribe(paint);
-
-  sel.addEventListener("change", async () => {
-    showHint(t("app.profile.switching"));
-    try {
-      await P.setActive(sel.value);
-      showHint(t("app.profile.active_reload"));
-      setTimeout(() => window.location.reload(), 350);
-    } catch (err) {
-      showHint(t("trainers.error", { message: err && err.message ? err.message : err }), "err");
-    }
-  });
-
-  if (createBtn && nameInput) {
-    createBtn.addEventListener("click", async () => {
-      const name = nameInput.value.trim();
-      if (!name) {
-        showHint(t("app.profile.name_required"), "err");
-        return;
-      }
-      try {
-        const created = await P.create(name);
-        nameInput.value = "";
-        showHint(t("app.profile.created", { name: created.name }));
-      } catch (err) {
-        showHint(t("app.profile.create_error", { message: err && err.message ? err.message : err }), "err");
-      }
-    });
-  }
-
-  if (deleteBtn) {
-    deleteBtn.addEventListener("click", async () => {
-      const id = sel.value;
-      if (id === "default") return;
-      const confirmation = window.confirm(
-        t("app.profile.delete_confirm", { id }),
-      );
-      if (!confirmation) return;
-      try {
-        await P.remove(id);
-        showHint(t("app.profile.deleted", { id }));
-        setTimeout(() => window.location.reload(), 350);
-      } catch (err) {
-        showHint(t("app.profile.delete_error", { message: err && err.message ? err.message : err }), "err");
-      }
-    });
-  }
-}
-
 function setupSettingsView() {
   const sel = document.getElementById("settingsDimSelect");
   if (!sel || sel.dataset.wired) return;
@@ -1312,7 +1218,6 @@ function setupSettingsView() {
   });
   setupThemeSelect();
   setupArtworkSelect();
-  setupProfileSwitcher();
   paintVersionLabels();
   const versionEl = document.getElementById("settingsVersionLabel");
   const healthEl = document.getElementById("settingsHealthLabel");

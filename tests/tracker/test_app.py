@@ -178,6 +178,18 @@ def test_card_and_tcg_routes_are_not_mounted(tmp_path: Path) -> None:
     assert "/api/tcg/cards/search" not in paths
 
 
+def test_profile_routes_are_not_mounted(tmp_path: Path) -> None:
+    _minimal_layout(tmp_path)
+    (tmp_path / "data" / "pokedex.json").write_text("[]", encoding="utf-8")
+    settings = TrackerSettings(repo_root=tmp_path)
+    application = create_app(settings)
+    paths = {route.path for route in application.routes}
+
+    assert "/api/profiles" not in paths
+    assert "/api/profiles/active" not in paths
+    assert "/api/profiles/{profile_id}" not in paths
+
+
 def test_default_app_module_loads() -> None:
     assert default_app.title == "pokevault"
     assert default_app.version == APP_VERSION

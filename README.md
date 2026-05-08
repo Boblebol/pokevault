@@ -68,8 +68,8 @@ App documentation: Detailed product documentation lives in the app. Run `make de
 [http://127.0.0.1:8765](http://127.0.0.1:8765/) and go to `#/docs`.
 
 That in-app guide is bilingual FR/EN and covers Collection, physical binder
-planning, Trainer Cards, badge progress, local-first data files, profiles,
-backups, shortcuts and the local REST API. The public feature overview is
+planning, Trainer Cards, badge progress, local-first data files, backups,
+shortcuts and the local REST API. The public feature overview is
 available at [docs/features.html](docs/features.html).
 
 Pokemon details open in one modal across the app. That modal keeps capture
@@ -206,8 +206,6 @@ User state is local and ignored by Git:
 - `data/binder-config.json`
 - `data/binder-placements.json`
 - `data/trainer-contacts.json`
-- `data/profiles.json`
-- `data/profiles/<id>/...`
 
 Older installs may still have `data/hunts.json` from the explicit search-list
 workflow. The simplified capture/trade model treats that file as legacy local
@@ -230,7 +228,6 @@ The local API is mounted next to the web UI:
 | `/api/health` | App/API version and liveness |
 | `/api/progress` | Collection progress |
 | `/api/badges` | Badge catalog and progress |
-| `/api/profiles` | Local collection profiles |
 | `/api/trainers` | Optional local Trainer Cards and received contacts |
 | `/api/binder/*` | Binder configuration and placements |
 | `/data/game-pokedexes.json` | Game Pokedex definitions and known appearances |

@@ -125,8 +125,7 @@ l'historique mais ne sont plus recommandés pour les nouvelles PR.
 - `data/narrative-tags.json` est versionné avec les tags narratifs.
 - Les fichiers d'état utilisateur restent gitignorés :
   `collection-progress.json`, `collection-cards.json`, `hunts.json`,
-  `binder-config.json`, `binder-placements.json`, `profiles.json` et
-  `profiles/<id>/...`.
+  `binder-config.json` et `binder-placements.json`.
 - Toute modification du scraper doit être validée par `pytest tests/` puis
   idéalement par un `make fetch-test` pour ne pas casser le format.
 - Cas sensibles à ne pas régresser :

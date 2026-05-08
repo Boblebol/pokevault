@@ -242,3 +242,9 @@ def test_onboarding_product_tour_covers_local_trade_workflow() -> None:
         "sans compte",
     ]:
         assert text in block
+
+
+def test_settings_no_longer_exposes_multi_profile_controls() -> None:
+    assert "Pokédex multi-profils" not in HTML
+    assert "settingsProfileCreateBtn" not in HTML
+    assert "settingsProfileDeleteBtn" not in HTML
