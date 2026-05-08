@@ -340,3 +340,13 @@ def test_vault_lab_shell_uses_maquette_density_and_mobile_surfaces() -> None:
         ".mobile-more-menu",
     ]:
         assert token in mobile
+
+
+def test_stats_page_is_stats_only_vault_lab_dashboard() -> None:
+    stats_view = HTML.split('id="viewStats"', 1)[1].split('id="viewClasseur"', 1)[0]
+    assert 'id="statsBody"' in stats_view
+    assert 'id="statsBadges"' not in stats_view
+
+    stats_shell = "\n".join(_blocks("#viewStats .stats-shell"))
+    assert "grid-template-columns:" in stats_shell
+    assert "var(--pdx-panel)" in stats_shell or "var(--pdx-bg)" in stats_shell
