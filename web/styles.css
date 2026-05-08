@@ -4718,7 +4718,20 @@ html.site-onboarding-pending .app-view {
 
   @page { size: A4; margin: 10mm 8mm; }
 
-  .print-section { break-inside: avoid; }
+  .print-section {
+    break-inside: avoid;
+    background: #fff;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+  }
+  .print-section--pocket {
+    break-inside: avoid;
+    background: #fff;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+  }
   .print-section-title { break-after: avoid; }
   .print-table { font-size: 9pt; }
   .print-table th { font-size: 7.5pt; }

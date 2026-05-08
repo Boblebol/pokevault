@@ -18,8 +18,20 @@ def _media_block(max_width: int) -> str:
     return CSS[start:] if next_media < 0 else CSS[start:next_media]
 
 
+def _print_media_block() -> str:
+    marker = "@media print"
+    start = CSS.find(marker)
+    assert start >= 0, "missing print media block"
+    next_media = CSS.find("@media", start + len(marker))
+    return CSS[start:] if next_media < 0 else CSS[start:next_media]
+
+
 def _blocks(selector: str) -> list[str]:
     return re.findall(rf"{re.escape(selector)}\s*\{{([^}}]+)\}}", CSS, flags=re.MULTILINE)
+
+
+def _blocks_in(css: str, selector: str) -> list[str]:
+    return re.findall(rf"{re.escape(selector)}\s*\{{([^}}]+)\}}", css, flags=re.MULTILINE)
 
 
 def test_page_headers_scroll_with_content_under_fixed_app_bar() -> None:
@@ -270,6 +282,15 @@ def test_secondary_pages_use_vault_lab_panels() -> None:
         block = "\n".join(_blocks(selector))
         assert block, selector
         assert "var(--pdx-" in block, selector
+
+
+def test_print_sections_drop_screen_chrome_when_printing() -> None:
+    block = "\n".join(_blocks_in(_print_media_block(), ".print-section"))
+    assert "break-inside: avoid;" in block
+    assert "background: #fff;" in block or "background: none;" in block
+    assert "border: 0;" in block
+    assert "border-radius: 0;" in block
+    assert "box-shadow: none;" in block
 
 
 def test_vault_lab_desktop_nav_order_separates_badges_from_stats() -> None:
