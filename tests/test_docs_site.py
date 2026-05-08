@@ -114,7 +114,7 @@ def test_web_app_references_runtime_brand_assets() -> None:
 
 
 def test_web_app_has_no_third_party_font_requests() -> None:
-    for path in [WEB / "index.html", WEB / "styles.css", *WEB.glob("*.js")]:
+    for path in [WEB / "index.html", WEB / "styles.css", *WEB.rglob("*.js")]:
         text = path.read_text(encoding="utf-8")
         assert "fonts.googleapis.com" not in text, path
         assert "fonts.gstatic.com" not in text, path
