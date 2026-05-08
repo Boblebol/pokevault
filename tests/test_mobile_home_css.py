@@ -350,3 +350,18 @@ def test_stats_page_is_stats_only_vault_lab_dashboard() -> None:
     stats_shell = "\n".join(_blocks("#viewStats .stats-shell"))
     assert "grid-template-columns:" in stats_shell
     assert "var(--pdx-panel)" in stats_shell or "var(--pdx-bg)" in stats_shell
+
+    stats_panels = "\n".join(
+        _blocks(
+            "#viewStats .stats-rail,\n"
+            "#viewStats .stats-hero,\n"
+            "#viewStats .stats-region-wrap"
+        )
+    )
+    assert "background: var(--pdx-panel);" in stats_panels
+    assert "border: 1px solid var(--pdx-border);" in stats_panels
+
+    responsive = _media_block(960)
+    assert "#viewStats .stats-shell" in responsive
+    assert "grid-template-columns: 1fr;" in responsive
+    assert "#viewStats .stats-kpi-grid" in responsive
