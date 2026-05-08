@@ -385,6 +385,18 @@ def test_collection_uses_vault_lab_rail_and_cards() -> None:
     assert "var(--accent)" not in active_filter
     assert "var(--accent-strong)" not in active_filter
 
+    filter_blocks = _blocks(".filter-btn")
+    assert filter_blocks
+    final_filter = filter_blocks[-1]
+    assert "border: 1px solid var(--pdx-border);" in final_filter
+    assert "box-shadow: none;" in final_filter
+    assert "var(--outline-soft)" not in final_filter
+
+    shared_filter = "\n".join(_blocks(".filter-btn,\n.region-filter,\n.search-input"))
+    assert "border: 1px solid var(--pdx-border);" in shared_filter
+    assert "box-shadow: none;" in shared_filter
+    assert "var(--outline-soft)" not in shared_filter
+
     card_focus = "\n".join(_blocks(".card:focus-visible"))
     assert "var(--pdx-cyan)" in card_focus or "var(--pdx-border-hi)" in card_focus
     assert "var(--accent)" not in card_focus
