@@ -7,15 +7,9 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 STYLES = ROOT / "web" / "styles.css"
-THEMES = ROOT / "web" / "themes.js"
-DESIGN = ROOT / "DESIGN.md"
+THEMES_RUNTIME = ROOT / "web" / "themes.js"
 
-EXPECTED_THEMES = {
-    "default": "Vault Lab",
-    "kanto": "Kanto Archive",
-    "hoenn": "Hoenn Deepsea",
-    "paldea": "Paldea Field Lab",
-}
+EXPECTED_THEME = "Vault Lab"
 
 REQUIRED_TOKENS = [
     "--bg",
@@ -114,60 +108,60 @@ def _channel_distance(left: str, right: str) -> float:
     return sum(abs(a - b) for a, b in zip(left_rgb, right_rgb, strict=True))
 
 
-def test_theme_tokens_cover_readable_open_source_palettes() -> None:
+def test_vault_lab_tokens_cover_readable_single_theme() -> None:
+    css = STYLES.read_text(encoding="utf-8")
+    tokens = _theme_tokens(css, "default")
+    missing = [token for token in REQUIRED_TOKENS if token not in tokens]
+    assert not missing, f"{EXPECTED_THEME}: missing {missing}"
+
+    for surface in ["--bg", "--card", "--surface-low", "--surface-high"]:
+        text_contrast = _contrast(tokens["--text"], tokens[surface])
+        muted_contrast = _contrast(tokens["--muted"], tokens[surface])
+        assert text_contrast >= 7.0, f"{EXPECTED_THEME}: text on {surface}"
+        assert muted_contrast >= 4.5, f"{EXPECTED_THEME}: muted on {surface}"
+
+    for signal in ["--accent", "--accent-strong", "--electric"]:
+        assert _contrast(tokens[signal], tokens["--bg"]) >= 4.5, f"{EXPECTED_THEME}: {signal} on bg"
+        assert _contrast(tokens[signal], tokens["--card"]) >= 4.5, f"{EXPECTED_THEME}: {signal} on card"
+
+    assert _contrast(tokens["--accent-ink"], tokens["--accent"]) >= 4.5, f"{EXPECTED_THEME}: accent ink"
+
+
+def test_vault_lab_surfaces_are_visually_distinct() -> None:
+    css = STYLES.read_text(encoding="utf-8")
+    tokens = _theme_tokens(css, "default")
+    assert _channel_distance(tokens["--bg"], tokens["--card"]) >= 0.10
+    assert _channel_distance(tokens["--card"], tokens["--control-bg"]) >= 0.05
+    assert _channel_distance(tokens["--card"], tokens["--surface-high"]) >= 0.14
+
+
+def test_single_theme_runtime_is_removed_from_web_app() -> None:
+    index = (ROOT / "web" / "index.html").read_text(encoding="utf-8")
     css = STYLES.read_text(encoding="utf-8")
 
-    for theme in EXPECTED_THEMES:
-        tokens = _theme_tokens(css, theme)
-        missing = [token for token in REQUIRED_TOKENS if token not in tokens]
-        assert not missing, f"{theme}: missing {missing}"
-
-        for surface in ["--bg", "--card", "--surface-low", "--surface-high"]:
-            text_contrast = _contrast(tokens["--text"], tokens[surface])
-            muted_contrast = _contrast(tokens["--muted"], tokens[surface])
-            assert text_contrast >= 7.0, f"{theme}: text on {surface}"
-            assert muted_contrast >= 4.5, f"{theme}: muted on {surface}"
-
-        for signal in ["--accent", "--accent-strong", "--electric"]:
-            assert _contrast(tokens[signal], tokens["--bg"]) >= 4.5, f"{theme}: {signal} on bg"
-            assert _contrast(tokens[signal], tokens["--card"]) >= 4.5, f"{theme}: {signal} on card"
-
-        assert _contrast(tokens["--accent-ink"], tokens["--accent"]) >= 4.5, f"{theme}: accent ink"
+    assert not THEMES_RUNTIME.exists()
+    assert 'src="/themes.js"' not in index
+    assert "settingsThemeSelect" not in index
+    assert 'data-theme="kanto"' not in css
+    assert 'html[data-theme="kanto"]' not in css
+    assert 'html[data-theme="hoenn"]' not in css
+    assert 'html[data-theme="paldea"]' not in css
 
 
-def test_theme_surfaces_are_visually_distinct() -> None:
+def test_vault_lab_fonts_are_local_and_declared() -> None:
     css = STYLES.read_text(encoding="utf-8")
-
-    for theme in EXPECTED_THEMES:
-        tokens = _theme_tokens(css, theme)
-        assert _channel_distance(tokens["--bg"], tokens["--card"]) >= 0.10, f"{theme}: bg/card"
-        assert _channel_distance(tokens["--card"], tokens["--control-bg"]) >= 0.05, (
-            f"{theme}: card/control"
-        )
-        assert _channel_distance(tokens["--card"], tokens["--surface-high"]) >= 0.14, (
-            f"{theme}: card/surface-high"
-        )
-
-        if theme == "kanto":
-            assert _channel_distance(tokens["--bg"], tokens["--card"]) >= 0.90, (
-                "kanto: bg/card"
-            )
-            assert _channel_distance(tokens["--card"], tokens["--control-bg"]) >= 0.50, (
-                "kanto: card/control"
-            )
-            assert _channel_distance(tokens["--card"], tokens["--surface-high"]) >= 0.90, (
-                "kanto: card/surface-high"
-            )
-
-
-def test_theme_labels_match_design_language() -> None:
-    themes_js = THEMES.read_text(encoding="utf-8")
-    design = DESIGN.read_text(encoding="utf-8")
-
-    for theme_id, label in EXPECTED_THEMES.items():
-        assert f'id: "{theme_id}", label: "{label}"' in themes_js
-        assert label in design
-    assert "Google Stitch" not in design
+    for font in [
+        "barlow-latin-400.woff2",
+        "barlow-latin-500.woff2",
+        "barlow-latin-600.woff2",
+        "barlow-latin-700.woff2",
+        "space-mono-latin-400.woff2",
+        "space-mono-latin-700.woff2",
+    ]:
+        assert (ROOT / "web" / "assets" / "fonts" / font).is_file(), font
+        assert f"/assets/fonts/{font}" in css
+    assert "fonts.googleapis.com" not in css
+    assert "fonts.gstatic.com" not in css
 
 
 def test_pokemon_modal_uses_theme_tokens() -> None:

@@ -1,26 +1,94 @@
 /* DESIGN.md — dense, peu de bruit */
 
+@font-face {
+  font-family: "Barlow";
+  src: url("/assets/fonts/barlow-latin-400.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Barlow";
+  src: url("/assets/fonts/barlow-latin-500.woff2") format("woff2");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Barlow";
+  src: url("/assets/fonts/barlow-latin-600.woff2") format("woff2");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Barlow";
+  src: url("/assets/fonts/barlow-latin-700.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Space Mono";
+  src: url("/assets/fonts/space-mono-latin-400.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Space Mono";
+  src: url("/assets/fonts/space-mono-latin-700.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
 :root {
   color-scheme: dark;
-  --bg: #111418;
-  --card: #1d232a;
-  --surface-low: #171c22;
-  --surface-high: #27313a;
-  --surface-highest: #34404b;
-  --accent: #ff6b5f;
-  --accent-strong: #ff9b54;
-  --accent-ink: #210806;
-  --electric: #36d5e8;
-  --text: #f4f7f9;
-  --muted: #b3c1cb;
-  --outline-soft: rgba(143, 163, 178, 0.28);
-  --outline-strong: rgba(179, 193, 203, 0.42);
-  --control-bg: #222a32;
-  --control-border: #526170;
-  --control-hover: #697987;
-  --success: #5dd39e;
-  --danger: #ff8f8f;
-  --warning: #ffd166;
+  --font-ui: "Barlow", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-mono: "Space Mono", "SFMono-Regular", Consolas, monospace;
+  --pdx-bg: #090E1A;
+  --pdx-panel: #111827;
+  --pdx-panel-hi: #1A2438;
+  --pdx-border: #1E2C42;
+  --pdx-border-hi: #2A3E5C;
+  --pdx-red: #CC1133;
+  --pdx-red-dark: #891022;
+  --pdx-red-glow: rgba(204, 17, 51, 0.25);
+  --pdx-cyan: #00CCEE;
+  --pdx-cyan-dim: rgba(0, 204, 238, 0.15);
+  --pdx-green: #00CC77;
+  --pdx-amber: #F5A623;
+  --pdx-text: #DDE6F0;
+  --pdx-text-dim: #5C7099;
+  --pdx-text-faint: #2D3C55;
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --bg: #090E1A;
+  --card: #111827;
+  --surface-low: #0D1424;
+  --surface-high: #1A2438;
+  --surface-highest: #22314A;
+  --accent: #CC1133;
+  --accent-strong: #E01B3D;
+  --accent-ink: #FFFFFF;
+  --electric: #00CCEE;
+  --text: #DDE6F0;
+  --muted: #8EA3C2;
+  --outline-soft: #1E2C42;
+  --outline-strong: #2A3E5C;
+  --control-bg: #090E1A;
+  --control-border: #1E2C42;
+  --control-hover: #2A3E5C;
+  --success: #00CC77;
+  --danger: #CC1133;
+  --warning: #F5A623;
 }
 
 *,
@@ -50,7 +118,7 @@ html,
 body {
   margin: 0;
   min-height: 100%;
-  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-family: var(--font-ui);
   background: var(--bg);
   color: var(--text);
 }
@@ -5469,79 +5537,6 @@ body.pokemon-modal-open {
     padding: 8px 6px;
   }
 }
-
-/* ── F13 · Thèmes de région ────────────────────────────────────── */
-
-html[data-theme="kanto"] {
-  color-scheme: light;
-  --bg: #d1a76d;
-  --card: #fffdf7;
-  --surface-low: #f2d9ad;
-  --surface-high: #d8b172;
-  --surface-highest: #b7793c;
-  --accent: #7c1424;
-  --accent-strong: #5f2b0f;
-  --accent-ink: #fffaf4;
-  --electric: #073d73;
-  --text: #211a16;
-  --muted: #3d3028;
-  --outline-soft: rgba(64, 42, 24, 0.46);
-  --outline-strong: rgba(64, 42, 24, 0.68);
-  --control-bg: #f0cf92;
-  --control-border: #6f4729;
-  --control-hover: #4d301d;
-  --success: #075f35;
-  --danger: #7c1424;
-  --warning: #5f4200;
-}
-
-html[data-theme="hoenn"] {
-  color-scheme: dark;
-  --bg: #071522;
-  --card: #102536;
-  --surface-low: #0c1d2b;
-  --surface-high: #18364a;
-  --surface-highest: #214b63;
-  --accent: #4fd5df;
-  --accent-strong: #6ee0b6;
-  --accent-ink: #032328;
-  --electric: #8bd7ff;
-  --text: #eef8fb;
-  --muted: #a9c6d3;
-  --outline-soft: rgba(137, 191, 213, 0.25);
-  --outline-strong: rgba(169, 198, 211, 0.42);
-  --control-bg: #142f42;
-  --control-border: #4f7f95;
-  --control-hover: #6a9bb3;
-  --success: #72e1ac;
-  --danger: #ff9d9d;
-  --warning: #ffd36a;
-}
-
-html[data-theme="paldea"] {
-  color-scheme: dark;
-  --bg: #17141f;
-  --card: #231d2d;
-  --surface-low: #1d1927;
-  --surface-high: #30283d;
-  --surface-highest: #3e334e;
-  --accent: #f2bd5b;
-  --accent-strong: #e97961;
-  --accent-ink: #211506;
-  --electric: #78ddc9;
-  --text: #f7f0e7;
-  --muted: #c8b9d0;
-  --outline-soft: rgba(200, 185, 208, 0.25);
-  --outline-strong: rgba(215, 202, 224, 0.42);
-  --control-bg: #2a2436;
-  --control-border: #766785;
-  --control-hover: #9181a1;
-  --success: #84dda8;
-  --danger: #ff9a9a;
-  --warning: #f2bd5b;
-}
-
-/* Default skin = no attribute, so :root variables apply as-is. */
 
 .theme-choice-row {
   display: flex;
