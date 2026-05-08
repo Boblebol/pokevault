@@ -315,6 +315,12 @@ def test_mobile_nav_is_hidden_on_desktop_and_positioned_on_mobile() -> None:
 
 
 def test_vault_lab_shell_uses_maquette_density_and_mobile_surfaces() -> None:
+    body = "\n".join(_blocks("html,\nbody"))
+    assert "background-color: var(--pdx-bg);" in body
+    assert "background-image: radial-gradient(" in body
+    assert "background-size: 22px 22px;" in body
+    assert "z-index: -1;" not in body
+
     topbar = "\n".join(_blocks(".stitch-topbar"))
     assert "height: 48px;" in topbar
     assert "background: var(--pdx-panel);" in topbar
