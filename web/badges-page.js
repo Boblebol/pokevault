@@ -23,7 +23,7 @@
       localeSubscribed = true;
     }
     window.PokevaultBadges?.subscribe?.(() => render());
-    void window.PokevaultBadges?.poll?.().then(() => render());
+    void window.PokevaultBadges?.poll?.({ silent: true }).then(() => render());
     render();
   }
 

@@ -281,3 +281,33 @@ def test_vault_lab_mobile_nav_uses_primary_tabs_and_plus_menu() -> None:
     more = HTML.split('id="mobileMoreMenu"', 1)[1].split("</nav>", 1)[0]
     for href in ['href="#/dresseurs"', 'href="#/print"', 'href="#/docs"', 'href="#/settings"']:
         assert href in more
+
+
+def test_mobile_nav_is_hidden_on_desktop_and_positioned_on_mobile() -> None:
+    bottom_default = "\n".join(_blocks(".mobile-bottom-nav"))
+    more_default = "\n".join(_blocks(".mobile-more-menu"))
+    assert "display: none;" in bottom_default
+    assert "display: none;" in more_default
+
+    mobile = _media_block(720)
+    for selector in [
+        ".mobile-bottom-nav",
+        ".mobile-more-menu",
+        ".mobile-more-menu[hidden]",
+    ]:
+        assert selector in mobile
+
+    bottom_mobile = re.search(r"\.mobile-bottom-nav\s*\{([^}]+)\}", mobile)
+    assert bottom_mobile
+    assert "display: flex;" in bottom_mobile.group(1)
+    assert "position: fixed;" in bottom_mobile.group(1)
+    assert "bottom: 0;" in bottom_mobile.group(1)
+
+    more_mobile = re.search(r"\.mobile-more-menu\s*\{([^}]+)\}", mobile)
+    assert more_mobile
+    assert "position: fixed;" in more_mobile.group(1)
+    assert "bottom:" in more_mobile.group(1)
+
+    hidden_mobile = re.search(r"\.mobile-more-menu\[hidden\]\s*\{([^}]+)\}", mobile)
+    assert hidden_mobile
+    assert "display: none;" in hidden_mobile.group(1)
