@@ -52,7 +52,7 @@ Pokevault does not upload it and does not create a public profile.
 ## Import a received card
 
 When someone sends you a Trainer Card file, import it from the `Dresseurs` tab.
-Pokevault stores the received card in the current local profile and makes it
+Pokevault stores the received card in the local contact book and makes it
 searchable by trainer name, region, favorite Pokemon, contact lines such as
 Instagram, Facebook or Téléphone, duplicate trade list, and private notes.
 
@@ -68,7 +68,7 @@ There is no server sync. If a trainer updates their card, they send a new file.
 Pokevault detects the stable `trainer_id` and updates the local contact when the
 incoming `updated_at` is newer.
 
-Deleting a received contact only removes the local copy from this profile; it
+Deleting a received contact only removes the local copy; it
 does not affect the exported card file or any other trainer.
 
 ## Find a trade
@@ -86,9 +86,8 @@ conversation between collectors.
 
 ## Privacy and local files
 
-The app stores received cards in `data/trainer-contacts.json` for the default
-profile, or `data/profiles/<id>/trainer-contacts.json` for additional profiles.
-The file is user state and is not versioned by Git.
+The app stores received cards in `data/trainer-contacts.json`. The file is user
+state and is not versioned by Git.
 
 Full backups and Trainer Cards are separate. A full backup is for restoring your
 workspace. A Trainer Card is a small portable contact file you choose to share.

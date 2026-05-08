@@ -477,10 +477,8 @@
             </article>
 
             <article class="docs-card">
-              <h2 data-i18n="app.docs.profiles_backup.title">Profils et sauvegardes</h2>
+              <h2 data-i18n="app.docs.profiles_backup.title">Sauvegardes</h2>
               <ul class="docs-list">
-                <li data-i18n="app.docs.profiles_backup.default">Le profil `default` utilise les fichiers historiques sous `data/`.</li>
-                <li data-i18n="app.docs.profiles_backup.extra">Les autres profils vivent sous `data/profiles/<id>/...` avec leur propre progression et leurs classeurs.</li>
                 <li data-i18n="app.docs.profiles_backup.export">`Réglages` exporte une sauvegarde complète versionnée.</li>
                 <li data-i18n="app.docs.profiles_backup.import">L'import remplace l'état local après confirmation; les Cartes Dresseur restent un échange séparé.</li>
               </ul>
@@ -493,7 +491,6 @@
                 <li data-i18n="app.docs.api.progress">`/api/progress`: progression, statuts, notes.</li>
                 <li data-i18n="app.docs.api.cards">`/data/game-pokedexes.json`: définitions des Pokédex de jeux.</li>
                 <li data-i18n="app.docs.api.badges">`/api/badges`: catalogue et badges débloqués.</li>
-                <li data-i18n="app.docs.api.profiles">`/api/profiles`: profils locaux.</li>
                 <li data-i18n="app.docs.api.trainers">`/api/trainers`: Cartes Dresseur et contacts reçus.</li>
                 <li data-i18n="app.docs.api.binder">`/api/binder/*`: configuration et placements classeur.</li>
                 <li data-i18n="app.docs.api.backup">`/api/export` et `/api/import`: sauvegarde complète.</li>
@@ -595,38 +592,6 @@
                 <span data-i18n="app.settings.replay">Rejouer l'onboarding</span>
               </button>
             </div>
-          </div>
-          <div class="stats-kpi-card">
-            <h2 class="stats-kpi-label" data-i18n="app.settings.multi_profiles">Pokédex multi-profils</h2>
-            <p class="stats-kpi-sub" data-i18n="app.settings.multi_profiles_help">
-              Chaque profil garde sa propre progression et ses classeurs (par
-              ex. « Hardcore », « Casual », « Living dex »).
-            </p>
-            <label class="region-filter-wrap settings-dim-label theme-choice-row">
-              <span class="region-filter-label" data-i18n="app.settings.active_profile">Profil actif</span>
-              <select id="settingsProfileSelect" class="region-filter" aria-label="Profil Pokédex actif" data-i18n-aria-label="app.settings.active_profile_aria"></select>
-            </label>
-            <div class="settings-data-actions profiles-actions">
-              <input
-                type="text"
-                id="settingsProfileNewName"
-                class="search-input profiles-name-input"
-                placeholder="Nom du nouveau profil"
-                aria-label="Nom du nouveau profil Pokédex"
-                data-i18n-placeholder="app.settings.new_profile"
-                data-i18n-aria-label="app.settings.new_profile_aria"
-                maxlength="64"
-              />
-              <button type="button" class="settings-action-btn" id="settingsProfileCreateBtn">
-                <span class="app-icon" aria-hidden="true">+</span>
-                <span data-i18n="app.settings.create">Créer</span>
-              </button>
-              <button type="button" class="settings-action-btn settings-action-btn--cancel" id="settingsProfileDeleteBtn">
-                <span class="app-icon" aria-hidden="true">×</span>
-                <span data-i18n="app.settings.delete">Supprimer</span>
-              </button>
-            </div>
-            <p id="settingsProfileHint" class="sync-hint" hidden></p>
           </div>
           <div class="stats-kpi-card">
             <h2 class="stats-kpi-label" data-i18n="app.settings.version">Version</h2>
@@ -874,7 +839,6 @@
 
     <script src="/themes.js"></script>
     <script src="/i18n.js" defer></script>
-    <script src="/profiles.js" defer></script>
     <script src="/empty-states.js" defer></script>
     <script src="/keyboard.js" defer></script>
     <script src="/toast.js" defer></script>

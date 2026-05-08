@@ -46,14 +46,13 @@ not add missions, focus lists or automatic sharing.
   matchups in one place.
 - Game Pokédex appearance metadata sourced from `data/game-pokedexes.json`.
 
-### Wave 4 - Binders, Badges And Profiles
+### Wave 4 - Binders, Badges And Print
 
 - Physical binder planning with 3×3 · 10-sheet defaults and custom formats.
 - Compact evolution-family ordering with printable reserved placeholders and
   non-printing alignment gaps.
 - Generation sprite modes for app and print.
 - Badge gallery with sealed badges until unlock.
-- Local profiles with isolated progress, binders and Trainer contacts.
 
 ## Active Next Track
 

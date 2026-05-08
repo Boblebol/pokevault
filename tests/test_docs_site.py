@@ -316,6 +316,43 @@ def test_in_app_documentation_is_documented_publicly() -> None:
         assert "physical binder" in text.lower()
 
 
+def test_web_app_no_longer_loads_profile_switcher() -> None:
+    index = (WEB / "index.html").read_text(encoding="utf-8")
+    app = (WEB / "app.js").read_text(encoding="utf-8")
+
+    assert "/profiles.js" not in index
+    assert "settingsProfileSelect" not in index
+    assert "PokevaultProfiles" not in app
+
+
+def test_active_docs_do_not_advertise_multi_profiles() -> None:
+    checked = [
+        ROOT / "README.md",
+        ROOT / "CONTRIBUTING.md",
+        DOCS / "architecture.html",
+        DOCS / "features.html",
+        DOCS / "install.html",
+        DOCS / "ROADMAP.md",
+        WEB / "index.html",
+        WEB / "i18n.js",
+    ]
+    joined = "\n".join(path.read_text(encoding="utf-8") for path in checked)
+
+    forbidden = [
+        "/api/profiles",
+        "data/profiles/<id>",
+        "data/profiles/&lt;id&gt;",
+        "data/profiles/",
+        "profiles.json",
+        "Multi-profile Pokedex",
+        "Pokédex multi-profils",
+        "Local profiles with isolated progress",
+        "Each profile keeps",
+    ]
+    for value in forbidden:
+        assert value not in joined
+
+
 def test_in_app_docs_cover_complete_product_workflows_in_both_languages() -> None:
     index = (WEB / "index.html").read_text(encoding="utf-8")
     i18n = (WEB / "i18n.js").read_text(encoding="utf-8")

@@ -6591,28 +6591,6 @@ html[data-theme="paldea"] {
   }
 }
 
-/* ── F15: Profil multi-Pokédex ── */
-
-.profiles-actions {
-  align-items: center;
-}
-
-.profiles-name-input {
-  flex: 1 1 220px;
-  min-width: 180px;
-  background: rgba(255 255 255 / 0.06);
-  border: 1px solid rgba(255 255 255 / 0.12);
-  color: inherit;
-  padding: 8px 12px;
-  border-radius: 8px;
-  font: 500 0.85rem / 1.4 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-}
-
-.profiles-name-input:focus {
-  outline: 2px solid var(--accent, #66f);
-  outline-offset: 2px;
-}
-
 .sync-hint--err {
   color: #f87171;
 }
@@ -6639,16 +6617,14 @@ html[data-theme="paldea"] {
 
 .region-filter,
 .onboarding__field select,
-.print-control-group select,
-.profiles-name-input {
+.print-control-group select {
   border-color: var(--control-border);
   background: var(--control-bg);
   color: var(--text);
 }
 
 .region-filter:focus,
-.search-input:focus,
-.profiles-name-input:focus {
+.search-input:focus {
   outline: 2px solid var(--electric);
   outline-offset: 2px;
 }
@@ -6711,8 +6687,7 @@ html[data-theme="paldea"] {
 .badge-tile,
 .stats-kpi-card,
 .print-controls,
-.import-preview,
-.profiles-name-input {
+.import-preview {
   border-color: var(--outline-soft);
   background: var(--card);
   color: var(--text);
