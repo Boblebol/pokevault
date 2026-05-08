@@ -378,3 +378,17 @@ def test_collection_uses_vault_lab_rail_and_cards() -> None:
     card = "\n".join(_blocks(".card"))
     assert "var(--pdx-panel)" in card or "var(--pdx-bg)" in card
     assert "var(--pdx-border)" in card
+
+    active_filter = "\n".join(_blocks("#viewListe .filter-btn.is-active"))
+    assert "var(--pdx-cyan)" in active_filter
+    assert "var(--pdx-cyan-dim)" in active_filter
+    assert "var(--accent)" not in active_filter
+    assert "var(--accent-strong)" not in active_filter
+
+    card_focus = "\n".join(_blocks(".card:focus-visible"))
+    assert "var(--pdx-cyan)" in card_focus or "var(--pdx-border-hi)" in card_focus
+    assert "var(--accent)" not in card_focus
+
+    collection_card = "\n".join(_blocks("#viewListe .grid .card"))
+    assert "border-radius: var(--radius-md);" in collection_card
+    assert "border-radius: 12px;" not in collection_card
