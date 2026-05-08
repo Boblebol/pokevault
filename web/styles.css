@@ -1050,21 +1050,23 @@ body {
 .filter-btn {
   padding: 6px 12px;
   font-size: 0.8125rem;
-  font-family: inherit;
-  border: 1px solid #444;
-  border-radius: 4px;
-  background: var(--card);
-  color: var(--text);
+  font-family: var(--font-ui);
+  border: 1px solid var(--pdx-border);
+  border-radius: var(--radius-sm);
+  background: var(--pdx-bg);
+  color: var(--pdx-text);
   cursor: pointer;
 }
 
 .filter-btn:hover {
-  border-color: #666;
+  border-color: var(--pdx-border-hi);
 }
 
-.filter-btn.is-active {
-  border-color: var(--accent);
-  color: var(--accent);
+.filter-btn.is-active,
+.filter-btn[aria-pressed="true"] {
+  border-color: var(--pdx-cyan);
+  background: var(--pdx-cyan-dim);
+  color: var(--pdx-cyan);
 }
 
 .region-chips {
@@ -1651,10 +1653,11 @@ body {
 .search-input {
   flex: 1;
   min-width: 0;
-  border: none;
-  background: transparent;
-  color: var(--text);
-  font-family: inherit;
+  border: 1px solid var(--pdx-border);
+  border-radius: var(--radius-sm);
+  background: var(--pdx-bg);
+  color: var(--pdx-text);
+  font-family: var(--font-ui);
   font-size: 0.875rem;
   outline: none;
 }
@@ -1679,16 +1682,23 @@ body {
 
 .card {
   position: relative;
+  min-width: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
   padding: 8px 6px 6px;
-  background: var(--card);
-  border-radius: 4px;
-  border: 1px solid transparent;
+  background: var(--pdx-panel);
+  border: 1px solid var(--pdx-border);
+  border-radius: var(--radius-md);
+  color: var(--pdx-text);
+  overflow: hidden;
   cursor: default;
   text-align: center;
-  transition: border-color 0.12s ease, opacity 0.12s ease;
+  transition:
+    background 0.12s ease,
+    border-color 0.12s ease,
+    opacity 0.12s ease,
+    transform 0.12s ease;
   user-select: none;
 }
 
@@ -1698,7 +1708,8 @@ body {
 }
 
 .card:hover {
-  border-color: #555;
+  border-color: var(--pdx-border-hi);
+  background: var(--pdx-panel-hi);
 }
 
 .card--empty-slot {
@@ -1751,15 +1762,18 @@ body {
   border-radius: 4px;
 }
 
-.card-num {
+.card-num,
+.card-number {
   font-size: 10px;
-  color: var(--muted);
+  color: var(--pdx-text-dim);
+  font-family: var(--font-mono);
   line-height: 1.2;
 }
 
 .card-name {
   font-size: 11px;
-  color: var(--text);
+  color: var(--pdx-text);
+  font-weight: 600;
   line-height: 1.25;
   max-width: 100%;
   overflow: hidden;
@@ -2034,8 +2048,8 @@ html.site-onboarding-pending .app-view {
 .card,
 .binder-slot,
 .wizard-choice {
-  background: var(--surface-low);
-  border-radius: 10px;
+  background: var(--pdx-panel);
+  border-radius: var(--radius-md);
   transition: transform 0.15s ease, background-color 0.15s ease;
 }
 
@@ -2043,7 +2057,7 @@ html.site-onboarding-pending .app-view {
 .binder-slot:hover:not(:disabled),
 .wizard-choice:hover {
   transform: translateY(-1px);
-  background: var(--surface-high);
+  background: var(--pdx-panel-hi);
 }
 
 .card-check {
@@ -2065,10 +2079,12 @@ html.site-onboarding-pending .app-view {
 .binder-wizard-field input[type="text"],
 .binder-wizard-field input[type="number"],
 .binder-wizard-binder-select {
-  border: none;
-  box-shadow: inset 0 -2px 0 0 #3a4951;
-  background: #1c1b1b;
-  border-radius: 6px;
+  border: 1px solid var(--pdx-border);
+  box-shadow: none;
+  background: var(--pdx-bg);
+  border-radius: var(--radius-sm);
+  color: var(--pdx-text);
+  font-family: var(--font-ui);
 }
 
 .region-filter:focus,
@@ -2185,9 +2201,7 @@ html.site-onboarding-pending .app-view {
 .card {
   padding: 9px 7px 8px;
   min-height: 122px;
-  box-shadow:
-    inset 0 0 0 1px var(--outline-soft),
-    0 8px 24px rgba(0, 0, 0, 0.22);
+  box-shadow: none;
 }
 
 .card.is-dimmed > :not(.card-action):not(.pokemon-network-row):not(.card-details) {
@@ -2200,14 +2214,14 @@ html.site-onboarding-pending .app-view {
 }
 
 .card.is-dimmed .pokemon-trade-chip {
-  background: color-mix(in oklab, var(--control-bg) 92%, var(--surface-high));
+  background: color-mix(in oklab, var(--pdx-bg) 92%, var(--pdx-panel-hi));
 }
 
 .card.is-dimmed .pokemon-trade-chip[data-active="true"] {
-  border-color: var(--accent);
-  background: color-mix(in oklab, var(--accent) 24%, var(--control-bg));
-  color: var(--text);
-  box-shadow: 0 0 0 2px color-mix(in oklab, var(--accent) 30%, transparent);
+  border-color: var(--pdx-cyan);
+  background: var(--pdx-cyan-dim);
+  color: var(--pdx-cyan);
+  box-shadow: none;
 }
 
 .card.is-dimmed .pokemon-trade-chip[data-action="duplicate"][data-active="true"] {
@@ -2222,12 +2236,13 @@ html.site-onboarding-pending .app-view {
 
 .card-num {
   font-variant-numeric: tabular-nums;
-  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-family: var(--font-mono);
   letter-spacing: 0.04em;
 }
 
 .card-name {
-  font-weight: 550;
+  color: var(--pdx-text);
+  font-weight: 600;
 }
 
 .binder-main {
@@ -3090,7 +3105,7 @@ html.site-onboarding-pending .app-view {
 
 #viewListe .grid .card {
   border-radius: 12px;
-  background: #0e0e0e;
+  background: var(--pdx-panel);
 }
 
 #viewListe .grid .card-top {
@@ -3223,7 +3238,8 @@ html.site-onboarding-pending .app-view {
 
 #viewListe .grid .card-region {
   margin-top: 6px;
-  color: #8ea3b0;
+  color: var(--pdx-text-dim);
+  font-family: var(--font-mono);
   font-size: 0.72rem;
 }
 
@@ -3462,19 +3478,19 @@ html.site-onboarding-pending .app-view {
 #viewListe .collection-shell {
   display: grid;
   grid-template-columns: 280px minmax(0, 1fr);
-  gap: 18px;
-  align-items: start;
+  gap: 16px;
   max-width: 1240px;
   margin: 0 auto;
+  align-items: start;
 }
 
 #viewListe .collection-rail {
   display: grid;
   gap: 12px;
-  padding: 14px;
-  border-radius: 14px;
-  background: rgba(28, 27, 27, 0.72);
-  box-shadow: inset 0 0 0 1px var(--outline-soft);
+  padding: 12px;
+  background: var(--pdx-panel);
+  border: 1px solid var(--pdx-border);
+  border-radius: var(--radius-lg);
 }
 
 #viewListe .collection-main {
@@ -3482,6 +3498,9 @@ html.site-onboarding-pending .app-view {
 }
 
 #viewListe .collection-main .grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 10px;
   max-width: none;
   margin: 0;
   padding-top: 0;
@@ -5037,14 +5056,10 @@ html.site-onboarding-pending .app-view {
   width: min(920px, 100%);
   max-height: min(860px, calc(100dvh - 32px));
   overflow: auto;
-  border: 1px solid var(--outline-soft);
-  border-radius: 8px;
-  background:
-    linear-gradient(
-      180deg,
-      color-mix(in oklab, var(--surface-high) 84%, var(--card)) 0%,
-      var(--card) 100%
-    );
+  border: 1px solid var(--pdx-border-hi);
+  border-radius: var(--radius-lg);
+  background: var(--pdx-panel);
+  color: var(--pdx-text);
   box-shadow: 0 24px 70px rgba(0, 0, 0, 0.52);
   animation: pokemon-modal-panel-in 220ms cubic-bezier(0.2, 0.82, 0.2, 1) both;
   will-change: transform, opacity;
@@ -5059,8 +5074,8 @@ html.site-onboarding-pending .app-view {
   justify-content: space-between;
   gap: 16px;
   padding: 14px 18px;
-  border-bottom: 1px solid var(--outline-soft);
-  background: color-mix(in oklab, var(--card) 88%, transparent);
+  border-bottom: 1px solid var(--pdx-border);
+  background: color-mix(in oklab, var(--pdx-panel) 88%, transparent);
   backdrop-filter: blur(12px);
 }
 
@@ -5068,7 +5083,8 @@ html.site-onboarding-pending .app-view {
   font-size: 0.82rem;
   font-weight: 800;
   text-transform: uppercase;
-  color: var(--muted);
+  color: var(--pdx-text-dim);
+  font-family: var(--font-mono);
 }
 
 .pokemon-modal__close {
@@ -5076,10 +5092,10 @@ html.site-onboarding-pending .app-view {
   width: 36px;
   height: 36px;
   place-items: center;
-  border: 1px solid var(--outline-soft);
+  border: 1px solid var(--pdx-border);
   border-radius: 8px;
-  background: var(--control-bg);
-  color: var(--text);
+  background: var(--pdx-bg);
+  color: var(--pdx-text-dim);
   font-size: 1.35rem;
   cursor: pointer;
 }
@@ -5274,9 +5290,10 @@ body.pokemon-modal-open {
   font-size: 0.72rem;
   font-weight: 600;
   letter-spacing: 0.02em;
-  color: rgba(18, 20, 36, 0.92);
-  background: rgba(255, 255, 255, 0.82);
-  border: 1px solid rgba(18, 20, 36, 0.14);
+  color: var(--pdx-text-dim);
+  font-family: var(--font-mono);
+  background: var(--pdx-bg);
+  border: 1px solid var(--pdx-border);
   border-radius: 999px;
   cursor: pointer;
   opacity: 0;
@@ -5297,8 +5314,8 @@ body.pokemon-modal-open {
 }
 
 .card-details:hover {
-  background: rgba(255, 255, 255, 0.98);
-  border-color: rgba(18, 20, 36, 0.28);
+  background: var(--pdx-panel-hi);
+  border-color: var(--pdx-border-hi);
 }
 
 .pokemon-modal-type-badge {
@@ -5308,6 +5325,16 @@ body.pokemon-modal-open {
   border: 1px solid var(--type-border);
   background: var(--type-bg);
   color: var(--type-ink);
+}
+
+.pokemon-fiche-section {
+  border-color: var(--pdx-border);
+}
+
+.pokemon-fiche-section__title,
+.pokemon-status-label {
+  color: var(--pdx-text-dim);
+  font-family: var(--font-mono);
 }
 
 .pokemon-fiche-section__toggle {
@@ -5364,9 +5391,9 @@ body.pokemon-modal-open {
   min-height: 42px;
   padding: 8px 13px;
   border-radius: 999px;
-  border: 1px solid var(--control-border);
-  background: var(--control-bg);
-  color: var(--text);
+  border: 1px solid var(--pdx-border);
+  background: var(--pdx-bg);
+  color: var(--pdx-text-dim);
   font-size: 0.82rem;
   font-weight: 700;
   line-height: 1.1;
@@ -5379,15 +5406,16 @@ body.pokemon-modal-open {
 }
 
 .pokemon-status-action:hover:not(:disabled) {
-  background: var(--surface-high);
-  border-color: var(--control-hover);
+  background: var(--pdx-panel-hi);
+  border-color: var(--pdx-border-hi);
 }
 
+.pokemon-status-action.is-active,
 .pokemon-status-action[data-active="true"] {
-  border-color: var(--accent);
-  background: color-mix(in oklab, var(--accent) 18%, var(--control-bg));
-  color: var(--text);
-  box-shadow: 0 0 0 2px color-mix(in oklab, var(--accent) 28%, transparent);
+  border-color: var(--pdx-cyan);
+  background: var(--pdx-cyan-dim);
+  color: var(--pdx-cyan);
+  box-shadow: none;
 }
 
 .pokemon-status-action:focus-visible {
@@ -5557,17 +5585,17 @@ body.pokemon-modal-open {
   min-height: 40px;
   padding: 8px 13px;
   border-radius: 999px;
-  border: 1px solid var(--control-border);
-  background: var(--control-bg);
-  color: var(--text);
+  border: 1px solid var(--pdx-cyan);
+  background: var(--pdx-bg);
+  color: var(--pdx-cyan);
   font-size: 0.82rem;
   font-weight: 700;
   cursor: pointer;
 }
 
 .pokemon-note-editor__save:hover:not(:disabled) {
-  background: var(--surface-high);
-  border-color: var(--control-hover);
+  background: var(--pdx-panel-hi);
+  border-color: var(--pdx-cyan);
 }
 
 .pokemon-note-editor__save:disabled {
@@ -6750,6 +6778,13 @@ body.pokemon-modal-open {
   color: var(--text);
 }
 
+.region-filter {
+  border-color: var(--pdx-border);
+  background: var(--pdx-bg);
+  color: var(--pdx-text);
+  font-family: var(--font-ui);
+}
+
 .region-filter:focus,
 .search-input:focus {
   outline: 2px solid var(--electric);
@@ -6757,11 +6792,15 @@ body.pokemon-modal-open {
 }
 
 .stats-pct,
-.card-region,
 .binder-page-panel-title,
 .binder-refresh--ghost,
 .toast__icon {
   color: var(--electric);
+}
+
+.card-region {
+  color: var(--pdx-text-dim);
+  font-family: var(--font-mono);
 }
 
 .collection-subtitle code,
@@ -6782,6 +6821,13 @@ body.pokemon-modal-open {
   color: var(--text);
 }
 
+.filter-btn {
+  border-color: var(--pdx-border);
+  background: var(--pdx-bg);
+  color: var(--pdx-text);
+  font-family: var(--font-ui);
+}
+
 .binder-refresh:hover,
 .filter-btn:hover,
 .binder-pager-btn:hover,
@@ -6789,6 +6835,11 @@ body.pokemon-modal-open {
 .print-action-btn:hover {
   border-color: var(--control-hover);
   background: var(--surface-high);
+}
+
+.filter-btn:hover {
+  border-color: var(--pdx-border-hi);
+  background: var(--pdx-panel-hi);
 }
 
 .binder-pager-btn,
@@ -6799,10 +6850,18 @@ body.pokemon-modal-open {
 
 .binder-refresh--ghost,
 .filter-btn.is-active,
+.filter-btn[aria-pressed="true"],
 .region-chip.is-active,
 .narrative-chip.is-active {
   border-color: var(--accent);
   color: var(--accent);
+}
+
+.filter-btn.is-active,
+.filter-btn[aria-pressed="true"] {
+  border-color: var(--pdx-cyan);
+  background: var(--pdx-cyan-dim);
+  color: var(--pdx-cyan);
 }
 
 .header,

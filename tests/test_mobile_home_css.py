@@ -365,3 +365,16 @@ def test_stats_page_is_stats_only_vault_lab_dashboard() -> None:
     assert "#viewStats .stats-shell" in responsive
     assert "grid-template-columns: 1fr;" in responsive
     assert "#viewStats .stats-kpi-grid" in responsive
+
+
+def test_collection_uses_vault_lab_rail_and_cards() -> None:
+    collection_shell = "\n".join(_blocks("#viewListe .collection-shell"))
+    assert "grid-template-columns:" in collection_shell
+
+    rail = "\n".join(_blocks("#viewListe .collection-rail"))
+    assert "var(--pdx-panel)" in rail
+    assert "var(--pdx-border)" in rail
+
+    card = "\n".join(_blocks(".card"))
+    assert "var(--pdx-panel)" in card or "var(--pdx-bg)" in card
+    assert "var(--pdx-border)" in card

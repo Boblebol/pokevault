@@ -172,8 +172,8 @@ def test_pokemon_modal_uses_theme_tokens() -> None:
     panel_css = panel_blocks[0]
 
     assert "background:" in panel_css
-    assert "var(--card)" in panel_css
-    assert "var(--outline-soft)" in panel_css
+    assert "var(--pdx-panel)" in panel_css
+    assert "var(--pdx-border-hi)" in panel_css
     assert "animation: pokemon-modal-panel-in" in modal_css
     assert "animation: pokemon-modal-scrim-in" in modal_css
     assert "backdrop-filter: blur(" in modal_css
