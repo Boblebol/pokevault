@@ -250,6 +250,20 @@ def test_settings_no_longer_exposes_multi_profile_controls() -> None:
     assert "settingsProfileDeleteBtn" not in HTML
 
 
+def test_secondary_pages_use_vault_lab_panels() -> None:
+    expected_selectors = [
+        "#viewClasseur .binder-shell-layout",
+        "#viewDresseurs .trainer-shell",
+        "#viewPrint .binder-shell-layout",
+        "#viewDocs .docs-shell",
+        "#viewSettings .stats-main",
+    ]
+    for selector in expected_selectors:
+        block = "\n".join(_blocks(selector))
+        assert block, selector
+        assert "var(--pdx-" in block, selector
+
+
 def test_vault_lab_desktop_nav_order_separates_badges_from_stats() -> None:
     nav = HTML.split('class="stitch-topnav"', 1)[1].split("</nav>", 1)[0]
     expected = [
