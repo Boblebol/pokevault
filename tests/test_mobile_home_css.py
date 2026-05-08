@@ -299,7 +299,8 @@ def test_mobile_nav_is_hidden_on_desktop_and_positioned_on_mobile() -> None:
 
     bottom_mobile = re.search(r"\.mobile-bottom-nav\s*\{([^}]+)\}", mobile)
     assert bottom_mobile
-    assert "display: flex;" in bottom_mobile.group(1)
+    assert "display: grid;" in bottom_mobile.group(1)
+    assert "grid-template-columns: repeat(5, minmax(0, 1fr));" in bottom_mobile.group(1)
     assert "position: fixed;" in bottom_mobile.group(1)
     assert "bottom: 0;" in bottom_mobile.group(1)
 
@@ -311,3 +312,25 @@ def test_mobile_nav_is_hidden_on_desktop_and_positioned_on_mobile() -> None:
     hidden_mobile = re.search(r"\.mobile-more-menu\[hidden\]\s*\{([^}]+)\}", mobile)
     assert hidden_mobile
     assert "display: none;" in hidden_mobile.group(1)
+
+
+def test_vault_lab_shell_uses_maquette_density_and_mobile_surfaces() -> None:
+    topbar = "\n".join(_blocks(".stitch-topbar"))
+    assert "height: 48px;" in topbar
+    assert "background: var(--pdx-panel);" in topbar
+    assert "border-bottom: 1px solid var(--pdx-border);" in topbar
+
+    nav_link = "\n".join(_blocks(".stitch-topnav .app-switch-link"))
+    assert "font-family: var(--font-mono);" in nav_link
+    assert "text-transform: uppercase;" in nav_link
+    assert "height: 48px;" in nav_link
+
+    mobile = _media_block(720)
+    for token in [
+        ".mobile-bottom-nav",
+        "position: fixed;",
+        "bottom: 0;",
+        "height: 58px;",
+        ".mobile-more-menu",
+    ]:
+        assert token in mobile

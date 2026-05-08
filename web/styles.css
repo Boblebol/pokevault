@@ -118,9 +118,23 @@ html,
 body {
   margin: 0;
   min-height: 100%;
+  background: var(--pdx-bg);
+  color: var(--pdx-text);
   font-family: var(--font-ui);
-  background: var(--bg);
-  color: var(--text);
+  font-size: 14px;
+  line-height: 1.4;
+  letter-spacing: 0;
+  -webkit-font-smoothing: antialiased;
+}
+
+body::before {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  content: "";
+  background-image: radial-gradient(circle, rgba(255, 255, 255, 0.018) 1px, transparent 1px);
+  background-size: 22px 22px;
 }
 
 .app-switch-link {
@@ -1963,14 +1977,6 @@ html.site-onboarding-pending .app-view {
   --warning: #ffd166;
 }
 
-html,
-body {
-  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  background:
-    radial-gradient(120% 120% at 100% 0%, color-mix(in oklab, var(--accent) 9%, transparent), transparent 48%),
-    var(--bg);
-}
-
 .app-nav-stack,
 .app-switch {
   background: rgba(19, 19, 19, 0.82);
@@ -2912,31 +2918,29 @@ body {
 .stitch-topbar {
   position: fixed;
   top: 0;
-  left: 0;
   right: 0;
-  z-index: 70;
-  height: 64px;
-  background: #131313;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  left: 0;
+  z-index: 100;
+  height: 48px;
+  background: var(--pdx-panel);
+  border-bottom: 1px solid var(--pdx-border);
 }
 
 .stitch-topbar-inner {
-  height: 100%;
-  max-width: 1920px;
-  margin: 0 auto;
-  padding: 0 24px;
   display: flex;
   align-items: center;
-  gap: 24px;
+  height: 48px;
+  padding: 0 16px;
+  gap: 18px;
 }
 
 .stitch-brand {
-  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  font-size: 1.12rem;
+  font-family: var(--font-mono);
+  font-size: 13px;
   font-weight: 700;
-  letter-spacing: -0.02em;
+  letter-spacing: 0.08em;
+  color: var(--pdx-text);
   text-transform: uppercase;
-  color: #ee1515;
 }
 
 .stitch-brand-logo {
@@ -2968,8 +2972,8 @@ body {
 .stitch-topnav {
   display: flex;
   flex: 1 1 auto;
-  gap: 10px;
-  margin-left: auto;
+  align-items: center;
+  gap: 2px;
   min-width: 0;
   overflow-x: auto;
   scrollbar-width: none;
@@ -2992,23 +2996,33 @@ body {
 }
 
 .stitch-canvas {
-  margin-left: 0;
-  padding-top: 74px;
   min-height: 100vh;
+  padding: 64px 16px 24px;
 }
 
 .stitch-topnav .app-switch-link {
-  flex: 0 0 auto;
-  border-bottom: none;
-  margin: 0;
-  border-radius: 8px;
-  padding: 9px 10px;
-  color: #a3918f;
+  display: inline-flex;
+  align-items: center;
+  height: 48px;
+  padding: 0 12px;
+  border-bottom: 2px solid transparent;
+  color: var(--pdx-text-dim);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-decoration: none;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.stitch-topnav .app-switch-link:hover,
+.stitch-topnav .app-switch-link.is-active {
+  color: var(--pdx-cyan);
 }
 
 .stitch-topnav .app-switch-link.is-active {
-  color: #00daf3;
-  box-shadow: inset 0 -2px 0 #00daf3;
+  border-bottom-color: var(--pdx-cyan);
 }
 
 .binder-refresh.is-active,
@@ -4781,29 +4795,96 @@ body {
   }
 }
 
+@media (min-width: 721px) {
+  .mobile-bottom-nav,
+  .mobile-more-menu {
+    display: none !important;
+  }
+}
+
 @media (max-width: 720px) {
-  /* A5 mobile home: progression, filters, then grid. */
+  .stitch-topnav {
+    display: none;
+  }
+
+  .stitch-canvas {
+    padding: 56px 10px 72px;
+  }
+
   .mobile-bottom-nav {
     position: fixed;
     right: 0;
     bottom: 0;
     left: 0;
-    z-index: 60;
+    z-index: 140;
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    height: 58px;
+    background: var(--pdx-panel);
+    border-top: 1px solid var(--pdx-border);
+  }
+
+  .mobile-bottom-nav__item {
     display: flex;
+    min-width: 0;
+    min-height: 44px;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    border: 0;
+    background: transparent;
+    color: var(--pdx-text-faint);
+    font-family: var(--font-mono);
+    font-size: 8px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-decoration: none;
+    text-transform: uppercase;
+  }
+
+  .mobile-bottom-nav__item.is-active {
+    color: var(--pdx-cyan);
   }
 
   .mobile-more-menu {
     position: fixed;
-    right: 12px;
-    bottom: 64px;
-    left: 12px;
-    z-index: 61;
+    right: 10px;
+    bottom: 68px;
+    z-index: 150;
     display: grid;
+    gap: 3px;
+    min-width: 180px;
+    padding: 8px;
+    background: var(--pdx-panel);
+    border: 1px solid var(--pdx-border-hi);
+    border-radius: var(--radius-md);
+    box-shadow: 0 18px 34px rgba(0, 0, 0, 0.35);
   }
 
   .mobile-more-menu[hidden] {
     display: none;
   }
+
+  .mobile-more-menu__link {
+    padding: 10px 12px;
+    border-radius: var(--radius-sm);
+    color: var(--pdx-text-dim);
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-decoration: none;
+    text-transform: uppercase;
+  }
+
+  .mobile-more-menu__link.is-active,
+  .mobile-more-menu__link:hover {
+    background: var(--pdx-panel-hi);
+    color: var(--pdx-cyan);
+  }
+
+  /* A5 mobile home: progression, filters, then grid. */
 
   #viewListe .collection-shell {
     grid-template-columns: 1fr;
