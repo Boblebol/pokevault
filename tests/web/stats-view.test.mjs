@@ -122,6 +122,13 @@ test("renderStats follows English i18n labels when available", async () => {
     state: { hunts: { "002-b": { wanted: true } } },
   };
   globalThis.PokevaultBadges = {
+    renderInto() {
+      throw new Error("stats must not render the badge gallery");
+    },
+    poll() {
+      return Promise.resolve();
+    },
+    subscribe() {},
     nearest() {
       return {
         title: "Sabrina - Marsh",
@@ -133,6 +140,8 @@ test("renderStats follows English i18n labels when available", async () => {
     },
   };
 
+  api.start();
+  await new Promise((resolve) => setTimeout(resolve, 0));
   api.render();
 
   const bodyText = textTree(elements.statsBody);
