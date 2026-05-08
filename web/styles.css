@@ -7143,22 +7143,35 @@ body.pokemon-modal-open {
   list-style: none;
 }
 
-.trainer-contact-links li,
 .trainer-tag-group li {
   padding: 0.25rem 0.45rem;
-  border: 1px solid var(--outline-soft);
-  border-radius: 0.35rem;
-  color: var(--text);
+  border: 1px solid var(--pdx-border);
+  border-radius: var(--radius-sm);
+  background: var(--pdx-bg);
+  color: var(--pdx-text-dim);
+  font-family: var(--font-mono);
+  overflow-wrap: anywhere;
+}
+
+.trainer-contact-links li {
+  padding: 0.25rem 0.45rem;
+  border: 1px solid var(--pdx-border);
+  border-radius: var(--radius-sm);
+  background: var(--pdx-bg);
+  color: var(--pdx-text-dim);
+  font-family: var(--font-mono);
   overflow-wrap: anywhere;
 }
 
 .trainer-contact-links span {
   margin-right: 0.35rem;
-  color: var(--muted);
+  color: var(--pdx-text-dim);
+  font-family: var(--font-mono);
 }
 
 .trainer-contact-links a {
-  color: inherit;
+  color: var(--pdx-text-dim);
+  font-family: var(--font-mono);
   text-decoration: underline;
   text-underline-offset: 0.12em;
 }
@@ -7174,8 +7187,8 @@ body.pokemon-modal-open {
 }
 
 .trainer-tag-group--badges li {
-  border-color: rgba(255, 203, 5, 0.42);
-  background: rgba(255, 203, 5, 0.08);
+  border-color: var(--pdx-border);
+  background: var(--pdx-bg);
 }
 
 .trainer-tag-group h3 {

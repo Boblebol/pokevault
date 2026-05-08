@@ -188,6 +188,14 @@ def test_trainer_contacts_are_optional_and_isolated() -> None:
     dresseurs_view = HTML.split('id="viewDresseurs"', 1)[1].split('id="viewPrint"', 1)[0]
     assert "onboarding" not in dresseurs_view.lower()
 
+    for selector in [".trainer-contact-links li", ".trainer-tag-group li"]:
+        block = "\n".join(_blocks(selector))
+        assert "border: 1px solid var(--pdx-border);" in block, selector
+        assert "border-radius: var(--radius-sm);" in block, selector
+        assert "background: var(--pdx-bg);" in block, selector
+        assert "color: var(--pdx-text-dim);" in block, selector
+        assert "font-family: var(--font-mono);" in block, selector
+
 
 def test_trade_chips_have_dedicated_compact_styles() -> None:
     expected_tokens = [
