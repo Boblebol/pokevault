@@ -183,6 +183,9 @@ test("renderInto builds a complete standalone badge gallery surface", async () =
   assert.ok(byClass(host, "stats-badges").length);
   assert.ok(byClass(host, "badge-gallery-controls").length);
   assert.ok(byClass(host, "stats-badges-grid").length);
+  assert.equal(byClass(host, "badge-tile").length, 2);
+  assert.match(textTree(host), /First/);
+  assert.match(textTree(host), /Locked/);
 });
 
 test("badgeTileClassNames includes metadata effect classes", async () => {
