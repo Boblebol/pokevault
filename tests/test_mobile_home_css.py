@@ -248,3 +248,36 @@ def test_settings_no_longer_exposes_multi_profile_controls() -> None:
     assert "Pokédex multi-profils" not in HTML
     assert "settingsProfileCreateBtn" not in HTML
     assert "settingsProfileDeleteBtn" not in HTML
+
+
+def test_vault_lab_desktop_nav_order_separates_badges_from_stats() -> None:
+    nav = HTML.split('class="stitch-topnav"', 1)[1].split("</nav>", 1)[0]
+    expected = [
+        'href="#/liste"',
+        'href="#/classeur"',
+        'href="#/dresseurs"',
+        'href="#/badges"',
+        'href="#/stats"',
+        'href="#/print"',
+        'href="#/docs"',
+        'href="#/settings"',
+    ]
+    positions = [nav.index(token) for token in expected]
+    assert positions == sorted(positions)
+
+
+def test_vault_lab_mobile_nav_uses_primary_tabs_and_plus_menu() -> None:
+    assert 'class="mobile-bottom-nav"' in HTML
+    for token in [
+        'data-mobile-view="liste"',
+        'data-mobile-view="classeur"',
+        'data-mobile-view="badges"',
+        'data-mobile-view="stats"',
+        'id="mobileMoreToggle"',
+        'id="mobileMoreMenu"',
+    ]:
+        assert token in HTML
+
+    more = HTML.split('id="mobileMoreMenu"', 1)[1].split("</nav>", 1)[0]
+    for href in ['href="#/dresseurs"', 'href="#/print"', 'href="#/docs"', 'href="#/settings"']:
+        assert href in more

@@ -225,6 +225,14 @@ test("docs route is recognized as a first-class app view", async () => {
   assert.equal(api.currentViewFromHash(), "docs");
 });
 
+test("badges route is recognized as a first-class app view", async () => {
+  const api = await loadModule();
+
+  globalThis.location.hash = "#/badges";
+
+  assert.equal(api.currentViewFromHash(), "badges");
+});
+
 test("artwork changes rerender the active Pokemon modal", async () => {
   const api = await loadModule();
   const rendered = [];

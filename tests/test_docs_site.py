@@ -134,6 +134,7 @@ def test_web_app_supports_fr_en_switch_on_main_surfaces() -> None:
     assert 'data-i18n-locale="en"' in index
     for key in [
         "app.collection.title",
+        "app.badges.title",
         "app.stats.title",
         "app.binders.title",
         "app.trainers.title",
@@ -146,6 +147,9 @@ def test_web_app_supports_fr_en_switch_on_main_surfaces() -> None:
     ]:
         assert f'data-i18n="{key}"' in index
         assert key in i18n
+    assert 'href="#/badges"' in index
+    assert 'id="viewBadges"' in index
+    assert '"app.nav.badges"' in i18n
     assert 'href="#/docs"' in index
     assert 'id="viewDocs"' in index
     assert '"app.nav.docs"' in i18n
