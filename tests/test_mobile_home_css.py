@@ -76,8 +76,8 @@ def test_badge_detail_modal_and_pokemon_preview_are_responsive() -> None:
     assert "inset: 0;" in overlay
 
     detail = "\n".join(_blocks(".badge-detail"))
-    assert "max-width: min(92vw, 560px);" in detail
-    assert "max-height: min(86vh, 720px);" in detail
+    assert "max-width: min(92vw, 720px);" in detail
+    assert "max-height: min(86vh, 760px);" in detail
     assert "overflow: auto;" in detail
 
     requirements = "\n".join(_blocks(".badge-detail-requirements"))

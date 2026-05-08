@@ -167,6 +167,24 @@ test("filterBadges filters by status category and region", async () => {
   );
 });
 
+test("renderInto builds a complete standalone badge gallery surface", async () => {
+  installBrowserStubs();
+  await import(`../../web/badges-view.js?case=standalone-${Date.now()}`);
+  const host = globalThis.document.createElement("section");
+  globalThis.window.PokevaultBadges._test.setCachedState({
+    catalog: [
+      { id: "first", title: "First", unlocked: true, current: 1, target: 1, percent: 100 },
+      { id: "locked", title: "Locked", unlocked: false, current: 0, target: 2, percent: 0 },
+    ],
+    unlocked: ["first"],
+  });
+  globalThis.window.PokevaultBadges.renderInto(host);
+
+  assert.ok(byClass(host, "stats-badges").length);
+  assert.ok(byClass(host, "badge-gallery-controls").length);
+  assert.ok(byClass(host, "stats-badges-grid").length);
+});
+
 test("badgeTileClassNames includes metadata effect classes", async () => {
   const api = await loadModule();
   assert.deepEqual(api.badgeTileClassNames({

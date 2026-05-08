@@ -1014,6 +1014,9 @@
       localizedText,
       typeMatchupGroups,
       buildSegmentedFilter,
+      setCachedState(state) {
+        cachedState = state;
+      },
     };
   }
 })();
