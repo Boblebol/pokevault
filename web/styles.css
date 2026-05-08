@@ -5842,8 +5842,8 @@ body.pokemon-modal-open {
 }
 
 .badge-filter__btn:hover {
-  border-color: var(--control-hover);
-  background: var(--surface-high);
+  border-color: var(--pdx-border-hi);
+  background: var(--pdx-panel-hi);
   transform: translateY(-1px);
 }
 
@@ -5857,7 +5857,7 @@ body.pokemon-modal-open {
 
 .badge-filter__btn:focus-visible,
 .badge-filter__select:focus-visible {
-  outline: 2px solid var(--electric);
+  outline: 2px solid var(--pdx-cyan);
   outline-offset: 2px;
 }
 
@@ -5893,12 +5893,12 @@ body.pokemon-modal-open {
 .badge-tile:hover,
 .badge-tile:focus-visible {
   opacity: 0.82;
-  border-color: var(--control-hover);
+  border-color: var(--pdx-border-hi);
   outline: none;
 }
 
 .badge-tile:focus-visible {
-  box-shadow: 0 0 0 2px var(--electric);
+  box-shadow: 0 0 0 2px var(--pdx-cyan);
 }
 
 .badge-tile::before,
@@ -5999,11 +5999,11 @@ body.pokemon-modal-open {
 }
 
 .badge-tile.badge-tile--prism.is-unlocked {
-  border-color: color-mix(in oklab, var(--electric) 62%, var(--accent));
+  border-color: color-mix(in oklab, var(--pdx-cyan) 62%, var(--pdx-red));
 }
 
 .badge-tile.badge-tile--holo.is-unlocked {
-  border-color: color-mix(in oklab, var(--electric) 72%, white);
+  border-color: color-mix(in oklab, var(--pdx-cyan) 72%, white);
 }
 
 .badge-tile.badge-tile--rival.is-unlocked {
@@ -6089,7 +6089,7 @@ body.pokemon-modal-open {
   overflow: hidden;
   border: 1px solid var(--outline-soft);
   border-radius: 999px;
-  background: var(--surface-high);
+  background: var(--pdx-panel-hi);
   color: var(--muted);
   font-size: 0.65rem;
   font-weight: 750;
@@ -6118,7 +6118,7 @@ body.pokemon-modal-open {
 
 .badge-requirement-chip.is-caught {
   border-color: color-mix(in oklab, var(--success) 55%, transparent);
-  background: color-mix(in oklab, var(--success) 14%, var(--surface-high));
+  background: color-mix(in oklab, var(--success) 14%, var(--pdx-panel-hi));
   color: var(--success);
 }
 
@@ -6139,7 +6139,7 @@ body.pokemon-modal-open {
   display: grid;
   place-items: center;
   padding: 16px;
-  background: rgba(9, 14, 26, 0.9);
+  background: color-mix(in oklab, var(--pdx-bg) 90%, transparent);
   backdrop-filter: blur(8px);
 }
 
@@ -6211,12 +6211,12 @@ body.pokemon-modal-open {
 
 .badge-detail__close:hover,
 .badge-detail__close:focus-visible {
-  border-color: var(--control-hover);
+  border-color: var(--pdx-border-hi);
   outline: none;
 }
 
 .badge-detail__close:focus-visible {
-  box-shadow: 0 0 0 2px var(--electric);
+  box-shadow: 0 0 0 2px var(--pdx-cyan);
 }
 
 .badge-detail__desc {
@@ -6238,7 +6238,7 @@ body.pokemon-modal-open {
   border: 1px solid var(--outline-soft);
   border-radius: 999px;
   padding: 4px 8px;
-  background: var(--surface-high);
+  background: var(--pdx-panel-hi);
   color: var(--muted);
   font-size: 0.68rem;
   font-weight: 700;
@@ -6260,14 +6260,14 @@ body.pokemon-modal-open {
   height: 7px;
   overflow: hidden;
   border-radius: 999px;
-  background: var(--surface-highest);
+  background: var(--pdx-border);
 }
 
 .badge-detail-progress__fill {
   display: block;
   height: 100%;
   border-radius: inherit;
-  background: linear-gradient(90deg, var(--electric), var(--accent-strong));
+  background: linear-gradient(90deg, var(--pdx-cyan), var(--pdx-red));
 }
 
 .badge-detail__requirements-section {
@@ -6295,7 +6295,7 @@ body.pokemon-modal-open {
   padding: 8px;
   border: 1px solid var(--outline-soft);
   border-radius: 8px;
-  background: var(--surface-high);
+  background: var(--pdx-panel-hi);
 }
 
 .badge-detail-requirement.is-missing {
