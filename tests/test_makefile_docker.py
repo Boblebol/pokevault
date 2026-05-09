@@ -58,8 +58,16 @@ def test_release_publishes_multi_arch_docker_images() -> None:
 def test_docker_image_embeds_reference_data_refresh_source() -> None:
     dockerfile = (ROOT / "Dockerfile").read_text(encoding="utf-8")
     compose = COMPOSE_FILE.read_text(encoding="utf-8")
+    dockerignore = (ROOT / ".dockerignore").read_text(encoding="utf-8")
 
     assert "COPY data/game-pokedexes.json data/game-pokedexes.json" in dockerfile
     assert "COPY data/game-pokedexes.json reference-data/game-pokedexes.json" in dockerfile
     assert "ENV TRACKER_REFERENCE_DATA_DIR=/app/reference-data" in dockerfile
     assert "TRACKER_REFERENCE_DATA_DIR=/app/reference-data" in compose
+    for name in [
+        "evolution-families.json",
+        "evolution-family-overrides.json",
+        "game-pokedexes.json",
+        "badge-battles.json",
+    ]:
+        assert f"!data/{name}" in dockerignore

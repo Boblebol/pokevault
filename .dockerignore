@@ -11,6 +11,10 @@ htmlcov/
 data/
 !data/pokedex.json
 !data/narrative-tags.json
+!data/evolution-families.json
+!data/evolution-family-overrides.json
+!data/game-pokedexes.json
+!data/badge-battles.json
 outputs/
 stitch-html/
 docs/
