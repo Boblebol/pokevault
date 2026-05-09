@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [1.6.3] — 2026-05-09
+
+### Added
+
+- Réglages expose a Maintenance section with reference data refresh and local
+  data deletion actions.
+- Docker images now embed a `/app/reference-data` source so mounted or missing
+  reference files can be restored from the app.
+
+### Changed
+
+- Réglages are reorganized into Préférences, Sauvegarde, Maintenance and
+  Système sections for a clearer local-first workflow.
+
 ## [1.6.2] — 2026-05-09
 
 ### Added

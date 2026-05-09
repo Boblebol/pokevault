@@ -13,6 +13,7 @@ from tracker.api.dependencies import (
     get_binder_placements_repository,
     get_binder_placements_service,
     get_binder_workspace_service,
+    get_data_maintenance_service,
     get_export_service,
     get_progress_repository,
     get_progress_service,
@@ -28,6 +29,7 @@ from tracker.services.badge_service import BadgeService
 from tracker.services.binder_config_service import BinderConfigService
 from tracker.services.binder_placements_service import BinderPlacementsService
 from tracker.services.binder_workspace_service import BinderWorkspaceService
+from tracker.services.data_maintenance_service import DataMaintenanceService
 from tracker.services.export_service import ExportService
 from tracker.services.progress_service import ProgressService
 from tracker.services.trainer_contact_service import TrainerContactService
@@ -73,6 +75,19 @@ def test_get_export_service(tmp_path: Path) -> None:
         placements_repo=pl_repo,
     )
     assert isinstance(svc, ExportService)
+
+
+def test_get_data_maintenance_service_uses_reference_data_dir(tmp_path: Path) -> None:
+    reference_dir = tmp_path / "reference-data"
+    reference_dir.mkdir()
+    (reference_dir / "pokedex.json").write_text("[]", encoding="utf-8")
+    settings = TrackerSettings(repo_root=tmp_path, reference_data_dir=reference_dir)
+
+    svc = get_data_maintenance_service(settings=settings)
+
+    assert isinstance(svc, DataMaintenanceService)
+    by_name = {item.name: item for item in svc.status().files}
+    assert by_name["pokedex.json"].refresh_available is True
 
 
 def test_get_trainer_contact_repository_and_service(tmp_path: Path) -> None:

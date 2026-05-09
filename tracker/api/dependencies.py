@@ -22,6 +22,7 @@ from tracker.services.badge_service import BadgeService
 from tracker.services.binder_config_service import BinderConfigService
 from tracker.services.binder_placements_service import BinderPlacementsService
 from tracker.services.binder_workspace_service import BinderWorkspaceService
+from tracker.services.data_maintenance_service import DataMaintenanceService
 from tracker.services.export_service import ExportService
 from tracker.services.progress_service import ProgressService
 from tracker.services.trainer_contact_service import TrainerContactService
@@ -107,4 +108,13 @@ def get_export_service(
         config_repo,
         placements_repo,
         settings.pokedex_path,
+    )
+
+
+def get_data_maintenance_service(
+    settings: Annotated[TrackerSettings, Depends(get_settings)],
+) -> DataMaintenanceService:
+    return DataMaintenanceService(
+        settings.data_dir,
+        settings.reference_data_dir or settings.data_dir,
     )

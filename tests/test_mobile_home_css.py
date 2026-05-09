@@ -285,6 +285,27 @@ def test_settings_no_longer_exposes_multi_profile_controls() -> None:
     assert "settingsProfileDeleteBtn" not in HTML
 
 
+def test_settings_are_grouped_into_coherent_data_sections() -> None:
+    settings = HTML.split('id="viewSettings"', 1)[1].split('class="stitch-footer"', 1)[0]
+
+    for text in [
+        "Préférences",
+        "Sauvegarde",
+        "Maintenance",
+        "Système",
+        "Rafraîchir références",
+        "Supprimer mes données locales",
+    ]:
+        assert text in settings
+    for token in [
+        'id="settingsMaintenanceStatus"',
+        'id="settingsMaintenanceRefreshBtn"',
+        'id="settingsDataResetBtn"',
+        'settings-action-btn--danger',
+    ]:
+        assert token in settings
+
+
 def test_secondary_pages_use_vault_lab_panels() -> None:
     expected_selectors = [
         "#viewClasseur .binder-shell-layout",

@@ -5,7 +5,8 @@
 
 const API_PROGRESS = "/api/progress";
 const API_HEALTH = "/api/health";
-const APP_VERSION = "1.6.2";
+const API_DATA = "/api/data";
+const APP_VERSION = "1.6.3";
 const PROGRESS_QUEUE_KEY = "pokedex_progress_queue";
 const FORM_FILTER_STORAGE_KEY = "pokedexFormFilter";
 const TYPE_FILTER_STORAGE_KEY = "pokedexTypeFilter";
@@ -32,6 +33,18 @@ const APP_FALLBACK_I18N = {
   "app.import.invalid": "Fichier invalide: {message}",
   "app.import.success": "Import : {caught} attrapés, {binders} classeurs. Rechargement…",
   "app.import.failed": "Échec import : {message}",
+  "app.settings.maintenance_status": "{references} · {local}",
+  "app.settings.reference_file": "référence",
+  "app.settings.reference_files": "références",
+  "app.settings.local_file": "donnée locale",
+  "app.settings.local_files": "données locales",
+  "app.settings.maintenance_status_error": "Maintenance indisponible.",
+  "app.settings.reset_confirm": "Supprimer progression, classeurs, contacts et préférences locales ? Les fichiers de référence seront conservés.",
+  "app.settings.maintenance_refresh_success": "Références rafraîchies : {count}.",
+  "app.settings.maintenance_refresh_empty": "Références déjà à jour.",
+  "app.settings.maintenance_refresh_failed": "Échec du rafraîchissement : {message}",
+  "app.settings.maintenance_reset_success": "Données locales supprimées : {count}. Rechargement...",
+  "app.settings.maintenance_reset_failed": "Échec de suppression : {message}",
   "app.date.unknown": "inconnue",
   "app.list.silent": "Le Pokédex reste silencieux sur ce périmètre.",
   "app.list.display": "Affichage : 1-{end} sur {total} entrées filtrées · {pct}% capturées dans cette vue.",
@@ -95,6 +108,17 @@ let collectionBootstrapPromise = null;
 const caughtUiListeners = new Set();
 
 const DIM_STORAGE_KEY = "pokedexDimMode";
+const CLIENT_STATE_STORAGE_KEYS = [
+  DIM_STORAGE_KEY,
+  FORM_FILTER_STORAGE_KEY,
+  TYPE_FILTER_STORAGE_KEY,
+  PROGRESS_QUEUE_KEY,
+  "pokevault.ui.profile",
+  "pokevault.ui.artwork",
+  "pokedexPreferredRegion",
+  "pokedexBinderWizardDismissed",
+  "pokevault_locale",
+];
 const dimUiListeners = new Set();
 
 /**
@@ -1188,6 +1212,118 @@ function rerenderArtworkSurface() {
   if (typeof render === "function") render();
 }
 
+function dataMaintenanceCounts(payload) {
+  const files = Array.isArray(payload?.files) ? payload.files : [];
+  return {
+    references: files.filter((item) => item?.kind === "reference" && item.present).length,
+    local: files.filter((item) => item?.kind === "local_state" && item.present).length,
+  };
+}
+
+function renderSettingsMaintenanceStatus(payload) {
+  const status = document.getElementById("settingsMaintenanceStatus");
+  if (!status) return;
+  const counts = dataMaintenanceCounts(payload);
+  status.textContent = t("app.settings.maintenance_status", {
+    references: `${counts.references} ${t(counts.references === 1 ? "app.settings.reference_file" : "app.settings.reference_files")}`,
+    local: `${counts.local} ${t(counts.local === 1 ? "app.settings.local_file" : "app.settings.local_files")}`,
+  });
+}
+
+function showSettingsMaintenanceHint(message, isError = false) {
+  const hint = document.getElementById("settingsMaintenanceHint");
+  if (!hint) return;
+  hint.textContent = message;
+  hint.hidden = false;
+  hint.style.color = isError ? "var(--md-error, #ffb4ab)" : "";
+  if (!isError) setTimeout(() => { hint.hidden = true; }, 5000);
+}
+
+async function loadSettingsMaintenanceStatus() {
+  const status = document.getElementById("settingsMaintenanceStatus");
+  try {
+    const res = await fetch(`${API_DATA}/status`);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const payload = await res.json();
+    renderSettingsMaintenanceStatus(payload);
+    return payload;
+  } catch {
+    if (status) status.textContent = t("app.settings.maintenance_status_error");
+    return null;
+  }
+}
+
+function clearClientMaintenanceState() {
+  for (const key of CLIENT_STATE_STORAGE_KEYS) {
+    try {
+      localStorage.removeItem(key);
+    } catch {
+      /* private mode */
+    }
+  }
+  try {
+    sessionStorage.removeItem("pokedexKbFocusSlug");
+  } catch {
+    /* private mode */
+  }
+}
+
+function countChangedFiles(payload) {
+  return Array.isArray(payload?.changed) ? payload.changed.length : 0;
+}
+
+function setupSettingsMaintenanceActions() {
+  const refreshBtn = document.getElementById("settingsMaintenanceRefreshBtn");
+  const resetBtn = document.getElementById("settingsDataResetBtn");
+  if (!refreshBtn || !resetBtn) return Promise.resolve(null);
+  if (!refreshBtn.dataset.wired) {
+    refreshBtn.dataset.wired = "1";
+    refreshBtn.addEventListener("click", async () => {
+      refreshBtn.disabled = true;
+      try {
+        const res = await fetch(`${API_DATA}/refresh`, { method: "POST" });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const payload = await res.json();
+        const changed = countChangedFiles(payload);
+        showSettingsMaintenanceHint(
+          changed
+            ? t("app.settings.maintenance_refresh_success", { count: changed })
+            : t("app.settings.maintenance_refresh_empty"),
+          false,
+        );
+        await loadSettingsMaintenanceStatus();
+      } catch (err) {
+        showSettingsMaintenanceHint(t("app.settings.maintenance_refresh_failed", { message: err.message }), true);
+      } finally {
+        refreshBtn.disabled = false;
+      }
+    });
+  }
+  if (!resetBtn.dataset.wired) {
+    resetBtn.dataset.wired = "1";
+    resetBtn.addEventListener("click", async () => {
+      const shouldReset = typeof confirm === "function" ? confirm(t("app.settings.reset_confirm")) : false;
+      if (!shouldReset) return;
+      resetBtn.disabled = true;
+      try {
+        const res = await fetch(`${API_DATA}/reset-local`, { method: "POST" });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const payload = await res.json();
+        clearClientMaintenanceState();
+        showSettingsMaintenanceHint(
+          t("app.settings.maintenance_reset_success", { count: countChangedFiles(payload) }),
+          false,
+        );
+        setTimeout(() => location.reload(), 900);
+      } catch (err) {
+        showSettingsMaintenanceHint(t("app.settings.maintenance_reset_failed", { message: err.message }), true);
+        resetBtn.disabled = false;
+      }
+    });
+  }
+  return loadSettingsMaintenanceStatus();
+}
+
 function setupSettingsView() {
   const sel = document.getElementById("settingsDimSelect");
   if (!sel || sel.dataset.wired) return;
@@ -1218,6 +1354,7 @@ function setupSettingsView() {
     }
   })();
   setupExportImport();
+  void setupSettingsMaintenanceActions();
 }
 
 let pendingImportPayload = null;
@@ -1586,7 +1723,9 @@ if (window.__POKEVAULT_APP_TESTS__) {
   window.PokedexCollection._test = {
     currentViewFromHash,
     isSupportedBackupSchemaVersion,
+    renderSettingsMaintenanceStatus,
     rerenderArtworkSurface,
+    setupSettingsMaintenanceActions,
     shouldDimCardForHighlight,
   };
 }
@@ -1927,6 +2066,9 @@ function applyAppRoute() {
   }
   if (view === "stats" && typeof window.PokedexStats?.start === "function") {
     window.PokedexStats.start();
+  }
+  if (view === "settings") {
+    setupSettingsView();
   }
   if (view === "print" && typeof window.PokedexPrint?.start === "function") {
     window.PokedexPrint.start();

@@ -9,6 +9,7 @@ from fastapi.staticfiles import StaticFiles
 from tracker.api.controllers import (
     badge_router,
     binder_router,
+    data_router,
     export_router,
     health_router,
     progress_router,
@@ -31,6 +32,7 @@ def create_app(settings: TrackerSettings | None = None) -> FastAPI:
     app.include_router(badge_router)
     app.include_router(trainer_contact_router)
     app.include_router(export_router)
+    app.include_router(data_router)
     app.include_router(health_router)
 
     data_dir = s.data_dir.resolve()

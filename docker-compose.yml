@@ -9,4 +9,5 @@ services:
     environment:
       - TRACKER_HOST=0.0.0.0
       - TRACKER_PORT=8765
+      - TRACKER_REFERENCE_DATA_DIR=/app/reference-data
     restart: unless-stopped

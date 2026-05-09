@@ -165,6 +165,18 @@ def test_hunts_route_is_not_mounted(tmp_path: Path) -> None:
     assert "/api/hunts/{slug}" not in paths
 
 
+def test_data_maintenance_routes_are_mounted(tmp_path: Path) -> None:
+    _minimal_layout(tmp_path)
+    (tmp_path / "data" / "pokedex.json").write_text("[]", encoding="utf-8")
+    settings = TrackerSettings(repo_root=tmp_path)
+    application = create_app(settings)
+    paths = {route.path for route in application.routes}
+
+    assert "/api/data/status" in paths
+    assert "/api/data/refresh" in paths
+    assert "/api/data/reset-local" in paths
+
+
 def test_card_and_tcg_routes_are_not_mounted(tmp_path: Path) -> None:
     _minimal_layout(tmp_path)
     (tmp_path / "data" / "pokedex.json").write_text("[]", encoding="utf-8")
