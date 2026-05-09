@@ -7,6 +7,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [1.6.0] — 2026-05-09
+
+### Added
+
+- Vault Lab redesign across the application, matching the maquette/v1 direction
+  with denser navigation, local fonts, responsive mobile tabs and a dedicated
+  More menu for secondary surfaces.
+- A standalone Badges page with filtered badge gallery, while Statistics keeps
+  a focused dashboard for collection, region and type completion.
+- Node frontend coverage helper through `make web-test-cov`, plus targeted
+  coverage for badges, stats and redesigned route behavior.
+
+### Changed
+
+- The previous runtime theme switcher was removed so the app ships one cohesive
+  Vault Lab visual system for now.
+- Pokémon and badge detail openings continue to use modal surfaces, now stacked
+  above fixed desktop and mobile navigation.
+
+### Fixed
+
+- Direct hash routes for Statistics and Print load their page modules before the
+  app router starts.
+- Stale Stats/Badges coupling styles were removed so the two pages stay split.
+
 ## [1.5.0] — 2026-05-07
 
 ### Added
