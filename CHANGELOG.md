@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [1.6.2] — 2026-05-09
+
+### Added
+
+- Game Pokédex appearances now cover every Pokémon shipped in
+  `data/pokedex.json`, so Pokémon fiches no longer fall back to an empty game
+  appearance section for known entries.
+- Collection cards show a small `2+` marker when a local Pokémon is marked as
+  `Plusieurs exemplaires`.
+- `Cmd/Ctrl+K` focuses collection search from any app view.
+
+### Changed
+
+- Product docs now keep Badges and Statistics copy separated while preserving
+  the public badge catalog description.
+
 ## [1.6.1] — 2026-05-09
 
 ### Changed

@@ -426,6 +426,25 @@ def test_public_features_page_has_bilingual_product_copy() -> None:
     assert "EN:" in i18n
 
 
+def test_product_docs_split_badges_from_stats_copy() -> None:
+    features = (DOCS / "features.html").read_text(encoding="utf-8")
+    docs_i18n = (DOCS / "assets" / "i18n.js").read_text(encoding="utf-8")
+    app_index = (WEB / "index.html").read_text(encoding="utf-8")
+    app_i18n = (WEB / "i18n.js").read_text(encoding="utf-8")
+
+    for text in [features, docs_i18n, app_index, app_i18n]:
+        assert "Badges et stats" not in text
+        assert "Badges and stats" not in text
+        assert "requirement previews" not in text
+        assert "badge progress" not in text
+
+    assert 'data-i18n="app.docs.badges.title"' in app_index
+    assert 'data-i18n="app.docs.stats.title"' in app_index
+    assert "features.stats.title" in docs_i18n
+    assert '"features.stats.title": "Statistiques"' in docs_i18n
+    assert '"features.stats.title": "Stats"' in docs_i18n
+
+
 def test_readme_is_developer_oriented_and_delegates_product_docs() -> None:
     readme = (ROOT / "README.md").read_text(encoding="utf-8")
 

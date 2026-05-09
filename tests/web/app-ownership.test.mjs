@@ -357,4 +357,7 @@ test("pokemon cards suppress Vu chez for local duplicates even when raw progress
   assert.equal(String(card.className).includes("is-dimmed"), false);
   assert.doesNotMatch(card["aria-label"], /vu chez/);
   assert.equal(card.dataset.ownership, "Plusieurs exemplaires");
+  const ownedCount = findByClass(card, "pokemon-owned-count");
+  assert.equal(ownedCount?.textContent, "2+");
+  assert.equal(ownedCount?.title, "Plusieurs exemplaires");
 });

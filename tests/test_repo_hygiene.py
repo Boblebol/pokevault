@@ -116,6 +116,33 @@ def test_game_pokedex_reference_file_has_public_shape() -> None:
     assert "xy-kalos-central" in payload["appearances_by_slug"]["0001-bulbasaur"]
 
 
+def test_game_pokedex_reference_covers_every_shipped_pokemon() -> None:
+    import json
+
+    pokedex = json.loads((ROOT / "data" / "pokedex.json").read_text(encoding="utf-8"))
+    game_pokedexes = json.loads((ROOT / "data" / "game-pokedexes.json").read_text(encoding="utf-8"))
+
+    known_ids = {entry["id"] for entry in game_pokedexes["pokedexes"]}
+    appearances = game_pokedexes["appearances_by_slug"]
+
+    missing = [
+        pokemon["slug"]
+        for pokemon in pokedex["pokemon"]
+        if not appearances.get(pokemon["slug"])
+    ]
+    invalid = sorted(
+        {
+            pokedex_id
+            for ids in appearances.values()
+            for pokedex_id in ids
+            if pokedex_id not in known_ids
+        }
+    )
+
+    assert missing == []
+    assert invalid == []
+
+
 def test_runtime_help_references_existing_dev_command() -> None:
     for path in [
         ROOT / "web" / "app.js",
