@@ -19,8 +19,9 @@
           <a href="#/liste" class="app-switch-link is-active" data-view="liste" aria-current="page" data-i18n="app.nav.collection">Collection</a>
           <a href="#/classeur" class="app-switch-link" data-view="classeur" data-i18n="app.nav.binders">Classeurs</a>
           <a href="#/dresseurs" class="app-switch-link" data-view="dresseurs" data-i18n="app.nav.trainers">Dresseurs</a>
-          <a href="#/print" class="app-switch-link" data-view="print" data-i18n="app.nav.print">Impression</a>
+          <a href="#/badges" class="app-switch-link" data-view="badges" data-i18n="app.nav.badges">Badges</a>
           <a href="#/stats" class="app-switch-link" data-view="stats" data-i18n="app.nav.stats">Statistiques</a>
+          <a href="#/print" class="app-switch-link" data-view="print" data-i18n="app.nav.print">Impression</a>
           <a href="#/docs" class="app-switch-link" data-view="docs" data-i18n="app.nav.docs">Docs</a>
           <a href="#/settings" class="app-switch-link" data-view="settings" data-i18n="app.nav.settings">Réglages</a>
         </nav>
@@ -178,6 +179,16 @@
         </div>
       </div>
 
+      <div id="viewBadges" class="app-view" hidden>
+        <header class="header app-collection-header binder-header badges-header">
+          <h1 class="title" data-i18n="app.badges.title">Badges</h1>
+          <p class="collection-subtitle" data-i18n="app.badges.subtitle">Galerie complète des badges, filtres et dossiers combat.</p>
+        </header>
+        <section class="badges-shell" aria-label="Galerie de badges" data-i18n-aria-label="app.badges.shell">
+          <main class="badges-content" id="badgesBody"></main>
+        </section>
+      </div>
+
       <div id="viewStats" class="app-view" hidden>
         <header class="header app-collection-header binder-header stats-header">
           <h1 class="title" data-i18n="app.stats.title">Statistiques</h1>
@@ -197,7 +208,6 @@
           </aside>
           <main class="stats-content stats-content--dashboard">
             <section class="stats-main stats-main--overview" id="statsBody"></section>
-            <section class="stats-main stats-main--badges" id="statsBadges"></section>
           </main>
         </section>
       </div>
@@ -383,7 +393,7 @@
             Guide embarqué pour utiliser Pokevault sans quitter l'app locale.
           </p>
         </header>
-        <section class="docs-shell" aria-label="Documentation Pokevault" data-i18n-aria-label="app.docs.shell">
+        <section class="docs-shell" aria-label="Documentation" data-i18n-aria-label="app.docs.shell">
           <section class="docs-hero">
             <p class="docs-kicker" data-i18n="app.docs.kicker">Documentation intégrée</p>
             <h2 data-i18n="app.docs.hero.title">Tout garder en local, tout comprendre vite.</h2>
@@ -459,8 +469,8 @@
             <article class="docs-card">
               <h2 data-i18n="app.docs.badges.title">Badges et stats</h2>
               <ul class="docs-list">
-                <li data-i18n="app.docs.badges.stats">Statistiques suit la complétion globale, régionale, par type et par badge.</li>
-                <li data-i18n="app.docs.badges.gallery">La galerie garde les badges verrouillés scellés jusqu'au déblocage.</li>
+                <li data-i18n="app.docs.badges.stats">Statistiques suit la progression Pokédex globale, régionale et par type.</li>
+                <li data-i18n="app.docs.badges.gallery">Badges regroupe la galerie, les filtres et les dossiers combat.</li>
                 <li data-i18n="app.docs.badges.catalog">Le catalogue couvre Kanto, Johto et les équipes de base Rubis/Saphir à Écarlate/Violet, sans remakes.</li>
               </ul>
             </article>
@@ -542,10 +552,6 @@
                 <option value="caught" data-i18n="app.dim.caught">Atténuer capturés</option>
                 <option value="missing" data-i18n="app.dim.missing">Atténuer manquants</option>
               </select>
-            </label>
-            <label class="region-filter-wrap settings-dim-label theme-choice-row">
-              <span class="region-filter-label" data-i18n="app.settings.theme">Thème</span>
-              <select id="settingsThemeSelect" class="region-filter" aria-label="Thème de région"></select>
             </label>
             <label class="region-filter-wrap settings-dim-label theme-choice-row">
               <span class="region-filter-label" data-i18n="app.settings.artwork">Images / sprites</span>
@@ -837,12 +843,26 @@
       </aside>
     </div>
 
-    <script src="/themes.js"></script>
+    <nav class="mobile-bottom-nav" aria-label="Navigation mobile" data-i18n-aria-label="app.nav.mobile">
+      <a href="#/liste" class="mobile-bottom-nav__item" data-mobile-view="liste" data-view="liste"><span aria-hidden="true">◉</span><span data-i18n="app.nav.collection_short">Dex</span></a>
+      <a href="#/classeur" class="mobile-bottom-nav__item" data-mobile-view="classeur" data-view="classeur"><span aria-hidden="true">▦</span><span data-i18n="app.nav.binders_short">Classeurs</span></a>
+      <a href="#/badges" class="mobile-bottom-nav__item" data-mobile-view="badges" data-view="badges"><span aria-hidden="true">⬡</span><span data-i18n="app.nav.badges">Badges</span></a>
+      <a href="#/stats" class="mobile-bottom-nav__item" data-mobile-view="stats" data-view="stats"><span aria-hidden="true">▣</span><span data-i18n="app.nav.stats_short">Stats</span></a>
+      <button type="button" class="mobile-bottom-nav__item" id="mobileMoreToggle" aria-expanded="false" aria-controls="mobileMoreMenu"><span aria-hidden="true">☰</span><span data-i18n="app.nav.more">Plus</span></button>
+    </nav>
+    <nav class="mobile-more-menu" id="mobileMoreMenu" aria-label="Navigation secondaire" data-i18n-aria-label="app.nav.more_menu" hidden>
+      <a href="#/dresseurs" class="mobile-more-menu__link" data-view="dresseurs" data-i18n="app.nav.trainers">Dresseurs</a>
+      <a href="#/print" class="mobile-more-menu__link" data-view="print" data-i18n="app.nav.print">Impression</a>
+      <a href="#/docs" class="mobile-more-menu__link" data-view="docs" data-i18n="app.nav.docs">Docs</a>
+      <a href="#/settings" class="mobile-more-menu__link" data-view="settings" data-i18n="app.nav.settings">Réglages</a>
+    </nav>
+
     <script src="/i18n.js" defer></script>
     <script src="/empty-states.js" defer></script>
     <script src="/keyboard.js" defer></script>
     <script src="/toast.js" defer></script>
     <script src="/badges-view.js" defer></script>
+    <script src="/badges-page.js" defer></script>
     <script src="/artwork-switcher.js" defer></script>
     <script src="/onboarding.js" defer></script>
     <script src="/type-chart.js" defer></script>
@@ -853,9 +873,9 @@
     <script src="/pokedex-filters.js" defer></script>
     <script src="/pokedex-dashboard.js" defer></script>
     <script src="/trainer-contacts.js" defer></script>
-    <script src="/app.js" defer></script>
     <script src="/binder-collection-view.js" defer></script>
     <script src="/stats-view.js" defer></script>
     <script src="/print-view.js" defer></script>
+    <script src="/app.js" defer></script>
   </body>
 </html>

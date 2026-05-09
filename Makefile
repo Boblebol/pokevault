@@ -17,7 +17,7 @@ AWK ?= awk
 
 .DEFAULT_GOAL := help
 
-.PHONY: help vars install dev open fetch fetch-test fetch-evolutions test test-cov web-test lightpanda-e2e lint fmt check clean \
+.PHONY: help vars install dev open fetch fetch-test fetch-evolutions test test-cov web-test web-test-cov lightpanda-e2e lint fmt check clean \
 	build docker-build docker-up docker-up-local docker-down docker-logs
 
 ##@ General
@@ -85,6 +85,9 @@ test-cov: ## Lancer les tests avec couverture (100% tracker)
 
 web-test: ## Lancer les tests web vanilla Node
 	node --test tests/web/*.test.mjs
+
+web-test-cov: ## Lancer les tests web vanilla Node avec couverture
+	node --test --experimental-test-coverage --test-coverage-include='web/**/*.js' --test-coverage-exclude='tests/**' tests/web/*.test.mjs
 
 lightpanda-e2e: ## Lancer les checks navigateur optionnels Lightpanda
 	node tests/e2e/lightpanda-print-placeholders.mjs

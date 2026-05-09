@@ -306,14 +306,6 @@ function renderStats() {
 let statsStarted = false;
 let statsLocaleSubbed = false;
 
-function renderBadgesBlock() {
-  const host = document.getElementById("statsBadges");
-  if (!host) return;
-  const B = window.PokevaultBadges;
-  if (!B) return;
-  B.renderInto(host);
-}
-
 function startStatsIfNeeded() {
   void (async () => {
     try {
@@ -324,20 +316,12 @@ function startStatsIfNeeded() {
     if (!statsStarted) {
       statsStarted = true;
       window.PokedexCollection?.subscribeCaught?.(() => renderStats());
-      window.PokevaultBadges?.subscribe?.(() => {
-        renderStats();
-        renderBadgesBlock();
-      });
     }
     if (!statsLocaleSubbed) {
       statsLocaleSubbed = true;
-      window.PokevaultI18n?.subscribeLocale?.(() => {
-        renderStats();
-        renderBadgesBlock();
-      });
+      window.PokevaultI18n?.subscribeLocale?.(() => renderStats());
     }
     renderStats();
-    window.PokevaultBadges?.poll?.().then(() => renderBadgesBlock());
   })();
 }
 

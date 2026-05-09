@@ -53,6 +53,15 @@ def test_make_check_runs_web_tests_by_default() -> None:
     assert "\tnode --test tests/web/*.test.mjs" in makefile
 
 
+def test_makefile_exposes_node_coverage_for_web_tests() -> None:
+    makefile = (ROOT / "Makefile").read_text(encoding="utf-8")
+
+    assert re.search(r"^web-test-cov:.*$", makefile, flags=re.MULTILINE)
+    assert "--experimental-test-coverage" in makefile
+    assert "--test-coverage-include='web/**/*.js'" in makefile
+    assert "--test-coverage-exclude='tests/**'" in makefile
+
+
 def test_contributing_documents_dependabot_uv_updates() -> None:
     contributing = (ROOT / "CONTRIBUTING.md").read_text(encoding="utf-8")
 

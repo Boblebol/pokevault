@@ -114,13 +114,11 @@ def test_web_app_references_runtime_brand_assets() -> None:
 
 
 def test_web_app_has_no_third_party_font_requests() -> None:
-    index = (WEB / "index.html").read_text(encoding="utf-8")
-
-    assert "fonts.googleapis.com" not in index
-    assert "fonts.gstatic.com" not in index
-    assert "Material+Symbols" not in index
-    for path in [WEB / "index.html", WEB / "styles.css", *WEB.glob("*.js")]:
+    for path in [WEB / "index.html", WEB / "styles.css", *WEB.rglob("*.js")]:
         text = path.read_text(encoding="utf-8")
+        assert "fonts.googleapis.com" not in text, path
+        assert "fonts.gstatic.com" not in text, path
+        assert "Material+Symbols" not in text, path
         assert "Material Symbols" not in text, path
         assert "material-symbols" not in text, path
 
@@ -134,6 +132,7 @@ def test_web_app_supports_fr_en_switch_on_main_surfaces() -> None:
     assert 'data-i18n-locale="en"' in index
     for key in [
         "app.collection.title",
+        "app.badges.title",
         "app.stats.title",
         "app.binders.title",
         "app.trainers.title",
@@ -146,6 +145,9 @@ def test_web_app_supports_fr_en_switch_on_main_surfaces() -> None:
     ]:
         assert f'data-i18n="{key}"' in index
         assert key in i18n
+    assert 'href="#/badges"' in index
+    assert 'id="viewBadges"' in index
+    assert '"app.nav.badges"' in i18n
     assert 'href="#/docs"' in index
     assert 'id="viewDocs"' in index
     assert '"app.nav.docs"' in i18n

@@ -5,7 +5,7 @@
 
 const API_PROGRESS = "/api/progress";
 const API_HEALTH = "/api/health";
-const APP_VERSION = "1.5.0";
+const APP_VERSION = "1.6.0";
 const PROGRESS_QUEUE_KEY = "pokedex_progress_queue";
 const FORM_FILTER_STORAGE_KEY = "pokedexFormFilter";
 const TYPE_FILTER_STORAGE_KEY = "pokedexTypeFilter";
@@ -1155,25 +1155,6 @@ function appendVisibleItems(fullList) {
   window.PokevaultKeyboard?.repaint?.();
 }
 
-function setupThemeSelect() {
-  const sel = document.getElementById("settingsThemeSelect");
-  const T = window.PokevaultThemes;
-  if (!sel || !T || sel.dataset.wired) return;
-  sel.dataset.wired = "1";
-  sel.replaceChildren();
-  for (const t of T.list) {
-    const opt = document.createElement("option");
-    opt.value = t.id;
-    opt.textContent = t.label;
-    sel.append(opt);
-  }
-  sel.value = T.current;
-  sel.addEventListener("change", () => T.set(sel.value));
-  T.subscribe((id) => {
-    if (sel.value !== id) sel.value = id;
-  });
-}
-
 function setupArtworkSelect() {
   const sel = document.getElementById("settingsArtworkSelect");
   const A = window.PokevaultArtwork;
@@ -1216,7 +1197,6 @@ function setupSettingsView() {
   subscribeDimMode((mode) => {
     sel.value = mode;
   });
-  setupThemeSelect();
   setupArtworkSelect();
   paintVersionLabels();
   const versionEl = document.getElementById("settingsVersionLabel");
@@ -1819,6 +1799,7 @@ function currentViewFromHash() {
   if (raw === "stats") return "stats";
   if (raw === "classeur") return "classeur";
   if (raw === "dresseurs") return "dresseurs";
+  if (raw === "badges") return "badges";
   if (raw === "settings") return "settings";
   if (raw === "print") return "print";
   if (raw === "docs") return "docs";
@@ -1845,6 +1826,42 @@ function updateAppSwitchNav(view) {
     if (on) a.setAttribute("aria-current", "page");
     else a.removeAttribute("aria-current");
   });
+  document.querySelectorAll("[data-mobile-view]").forEach((a) => {
+    const v = a.dataset.mobileView;
+    const on = v === view;
+    a.classList.toggle("is-active", on);
+    if (on) a.setAttribute("aria-current", "page");
+    else a.removeAttribute("aria-current");
+  });
+  document.querySelectorAll(".mobile-more-menu__link").forEach((a) => {
+    const v = a.dataset.view;
+    const on = v === view;
+    a.classList.toggle("is-active", on);
+    if (on) a.setAttribute("aria-current", "page");
+    else a.removeAttribute("aria-current");
+  });
+}
+
+function closeMobileMoreMenu() {
+  const toggle = document.getElementById("mobileMoreToggle");
+  const menu = document.getElementById("mobileMoreMenu");
+  if (toggle) toggle.setAttribute("aria-expanded", "false");
+  if (menu) menu.hidden = true;
+}
+
+function setupMobileMoreMenu() {
+  const toggle = document.getElementById("mobileMoreToggle");
+  const menu = document.getElementById("mobileMoreMenu");
+  if (!toggle || !menu || toggle.dataset.bound) return;
+  toggle.dataset.bound = "1";
+  toggle.addEventListener("click", () => {
+    const isOpen = toggle.getAttribute("aria-expanded") === "true";
+    toggle.setAttribute("aria-expanded", isOpen ? "false" : "true");
+    menu.hidden = isOpen;
+  });
+  menu.querySelectorAll?.("a").forEach((link) => {
+    link.addEventListener("click", () => closeMobileMoreMenu());
+  });
 }
 
 function applyAppRoute() {
@@ -1853,6 +1870,7 @@ function applyAppRoute() {
   const elListe = document.getElementById("viewListe");
   const elClasseur = document.getElementById("viewClasseur");
   const elDresseurs = document.getElementById("viewDresseurs");
+  const elBadges = document.getElementById("viewBadges");
   const elStats = document.getElementById("viewStats");
   const elSettings = document.getElementById("viewSettings");
   const elPrint = document.getElementById("viewPrint");
@@ -1860,13 +1878,16 @@ function applyAppRoute() {
   if (elListe) elListe.hidden = view !== "liste";
   if (elClasseur) elClasseur.hidden = view !== "classeur";
   if (elDresseurs) elDresseurs.hidden = view !== "dresseurs";
+  if (elBadges) elBadges.hidden = view !== "badges";
   if (elStats) elStats.hidden = view !== "stats";
   if (elSettings) elSettings.hidden = view !== "settings";
   if (elPrint) elPrint.hidden = view !== "print";
   if (elDocs) elDocs.hidden = view !== "docs";
   updateAppSwitchNav(view);
+  closeMobileMoreMenu();
   const titles = {
     liste: `pokevault — ${t("app.nav.collection")}`,
+    badges: `pokevault — ${t("app.badges.title")}`,
     stats: `pokevault — ${t("app.nav.stats")}`,
     settings: `pokevault — ${t("app.nav.settings")}`,
     print: `pokevault — ${t("app.nav.print")}`,
@@ -1889,6 +1910,9 @@ function applyAppRoute() {
   }
   if (view === "dresseurs" && typeof window.PokevaultTrainerContacts?.start === "function") {
     window.PokevaultTrainerContacts.start();
+  }
+  if (view === "badges" && typeof window.PokevaultBadgesPage?.start === "function") {
+    window.PokevaultBadgesPage.start();
   }
   if (view === "stats" && typeof window.PokedexStats?.start === "function") {
     window.PokedexStats.start();
@@ -1918,5 +1942,6 @@ window.PokevaultI18n?.subscribeLocale?.(() => {
 window.applyPokedexAppRoute = applyAppRoute;
 
 void (async () => {
+  setupMobileMoreMenu();
   applyAppRoute();
 })();

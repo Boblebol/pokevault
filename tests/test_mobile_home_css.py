@@ -18,8 +18,35 @@ def _media_block(max_width: int) -> str:
     return CSS[start:] if next_media < 0 else CSS[start:next_media]
 
 
+def _print_media_block() -> str:
+    marker = "@media print"
+    start = CSS.find(marker)
+    assert start >= 0, "missing print media block"
+    next_media = CSS.find("@media", start + len(marker))
+    return CSS[start:] if next_media < 0 else CSS[start:next_media]
+
+
 def _blocks(selector: str) -> list[str]:
     return re.findall(rf"{re.escape(selector)}\s*\{{([^}}]+)\}}", CSS, flags=re.MULTILINE)
+
+
+def _blocks_in(css: str, selector: str) -> list[str]:
+    return re.findall(rf"{re.escape(selector)}\s*\{{([^}}]+)\}}", css, flags=re.MULTILINE)
+
+
+def _script_index(src: str) -> int:
+    marker = f'<script src="{src}"'
+    index = HTML.find(marker)
+    assert index >= 0, f"missing script {src}"
+    return index
+
+
+def test_late_page_modules_load_before_app_router_for_direct_hashes() -> None:
+    """Initial #/stats and #/print loads need page modules before app.js routes."""
+
+    app_index = _script_index("/app.js")
+    assert _script_index("/stats-view.js") < app_index
+    assert _script_index("/print-view.js") < app_index
 
 
 def test_page_headers_scroll_with_content_under_fixed_app_bar() -> None:
@@ -76,8 +103,8 @@ def test_badge_detail_modal_and_pokemon_preview_are_responsive() -> None:
     assert "inset: 0;" in overlay
 
     detail = "\n".join(_blocks(".badge-detail"))
-    assert "max-width: min(92vw, 560px);" in detail
-    assert "max-height: min(86vh, 720px);" in detail
+    assert "max-width: min(92vw, 720px);" in detail
+    assert "max-height: min(86vh, 760px);" in detail
     assert "overflow: auto;" in detail
 
     requirements = "\n".join(_blocks(".badge-detail-requirements"))
@@ -188,6 +215,14 @@ def test_trainer_contacts_are_optional_and_isolated() -> None:
     dresseurs_view = HTML.split('id="viewDresseurs"', 1)[1].split('id="viewPrint"', 1)[0]
     assert "onboarding" not in dresseurs_view.lower()
 
+    for selector in [".trainer-contact-links li", ".trainer-tag-group li"]:
+        block = "\n".join(_blocks(selector))
+        assert "border: 1px solid var(--pdx-border);" in block, selector
+        assert "border-radius: var(--radius-sm);" in block, selector
+        assert "background: var(--pdx-bg);" in block, selector
+        assert "color: var(--pdx-text-dim);" in block, selector
+        assert "font-family: var(--font-mono);" in block, selector
+
 
 def test_trade_chips_have_dedicated_compact_styles() -> None:
     expected_tokens = [
@@ -248,3 +283,194 @@ def test_settings_no_longer_exposes_multi_profile_controls() -> None:
     assert "Pokédex multi-profils" not in HTML
     assert "settingsProfileCreateBtn" not in HTML
     assert "settingsProfileDeleteBtn" not in HTML
+
+
+def test_secondary_pages_use_vault_lab_panels() -> None:
+    expected_selectors = [
+        "#viewClasseur .binder-shell-layout",
+        "#viewDresseurs .trainer-shell",
+        "#viewPrint .binder-shell-layout",
+        "#viewDocs .docs-shell",
+        "#viewSettings .stats-main",
+    ]
+    for selector in expected_selectors:
+        block = "\n".join(_blocks(selector))
+        assert block, selector
+        assert "var(--pdx-" in block, selector
+
+
+def test_print_sections_drop_screen_chrome_when_printing() -> None:
+    block = "\n".join(_blocks_in(_print_media_block(), ".print-section"))
+    assert "break-inside: avoid;" in block
+    assert "background: #fff;" in block or "background: none;" in block
+    assert "border: 0;" in block
+    assert "border-radius: 0;" in block
+    assert "box-shadow: none;" in block
+
+
+def test_vault_lab_desktop_nav_order_separates_badges_from_stats() -> None:
+    nav = HTML.split('class="stitch-topnav"', 1)[1].split("</nav>", 1)[0]
+    expected = [
+        'href="#/liste"',
+        'href="#/classeur"',
+        'href="#/dresseurs"',
+        'href="#/badges"',
+        'href="#/stats"',
+        'href="#/print"',
+        'href="#/docs"',
+        'href="#/settings"',
+    ]
+    positions = [nav.index(token) for token in expected]
+    assert positions == sorted(positions)
+
+
+def test_vault_lab_mobile_nav_uses_primary_tabs_and_plus_menu() -> None:
+    assert 'class="mobile-bottom-nav"' in HTML
+    for token in [
+        'data-mobile-view="liste"',
+        'data-mobile-view="classeur"',
+        'data-mobile-view="badges"',
+        'data-mobile-view="stats"',
+        'id="mobileMoreToggle"',
+        'id="mobileMoreMenu"',
+    ]:
+        assert token in HTML
+
+    more = HTML.split('id="mobileMoreMenu"', 1)[1].split("</nav>", 1)[0]
+    for href in ['href="#/dresseurs"', 'href="#/print"', 'href="#/docs"', 'href="#/settings"']:
+        assert href in more
+
+
+def test_mobile_nav_is_hidden_on_desktop_and_positioned_on_mobile() -> None:
+    bottom_default = "\n".join(_blocks(".mobile-bottom-nav"))
+    more_default = "\n".join(_blocks(".mobile-more-menu"))
+    assert "display: none;" in bottom_default
+    assert "display: none;" in more_default
+
+    mobile = _media_block(720)
+    for selector in [
+        ".mobile-bottom-nav",
+        ".mobile-more-menu",
+        ".mobile-more-menu[hidden]",
+    ]:
+        assert selector in mobile
+
+    bottom_mobile = re.search(r"\.mobile-bottom-nav\s*\{([^}]+)\}", mobile)
+    assert bottom_mobile
+    assert "display: grid;" in bottom_mobile.group(1)
+    assert "grid-template-columns: repeat(5, minmax(0, 1fr));" in bottom_mobile.group(1)
+    assert "position: fixed;" in bottom_mobile.group(1)
+    assert "bottom: 0;" in bottom_mobile.group(1)
+
+    more_mobile = re.search(r"\.mobile-more-menu\s*\{([^}]+)\}", mobile)
+    assert more_mobile
+    assert "position: fixed;" in more_mobile.group(1)
+    assert "bottom:" in more_mobile.group(1)
+
+    hidden_mobile = re.search(r"\.mobile-more-menu\[hidden\]\s*\{([^}]+)\}", mobile)
+    assert hidden_mobile
+    assert "display: none;" in hidden_mobile.group(1)
+
+
+def test_pokemon_modal_stacks_above_fixed_navigation() -> None:
+    topbar = "\n".join(_blocks(".stitch-topbar"))
+    bottom_nav = "\n".join(_blocks_in(_media_block(720), ".mobile-bottom-nav"))
+    modal = "\n".join(_blocks(".pokemon-modal"))
+
+    assert "--z-modal: 220;" in CSS
+    assert "z-index: var(--z-app-bar);" in topbar
+    assert "z-index: var(--z-mobile-nav);" in bottom_nav
+    assert "z-index: var(--z-modal);" in modal
+
+
+def test_vault_lab_shell_uses_maquette_density_and_mobile_surfaces() -> None:
+    body = "\n".join(_blocks("html,\nbody"))
+    assert "background-color: var(--pdx-bg);" in body
+    assert "background-image: radial-gradient(" in body
+    assert "background-size: 22px 22px;" in body
+    assert "z-index: -1;" not in body
+
+    topbar = "\n".join(_blocks(".stitch-topbar"))
+    assert "height: 48px;" in topbar
+    assert "background: var(--pdx-panel);" in topbar
+    assert "border-bottom: 1px solid var(--pdx-border);" in topbar
+
+    nav_link = "\n".join(_blocks(".stitch-topnav .app-switch-link"))
+    assert "font-family: var(--font-mono);" in nav_link
+    assert "text-transform: uppercase;" in nav_link
+    assert "height: 48px;" in nav_link
+
+    mobile = _media_block(720)
+    for token in [
+        ".mobile-bottom-nav",
+        "position: fixed;",
+        "bottom: 0;",
+        "height: 58px;",
+        ".mobile-more-menu",
+    ]:
+        assert token in mobile
+
+
+def test_stats_page_is_stats_only_vault_lab_dashboard() -> None:
+    stats_view = HTML.split('id="viewStats"', 1)[1].split('id="viewClasseur"', 1)[0]
+    assert 'id="statsBody"' in stats_view
+    assert 'id="statsBadges"' not in stats_view
+    assert "stats-main--badges" not in CSS
+
+    stats_shell = "\n".join(_blocks("#viewStats .stats-shell"))
+    assert "grid-template-columns:" in stats_shell
+    assert "var(--pdx-panel)" in stats_shell or "var(--pdx-bg)" in stats_shell
+
+    stats_panels = "\n".join(
+        _blocks(
+            "#viewStats .stats-rail,\n"
+            "#viewStats .stats-hero,\n"
+            "#viewStats .stats-region-wrap"
+        )
+    )
+    assert "background: var(--pdx-panel);" in stats_panels
+    assert "border: 1px solid var(--pdx-border);" in stats_panels
+
+    responsive = _media_block(960)
+    assert "#viewStats .stats-shell" in responsive
+    assert "grid-template-columns: 1fr;" in responsive
+    assert "#viewStats .stats-kpi-grid" in responsive
+
+
+def test_collection_uses_vault_lab_rail_and_cards() -> None:
+    collection_shell = "\n".join(_blocks("#viewListe .collection-shell"))
+    assert "grid-template-columns:" in collection_shell
+
+    rail = "\n".join(_blocks("#viewListe .collection-rail"))
+    assert "var(--pdx-panel)" in rail
+    assert "var(--pdx-border)" in rail
+
+    card = "\n".join(_blocks(".card"))
+    assert "var(--pdx-panel)" in card or "var(--pdx-bg)" in card
+    assert "var(--pdx-border)" in card
+
+    active_filter = "\n".join(_blocks("#viewListe .filter-btn.is-active"))
+    assert "var(--pdx-cyan)" in active_filter
+    assert "var(--pdx-cyan-dim)" in active_filter
+    assert "var(--accent)" not in active_filter
+    assert "var(--accent-strong)" not in active_filter
+
+    filter_blocks = _blocks(".filter-btn")
+    assert filter_blocks
+    final_filter = filter_blocks[-1]
+    assert "border: 1px solid var(--pdx-border);" in final_filter
+    assert "box-shadow: none;" in final_filter
+    assert "var(--outline-soft)" not in final_filter
+
+    shared_filter = "\n".join(_blocks(".filter-btn,\n.region-filter,\n.search-input"))
+    assert "border: 1px solid var(--pdx-border);" in shared_filter
+    assert "box-shadow: none;" in shared_filter
+    assert "var(--outline-soft)" not in shared_filter
+
+    card_focus = "\n".join(_blocks(".card:focus-visible"))
+    assert "var(--pdx-cyan)" in card_focus or "var(--pdx-border-hi)" in card_focus
+    assert "var(--accent)" not in card_focus
+
+    collection_card = "\n".join(_blocks("#viewListe .grid .card"))
+    assert "border-radius: var(--radius-md);" in collection_card
+    assert "border-radius: 12px;" not in collection_card
