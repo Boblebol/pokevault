@@ -5,7 +5,7 @@
 
 const API_PROGRESS = "/api/progress";
 const API_HEALTH = "/api/health";
-const APP_VERSION = "1.6.1";
+const APP_VERSION = "1.6.2";
 const PROGRESS_QUEUE_KEY = "pokedex_progress_queue";
 const FORM_FILTER_STORAGE_KEY = "pokedexFormFilter";
 const TYPE_FILTER_STORAGE_KEY = "pokedexTypeFilter";
@@ -1449,6 +1449,8 @@ function createPokemonCard(p, opts) {
   const numEl = document.createElement("div");
   numEl.className = "card-num";
   numEl.textContent = displayNumber(p.number);
+  const markers = document.createElement("div");
+  markers.className = "card-markers";
   const statusIcon = document.createElement("span");
   const statusClass = caught ? "is-caught" : visualSeen ? "is-seen" : "is-missing";
   statusIcon.className = `card-status-icon ${statusClass}`;
@@ -1458,7 +1460,16 @@ function createPokemonCard(p, opts) {
       ? "◉"
       : "○";
   statusIcon.setAttribute("aria-hidden", "true");
-  top.append(numEl, statusIcon);
+  markers.append(statusIcon);
+  if (ownership.duplicate) {
+    const ownedCount = document.createElement("span");
+    ownedCount.className = "pokemon-owned-count";
+    ownedCount.textContent = "2+";
+    ownedCount.title = card.dataset.ownership || t("pokemon_fiche.ownership.duplicate");
+    ownedCount.setAttribute("aria-label", ownedCount.title);
+    markers.append(ownedCount);
+  }
+  top.append(numEl, markers);
   card.append(top);
 
   const imgWrap = document.createElement("div");

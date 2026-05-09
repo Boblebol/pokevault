@@ -1,13 +1,16 @@
 {
   "version": 1,
-  "description_fr": "Référence compacte des Pokédex de jeux principaux et des premières apparitions utiles à la fiche Pokémon.",
-  "description_en": "Compact reference for mainline game Pokedexes and starter appearances used by the Pokemon modal.",
+  "description_fr": "Référence compacte des Pokédex de jeux principaux couvrant tous les Pokémon livrés avec l'application.",
+  "description_en": "Compact reference for mainline game Pokedexes covering every Pokemon shipped with the app.",
   "pokedexes": [
     {
       "id": "rb-kanto",
       "generation": 1,
       "region": "Kanto",
-      "games": ["Rouge", "Bleu"],
+      "games": [
+        "Rouge",
+        "Bleu"
+      ],
       "label_fr": "Pokédex de Kanto - Rouge/Bleu",
       "label_en": "Kanto Pokédex - Red/Blue"
     },
@@ -15,7 +18,9 @@
       "id": "yellow-kanto",
       "generation": 1,
       "region": "Kanto",
-      "games": ["Jaune"],
+      "games": [
+        "Jaune"
+      ],
       "label_fr": "Pokédex de Kanto - Jaune",
       "label_en": "Kanto Pokédex - Yellow"
     },
@@ -23,7 +28,11 @@
       "id": "gsc-johto",
       "generation": 2,
       "region": "Johto",
-      "games": ["Or", "Argent", "Cristal"],
+      "games": [
+        "Or",
+        "Argent",
+        "Cristal"
+      ],
       "label_fr": "Pokédex de Johto - Or/Argent/Cristal",
       "label_en": "Johto Pokédex - Gold/Silver/Crystal"
     },
@@ -31,7 +40,10 @@
       "id": "rs-hoenn",
       "generation": 3,
       "region": "Hoenn",
-      "games": ["Rubis", "Saphir"],
+      "games": [
+        "Rubis",
+        "Saphir"
+      ],
       "label_fr": "Pokédex de Hoenn - Rubis/Saphir",
       "label_en": "Hoenn Pokédex - Ruby/Sapphire"
     },
@@ -39,7 +51,10 @@
       "id": "frlg-kanto",
       "generation": 3,
       "region": "Kanto",
-      "games": ["Rouge Feu", "Vert Feuille"],
+      "games": [
+        "Rouge Feu",
+        "Vert Feuille"
+      ],
       "label_fr": "Pokédex de Kanto - Rouge Feu/Vert Feuille",
       "label_en": "Kanto Pokédex - FireRed/LeafGreen"
     },
@@ -47,7 +62,10 @@
       "id": "dp-sinnoh",
       "generation": 4,
       "region": "Sinnoh",
-      "games": ["Diamant", "Perle"],
+      "games": [
+        "Diamant",
+        "Perle"
+      ],
       "label_fr": "Pokédex de Sinnoh - Diamant/Perle",
       "label_en": "Sinnoh Pokédex - Diamond/Pearl"
     },
@@ -55,7 +73,10 @@
       "id": "hgss-johto",
       "generation": 4,
       "region": "Johto",
-      "games": ["HeartGold", "SoulSilver"],
+      "games": [
+        "HeartGold",
+        "SoulSilver"
+      ],
       "label_fr": "Pokédex de Johto - HeartGold/SoulSilver",
       "label_en": "Johto Pokédex - HeartGold/SoulSilver"
     },
@@ -63,7 +84,10 @@
       "id": "bw-unova",
       "generation": 5,
       "region": "Unys",
-      "games": ["Noir", "Blanc"],
+      "games": [
+        "Noir",
+        "Blanc"
+      ],
       "label_fr": "Pokédex d'Unys - Noir/Blanc",
       "label_en": "Unova Pokédex - Black/White"
     },
@@ -71,7 +95,10 @@
       "id": "b2w2-unova",
       "generation": 5,
       "region": "Unys",
-      "games": ["Noir 2", "Blanc 2"],
+      "games": [
+        "Noir 2",
+        "Blanc 2"
+      ],
       "label_fr": "Pokédex d'Unys - Noir 2/Blanc 2",
       "label_en": "Unova Pokédex - Black 2/White 2"
     },
@@ -79,7 +106,10 @@
       "id": "xy-kalos-central",
       "generation": 6,
       "region": "Kalos",
-      "games": ["X", "Y"],
+      "games": [
+        "X",
+        "Y"
+      ],
       "label_fr": "Pokédex de Kalos Centre - X/Y",
       "label_en": "Central Kalos Pokédex - X/Y"
     },
@@ -87,7 +117,10 @@
       "id": "xy-kalos-coastal",
       "generation": 6,
       "region": "Kalos",
-      "games": ["X", "Y"],
+      "games": [
+        "X",
+        "Y"
+      ],
       "label_fr": "Pokédex de Kalos Côtes - X/Y",
       "label_en": "Coastal Kalos Pokédex - X/Y"
     },
@@ -95,7 +128,10 @@
       "id": "xy-kalos-mountain",
       "generation": 6,
       "region": "Kalos",
-      "games": ["X", "Y"],
+      "games": [
+        "X",
+        "Y"
+      ],
       "label_fr": "Pokédex de Kalos Monts - X/Y",
       "label_en": "Mountain Kalos Pokédex - X/Y"
     },
@@ -103,7 +139,10 @@
       "id": "oras-hoenn",
       "generation": 6,
       "region": "Hoenn",
-      "games": ["Rubis Oméga", "Saphir Alpha"],
+      "games": [
+        "Rubis Oméga",
+        "Saphir Alpha"
+      ],
       "label_fr": "Pokédex de Hoenn - Rubis Oméga/Saphir Alpha",
       "label_en": "Hoenn Pokédex - Omega Ruby/Alpha Sapphire"
     },
@@ -111,7 +150,10 @@
       "id": "sm-alola",
       "generation": 7,
       "region": "Alola",
-      "games": ["Soleil", "Lune"],
+      "games": [
+        "Soleil",
+        "Lune"
+      ],
       "label_fr": "Pokédex d'Alola - Soleil/Lune",
       "label_en": "Alola Pokédex - Sun/Moon"
     },
@@ -119,7 +161,10 @@
       "id": "usum-alola",
       "generation": 7,
       "region": "Alola",
-      "games": ["Ultra-Soleil", "Ultra-Lune"],
+      "games": [
+        "Ultra-Soleil",
+        "Ultra-Lune"
+      ],
       "label_fr": "Pokédex d'Alola - Ultra-Soleil/Ultra-Lune",
       "label_en": "Alola Pokédex - Ultra Sun/Ultra Moon"
     },
@@ -127,7 +172,10 @@
       "id": "lgpe-kanto",
       "generation": 7,
       "region": "Kanto",
-      "games": ["Let's Go, Pikachu", "Let's Go, Évoli"],
+      "games": [
+        "Let's Go, Pikachu",
+        "Let's Go, Évoli"
+      ],
       "label_fr": "Pokédex de Kanto - Let's Go",
       "label_en": "Kanto Pokédex - Let's Go"
     },
@@ -135,7 +183,10 @@
       "id": "swsh-galar",
       "generation": 8,
       "region": "Galar",
-      "games": ["Épée", "Bouclier"],
+      "games": [
+        "Épée",
+        "Bouclier"
+      ],
       "label_fr": "Pokédex de Galar - Épée/Bouclier",
       "label_en": "Galar Pokédex - Sword/Shield"
     },
@@ -143,7 +194,10 @@
       "id": "bdsp-sinnoh",
       "generation": 8,
       "region": "Sinnoh",
-      "games": ["Diamant Étincelant", "Perle Scintillante"],
+      "games": [
+        "Diamant Étincelant",
+        "Perle Scintillante"
+      ],
       "label_fr": "Pokédex de Sinnoh - Diamant Étincelant/Perle Scintillante",
       "label_en": "Sinnoh Pokédex - Brilliant Diamond/Shining Pearl"
     },
@@ -151,7 +205,9 @@
       "id": "pla-hisui",
       "generation": 8,
       "region": "Hisui",
-      "games": ["Légendes Pokémon : Arceus"],
+      "games": [
+        "Légendes Pokémon : Arceus"
+      ],
       "label_fr": "Pokédex de Hisui - Légendes Pokémon : Arceus",
       "label_en": "Hisui Pokédex - Pokémon Legends: Arceus"
     },
@@ -159,7 +215,10 @@
       "id": "sv-paldea",
       "generation": 9,
       "region": "Paldea",
-      "games": ["Écarlate", "Violet"],
+      "games": [
+        "Écarlate",
+        "Violet"
+      ],
       "label_fr": "Pokédex de Paldea - Écarlate/Violet",
       "label_en": "Paldea Pokédex - Scarlet/Violet"
     },
@@ -167,7 +226,9 @@
       "id": "sv-kitakami",
       "generation": 9,
       "region": "Septentria",
-      "games": ["Le trésor enfoui de la Zone Zéro : Le Masque Turquoise"],
+      "games": [
+        "Le trésor enfoui de la Zone Zéro : Le Masque Turquoise"
+      ],
       "label_fr": "Pokédex de Septentria - Le Masque Turquoise",
       "label_en": "Kitakami Pokédex - The Teal Mask"
     },
@@ -175,38 +236,5789 @@
       "id": "sv-blueberry",
       "generation": 9,
       "region": "Institut Myrtille",
-      "games": ["Le trésor enfoui de la Zone Zéro : Le Disque Indigo"],
+      "games": [
+        "Le trésor enfoui de la Zone Zéro : Le Disque Indigo"
+      ],
       "label_fr": "Pokédex Myrtille - Le Disque Indigo",
       "label_en": "Blueberry Pokédex - The Indigo Disk"
     }
   ],
   "appearances_by_slug": {
-    "0001-bulbasaur": ["rb-kanto", "yellow-kanto", "frlg-kanto", "xy-kalos-central", "lgpe-kanto", "sv-blueberry"],
-    "0004-charmander": ["rb-kanto", "yellow-kanto", "frlg-kanto", "xy-kalos-central", "lgpe-kanto", "sv-blueberry"],
-    "0007-squirtle": ["rb-kanto", "yellow-kanto", "frlg-kanto", "xy-kalos-central", "lgpe-kanto", "sv-blueberry"],
-    "0152-chikorita": ["gsc-johto", "hgss-johto", "sv-blueberry"],
-    "0155-cyndaquil": ["gsc-johto", "hgss-johto", "pla-hisui", "sv-blueberry"],
-    "0158-totodile": ["gsc-johto", "hgss-johto", "sv-blueberry"],
-    "0252-treecko": ["rs-hoenn", "oras-hoenn", "sv-blueberry"],
-    "0255-torchic": ["rs-hoenn", "oras-hoenn", "sv-blueberry"],
-    "0258-mudkip": ["rs-hoenn", "oras-hoenn", "sv-blueberry"],
-    "0387-turtwig": ["dp-sinnoh", "bdsp-sinnoh", "pla-hisui", "sv-blueberry"],
-    "0390-chimchar": ["dp-sinnoh", "bdsp-sinnoh", "pla-hisui", "sv-blueberry"],
-    "0393-piplup": ["dp-sinnoh", "bdsp-sinnoh", "pla-hisui", "sv-blueberry"],
-    "0495-snivy": ["bw-unova", "b2w2-unova", "sv-blueberry"],
-    "0498-tepig": ["bw-unova", "b2w2-unova", "sv-blueberry"],
-    "0501-oshawott": ["bw-unova", "b2w2-unova", "pla-hisui", "sv-blueberry"],
-    "0650-chespin": ["xy-kalos-central", "sv-blueberry"],
-    "0653-fennekin": ["xy-kalos-central", "sv-blueberry"],
-    "0656-froakie": ["xy-kalos-central", "sv-blueberry"],
-    "0722-rowlet": ["sm-alola", "usum-alola", "pla-hisui", "sv-blueberry"],
-    "0725-litten": ["sm-alola", "usum-alola", "sv-blueberry"],
-    "0728-popplio": ["sm-alola", "usum-alola", "sv-blueberry"],
-    "0810-grookey": ["swsh-galar", "sv-blueberry"],
-    "0813-scorbunny": ["swsh-galar", "sv-blueberry"],
-    "0816-sobble": ["swsh-galar", "sv-blueberry"],
-    "0906-sprigatito": ["sv-paldea"],
-    "0909-fuecoco": ["sv-paldea"],
-    "0912-quaxly": ["sv-paldea"]
+    "0001-bulbasaur": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto",
+      "xy-kalos-central",
+      "sv-blueberry"
+    ],
+    "0002-ivysaur": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0003-mega-venusaur": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0003-venusaur": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0003-venusaur-gigantamax": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0004-charmander": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto",
+      "xy-kalos-central",
+      "sv-blueberry"
+    ],
+    "0005-charmeleon": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0006-charizard": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0006-charizard-gigantamax": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0006-mega-charizard-x": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0006-mega-charizard-y": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0007-squirtle": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto",
+      "xy-kalos-central",
+      "sv-blueberry"
+    ],
+    "0008-wartortle": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0009-blastoise": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0009-blastoise-gigantamax": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0009-mega-blastoise": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0010-caterpie": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0011-metapod": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0012-butterfree": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0012-butterfree-gigantamax": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0013-weedle": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0014-kakuna": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0015-beedrill": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0015-mega-beedrill": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0016-pidgey": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0017-pidgeotto": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0018-mega-pidgeot": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0018-pidgeot": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0019-rattata": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0019-rattata-alolan-form": [
+      "sm-alola",
+      "usum-alola"
+    ],
+    "0020-raticate": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0020-raticate-alolan-form": [
+      "sm-alola",
+      "usum-alola"
+    ],
+    "0021-spearow": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0022-fearow": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0023-ekans": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0024-arbok": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0025-pikachu": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0025-pikachu-alola-cap": [
+      "sm-alola",
+      "usum-alola"
+    ],
+    "0025-pikachu-cosplay-pikachu": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0025-pikachu-gigantamax": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0025-pikachu-hoenn-cap": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0025-pikachu-kalos-cap": [
+      "xy-kalos-central"
+    ],
+    "0025-pikachu-original-cap": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0025-pikachu-partner": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0025-pikachu-partner-cap": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0025-pikachu-pikachu-belle": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0025-pikachu-pikachu-libre": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0025-pikachu-pikachu-ph-d": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0025-pikachu-pikachu-pop-star": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0025-pikachu-pikachu-rock-star": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0025-pikachu-sinnoh-cap": [
+      "dp-sinnoh",
+      "bdsp-sinnoh"
+    ],
+    "0025-pikachu-unova-cap": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0025-pikachu-world-cap": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0026-mega-raichu-x": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0026-mega-raichu-y": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0026-raichu": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0026-raichu-alolan-form": [
+      "sm-alola",
+      "usum-alola"
+    ],
+    "0027-sandshrew": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0027-sandshrew-alolan-form": [
+      "sm-alola",
+      "usum-alola"
+    ],
+    "0028-sandslash": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0028-sandslash-alolan-form": [
+      "sm-alola",
+      "usum-alola"
+    ],
+    "0029-nidoran": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0030-nidorina": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0031-nidoqueen": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0032-nidoran": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0033-nidorino": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0034-nidoking": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0035-clefairy": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0036-clefable": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0036-mega-clefable": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0037-vulpix": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0037-vulpix-alolan-form": [
+      "sm-alola",
+      "usum-alola"
+    ],
+    "0038-ninetales": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0038-ninetales-alolan-form": [
+      "sm-alola",
+      "usum-alola"
+    ],
+    "0039-jigglypuff": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0040-wigglytuff": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0041-zubat": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0042-golbat": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0043-oddish": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0044-gloom": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0045-vileplume": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0046-paras": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0047-parasect": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0048-venonat": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0049-venomoth": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0050-diglett": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0050-diglett-alolan-form": [
+      "sm-alola",
+      "usum-alola"
+    ],
+    "0051-dugtrio": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0051-dugtrio-alolan-form": [
+      "sm-alola",
+      "usum-alola"
+    ],
+    "0052-meowth": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0052-meowth-alolan-form": [
+      "sm-alola",
+      "usum-alola"
+    ],
+    "0052-meowth-galarian-form": [
+      "swsh-galar"
+    ],
+    "0052-meowth-gigantamax": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0053-persian": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0053-persian-alolan-form": [
+      "sm-alola",
+      "usum-alola"
+    ],
+    "0054-psyduck": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0055-golduck": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0056-mankey": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0057-primeape": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0058-growlithe": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0058-growlithe-hisuian-form": [
+      "pla-hisui"
+    ],
+    "0059-arcanine": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0059-arcanine-hisuian-form": [
+      "pla-hisui"
+    ],
+    "0060-poliwag": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0061-poliwhirl": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0062-poliwrath": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0063-abra": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0064-kadabra": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0065-alakazam": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0065-mega-alakazam": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0066-machop": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0067-machoke": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0068-machamp": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0068-machamp-gigantamax": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0069-bellsprout": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0070-weepinbell": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0071-mega-victreebel": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0071-victreebel": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0072-tentacool": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0073-tentacruel": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0074-geodude": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0074-geodude-alolan-form": [
+      "sm-alola",
+      "usum-alola"
+    ],
+    "0075-graveler": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0075-graveler-alolan-form": [
+      "sm-alola",
+      "usum-alola"
+    ],
+    "0076-golem": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0076-golem-alolan-form": [
+      "sm-alola",
+      "usum-alola"
+    ],
+    "0077-ponyta": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0077-ponyta-galarian-form": [
+      "swsh-galar"
+    ],
+    "0078-rapidash": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0078-rapidash-galarian-form": [
+      "swsh-galar"
+    ],
+    "0079-slowpoke": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0079-slowpoke-galarian-form": [
+      "swsh-galar"
+    ],
+    "0080-mega-slowbro": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0080-slowbro": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0080-slowbro-galarian-form": [
+      "swsh-galar"
+    ],
+    "0081-magnemite": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0082-magneton": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0083-farfetch-d": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0083-farfetch-d-galarian-form": [
+      "swsh-galar"
+    ],
+    "0084-doduo": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0085-dodrio": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0086-seel": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0087-dewgong": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0088-grimer": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0088-grimer-alolan-form": [
+      "sm-alola",
+      "usum-alola"
+    ],
+    "0089-muk": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0089-muk-alolan-form": [
+      "sm-alola",
+      "usum-alola"
+    ],
+    "0090-shellder": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0091-cloyster": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0092-gastly": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0093-haunter": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0094-gengar": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0094-gengar-gigantamax": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0094-mega-gengar": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0095-onix": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0096-drowzee": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0097-hypno": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0098-krabby": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0099-kingler": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0099-kingler-gigantamax": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0100-voltorb": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0100-voltorb-hisuian-form": [
+      "pla-hisui"
+    ],
+    "0101-electrode": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0101-electrode-hisuian-form": [
+      "pla-hisui"
+    ],
+    "0102-exeggcute": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0103-exeggutor": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0103-exeggutor-alolan-form": [
+      "sm-alola",
+      "usum-alola"
+    ],
+    "0104-cubone": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0105-marowak": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0105-marowak-alolan-form": [
+      "sm-alola",
+      "usum-alola"
+    ],
+    "0106-hitmonlee": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0107-hitmonchan": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0108-lickitung": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0109-koffing": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0110-weezing": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0110-weezing-galarian-form": [
+      "swsh-galar"
+    ],
+    "0111-rhyhorn": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0112-rhydon": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0113-chansey": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0114-tangela": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0115-kangaskhan": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0115-mega-kangaskhan": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0116-horsea": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0117-seadra": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0118-goldeen": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0119-seaking": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0120-staryu": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0121-mega-starmie": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0121-starmie": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0122-mr-mime": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0122-mr-mime-galarian-form": [
+      "swsh-galar"
+    ],
+    "0123-scyther": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0124-jynx": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0125-electabuzz": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0126-magmar": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0127-mega-pinsir": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0127-pinsir": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0128-tauros": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0128-tauros-paldean-form-aqua-breed": [
+      "sv-paldea"
+    ],
+    "0128-tauros-paldean-form-blaze-breed": [
+      "sv-paldea"
+    ],
+    "0128-tauros-paldean-form-combat-breed": [
+      "sv-paldea"
+    ],
+    "0129-magikarp": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0130-gyarados": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0130-mega-gyarados": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0131-lapras": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0131-lapras-gigantamax": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0132-ditto": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0133-eevee": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0133-eevee-gigantamax": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0133-eevee-partner": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0134-vaporeon": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0135-jolteon": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0136-flareon": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0137-porygon": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0138-omanyte": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0139-omastar": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0140-kabuto": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0141-kabutops": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0142-aerodactyl": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0142-mega-aerodactyl": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0143-snorlax": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0143-snorlax-gigantamax": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0144-articuno": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0144-articuno-galarian-form": [
+      "swsh-galar"
+    ],
+    "0145-zapdos": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0145-zapdos-galarian-form": [
+      "swsh-galar"
+    ],
+    "0146-moltres": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0146-moltres-galarian-form": [
+      "swsh-galar"
+    ],
+    "0147-dratini": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0148-dragonair": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0149-dragonite": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0149-mega-dragonite": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0150-mega-mewtwo-x": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0150-mega-mewtwo-y": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0150-mewtwo": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0151-mew": [
+      "rb-kanto",
+      "yellow-kanto",
+      "frlg-kanto",
+      "lgpe-kanto"
+    ],
+    "0152-chikorita": [
+      "gsc-johto",
+      "hgss-johto",
+      "sv-blueberry"
+    ],
+    "0153-bayleef": [
+      "gsc-johto",
+      "hgss-johto"
+    ],
+    "0154-mega-meganium": [
+      "gsc-johto",
+      "hgss-johto"
+    ],
+    "0154-meganium": [
+      "gsc-johto",
+      "hgss-johto"
+    ],
+    "0155-cyndaquil": [
+      "gsc-johto",
+      "hgss-johto",
+      "pla-hisui",
+      "sv-blueberry"
+    ],
+    "0156-quilava": [
+      "gsc-johto",
+      "hgss-johto"
+    ],
+    "0157-typhlosion": [
+      "gsc-johto",
+      "hgss-johto"
+    ],
+    "0157-typhlosion-hisuian-form": [
+      "pla-hisui"
+    ],
+    "0158-totodile": [
+      "gsc-johto",
+      "hgss-johto",
+      "sv-blueberry"
+    ],
+    "0159-croconaw": [
+      "gsc-johto",
+      "hgss-johto"
+    ],
+    "0160-feraligatr": [
+      "gsc-johto",
+      "hgss-johto"
+    ],
+    "0160-mega-feraligatr": [
+      "gsc-johto",
+      "hgss-johto"
+    ],
+    "0161-sentret": [
+      "gsc-johto",
+      "hgss-johto"
+    ],
+    "0162-furret": [
+      "gsc-johto",
+      "hgss-johto"
+    ],
+    "0163-hoothoot": [
+      "gsc-johto",
+      "hgss-johto"
+    ],
+    "0164-noctowl": [
+      "gsc-johto",
+      "hgss-johto"
+    ],
+    "0165-ledyba": [
+      "gsc-johto",
+      "hgss-johto"
+    ],
+    "0166-ledian": [
+      "gsc-johto",
+      "hgss-johto"
+    ],
+    "0167-spinarak": [
+      "gsc-johto",
+      "hgss-johto"
+    ],
+    "0168-ariados": [
+      "gsc-johto",
+      "hgss-johto"
+    ],
+    "0169-crobat": [
+      "gsc-johto",
+      "hgss-johto"
+    ],
+    "0170-chinchou": [
+      "gsc-johto",
+      "hgss-johto"
+    ],
+    "0171-lanturn": [
+      "gsc-johto",
+      "hgss-johto"
+    ],
+    "0172-pichu": [
+      "gsc-johto",
+      "hgss-johto"
+    ],
+    "0172-pichu-spiky-eared": [
+      "gsc-johto",
+      "hgss-johto"
+    ],
+    "0173-cleffa": [
+      "gsc-johto",
+      "hgss-johto"
+    ],
+    "0174-igglybuff": [
+      "gsc-johto",
+      "hgss-johto"
+    ],
+    "0175-togepi": [
+      "gsc-johto",
+      "hgss-johto"
+    ],
+    "0176-togetic": [
+      "gsc-johto",
+      "hgss-johto"
+    ],
+    "0177-natu": [
+      "gsc-johto",
+      "hgss-johto"
+    ],
+    "0178-xatu": [
+      "gsc-johto",
+      "hgss-johto"
+    ],
+    "0179-mareep": [
+      "gsc-johto",
+      "hgss-johto"
+    ],
+    "0180-flaaffy": [
+      "gsc-johto",
+      "hgss-johto"
+    ],
+    "0181-ampharos": [
+      "gsc-johto",
+      "hgss-johto"
+    ],
+    "0181-mega-ampharos": [
+      "gsc-johto",
+      "hgss-johto"
+    ],
+    "0182-bellossom": [
+      "gsc-johto",
+      "hgss-johto"
+    ],
+    "0183-marill": [
+      "gsc-johto",
+      "hgss-johto"
+    ],
+    "0184-azumarill": [
+      "gsc-johto",
+      "hgss-johto"
+    ],
+    "0185-sudowoodo": [
+      "gsc-johto",
+      "hgss-johto"
+    ],
+    "0186-politoed": [
+      "gsc-johto",
+      "hgss-johto"
+    ],
+    "0187-hoppip": [
+      "gsc-johto",
+      "hgss-johto"
+    ],
+    "0188-skiploom": [
+      "gsc-johto",
+      "hgss-johto"
+    ],
+    "0189-jumpluff": [
+      "gsc-johto",
+      "hgss-johto"
+    ],
+    "0190-aipom": [
+      "gsc-johto",
+      "hgss-johto"
+    ],
+    "0191-sunkern": [
+      "gsc-johto",
+      "hgss-johto"
+    ],
+    "0192-sunflora": [
+      "gsc-johto",
+      "hgss-johto"
+    ],
+    "0193-yanma": [
+      "gsc-johto",
+      "hgss-johto"
+    ],
+    "0194-wooper": [
+      "gsc-johto",
+      "hgss-johto"
+    ],
+    "0194-wooper-paldean-form": [
+      "sv-paldea"
+    ],
+    "0195-quagsire": [
+      "gsc-johto",
+      "hgss-johto"
+    ],
+    "0196-espeon": [
+      "gsc-johto",
+      "hgss-johto"
+    ],
+    "0197-umbreon": [
+      "gsc-johto",
+      "hgss-johto"
+    ],
+    "0198-murkrow": [
+      "gsc-johto",
+      "hgss-johto"
+    ],
+    "0199-slowking": [
+      "gsc-johto",
+      "hgss-johto"
+    ],
+    "0199-slowking-galarian-form": [
+      "swsh-galar"
+    ],
+    "0200-misdreavus": [
+      "gsc-johto",
+      "hgss-johto"
+    ],
+    "0201-unown": [
+      "gsc-johto",
+      "hgss-johto"
+    ],
+    "0201-unown-2": [
+      "gsc-johto",
+      "hgss-johto"
+    ],
+    "0201-unown-a": [
+      "gsc-johto",
+      "hgss-johto"
+    ],
+    "0201-unown-b": [
+      "gsc-johto",
+      "hgss-johto"
+    ],
+    "0201-unown-c": [
+      "gsc-johto",
+      "hgss-johto"
+    ],
+    "0201-unown-d": [
+      "gsc-johto",
+      "hgss-johto"
+    ],
+    "0201-unown-e": [
+      "gsc-johto",
+      "hgss-johto"
+    ],
+    "0201-unown-f": [
+      "gsc-johto",
+      "hgss-johto"
+    ],
+    "0201-unown-g": [
+      "gsc-johto",
+      "hgss-johto"
+    ],
+    "0201-unown-h": [
+      "gsc-johto",
+      "hgss-johto"
+    ],
+    "0201-unown-i": [
+      "gsc-johto",
+      "hgss-johto"
+    ],
+    "0201-unown-j": [
+      "gsc-johto",
+      "hgss-johto"
+    ],
+    "0201-unown-k": [
+      "gsc-johto",
+      "hgss-johto"
+    ],
+    "0201-unown-l": [
+      "gsc-johto",
+      "hgss-johto"
+    ],
+    "0201-unown-m": [
+      "gsc-johto",
+      "hgss-johto"
+    ],
+    "0201-unown-n": [
+      "gsc-johto",
+      "hgss-johto"
+    ],
+    "0201-unown-o": [
+      "gsc-johto",
+      "hgss-johto"
+    ],
+    "0201-unown-p": [
+      "gsc-johto",
+      "hgss-johto"
+    ],
+    "0201-unown-q": [
+      "gsc-johto",
+      "hgss-johto"
+    ],
+    "0201-unown-r": [
+      "gsc-johto",
+      "hgss-johto"
+    ],
+    "0201-unown-s": [
+      "gsc-johto",
+      "hgss-johto"
+    ],
+    "0201-unown-t": [
+      "gsc-johto",
+      "hgss-johto"
+    ],
+    "0201-unown-u": [
+      "gsc-johto",
+      "hgss-johto"
+    ],
+    "0201-unown-v": [
+      "gsc-johto",
+      "hgss-johto"
+    ],
+    "0201-unown-w": [
+      "gsc-johto",
+      "hgss-johto"
+    ],
+    "0201-unown-x": [
+      "gsc-johto",
+      "hgss-johto"
+    ],
+    "0201-unown-y": [
+      "gsc-johto",
+      "hgss-johto"
+    ],
+    "0201-unown-z": [
+      "gsc-johto",
+      "hgss-johto"
+    ],
+    "0202-wobbuffet": [
+      "gsc-johto",
+      "hgss-johto"
+    ],
+    "0203-girafarig": [
+      "gsc-johto",
+      "hgss-johto"
+    ],
+    "0204-pineco": [
+      "gsc-johto",
+      "hgss-johto"
+    ],
+    "0205-forretress": [
+      "gsc-johto",
+      "hgss-johto"
+    ],
+    "0206-dunsparce": [
+      "gsc-johto",
+      "hgss-johto"
+    ],
+    "0207-gligar": [
+      "gsc-johto",
+      "hgss-johto"
+    ],
+    "0208-mega-steelix": [
+      "gsc-johto",
+      "hgss-johto"
+    ],
+    "0208-steelix": [
+      "gsc-johto",
+      "hgss-johto"
+    ],
+    "0209-snubbull": [
+      "gsc-johto",
+      "hgss-johto"
+    ],
+    "0210-granbull": [
+      "gsc-johto",
+      "hgss-johto"
+    ],
+    "0211-qwilfish": [
+      "gsc-johto",
+      "hgss-johto"
+    ],
+    "0211-qwilfish-hisuian-form": [
+      "pla-hisui"
+    ],
+    "0212-mega-scizor": [
+      "gsc-johto",
+      "hgss-johto"
+    ],
+    "0212-scizor": [
+      "gsc-johto",
+      "hgss-johto"
+    ],
+    "0213-shuckle": [
+      "gsc-johto",
+      "hgss-johto"
+    ],
+    "0214-heracross": [
+      "gsc-johto",
+      "hgss-johto"
+    ],
+    "0214-mega-heracross": [
+      "gsc-johto",
+      "hgss-johto"
+    ],
+    "0215-sneasel": [
+      "gsc-johto",
+      "hgss-johto"
+    ],
+    "0215-sneasel-hisuian-form": [
+      "pla-hisui"
+    ],
+    "0216-teddiursa": [
+      "gsc-johto",
+      "hgss-johto"
+    ],
+    "0217-ursaring": [
+      "gsc-johto",
+      "hgss-johto"
+    ],
+    "0218-slugma": [
+      "gsc-johto",
+      "hgss-johto"
+    ],
+    "0219-magcargo": [
+      "gsc-johto",
+      "hgss-johto"
+    ],
+    "0220-swinub": [
+      "gsc-johto",
+      "hgss-johto"
+    ],
+    "0221-piloswine": [
+      "gsc-johto",
+      "hgss-johto"
+    ],
+    "0222-corsola": [
+      "gsc-johto",
+      "hgss-johto"
+    ],
+    "0222-corsola-galarian-form": [
+      "swsh-galar"
+    ],
+    "0223-remoraid": [
+      "gsc-johto",
+      "hgss-johto"
+    ],
+    "0224-octillery": [
+      "gsc-johto",
+      "hgss-johto"
+    ],
+    "0225-delibird": [
+      "gsc-johto",
+      "hgss-johto"
+    ],
+    "0226-mantine": [
+      "gsc-johto",
+      "hgss-johto"
+    ],
+    "0227-mega-skarmory": [
+      "gsc-johto",
+      "hgss-johto"
+    ],
+    "0227-skarmory": [
+      "gsc-johto",
+      "hgss-johto"
+    ],
+    "0228-houndour": [
+      "gsc-johto",
+      "hgss-johto"
+    ],
+    "0229-houndoom": [
+      "gsc-johto",
+      "hgss-johto"
+    ],
+    "0229-mega-houndoom": [
+      "gsc-johto",
+      "hgss-johto"
+    ],
+    "0230-kingdra": [
+      "gsc-johto",
+      "hgss-johto"
+    ],
+    "0231-phanpy": [
+      "gsc-johto",
+      "hgss-johto"
+    ],
+    "0232-donphan": [
+      "gsc-johto",
+      "hgss-johto"
+    ],
+    "0233-porygon2": [
+      "gsc-johto",
+      "hgss-johto"
+    ],
+    "0234-stantler": [
+      "gsc-johto",
+      "hgss-johto"
+    ],
+    "0235-smeargle": [
+      "gsc-johto",
+      "hgss-johto"
+    ],
+    "0236-tyrogue": [
+      "gsc-johto",
+      "hgss-johto"
+    ],
+    "0237-hitmontop": [
+      "gsc-johto",
+      "hgss-johto"
+    ],
+    "0238-smoochum": [
+      "gsc-johto",
+      "hgss-johto"
+    ],
+    "0239-elekid": [
+      "gsc-johto",
+      "hgss-johto"
+    ],
+    "0240-magby": [
+      "gsc-johto",
+      "hgss-johto"
+    ],
+    "0241-miltank": [
+      "gsc-johto",
+      "hgss-johto"
+    ],
+    "0242-blissey": [
+      "gsc-johto",
+      "hgss-johto"
+    ],
+    "0243-raikou": [
+      "gsc-johto",
+      "hgss-johto"
+    ],
+    "0244-entei": [
+      "gsc-johto",
+      "hgss-johto"
+    ],
+    "0245-suicune": [
+      "gsc-johto",
+      "hgss-johto"
+    ],
+    "0246-larvitar": [
+      "gsc-johto",
+      "hgss-johto"
+    ],
+    "0247-pupitar": [
+      "gsc-johto",
+      "hgss-johto"
+    ],
+    "0248-mega-tyranitar": [
+      "gsc-johto",
+      "hgss-johto"
+    ],
+    "0248-tyranitar": [
+      "gsc-johto",
+      "hgss-johto"
+    ],
+    "0249-lugia": [
+      "gsc-johto",
+      "hgss-johto"
+    ],
+    "0250-ho-oh": [
+      "gsc-johto",
+      "hgss-johto"
+    ],
+    "0251-celebi": [
+      "gsc-johto",
+      "hgss-johto"
+    ],
+    "0252-treecko": [
+      "rs-hoenn",
+      "oras-hoenn",
+      "sv-blueberry"
+    ],
+    "0253-grovyle": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0254-mega-sceptile": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0254-sceptile": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0255-torchic": [
+      "rs-hoenn",
+      "oras-hoenn",
+      "sv-blueberry"
+    ],
+    "0256-combusken": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0257-blaziken": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0257-mega-blaziken": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0258-mudkip": [
+      "rs-hoenn",
+      "oras-hoenn",
+      "sv-blueberry"
+    ],
+    "0259-marshtomp": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0260-mega-swampert": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0260-swampert": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0261-poochyena": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0262-mightyena": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0263-zigzagoon": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0263-zigzagoon-galarian-form": [
+      "swsh-galar"
+    ],
+    "0264-linoone": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0264-linoone-galarian-form": [
+      "swsh-galar"
+    ],
+    "0265-wurmple": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0266-silcoon": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0267-beautifly": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0268-cascoon": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0269-dustox": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0270-lotad": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0271-lombre": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0272-ludicolo": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0273-seedot": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0274-nuzleaf": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0275-shiftry": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0276-taillow": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0277-swellow": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0278-wingull": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0279-pelipper": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0280-ralts": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0281-kirlia": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0282-gardevoir": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0282-mega-gardevoir": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0283-surskit": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0284-masquerain": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0285-shroomish": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0286-breloom": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0287-slakoth": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0288-vigoroth": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0289-slaking": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0290-nincada": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0291-ninjask": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0292-shedinja": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0293-whismur": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0294-loudred": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0295-exploud": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0296-makuhita": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0297-hariyama": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0298-azurill": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0299-nosepass": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0300-skitty": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0301-delcatty": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0302-mega-sableye": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0302-sableye": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0303-mawile": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0303-mega-mawile": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0304-aron": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0305-lairon": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0306-aggron": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0306-mega-aggron": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0307-meditite": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0308-medicham": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0308-mega-medicham": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0309-electrike": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0310-manectric": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0310-mega-manectric": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0311-plusle": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0312-minun": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0313-volbeat": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0314-illumise": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0315-roselia": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0316-gulpin": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0317-swalot": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0318-carvanha": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0319-mega-sharpedo": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0319-sharpedo": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0320-wailmer": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0321-wailord": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0322-numel": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0323-camerupt": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0323-mega-camerupt": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0324-torkoal": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0325-spoink": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0326-grumpig": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0327-spinda": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0328-trapinch": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0329-vibrava": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0330-flygon": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0331-cacnea": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0332-cacturne": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0333-swablu": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0334-altaria": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0334-mega-altaria": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0335-zangoose": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0336-seviper": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0337-lunatone": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0338-solrock": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0339-barboach": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0340-whiscash": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0341-corphish": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0342-crawdaunt": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0343-baltoy": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0344-claydol": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0345-lileep": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0346-cradily": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0347-anorith": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0348-armaldo": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0349-feebas": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0350-milotic": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0351-castform": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0351-castform-rainy-form": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0351-castform-snowy-form": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0351-castform-sunny-form": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0352-kecleon": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0353-shuppet": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0354-banette": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0354-mega-banette": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0355-duskull": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0356-dusclops": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0357-tropius": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0358-chimecho": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0358-mega-chimecho": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0359-absol": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0359-mega-absol": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0359-mega-absol-z": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0360-wynaut": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0361-snorunt": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0362-glalie": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0362-mega-glalie": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0363-spheal": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0364-sealeo": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0365-walrein": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0366-clamperl": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0367-huntail": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0368-gorebyss": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0369-relicanth": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0370-luvdisc": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0371-bagon": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0372-shelgon": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0373-mega-salamence": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0373-salamence": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0374-beldum": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0375-metang": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0376-mega-metagross": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0376-metagross": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0377-regirock": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0378-regice": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0379-registeel": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0380-latias": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0380-mega-latias": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0381-latios": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0381-mega-latios": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0382-kyogre": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0382-primal-kyogre": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0383-groudon": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0383-primal-groudon": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0384-mega-rayquaza": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0384-rayquaza": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0385-jirachi": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0386-deoxys-attack-forme": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0386-deoxys-defense-forme": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0386-deoxys-normal-forme": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0386-deoxys-speed-forme": [
+      "rs-hoenn",
+      "oras-hoenn"
+    ],
+    "0387-turtwig": [
+      "dp-sinnoh",
+      "bdsp-sinnoh",
+      "pla-hisui",
+      "sv-blueberry"
+    ],
+    "0388-grotle": [
+      "dp-sinnoh",
+      "bdsp-sinnoh"
+    ],
+    "0389-torterra": [
+      "dp-sinnoh",
+      "bdsp-sinnoh"
+    ],
+    "0390-chimchar": [
+      "dp-sinnoh",
+      "bdsp-sinnoh",
+      "pla-hisui",
+      "sv-blueberry"
+    ],
+    "0391-monferno": [
+      "dp-sinnoh",
+      "bdsp-sinnoh"
+    ],
+    "0392-infernape": [
+      "dp-sinnoh",
+      "bdsp-sinnoh"
+    ],
+    "0393-piplup": [
+      "dp-sinnoh",
+      "bdsp-sinnoh",
+      "pla-hisui",
+      "sv-blueberry"
+    ],
+    "0394-prinplup": [
+      "dp-sinnoh",
+      "bdsp-sinnoh"
+    ],
+    "0395-empoleon": [
+      "dp-sinnoh",
+      "bdsp-sinnoh"
+    ],
+    "0396-starly": [
+      "dp-sinnoh",
+      "bdsp-sinnoh"
+    ],
+    "0397-staravia": [
+      "dp-sinnoh",
+      "bdsp-sinnoh"
+    ],
+    "0398-mega-staraptor": [
+      "dp-sinnoh",
+      "bdsp-sinnoh"
+    ],
+    "0398-staraptor": [
+      "dp-sinnoh",
+      "bdsp-sinnoh"
+    ],
+    "0399-bidoof": [
+      "dp-sinnoh",
+      "bdsp-sinnoh"
+    ],
+    "0400-bibarel": [
+      "dp-sinnoh",
+      "bdsp-sinnoh"
+    ],
+    "0401-kricketot": [
+      "dp-sinnoh",
+      "bdsp-sinnoh"
+    ],
+    "0402-kricketune": [
+      "dp-sinnoh",
+      "bdsp-sinnoh"
+    ],
+    "0403-shinx": [
+      "dp-sinnoh",
+      "bdsp-sinnoh"
+    ],
+    "0404-luxio": [
+      "dp-sinnoh",
+      "bdsp-sinnoh"
+    ],
+    "0405-luxray": [
+      "dp-sinnoh",
+      "bdsp-sinnoh"
+    ],
+    "0406-budew": [
+      "dp-sinnoh",
+      "bdsp-sinnoh"
+    ],
+    "0407-roserade": [
+      "dp-sinnoh",
+      "bdsp-sinnoh"
+    ],
+    "0408-cranidos": [
+      "dp-sinnoh",
+      "bdsp-sinnoh"
+    ],
+    "0409-rampardos": [
+      "dp-sinnoh",
+      "bdsp-sinnoh"
+    ],
+    "0410-shieldon": [
+      "dp-sinnoh",
+      "bdsp-sinnoh"
+    ],
+    "0411-bastiodon": [
+      "dp-sinnoh",
+      "bdsp-sinnoh"
+    ],
+    "0412-burmy-plant-cloak": [
+      "dp-sinnoh",
+      "bdsp-sinnoh"
+    ],
+    "0412-burmy-sandy-cloak": [
+      "dp-sinnoh",
+      "bdsp-sinnoh"
+    ],
+    "0412-burmy-trash-cloak": [
+      "dp-sinnoh",
+      "bdsp-sinnoh"
+    ],
+    "0413-wormadam-plant-cloak": [
+      "dp-sinnoh",
+      "bdsp-sinnoh"
+    ],
+    "0413-wormadam-sandy-cloak": [
+      "dp-sinnoh",
+      "bdsp-sinnoh"
+    ],
+    "0413-wormadam-trash-cloak": [
+      "dp-sinnoh",
+      "bdsp-sinnoh"
+    ],
+    "0414-mothim": [
+      "dp-sinnoh",
+      "bdsp-sinnoh"
+    ],
+    "0415-combee": [
+      "dp-sinnoh",
+      "bdsp-sinnoh"
+    ],
+    "0416-vespiquen": [
+      "dp-sinnoh",
+      "bdsp-sinnoh"
+    ],
+    "0417-pachirisu": [
+      "dp-sinnoh",
+      "bdsp-sinnoh"
+    ],
+    "0418-buizel": [
+      "dp-sinnoh",
+      "bdsp-sinnoh"
+    ],
+    "0419-floatzel": [
+      "dp-sinnoh",
+      "bdsp-sinnoh"
+    ],
+    "0420-cherubi": [
+      "dp-sinnoh",
+      "bdsp-sinnoh"
+    ],
+    "0421-cherrim-overcast-form": [
+      "dp-sinnoh",
+      "bdsp-sinnoh"
+    ],
+    "0421-cherrim-sunshine-form": [
+      "dp-sinnoh",
+      "bdsp-sinnoh"
+    ],
+    "0422-shellos-east-sea": [
+      "dp-sinnoh",
+      "bdsp-sinnoh"
+    ],
+    "0422-shellos-west-sea": [
+      "dp-sinnoh",
+      "bdsp-sinnoh"
+    ],
+    "0423-gastrodon-east-sea": [
+      "dp-sinnoh",
+      "bdsp-sinnoh"
+    ],
+    "0423-gastrodon-west-sea": [
+      "dp-sinnoh",
+      "bdsp-sinnoh"
+    ],
+    "0424-ambipom": [
+      "dp-sinnoh",
+      "bdsp-sinnoh"
+    ],
+    "0425-drifloon": [
+      "dp-sinnoh",
+      "bdsp-sinnoh"
+    ],
+    "0426-drifblim": [
+      "dp-sinnoh",
+      "bdsp-sinnoh"
+    ],
+    "0427-buneary": [
+      "dp-sinnoh",
+      "bdsp-sinnoh"
+    ],
+    "0428-lopunny": [
+      "dp-sinnoh",
+      "bdsp-sinnoh"
+    ],
+    "0428-mega-lopunny": [
+      "dp-sinnoh",
+      "bdsp-sinnoh"
+    ],
+    "0429-mismagius": [
+      "dp-sinnoh",
+      "bdsp-sinnoh"
+    ],
+    "0430-honchkrow": [
+      "dp-sinnoh",
+      "bdsp-sinnoh"
+    ],
+    "0431-glameow": [
+      "dp-sinnoh",
+      "bdsp-sinnoh"
+    ],
+    "0432-purugly": [
+      "dp-sinnoh",
+      "bdsp-sinnoh"
+    ],
+    "0433-chingling": [
+      "dp-sinnoh",
+      "bdsp-sinnoh"
+    ],
+    "0434-stunky": [
+      "dp-sinnoh",
+      "bdsp-sinnoh"
+    ],
+    "0435-skuntank": [
+      "dp-sinnoh",
+      "bdsp-sinnoh"
+    ],
+    "0436-bronzor": [
+      "dp-sinnoh",
+      "bdsp-sinnoh"
+    ],
+    "0437-bronzong": [
+      "dp-sinnoh",
+      "bdsp-sinnoh"
+    ],
+    "0438-bonsly": [
+      "dp-sinnoh",
+      "bdsp-sinnoh"
+    ],
+    "0439-mime-jr": [
+      "dp-sinnoh",
+      "bdsp-sinnoh"
+    ],
+    "0440-happiny": [
+      "dp-sinnoh",
+      "bdsp-sinnoh"
+    ],
+    "0441-chatot": [
+      "dp-sinnoh",
+      "bdsp-sinnoh"
+    ],
+    "0442-spiritomb": [
+      "dp-sinnoh",
+      "bdsp-sinnoh"
+    ],
+    "0443-gible": [
+      "dp-sinnoh",
+      "bdsp-sinnoh"
+    ],
+    "0444-gabite": [
+      "dp-sinnoh",
+      "bdsp-sinnoh"
+    ],
+    "0445-garchomp": [
+      "dp-sinnoh",
+      "bdsp-sinnoh"
+    ],
+    "0445-mega-garchomp": [
+      "dp-sinnoh",
+      "bdsp-sinnoh"
+    ],
+    "0445-mega-garchomp-z": [
+      "dp-sinnoh",
+      "bdsp-sinnoh"
+    ],
+    "0446-munchlax": [
+      "dp-sinnoh",
+      "bdsp-sinnoh"
+    ],
+    "0447-riolu": [
+      "dp-sinnoh",
+      "bdsp-sinnoh"
+    ],
+    "0448-lucario": [
+      "dp-sinnoh",
+      "bdsp-sinnoh"
+    ],
+    "0448-mega-lucario": [
+      "dp-sinnoh",
+      "bdsp-sinnoh"
+    ],
+    "0448-mega-lucario-z": [
+      "dp-sinnoh",
+      "bdsp-sinnoh"
+    ],
+    "0449-hippopotas": [
+      "dp-sinnoh",
+      "bdsp-sinnoh"
+    ],
+    "0450-hippowdon": [
+      "dp-sinnoh",
+      "bdsp-sinnoh"
+    ],
+    "0451-skorupi": [
+      "dp-sinnoh",
+      "bdsp-sinnoh"
+    ],
+    "0452-drapion": [
+      "dp-sinnoh",
+      "bdsp-sinnoh"
+    ],
+    "0453-croagunk": [
+      "dp-sinnoh",
+      "bdsp-sinnoh"
+    ],
+    "0454-toxicroak": [
+      "dp-sinnoh",
+      "bdsp-sinnoh"
+    ],
+    "0455-carnivine": [
+      "dp-sinnoh",
+      "bdsp-sinnoh"
+    ],
+    "0456-finneon": [
+      "dp-sinnoh",
+      "bdsp-sinnoh"
+    ],
+    "0457-lumineon": [
+      "dp-sinnoh",
+      "bdsp-sinnoh"
+    ],
+    "0458-mantyke": [
+      "dp-sinnoh",
+      "bdsp-sinnoh"
+    ],
+    "0459-snover": [
+      "dp-sinnoh",
+      "bdsp-sinnoh"
+    ],
+    "0460-abomasnow": [
+      "dp-sinnoh",
+      "bdsp-sinnoh"
+    ],
+    "0460-mega-abomasnow": [
+      "dp-sinnoh",
+      "bdsp-sinnoh"
+    ],
+    "0461-weavile": [
+      "dp-sinnoh",
+      "bdsp-sinnoh"
+    ],
+    "0462-magnezone": [
+      "dp-sinnoh",
+      "bdsp-sinnoh"
+    ],
+    "0463-lickilicky": [
+      "dp-sinnoh",
+      "bdsp-sinnoh"
+    ],
+    "0464-rhyperior": [
+      "dp-sinnoh",
+      "bdsp-sinnoh"
+    ],
+    "0465-tangrowth": [
+      "dp-sinnoh",
+      "bdsp-sinnoh"
+    ],
+    "0466-electivire": [
+      "dp-sinnoh",
+      "bdsp-sinnoh"
+    ],
+    "0467-magmortar": [
+      "dp-sinnoh",
+      "bdsp-sinnoh"
+    ],
+    "0468-togekiss": [
+      "dp-sinnoh",
+      "bdsp-sinnoh"
+    ],
+    "0469-yanmega": [
+      "dp-sinnoh",
+      "bdsp-sinnoh"
+    ],
+    "0470-leafeon": [
+      "dp-sinnoh",
+      "bdsp-sinnoh"
+    ],
+    "0471-glaceon": [
+      "dp-sinnoh",
+      "bdsp-sinnoh"
+    ],
+    "0472-gliscor": [
+      "dp-sinnoh",
+      "bdsp-sinnoh"
+    ],
+    "0473-mamoswine": [
+      "dp-sinnoh",
+      "bdsp-sinnoh"
+    ],
+    "0474-porygon-z": [
+      "dp-sinnoh",
+      "bdsp-sinnoh"
+    ],
+    "0475-gallade": [
+      "dp-sinnoh",
+      "bdsp-sinnoh"
+    ],
+    "0475-mega-gallade": [
+      "dp-sinnoh",
+      "bdsp-sinnoh"
+    ],
+    "0476-probopass": [
+      "dp-sinnoh",
+      "bdsp-sinnoh"
+    ],
+    "0477-dusknoir": [
+      "dp-sinnoh",
+      "bdsp-sinnoh"
+    ],
+    "0478-froslass": [
+      "dp-sinnoh",
+      "bdsp-sinnoh"
+    ],
+    "0478-mega-froslass": [
+      "dp-sinnoh",
+      "bdsp-sinnoh"
+    ],
+    "0479-rotom": [
+      "dp-sinnoh",
+      "bdsp-sinnoh"
+    ],
+    "0479-rotom-fan-rottom": [
+      "dp-sinnoh",
+      "bdsp-sinnoh"
+    ],
+    "0479-rotom-frost-rottom": [
+      "dp-sinnoh",
+      "bdsp-sinnoh"
+    ],
+    "0479-rotom-heat-rottom": [
+      "dp-sinnoh",
+      "bdsp-sinnoh"
+    ],
+    "0479-rotom-mow-rottom": [
+      "dp-sinnoh",
+      "bdsp-sinnoh"
+    ],
+    "0479-rotom-wash-rottom": [
+      "dp-sinnoh",
+      "bdsp-sinnoh"
+    ],
+    "0480-uxie": [
+      "dp-sinnoh",
+      "bdsp-sinnoh"
+    ],
+    "0481-mesprit": [
+      "dp-sinnoh",
+      "bdsp-sinnoh"
+    ],
+    "0482-azelf": [
+      "dp-sinnoh",
+      "bdsp-sinnoh"
+    ],
+    "0483-dialga": [
+      "dp-sinnoh",
+      "bdsp-sinnoh"
+    ],
+    "0483-dialga-origin-forme": [
+      "dp-sinnoh",
+      "bdsp-sinnoh"
+    ],
+    "0484-palkia": [
+      "dp-sinnoh",
+      "bdsp-sinnoh"
+    ],
+    "0484-palkia-origin-forme": [
+      "dp-sinnoh",
+      "bdsp-sinnoh"
+    ],
+    "0485-heatran": [
+      "dp-sinnoh",
+      "bdsp-sinnoh"
+    ],
+    "0485-mega-heatran": [
+      "dp-sinnoh",
+      "bdsp-sinnoh"
+    ],
+    "0486-regigigas": [
+      "dp-sinnoh",
+      "bdsp-sinnoh"
+    ],
+    "0487-giratina-altered-forme": [
+      "dp-sinnoh",
+      "bdsp-sinnoh"
+    ],
+    "0487-giratina-origin-forme": [
+      "dp-sinnoh",
+      "bdsp-sinnoh"
+    ],
+    "0488-cresselia": [
+      "dp-sinnoh",
+      "bdsp-sinnoh"
+    ],
+    "0489-phione": [
+      "dp-sinnoh",
+      "bdsp-sinnoh"
+    ],
+    "0490-manaphy": [
+      "dp-sinnoh",
+      "bdsp-sinnoh"
+    ],
+    "0491-darkrai": [
+      "dp-sinnoh",
+      "bdsp-sinnoh"
+    ],
+    "0491-mega-darkrai": [
+      "dp-sinnoh",
+      "bdsp-sinnoh"
+    ],
+    "0492-shaymin-land-forme": [
+      "dp-sinnoh",
+      "bdsp-sinnoh"
+    ],
+    "0492-shaymin-sky-forme": [
+      "dp-sinnoh",
+      "bdsp-sinnoh"
+    ],
+    "0493-arceus": [
+      "dp-sinnoh",
+      "bdsp-sinnoh"
+    ],
+    "0493-arceus-bug": [
+      "dp-sinnoh",
+      "bdsp-sinnoh"
+    ],
+    "0493-arceus-dark": [
+      "dp-sinnoh",
+      "bdsp-sinnoh"
+    ],
+    "0493-arceus-dragon": [
+      "dp-sinnoh",
+      "bdsp-sinnoh"
+    ],
+    "0493-arceus-electric": [
+      "dp-sinnoh",
+      "bdsp-sinnoh"
+    ],
+    "0493-arceus-fairy": [
+      "dp-sinnoh",
+      "bdsp-sinnoh"
+    ],
+    "0493-arceus-fighting": [
+      "dp-sinnoh",
+      "bdsp-sinnoh"
+    ],
+    "0493-arceus-fire": [
+      "dp-sinnoh",
+      "bdsp-sinnoh"
+    ],
+    "0493-arceus-flying": [
+      "dp-sinnoh",
+      "bdsp-sinnoh"
+    ],
+    "0493-arceus-ghost": [
+      "dp-sinnoh",
+      "bdsp-sinnoh"
+    ],
+    "0493-arceus-grass": [
+      "dp-sinnoh",
+      "bdsp-sinnoh"
+    ],
+    "0493-arceus-ground": [
+      "dp-sinnoh",
+      "bdsp-sinnoh"
+    ],
+    "0493-arceus-ice": [
+      "dp-sinnoh",
+      "bdsp-sinnoh"
+    ],
+    "0493-arceus-poison": [
+      "dp-sinnoh",
+      "bdsp-sinnoh"
+    ],
+    "0493-arceus-psychic": [
+      "dp-sinnoh",
+      "bdsp-sinnoh"
+    ],
+    "0493-arceus-rock": [
+      "dp-sinnoh",
+      "bdsp-sinnoh"
+    ],
+    "0493-arceus-steel": [
+      "dp-sinnoh",
+      "bdsp-sinnoh"
+    ],
+    "0493-arceus-water": [
+      "dp-sinnoh",
+      "bdsp-sinnoh"
+    ],
+    "0494-victini": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0495-snivy": [
+      "bw-unova",
+      "b2w2-unova",
+      "sv-blueberry"
+    ],
+    "0496-servine": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0497-serperior": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0498-tepig": [
+      "bw-unova",
+      "b2w2-unova",
+      "sv-blueberry"
+    ],
+    "0499-pignite": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0500-emboar": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0500-mega-emboar": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0501-oshawott": [
+      "bw-unova",
+      "b2w2-unova",
+      "pla-hisui",
+      "sv-blueberry"
+    ],
+    "0502-dewott": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0503-samurott": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0503-samurott-hisuian-form": [
+      "pla-hisui"
+    ],
+    "0504-patrat": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0505-watchog": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0506-lillipup": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0507-herdier": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0508-stoutland": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0509-purrloin": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0510-liepard": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0511-pansage": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0512-simisage": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0513-pansear": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0514-simisear": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0515-panpour": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0516-simipour": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0517-munna": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0518-musharna": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0519-pidove": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0520-tranquill": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0521-unfezant": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0522-blitzle": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0523-zebstrika": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0524-roggenrola": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0525-boldore": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0526-gigalith": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0527-woobat": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0528-swoobat": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0529-drilbur": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0530-excadrill": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0530-mega-excadrill": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0531-audino": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0531-mega-audino": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0532-timburr": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0533-gurdurr": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0534-conkeldurr": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0535-tympole": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0536-palpitoad": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0537-seismitoad": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0538-throh": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0539-sawk": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0540-sewaddle": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0541-swadloon": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0542-leavanny": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0543-venipede": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0544-whirlipede": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0545-mega-scolipede": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0545-scolipede": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0546-cottonee": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0547-whimsicott": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0548-petilil": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0549-lilligant": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0549-lilligant-hisuian-form": [
+      "pla-hisui"
+    ],
+    "0550-basculin-blue-striped-form": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0550-basculin-red-striped-form": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0550-basculin-white-striped-form": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0551-sandile": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0552-krokorok": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0553-krookodile": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0554-darumaka": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0554-darumaka-galarian-form": [
+      "swsh-galar"
+    ],
+    "0555-darmanitan-galarian-form-standard-mode": [
+      "swsh-galar"
+    ],
+    "0555-darmanitan-galarian-form-zen-mode": [
+      "swsh-galar"
+    ],
+    "0555-darmanitan-standard-mode": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0555-darmanitan-zen-mode": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0556-maractus": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0557-dwebble": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0558-crustle": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0559-scraggy": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0560-mega-scrafty": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0560-scrafty": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0561-sigilyph": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0562-yamask": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0562-yamask-galarian-form": [
+      "swsh-galar"
+    ],
+    "0563-cofagrigus": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0564-tirtouga": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0565-carracosta": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0566-archen": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0567-archeops": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0568-trubbish": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0569-garbodor": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0569-garbodor-gigantamax": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0570-zorua": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0570-zorua-hisuian-form": [
+      "pla-hisui"
+    ],
+    "0571-zoroark": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0571-zoroark-hisuian-form": [
+      "pla-hisui"
+    ],
+    "0572-minccino": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0573-cinccino": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0574-gothita": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0575-gothorita": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0576-gothitelle": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0577-solosis": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0578-duosion": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0579-reuniclus": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0580-ducklett": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0581-swanna": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0582-vanillite": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0583-vanillish": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0584-vanilluxe": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0585-deerling-autumn-form": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0585-deerling-spring-form": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0585-deerling-summer-form": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0585-deerling-winter-form": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0586-sawsbuck-autumn-form": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0586-sawsbuck-spring-form": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0586-sawsbuck-summer-form": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0586-sawsbuck-winter-form": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0587-emolga": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0588-karrablast": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0589-escavalier": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0590-foongus": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0591-amoonguss": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0592-frillish": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0593-jellicent": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0594-alomomola": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0595-joltik": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0596-galvantula": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0597-ferroseed": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0598-ferrothorn": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0599-klink": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0600-klang": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0601-klinklang": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0602-tynamo": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0603-eelektrik": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0604-eelektross": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0604-mega-eelektross": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0605-elgyem": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0606-beheeyem": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0607-litwick": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0608-lampent": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0609-chandelure": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0609-mega-chandelure": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0610-axew": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0611-fraxure": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0612-haxorus": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0613-cubchoo": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0614-beartic": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0615-cryogonal": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0616-shelmet": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0617-accelgor": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0618-stunfisk": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0618-stunfisk-galarian-form": [
+      "swsh-galar"
+    ],
+    "0619-mienfoo": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0620-mienshao": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0621-druddigon": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0622-golett": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0623-golurk": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0623-mega-golurk": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0624-pawniard": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0625-bisharp": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0626-bouffalant": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0627-rufflet": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0628-braviary": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0628-braviary-hisuian-form": [
+      "pla-hisui"
+    ],
+    "0629-vullaby": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0630-mandibuzz": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0631-heatmor": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0632-durant": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0633-deino": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0634-zweilous": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0635-hydreigon": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0636-larvesta": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0637-volcarona": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0638-cobalion": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0639-terrakion": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0640-virizion": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0641-tornadus-incarnate-forme": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0641-tornadus-therian-forme": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0642-thundurus-incarnate-forme": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0642-thundurus-therian-forme": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0643-reshiram": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0644-zekrom": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0645-landorus-incarnate-forme": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0645-landorus-therian-forme": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0646-kyurem": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0646-kyurem-black-kyurem": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0646-kyurem-white-kyurem": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0647-keldeo-ordinary-form": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0647-keldeo-resolute-form": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0648-meloetta-aria-forme": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0648-meloetta-pirouette-forme": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0649-genesect": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0649-genesect-burn-drive": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0649-genesect-chill-drive": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0649-genesect-douse-drive": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0649-genesect-shock-drive": [
+      "bw-unova",
+      "b2w2-unova"
+    ],
+    "0650-chespin": [
+      "xy-kalos-central",
+      "sv-blueberry"
+    ],
+    "0651-quilladin": [
+      "xy-kalos-central"
+    ],
+    "0652-chesnaught": [
+      "xy-kalos-central"
+    ],
+    "0652-mega-chesnaught": [
+      "xy-kalos-central"
+    ],
+    "0653-fennekin": [
+      "xy-kalos-central",
+      "sv-blueberry"
+    ],
+    "0654-braixen": [
+      "xy-kalos-central"
+    ],
+    "0655-delphox": [
+      "xy-kalos-central"
+    ],
+    "0655-mega-delphox": [
+      "xy-kalos-central"
+    ],
+    "0656-froakie": [
+      "xy-kalos-central",
+      "sv-blueberry"
+    ],
+    "0657-frogadier": [
+      "xy-kalos-central"
+    ],
+    "0658-greninja": [
+      "xy-kalos-central"
+    ],
+    "0658-greninja-ash-greninja": [
+      "xy-kalos-central"
+    ],
+    "0658-mega-greninja": [
+      "xy-kalos-central"
+    ],
+    "0659-bunnelby": [
+      "xy-kalos-central"
+    ],
+    "0660-diggersby": [
+      "xy-kalos-central"
+    ],
+    "0661-fletchling": [
+      "xy-kalos-central"
+    ],
+    "0662-fletchinder": [
+      "xy-kalos-central"
+    ],
+    "0663-talonflame": [
+      "xy-kalos-central"
+    ],
+    "0664-scatterbug": [
+      "xy-kalos-central"
+    ],
+    "0665-spewpa": [
+      "xy-kalos-central"
+    ],
+    "0666-vivillon-archipelago-pattern": [
+      "xy-kalos-central"
+    ],
+    "0666-vivillon-continental-pattern": [
+      "xy-kalos-central"
+    ],
+    "0666-vivillon-elegant-pattern": [
+      "xy-kalos-central"
+    ],
+    "0666-vivillon-fancy-pattern": [
+      "xy-kalos-central"
+    ],
+    "0666-vivillon-garden-pattern": [
+      "xy-kalos-central"
+    ],
+    "0666-vivillon-high-plains-pattern": [
+      "xy-kalos-central"
+    ],
+    "0666-vivillon-icy-snow-pattern": [
+      "xy-kalos-central"
+    ],
+    "0666-vivillon-jungle-pattern": [
+      "xy-kalos-central"
+    ],
+    "0666-vivillon-marine-pattern": [
+      "xy-kalos-central"
+    ],
+    "0666-vivillon-meadow-pattern": [
+      "xy-kalos-central"
+    ],
+    "0666-vivillon-modern-pattern": [
+      "xy-kalos-central"
+    ],
+    "0666-vivillon-monsoon-pattern": [
+      "xy-kalos-central"
+    ],
+    "0666-vivillon-ocean-pattern": [
+      "xy-kalos-central"
+    ],
+    "0666-vivillon-poke-ball-pattern": [
+      "xy-kalos-central"
+    ],
+    "0666-vivillon-polar-pattern": [
+      "xy-kalos-central"
+    ],
+    "0666-vivillon-river-pattern": [
+      "xy-kalos-central"
+    ],
+    "0666-vivillon-sandstorm-pattern": [
+      "xy-kalos-central"
+    ],
+    "0666-vivillon-savanna-pattern": [
+      "xy-kalos-central"
+    ],
+    "0666-vivillon-sun-pattern": [
+      "xy-kalos-central"
+    ],
+    "0666-vivillon-tundra-pattern": [
+      "xy-kalos-central"
+    ],
+    "0667-litleo": [
+      "xy-kalos-central"
+    ],
+    "0668-mega-pyroar": [
+      "xy-kalos-central"
+    ],
+    "0668-pyroar": [
+      "xy-kalos-central"
+    ],
+    "0669-flabebe-blue-flower": [
+      "xy-kalos-central"
+    ],
+    "0669-flabebe-orange-flower": [
+      "xy-kalos-central"
+    ],
+    "0669-flabebe-red-flower": [
+      "xy-kalos-central"
+    ],
+    "0669-flabebe-white-flower": [
+      "xy-kalos-central"
+    ],
+    "0669-flabebe-yellow-flower": [
+      "xy-kalos-central"
+    ],
+    "0670-floette-blue-flower": [
+      "xy-kalos-central"
+    ],
+    "0670-floette-eternal-flower": [
+      "xy-kalos-central"
+    ],
+    "0670-floette-orange-flower": [
+      "xy-kalos-central"
+    ],
+    "0670-floette-red-flower": [
+      "xy-kalos-central"
+    ],
+    "0670-floette-white-flower": [
+      "xy-kalos-central"
+    ],
+    "0670-floette-yellow-flower": [
+      "xy-kalos-central"
+    ],
+    "0670-mega-floette": [
+      "xy-kalos-central"
+    ],
+    "0671-florges-blue-flower": [
+      "xy-kalos-central"
+    ],
+    "0671-florges-orange-flower": [
+      "xy-kalos-central"
+    ],
+    "0671-florges-red-flower": [
+      "xy-kalos-central"
+    ],
+    "0671-florges-white-flower": [
+      "xy-kalos-central"
+    ],
+    "0671-florges-yellow-flower": [
+      "xy-kalos-central"
+    ],
+    "0672-skiddo": [
+      "xy-kalos-central"
+    ],
+    "0673-gogoat": [
+      "xy-kalos-central"
+    ],
+    "0674-pancham": [
+      "xy-kalos-central"
+    ],
+    "0675-pangoro": [
+      "xy-kalos-central"
+    ],
+    "0676-furfrou-dandy-trim": [
+      "xy-kalos-central"
+    ],
+    "0676-furfrou-debutante-trim": [
+      "xy-kalos-central"
+    ],
+    "0676-furfrou-diamond-trim": [
+      "xy-kalos-central"
+    ],
+    "0676-furfrou-heart-trim": [
+      "xy-kalos-central"
+    ],
+    "0676-furfrou-kabuki-trim": [
+      "xy-kalos-central"
+    ],
+    "0676-furfrou-la-reine-trim": [
+      "xy-kalos-central"
+    ],
+    "0676-furfrou-matron-trim": [
+      "xy-kalos-central"
+    ],
+    "0676-furfrou-natural-form": [
+      "xy-kalos-central"
+    ],
+    "0676-furfrou-pharaoh-trim": [
+      "xy-kalos-central"
+    ],
+    "0676-furfrou-star-trim": [
+      "xy-kalos-central"
+    ],
+    "0677-espurr": [
+      "xy-kalos-central"
+    ],
+    "0678-mega-meowstic": [
+      "xy-kalos-central"
+    ],
+    "0678-meowstic-female": [
+      "xy-kalos-central"
+    ],
+    "0678-meowstic-male": [
+      "xy-kalos-central"
+    ],
+    "0679-honedge": [
+      "xy-kalos-central"
+    ],
+    "0680-doublade": [
+      "xy-kalos-central"
+    ],
+    "0681-aegislash-blade-forme": [
+      "xy-kalos-central"
+    ],
+    "0681-aegislash-shield-forme": [
+      "xy-kalos-central"
+    ],
+    "0682-spritzee": [
+      "xy-kalos-central"
+    ],
+    "0683-aromatisse": [
+      "xy-kalos-central"
+    ],
+    "0684-swirlix": [
+      "xy-kalos-central"
+    ],
+    "0685-slurpuff": [
+      "xy-kalos-central"
+    ],
+    "0686-inkay": [
+      "xy-kalos-central"
+    ],
+    "0687-malamar": [
+      "xy-kalos-central"
+    ],
+    "0687-mega-malamar": [
+      "xy-kalos-central"
+    ],
+    "0688-binacle": [
+      "xy-kalos-central"
+    ],
+    "0689-barbaracle": [
+      "xy-kalos-central"
+    ],
+    "0689-mega-barbaracle": [
+      "xy-kalos-central"
+    ],
+    "0690-skrelp": [
+      "xy-kalos-central"
+    ],
+    "0691-dragalge": [
+      "xy-kalos-central"
+    ],
+    "0691-mega-dragalge": [
+      "xy-kalos-central"
+    ],
+    "0692-clauncher": [
+      "xy-kalos-central"
+    ],
+    "0693-clawitzer": [
+      "xy-kalos-central"
+    ],
+    "0694-helioptile": [
+      "xy-kalos-central"
+    ],
+    "0695-heliolisk": [
+      "xy-kalos-central"
+    ],
+    "0696-tyrunt": [
+      "xy-kalos-central"
+    ],
+    "0697-tyrantrum": [
+      "xy-kalos-central"
+    ],
+    "0698-amaura": [
+      "xy-kalos-central"
+    ],
+    "0699-aurorus": [
+      "xy-kalos-central"
+    ],
+    "0700-sylveon": [
+      "xy-kalos-central"
+    ],
+    "0701-hawlucha": [
+      "xy-kalos-central"
+    ],
+    "0701-mega-hawlucha": [
+      "xy-kalos-central"
+    ],
+    "0702-dedenne": [
+      "xy-kalos-central"
+    ],
+    "0703-carbink": [
+      "xy-kalos-central"
+    ],
+    "0704-goomy": [
+      "xy-kalos-central"
+    ],
+    "0705-sliggoo": [
+      "xy-kalos-central"
+    ],
+    "0705-sliggoo-hisuian-form": [
+      "pla-hisui"
+    ],
+    "0706-goodra": [
+      "xy-kalos-central"
+    ],
+    "0706-goodra-hisuian-form": [
+      "pla-hisui"
+    ],
+    "0707-klefki": [
+      "xy-kalos-central"
+    ],
+    "0708-phantump": [
+      "xy-kalos-central"
+    ],
+    "0709-trevenant": [
+      "xy-kalos-central"
+    ],
+    "0710-pumpkaboo-jumbo-variety": [
+      "xy-kalos-central"
+    ],
+    "0710-pumpkaboo-large-variety": [
+      "xy-kalos-central"
+    ],
+    "0710-pumpkaboo-medium-variety": [
+      "xy-kalos-central"
+    ],
+    "0710-pumpkaboo-small-variety": [
+      "xy-kalos-central"
+    ],
+    "0711-gourgeist-jumbo-variety": [
+      "xy-kalos-central"
+    ],
+    "0711-gourgeist-large-variety": [
+      "xy-kalos-central"
+    ],
+    "0711-gourgeist-medium-variety": [
+      "xy-kalos-central"
+    ],
+    "0711-gourgeist-small-variety": [
+      "xy-kalos-central"
+    ],
+    "0712-bergmite": [
+      "xy-kalos-central"
+    ],
+    "0713-avalugg": [
+      "xy-kalos-central"
+    ],
+    "0713-avalugg-hisuian-form": [
+      "pla-hisui"
+    ],
+    "0714-noibat": [
+      "xy-kalos-central"
+    ],
+    "0715-noivern": [
+      "xy-kalos-central"
+    ],
+    "0716-xerneas-active-mode": [
+      "xy-kalos-central"
+    ],
+    "0716-xerneas-neutral-mode": [
+      "xy-kalos-central"
+    ],
+    "0717-yveltal": [
+      "xy-kalos-central"
+    ],
+    "0718-mega-zygarde": [
+      "xy-kalos-central"
+    ],
+    "0718-zygarde-10-forme": [
+      "xy-kalos-central"
+    ],
+    "0718-zygarde-50-forme": [
+      "xy-kalos-central"
+    ],
+    "0718-zygarde-complete-forme": [
+      "xy-kalos-central"
+    ],
+    "0719-diancie": [
+      "xy-kalos-central"
+    ],
+    "0719-mega-diancie": [
+      "xy-kalos-central"
+    ],
+    "0720-hoopa-hoopa-confined": [
+      "xy-kalos-central"
+    ],
+    "0720-hoopa-hoopa-unbound": [
+      "xy-kalos-central"
+    ],
+    "0721-volcanion": [
+      "xy-kalos-central"
+    ],
+    "0722-rowlet": [
+      "sm-alola",
+      "usum-alola",
+      "pla-hisui",
+      "sv-blueberry"
+    ],
+    "0723-dartrix": [
+      "sm-alola",
+      "usum-alola"
+    ],
+    "0724-decidueye": [
+      "sm-alola",
+      "usum-alola"
+    ],
+    "0724-decidueye-hisuian-form": [
+      "pla-hisui"
+    ],
+    "0725-litten": [
+      "sm-alola",
+      "usum-alola",
+      "sv-blueberry"
+    ],
+    "0726-torracat": [
+      "sm-alola",
+      "usum-alola"
+    ],
+    "0727-incineroar": [
+      "sm-alola",
+      "usum-alola"
+    ],
+    "0728-popplio": [
+      "sm-alola",
+      "usum-alola",
+      "sv-blueberry"
+    ],
+    "0729-brionne": [
+      "sm-alola",
+      "usum-alola"
+    ],
+    "0730-primarina": [
+      "sm-alola",
+      "usum-alola"
+    ],
+    "0731-pikipek": [
+      "sm-alola",
+      "usum-alola"
+    ],
+    "0732-trumbeak": [
+      "sm-alola",
+      "usum-alola"
+    ],
+    "0733-toucannon": [
+      "sm-alola",
+      "usum-alola"
+    ],
+    "0734-yungoos": [
+      "sm-alola",
+      "usum-alola"
+    ],
+    "0735-gumshoos": [
+      "sm-alola",
+      "usum-alola"
+    ],
+    "0736-grubbin": [
+      "sm-alola",
+      "usum-alola"
+    ],
+    "0737-charjabug": [
+      "sm-alola",
+      "usum-alola"
+    ],
+    "0738-vikavolt": [
+      "sm-alola",
+      "usum-alola"
+    ],
+    "0739-crabrawler": [
+      "sm-alola",
+      "usum-alola"
+    ],
+    "0740-crabominable": [
+      "sm-alola",
+      "usum-alola"
+    ],
+    "0740-mega-crabominable": [
+      "sm-alola",
+      "usum-alola"
+    ],
+    "0741-oricorio-baile-style": [
+      "sm-alola",
+      "usum-alola"
+    ],
+    "0741-oricorio-pa-u-style": [
+      "sm-alola",
+      "usum-alola"
+    ],
+    "0741-oricorio-pom-pom-style": [
+      "sm-alola",
+      "usum-alola"
+    ],
+    "0741-oricorio-sensu-style": [
+      "sm-alola",
+      "usum-alola"
+    ],
+    "0742-cutiefly": [
+      "sm-alola",
+      "usum-alola"
+    ],
+    "0743-ribombee": [
+      "sm-alola",
+      "usum-alola"
+    ],
+    "0744-rockruff": [
+      "sm-alola",
+      "usum-alola"
+    ],
+    "0745-lycanroc-dusk-form": [
+      "sm-alola",
+      "usum-alola"
+    ],
+    "0745-lycanroc-midday-form": [
+      "sm-alola",
+      "usum-alola"
+    ],
+    "0745-lycanroc-midnight-form": [
+      "sm-alola",
+      "usum-alola"
+    ],
+    "0746-wishiwashi-school-form": [
+      "sm-alola",
+      "usum-alola"
+    ],
+    "0746-wishiwashi-solo-form": [
+      "sm-alola",
+      "usum-alola"
+    ],
+    "0747-mareanie": [
+      "sm-alola",
+      "usum-alola"
+    ],
+    "0748-toxapex": [
+      "sm-alola",
+      "usum-alola"
+    ],
+    "0749-mudbray": [
+      "sm-alola",
+      "usum-alola"
+    ],
+    "0750-mudsdale": [
+      "sm-alola",
+      "usum-alola"
+    ],
+    "0751-dewpider": [
+      "sm-alola",
+      "usum-alola"
+    ],
+    "0752-araquanid": [
+      "sm-alola",
+      "usum-alola"
+    ],
+    "0753-fomantis": [
+      "sm-alola",
+      "usum-alola"
+    ],
+    "0754-lurantis": [
+      "sm-alola",
+      "usum-alola"
+    ],
+    "0755-morelull": [
+      "sm-alola",
+      "usum-alola"
+    ],
+    "0756-shiinotic": [
+      "sm-alola",
+      "usum-alola"
+    ],
+    "0757-salandit": [
+      "sm-alola",
+      "usum-alola"
+    ],
+    "0758-salazzle": [
+      "sm-alola",
+      "usum-alola"
+    ],
+    "0759-stufful": [
+      "sm-alola",
+      "usum-alola"
+    ],
+    "0760-bewear": [
+      "sm-alola",
+      "usum-alola"
+    ],
+    "0761-bounsweet": [
+      "sm-alola",
+      "usum-alola"
+    ],
+    "0762-steenee": [
+      "sm-alola",
+      "usum-alola"
+    ],
+    "0763-tsareena": [
+      "sm-alola",
+      "usum-alola"
+    ],
+    "0764-comfey": [
+      "sm-alola",
+      "usum-alola"
+    ],
+    "0765-oranguru": [
+      "sm-alola",
+      "usum-alola"
+    ],
+    "0766-passimian": [
+      "sm-alola",
+      "usum-alola"
+    ],
+    "0767-wimpod": [
+      "sm-alola",
+      "usum-alola"
+    ],
+    "0768-golisopod": [
+      "sm-alola",
+      "usum-alola"
+    ],
+    "0768-mega-golisopod": [
+      "sm-alola",
+      "usum-alola"
+    ],
+    "0769-sandygast": [
+      "sm-alola",
+      "usum-alola"
+    ],
+    "0770-palossand": [
+      "sm-alola",
+      "usum-alola"
+    ],
+    "0771-pyukumuku": [
+      "sm-alola",
+      "usum-alola"
+    ],
+    "0772-type-null": [
+      "sm-alola",
+      "usum-alola"
+    ],
+    "0773-silvally-type-bug": [
+      "sm-alola",
+      "usum-alola"
+    ],
+    "0773-silvally-type-dark": [
+      "sm-alola",
+      "usum-alola"
+    ],
+    "0773-silvally-type-dragon": [
+      "sm-alola",
+      "usum-alola"
+    ],
+    "0773-silvally-type-electric": [
+      "sm-alola",
+      "usum-alola"
+    ],
+    "0773-silvally-type-fairy": [
+      "sm-alola",
+      "usum-alola"
+    ],
+    "0773-silvally-type-fighting": [
+      "sm-alola",
+      "usum-alola"
+    ],
+    "0773-silvally-type-fire": [
+      "sm-alola",
+      "usum-alola"
+    ],
+    "0773-silvally-type-flying": [
+      "sm-alola",
+      "usum-alola"
+    ],
+    "0773-silvally-type-ghost": [
+      "sm-alola",
+      "usum-alola"
+    ],
+    "0773-silvally-type-grass": [
+      "sm-alola",
+      "usum-alola"
+    ],
+    "0773-silvally-type-ground": [
+      "sm-alola",
+      "usum-alola"
+    ],
+    "0773-silvally-type-ice": [
+      "sm-alola",
+      "usum-alola"
+    ],
+    "0773-silvally-type-normal": [
+      "sm-alola",
+      "usum-alola"
+    ],
+    "0773-silvally-type-poison": [
+      "sm-alola",
+      "usum-alola"
+    ],
+    "0773-silvally-type-psychic": [
+      "sm-alola",
+      "usum-alola"
+    ],
+    "0773-silvally-type-rock": [
+      "sm-alola",
+      "usum-alola"
+    ],
+    "0773-silvally-type-steel": [
+      "sm-alola",
+      "usum-alola"
+    ],
+    "0773-silvally-type-water": [
+      "sm-alola",
+      "usum-alola"
+    ],
+    "0774-minior-blue-core": [
+      "sm-alola",
+      "usum-alola"
+    ],
+    "0774-minior-green-core": [
+      "sm-alola",
+      "usum-alola"
+    ],
+    "0774-minior-indigo-core": [
+      "sm-alola",
+      "usum-alola"
+    ],
+    "0774-minior-meteor-form": [
+      "sm-alola",
+      "usum-alola"
+    ],
+    "0774-minior-orange-core": [
+      "sm-alola",
+      "usum-alola"
+    ],
+    "0774-minior-red-core": [
+      "sm-alola",
+      "usum-alola"
+    ],
+    "0774-minior-violet-core": [
+      "sm-alola",
+      "usum-alola"
+    ],
+    "0774-minior-yellow-core": [
+      "sm-alola",
+      "usum-alola"
+    ],
+    "0775-komala": [
+      "sm-alola",
+      "usum-alola"
+    ],
+    "0776-turtonator": [
+      "sm-alola",
+      "usum-alola"
+    ],
+    "0777-togedemaru": [
+      "sm-alola",
+      "usum-alola"
+    ],
+    "0778-mimikyu-busted-form": [
+      "sm-alola",
+      "usum-alola"
+    ],
+    "0778-mimikyu-disguised-form": [
+      "sm-alola",
+      "usum-alola"
+    ],
+    "0779-bruxish": [
+      "sm-alola",
+      "usum-alola"
+    ],
+    "0780-drampa": [
+      "sm-alola",
+      "usum-alola"
+    ],
+    "0780-mega-drampa": [
+      "sm-alola",
+      "usum-alola"
+    ],
+    "0781-dhelmise": [
+      "sm-alola",
+      "usum-alola"
+    ],
+    "0782-jangmo-o": [
+      "sm-alola",
+      "usum-alola"
+    ],
+    "0783-hakamo-o": [
+      "sm-alola",
+      "usum-alola"
+    ],
+    "0784-kommo-o": [
+      "sm-alola",
+      "usum-alola"
+    ],
+    "0785-tapu-koko": [
+      "sm-alola",
+      "usum-alola"
+    ],
+    "0786-tapu-lele": [
+      "sm-alola",
+      "usum-alola"
+    ],
+    "0787-tapu-bulu": [
+      "sm-alola",
+      "usum-alola"
+    ],
+    "0788-tapu-fini": [
+      "sm-alola",
+      "usum-alola"
+    ],
+    "0789-cosmog": [
+      "sm-alola",
+      "usum-alola"
+    ],
+    "0790-cosmoem": [
+      "sm-alola",
+      "usum-alola"
+    ],
+    "0791-solgaleo": [
+      "sm-alola",
+      "usum-alola"
+    ],
+    "0792-lunala": [
+      "sm-alola",
+      "usum-alola"
+    ],
+    "0793-nihilego": [
+      "sm-alola",
+      "usum-alola"
+    ],
+    "0794-buzzwole": [
+      "sm-alola",
+      "usum-alola"
+    ],
+    "0795-pheromosa": [
+      "sm-alola",
+      "usum-alola"
+    ],
+    "0796-xurkitree": [
+      "sm-alola",
+      "usum-alola"
+    ],
+    "0797-celesteela": [
+      "sm-alola",
+      "usum-alola"
+    ],
+    "0798-kartana": [
+      "sm-alola",
+      "usum-alola"
+    ],
+    "0799-guzzlord": [
+      "sm-alola",
+      "usum-alola"
+    ],
+    "0800-necrozma": [
+      "sm-alola",
+      "usum-alola"
+    ],
+    "0800-necrozma-dawn-wings": [
+      "sm-alola",
+      "usum-alola"
+    ],
+    "0800-necrozma-dusk-mane": [
+      "sm-alola",
+      "usum-alola"
+    ],
+    "0800-ultra-necrozma": [
+      "sm-alola",
+      "usum-alola"
+    ],
+    "0801-magearna": [
+      "sm-alola",
+      "usum-alola"
+    ],
+    "0801-magearna-original-color": [
+      "sm-alola",
+      "usum-alola"
+    ],
+    "0801-mega-magearna": [
+      "sm-alola",
+      "usum-alola"
+    ],
+    "0801-mega-magearna-original-color": [
+      "sm-alola",
+      "usum-alola"
+    ],
+    "0802-marshadow": [
+      "sm-alola",
+      "usum-alola"
+    ],
+    "0803-poipole": [
+      "sm-alola",
+      "usum-alola"
+    ],
+    "0804-naganadel": [
+      "sm-alola",
+      "usum-alola"
+    ],
+    "0805-stakataka": [
+      "sm-alola",
+      "usum-alola"
+    ],
+    "0806-blacephalon": [
+      "sm-alola",
+      "usum-alola"
+    ],
+    "0807-mega-zeraora": [
+      "sm-alola",
+      "usum-alola"
+    ],
+    "0807-zeraora": [
+      "sm-alola",
+      "usum-alola"
+    ],
+    "0808-meltan": [
+      "lgpe-kanto"
+    ],
+    "0809-melmetal": [
+      "lgpe-kanto"
+    ],
+    "0809-melmetal-gigantamax": [
+      "lgpe-kanto"
+    ],
+    "0810-grookey": [
+      "swsh-galar",
+      "sv-blueberry"
+    ],
+    "0811-thwackey": [
+      "swsh-galar"
+    ],
+    "0812-rillaboom": [
+      "swsh-galar"
+    ],
+    "0812-rillaboom-gigantamax": [
+      "swsh-galar"
+    ],
+    "0813-scorbunny": [
+      "swsh-galar",
+      "sv-blueberry"
+    ],
+    "0814-raboot": [
+      "swsh-galar"
+    ],
+    "0815-cinderace": [
+      "swsh-galar"
+    ],
+    "0815-cinderace-gigantamax": [
+      "swsh-galar"
+    ],
+    "0816-sobble": [
+      "swsh-galar",
+      "sv-blueberry"
+    ],
+    "0817-drizzile": [
+      "swsh-galar"
+    ],
+    "0818-inteleon": [
+      "swsh-galar"
+    ],
+    "0818-inteleon-gigantamax": [
+      "swsh-galar"
+    ],
+    "0819-skwovet": [
+      "swsh-galar"
+    ],
+    "0820-greedent": [
+      "swsh-galar"
+    ],
+    "0821-rookidee": [
+      "swsh-galar"
+    ],
+    "0822-corvisquire": [
+      "swsh-galar"
+    ],
+    "0823-corviknight": [
+      "swsh-galar"
+    ],
+    "0823-corviknight-gigantamax": [
+      "swsh-galar"
+    ],
+    "0824-blipbug": [
+      "swsh-galar"
+    ],
+    "0825-dottler": [
+      "swsh-galar"
+    ],
+    "0826-orbeetle": [
+      "swsh-galar"
+    ],
+    "0826-orbeetle-gigantamax": [
+      "swsh-galar"
+    ],
+    "0827-nickit": [
+      "swsh-galar"
+    ],
+    "0828-thievul": [
+      "swsh-galar"
+    ],
+    "0829-gossifleur": [
+      "swsh-galar"
+    ],
+    "0830-eldegoss": [
+      "swsh-galar"
+    ],
+    "0831-wooloo": [
+      "swsh-galar"
+    ],
+    "0832-dubwool": [
+      "swsh-galar"
+    ],
+    "0833-chewtle": [
+      "swsh-galar"
+    ],
+    "0834-drednaw": [
+      "swsh-galar"
+    ],
+    "0834-drednaw-gigantamax": [
+      "swsh-galar"
+    ],
+    "0835-yamper": [
+      "swsh-galar"
+    ],
+    "0836-boltund": [
+      "swsh-galar"
+    ],
+    "0837-rolycoly": [
+      "swsh-galar"
+    ],
+    "0838-carkol": [
+      "swsh-galar"
+    ],
+    "0839-coalossal": [
+      "swsh-galar"
+    ],
+    "0839-coalossal-gigantamax": [
+      "swsh-galar"
+    ],
+    "0840-applin": [
+      "swsh-galar"
+    ],
+    "0841-flapple": [
+      "swsh-galar"
+    ],
+    "0841-flapple-gigantamax": [
+      "swsh-galar"
+    ],
+    "0842-appletun": [
+      "swsh-galar"
+    ],
+    "0842-appletun-gigantamax": [
+      "swsh-galar"
+    ],
+    "0843-silicobra": [
+      "swsh-galar"
+    ],
+    "0844-sandaconda": [
+      "swsh-galar"
+    ],
+    "0844-sandaconda-gigantamax": [
+      "swsh-galar"
+    ],
+    "0845-cramorant": [
+      "swsh-galar"
+    ],
+    "0845-cramorant-gorging-form": [
+      "swsh-galar"
+    ],
+    "0845-cramorant-gulping-form": [
+      "swsh-galar"
+    ],
+    "0846-arrokuda": [
+      "swsh-galar"
+    ],
+    "0847-barraskewda": [
+      "swsh-galar"
+    ],
+    "0848-toxel": [
+      "swsh-galar"
+    ],
+    "0849-toxtricity-amped-form": [
+      "swsh-galar"
+    ],
+    "0849-toxtricity-gigantamax": [
+      "swsh-galar"
+    ],
+    "0849-toxtricity-low-key-form": [
+      "swsh-galar"
+    ],
+    "0850-sizzlipede": [
+      "swsh-galar"
+    ],
+    "0851-centiskorch": [
+      "swsh-galar"
+    ],
+    "0851-centiskorch-gigantamax": [
+      "swsh-galar"
+    ],
+    "0852-clobbopus": [
+      "swsh-galar"
+    ],
+    "0853-grapploct": [
+      "swsh-galar"
+    ],
+    "0854-sinistea-antique-form": [
+      "swsh-galar"
+    ],
+    "0854-sinistea-phony-form": [
+      "swsh-galar"
+    ],
+    "0855-polteageist-antique-form": [
+      "swsh-galar"
+    ],
+    "0855-polteageist-phony-form": [
+      "swsh-galar"
+    ],
+    "0856-hatenna": [
+      "swsh-galar"
+    ],
+    "0857-hattrem": [
+      "swsh-galar"
+    ],
+    "0858-hatterene": [
+      "swsh-galar"
+    ],
+    "0858-hatterene-gigantamax": [
+      "swsh-galar"
+    ],
+    "0859-impidimp": [
+      "swsh-galar"
+    ],
+    "0860-morgrem": [
+      "swsh-galar"
+    ],
+    "0861-grimmsnarl": [
+      "swsh-galar"
+    ],
+    "0861-grimmsnarl-gigantamax": [
+      "swsh-galar"
+    ],
+    "0862-obstagoon": [
+      "swsh-galar"
+    ],
+    "0863-perrserker": [
+      "swsh-galar"
+    ],
+    "0864-cursola": [
+      "swsh-galar"
+    ],
+    "0865-sirfetch-d": [
+      "swsh-galar"
+    ],
+    "0866-mr-rime": [
+      "swsh-galar"
+    ],
+    "0867-runerigus": [
+      "swsh-galar"
+    ],
+    "0868-milcery": [
+      "swsh-galar"
+    ],
+    "0869-alcremie-caramel-swirl": [
+      "swsh-galar"
+    ],
+    "0869-alcremie-gigantamax": [
+      "swsh-galar"
+    ],
+    "0869-alcremie-lemon-cream": [
+      "swsh-galar"
+    ],
+    "0869-alcremie-matcha-cream": [
+      "swsh-galar"
+    ],
+    "0869-alcremie-mint-cream": [
+      "swsh-galar"
+    ],
+    "0869-alcremie-rainbow-swirl": [
+      "swsh-galar"
+    ],
+    "0869-alcremie-ruby-cream": [
+      "swsh-galar"
+    ],
+    "0869-alcremie-ruby-swirl": [
+      "swsh-galar"
+    ],
+    "0869-alcremie-salted-cream": [
+      "swsh-galar"
+    ],
+    "0869-alcremie-vanilla-cream": [
+      "swsh-galar"
+    ],
+    "0870-falinks": [
+      "swsh-galar"
+    ],
+    "0870-mega-falinks": [
+      "swsh-galar"
+    ],
+    "0871-pincurchin": [
+      "swsh-galar"
+    ],
+    "0872-snom": [
+      "swsh-galar"
+    ],
+    "0873-frosmoth": [
+      "swsh-galar"
+    ],
+    "0874-stonjourner": [
+      "swsh-galar"
+    ],
+    "0875-eiscue-ice-face": [
+      "swsh-galar"
+    ],
+    "0875-eiscue-noice-face": [
+      "swsh-galar"
+    ],
+    "0876-indeedee-female": [
+      "swsh-galar"
+    ],
+    "0876-indeedee-male": [
+      "swsh-galar"
+    ],
+    "0877-morpeko-full-belly-mode": [
+      "swsh-galar"
+    ],
+    "0877-morpeko-hangry-mode": [
+      "swsh-galar"
+    ],
+    "0878-cufant": [
+      "swsh-galar"
+    ],
+    "0879-copperajah": [
+      "swsh-galar"
+    ],
+    "0879-copperajah-gigantamax": [
+      "swsh-galar"
+    ],
+    "0880-dracozolt": [
+      "swsh-galar"
+    ],
+    "0881-arctozolt": [
+      "swsh-galar"
+    ],
+    "0882-dracovish": [
+      "swsh-galar"
+    ],
+    "0883-arctovish": [
+      "swsh-galar"
+    ],
+    "0884-duraludon": [
+      "swsh-galar"
+    ],
+    "0884-duraludon-gigantamax": [
+      "swsh-galar"
+    ],
+    "0885-dreepy": [
+      "swsh-galar"
+    ],
+    "0886-drakloak": [
+      "swsh-galar"
+    ],
+    "0887-dragapult": [
+      "swsh-galar"
+    ],
+    "0888-zacian-crowned-sword": [
+      "swsh-galar"
+    ],
+    "0888-zacian-hero-of-many-battles": [
+      "swsh-galar"
+    ],
+    "0889-zamazenta-crowned-shield": [
+      "swsh-galar"
+    ],
+    "0889-zamazenta-hero-of-many-battles": [
+      "swsh-galar"
+    ],
+    "0890-eternatus": [
+      "swsh-galar"
+    ],
+    "0890-eternatus-eternamax": [
+      "swsh-galar"
+    ],
+    "0891-kubfu": [
+      "swsh-galar"
+    ],
+    "0892-urshifu-gigantamax-rapid-strike-style": [
+      "swsh-galar"
+    ],
+    "0892-urshifu-gigantamax-single-strike-style": [
+      "swsh-galar"
+    ],
+    "0892-urshifu-rapid-strike-style": [
+      "swsh-galar"
+    ],
+    "0892-urshifu-single-strike-style": [
+      "swsh-galar"
+    ],
+    "0893-zarude": [
+      "swsh-galar"
+    ],
+    "0893-zarude-dada": [
+      "swsh-galar"
+    ],
+    "0894-regieleki": [
+      "swsh-galar"
+    ],
+    "0895-regidrago": [
+      "swsh-galar"
+    ],
+    "0896-glastrier": [
+      "swsh-galar"
+    ],
+    "0897-spectrier": [
+      "swsh-galar"
+    ],
+    "0898-calyrex": [
+      "swsh-galar"
+    ],
+    "0898-calyrex-ice-rider": [
+      "swsh-galar"
+    ],
+    "0898-calyrex-shadow-rider": [
+      "swsh-galar"
+    ],
+    "0899-wyrdeer": [
+      "pla-hisui"
+    ],
+    "0900-kleavor": [
+      "pla-hisui"
+    ],
+    "0901-ursaluna": [
+      "pla-hisui"
+    ],
+    "0901-ursaluna-bloodmoon": [
+      "pla-hisui"
+    ],
+    "0902-basculegion-female": [
+      "pla-hisui"
+    ],
+    "0902-basculegion-male": [
+      "pla-hisui"
+    ],
+    "0903-sneasler": [
+      "pla-hisui"
+    ],
+    "0904-overqwil": [
+      "pla-hisui"
+    ],
+    "0905-enamorus-incarnate-forme": [
+      "pla-hisui"
+    ],
+    "0905-enamorus-therian-forme": [
+      "pla-hisui"
+    ],
+    "0906-sprigatito": [
+      "sv-paldea"
+    ],
+    "0907-floragato": [
+      "sv-paldea"
+    ],
+    "0908-meowscarada": [
+      "sv-paldea"
+    ],
+    "0909-fuecoco": [
+      "sv-paldea"
+    ],
+    "0910-crocalor": [
+      "sv-paldea"
+    ],
+    "0911-skeledirge": [
+      "sv-paldea"
+    ],
+    "0912-quaxly": [
+      "sv-paldea"
+    ],
+    "0913-quaxwell": [
+      "sv-paldea"
+    ],
+    "0914-quaquaval": [
+      "sv-paldea"
+    ],
+    "0915-lechonk": [
+      "sv-paldea"
+    ],
+    "0916-oinkologne-female": [
+      "sv-paldea"
+    ],
+    "0916-oinkologne-male": [
+      "sv-paldea"
+    ],
+    "0917-tarountula": [
+      "sv-paldea"
+    ],
+    "0918-spidops": [
+      "sv-paldea"
+    ],
+    "0919-nymble": [
+      "sv-paldea"
+    ],
+    "0920-lokix": [
+      "sv-paldea"
+    ],
+    "0921-pawmi": [
+      "sv-paldea"
+    ],
+    "0922-pawmo": [
+      "sv-paldea"
+    ],
+    "0923-pawmot": [
+      "sv-paldea"
+    ],
+    "0924-tandemaus": [
+      "sv-paldea"
+    ],
+    "0925-maushold-family-of-four": [
+      "sv-paldea"
+    ],
+    "0925-maushold-family-of-three": [
+      "sv-paldea"
+    ],
+    "0926-fidough": [
+      "sv-paldea"
+    ],
+    "0927-dachsbun": [
+      "sv-paldea"
+    ],
+    "0928-smoliv": [
+      "sv-paldea"
+    ],
+    "0929-dolliv": [
+      "sv-paldea"
+    ],
+    "0930-arboliva": [
+      "sv-paldea"
+    ],
+    "0931-squawkabilly-blue-plumage": [
+      "sv-paldea"
+    ],
+    "0931-squawkabilly-green-plumage": [
+      "sv-paldea"
+    ],
+    "0931-squawkabilly-white-plumage": [
+      "sv-paldea"
+    ],
+    "0931-squawkabilly-yellow-plumage": [
+      "sv-paldea"
+    ],
+    "0932-nacli": [
+      "sv-paldea"
+    ],
+    "0933-naclstack": [
+      "sv-paldea"
+    ],
+    "0934-garganacl": [
+      "sv-paldea"
+    ],
+    "0935-charcadet": [
+      "sv-paldea"
+    ],
+    "0936-armarouge": [
+      "sv-paldea"
+    ],
+    "0937-ceruledge": [
+      "sv-paldea"
+    ],
+    "0938-tadbulb": [
+      "sv-paldea"
+    ],
+    "0939-bellibolt": [
+      "sv-paldea"
+    ],
+    "0940-wattrel": [
+      "sv-paldea"
+    ],
+    "0941-kilowattrel": [
+      "sv-paldea"
+    ],
+    "0942-maschiff": [
+      "sv-paldea"
+    ],
+    "0943-mabosstiff": [
+      "sv-paldea"
+    ],
+    "0944-shroodle": [
+      "sv-paldea"
+    ],
+    "0945-grafaiai": [
+      "sv-paldea"
+    ],
+    "0946-bramblin": [
+      "sv-paldea"
+    ],
+    "0947-brambleghast": [
+      "sv-paldea"
+    ],
+    "0948-toedscool": [
+      "sv-paldea"
+    ],
+    "0949-toedscruel": [
+      "sv-paldea"
+    ],
+    "0950-klawf": [
+      "sv-paldea"
+    ],
+    "0951-capsakid": [
+      "sv-paldea"
+    ],
+    "0952-mega-scovillain": [
+      "sv-paldea"
+    ],
+    "0952-scovillain": [
+      "sv-paldea"
+    ],
+    "0953-rellor": [
+      "sv-paldea"
+    ],
+    "0954-rabsca": [
+      "sv-paldea"
+    ],
+    "0955-flittle": [
+      "sv-paldea"
+    ],
+    "0956-espathra": [
+      "sv-paldea"
+    ],
+    "0957-tinkatink": [
+      "sv-paldea"
+    ],
+    "0958-tinkatuff": [
+      "sv-paldea"
+    ],
+    "0959-tinkaton": [
+      "sv-paldea"
+    ],
+    "0960-wiglett": [
+      "sv-paldea"
+    ],
+    "0961-wugtrio": [
+      "sv-paldea"
+    ],
+    "0962-bombirdier": [
+      "sv-paldea"
+    ],
+    "0963-finizen": [
+      "sv-paldea"
+    ],
+    "0964-palafin-hero-form": [
+      "sv-paldea"
+    ],
+    "0964-palafin-zero-form": [
+      "sv-paldea"
+    ],
+    "0965-varoom": [
+      "sv-paldea"
+    ],
+    "0966-revavroom": [
+      "sv-paldea"
+    ],
+    "0967-cyclizar": [
+      "sv-paldea"
+    ],
+    "0968-orthworm": [
+      "sv-paldea"
+    ],
+    "0969-glimmet": [
+      "sv-paldea"
+    ],
+    "0970-glimmora": [
+      "sv-paldea"
+    ],
+    "0970-mega-glimmora": [
+      "sv-paldea"
+    ],
+    "0971-greavard": [
+      "sv-paldea"
+    ],
+    "0972-houndstone": [
+      "sv-paldea"
+    ],
+    "0973-flamigo": [
+      "sv-paldea"
+    ],
+    "0974-cetoddle": [
+      "sv-paldea"
+    ],
+    "0975-cetitan": [
+      "sv-paldea"
+    ],
+    "0976-veluza": [
+      "sv-paldea"
+    ],
+    "0977-dondozo": [
+      "sv-paldea"
+    ],
+    "0978-mega-tatsugiri-curly-form": [
+      "sv-paldea"
+    ],
+    "0978-mega-tatsugiri-droopy-form": [
+      "sv-paldea"
+    ],
+    "0978-mega-tatsugiri-stretchy-form": [
+      "sv-paldea"
+    ],
+    "0978-tatsugiri-curly-form": [
+      "sv-paldea"
+    ],
+    "0978-tatsugiri-droopy-form": [
+      "sv-paldea"
+    ],
+    "0978-tatsugiri-stretchy-form": [
+      "sv-paldea"
+    ],
+    "0979-annihilape": [
+      "sv-paldea"
+    ],
+    "0980-clodsire": [
+      "sv-paldea"
+    ],
+    "0981-farigiraf": [
+      "sv-paldea"
+    ],
+    "0982-dudunsparce-three-segment-form": [
+      "sv-paldea"
+    ],
+    "0982-dudunsparce-two-segment-form": [
+      "sv-paldea"
+    ],
+    "0983-kingambit": [
+      "sv-paldea"
+    ],
+    "0984-great-tusk": [
+      "sv-paldea"
+    ],
+    "0985-scream-tail": [
+      "sv-paldea"
+    ],
+    "0986-brute-bonnet": [
+      "sv-paldea"
+    ],
+    "0987-flutter-mane": [
+      "sv-paldea"
+    ],
+    "0988-slither-wing": [
+      "sv-paldea"
+    ],
+    "0989-sandy-shocks": [
+      "sv-paldea"
+    ],
+    "0990-iron-treads": [
+      "sv-paldea"
+    ],
+    "0991-iron-bundle": [
+      "sv-paldea"
+    ],
+    "0992-iron-hands": [
+      "sv-paldea"
+    ],
+    "0993-iron-jugulis": [
+      "sv-paldea"
+    ],
+    "0994-iron-moth": [
+      "sv-paldea"
+    ],
+    "0995-iron-thorns": [
+      "sv-paldea"
+    ],
+    "0996-frigibax": [
+      "sv-paldea"
+    ],
+    "0997-arctibax": [
+      "sv-paldea"
+    ],
+    "0998-baxcalibur": [
+      "sv-paldea"
+    ],
+    "0998-mega-baxcalibur": [
+      "sv-paldea"
+    ],
+    "0999-gimmighoul-chest-form": [
+      "sv-paldea"
+    ],
+    "0999-gimmighoul-roaming-form": [
+      "sv-paldea"
+    ],
+    "1000-gholdengo": [
+      "sv-paldea"
+    ],
+    "1001-wo-chien": [
+      "sv-paldea"
+    ],
+    "1002-chien-pao": [
+      "sv-paldea"
+    ],
+    "1003-ting-lu": [
+      "sv-paldea"
+    ],
+    "1004-chi-yu": [
+      "sv-paldea"
+    ],
+    "1005-roaring-moon": [
+      "sv-paldea"
+    ],
+    "1006-iron-valiant": [
+      "sv-paldea"
+    ],
+    "1007-koraidon-apex-build": [
+      "sv-paldea"
+    ],
+    "1007-koraidon-gliding-build": [
+      "sv-paldea"
+    ],
+    "1007-koraidon-limited-build": [
+      "sv-paldea"
+    ],
+    "1007-koraidon-sprinting-build": [
+      "sv-paldea"
+    ],
+    "1007-koraidon-swimming-build": [
+      "sv-paldea"
+    ],
+    "1008-miraidon-aquatic-mode": [
+      "sv-paldea"
+    ],
+    "1008-miraidon-drive-mode": [
+      "sv-paldea"
+    ],
+    "1008-miraidon-glide-mode": [
+      "sv-paldea"
+    ],
+    "1008-miraidon-low-power-mode": [
+      "sv-paldea"
+    ],
+    "1008-miraidon-ultimate-mode": [
+      "sv-paldea"
+    ],
+    "1009-walking-wake": [
+      "sv-paldea"
+    ],
+    "1010-iron-leaves": [
+      "sv-paldea"
+    ],
+    "1011-dipplin": [
+      "sv-kitakami"
+    ],
+    "1012-poltchageist-artisan-form": [
+      "sv-kitakami"
+    ],
+    "1012-poltchageist-counterfeit-form": [
+      "sv-kitakami"
+    ],
+    "1013-sinistcha-masterpiece-form": [
+      "sv-kitakami"
+    ],
+    "1013-sinistcha-unremarkable-form": [
+      "sv-kitakami"
+    ],
+    "1014-okidogi": [
+      "sv-kitakami"
+    ],
+    "1015-munkidori": [
+      "sv-kitakami"
+    ],
+    "1016-fezandipiti": [
+      "sv-kitakami"
+    ],
+    "1017-ogerpon-cornerstone-mask": [
+      "sv-kitakami"
+    ],
+    "1017-ogerpon-hearthflame-mask": [
+      "sv-kitakami"
+    ],
+    "1017-ogerpon-teal-mask": [
+      "sv-kitakami"
+    ],
+    "1017-ogerpon-wellspring-mask": [
+      "sv-kitakami"
+    ],
+    "1018-archaludon": [
+      "sv-blueberry"
+    ],
+    "1019-hydrapple": [
+      "sv-blueberry"
+    ],
+    "1020-gouging-fire": [
+      "sv-blueberry"
+    ],
+    "1021-raging-bolt": [
+      "sv-blueberry"
+    ],
+    "1022-iron-boulder": [
+      "sv-blueberry"
+    ],
+    "1023-iron-crown": [
+      "sv-blueberry"
+    ],
+    "1024-terapagos-normal-form": [
+      "sv-blueberry"
+    ],
+    "1024-terapagos-stellar-form": [
+      "sv-blueberry"
+    ],
+    "1024-terapagos-terastal-form": [
+      "sv-blueberry"
+    ],
+    "1025-pecharunt": [
+      "sv-blueberry"
+    ]
   }
 }

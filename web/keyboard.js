@@ -3,6 +3,7 @@
  *
  * Global bindings on the list view:
  *   "/"  focus the search input
+ *   Cmd/Ctrl+K focus the collection search from any app view
  *   Esc  blur input / clear search if focused, otherwise drop card focus
  *   j    move keyboard focus to next visible card
  *   k    move keyboard focus to previous visible card
@@ -149,6 +150,14 @@
     handleDialogWiringOnce();
     if (e.defaultPrevented) return;
     const target = e.target;
+    const key = typeof e.key === "string" ? e.key.toLowerCase() : "";
+
+    if ((e.metaKey || e.ctrlKey) && !e.altKey && key === "k") {
+      e.preventDefault();
+      location.hash = "#/liste";
+      focusSearchInput();
+      return;
+    }
 
     if (e.key === "Escape") {
       const dlg = document.getElementById("shortcutsHelp");
