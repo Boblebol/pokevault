@@ -3727,10 +3727,6 @@ html.site-onboarding-pending .app-view {
   padding: 0;
 }
 
-#viewStats .stats-main--badges {
-  align-self: start;
-}
-
 #viewStats .stats-main::before {
   content: none;
   display: none;

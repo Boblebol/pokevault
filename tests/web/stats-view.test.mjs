@@ -85,7 +85,6 @@ test("renderStats follows English i18n labels when available", async () => {
     statsRailCount: new FakeElement("span"),
     statsRailMissing: new FakeElement("span"),
     statsRailBadge: new FakeElement("div"),
-    statsBadges: new FakeElement("section"),
   };
   const api = await loadModule(elements);
   globalThis.PokevaultI18n = {
