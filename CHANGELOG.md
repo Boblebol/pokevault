@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [1.6.1] — 2026-05-09
+
+### Changed
+
+- Badge tiles no longer show the bottom "Pokemon concernes" preview; required
+  Pokemon stay available from the badge detail modal only.
+
 ## [1.6.0] — 2026-05-09
 
 ### Added
