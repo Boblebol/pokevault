@@ -25,6 +25,7 @@ def test_tracker_settings_paths(tmp_path: Path, monkeypatch: pytest.MonkeyPatch)
     assert s.binder_placements_path == root / "data" / "binder-placements.json"
     assert s.pokedex_path == root / "data" / "pokedex.json"
     assert s.trainer_contacts_path == root / "data" / "trainer-contacts.json"
+    assert s.reference_data_dir is None
 
 
 def test_tracker_settings_from_env(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
@@ -33,10 +34,13 @@ def test_tracker_settings_from_env(tmp_path: Path, monkeypatch: pytest.MonkeyPat
     root = tmp_path / "r"
     root.mkdir()
     monkeypatch.setenv("TRACKER_REPO_ROOT", str(root))
+    reference_dir = tmp_path / "reference-data"
+    monkeypatch.setenv("TRACKER_REFERENCE_DATA_DIR", str(reference_dir))
     s = TrackerSettings()
     assert s.host == "0.0.0.0"
     assert s.port == 9999
     assert s.repo_root == root.resolve()
+    assert s.reference_data_dir == reference_dir
 
 
 def test_get_settings_is_cached() -> None:

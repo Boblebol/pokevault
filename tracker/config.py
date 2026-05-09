@@ -22,6 +22,10 @@ class TrackerSettings(BaseSettings):
         default_factory=lambda: Path(__file__).resolve().parent.parent,
         description="Racine du dépôt (web/, data/).",
     )
+    reference_data_dir: Path | None = Field(
+        default=None,
+        description="Optional shipped reference data directory used to refresh mounted data/.",
+    )
 
     @property
     def web_dir(self) -> Path:

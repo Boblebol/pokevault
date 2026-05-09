@@ -400,7 +400,7 @@
             <p data-i18n="app.docs.hero.text">
               Pokevault suit ton Pokédex, tes classeurs et tes échanges Dresseur
               avec des fichiers JSON lisibles sur ta machine. Cette page résume
-              les workflows actifs de la version 1.6.2.
+              les workflows actifs de la version 1.6.3.
             </p>
           </section>
 
@@ -547,12 +547,12 @@
       <div id="viewSettings" class="app-view" hidden>
         <header class="header app-collection-header binder-header">
           <h1 class="title" data-i18n="app.settings.title">Réglages</h1>
-          <p class="collection-subtitle" data-i18n="app.settings.subtitle">Préférences d'affichage, export et import de tes données.</p>
+          <p class="collection-subtitle" data-i18n="app.settings.subtitle">Préférences, sauvegardes et maintenance locale.</p>
         </header>
         <section class="stats-main">
           <div class="stats-kpi-card">
-            <h2 class="stats-kpi-label" data-i18n="app.settings.display">Affichage</h2>
-            <p class="stats-kpi-sub" data-i18n="app.settings.display_help">Le contraste des cartes est partagé entre liste et classeur.</p>
+            <h2 class="stats-kpi-label" data-i18n="app.settings.preferences">Préférences</h2>
+            <p class="stats-kpi-sub" data-i18n="app.settings.preferences_help">Ajuste l'affichage partagé entre liste, classeurs, badges et fiches.</p>
             <label class="region-filter-wrap settings-dim-label">
               <span class="region-filter-label" data-i18n="app.filters.dim">Mise en avant</span>
               <select id="settingsDimSelect" class="region-filter" aria-label="Mode global de mise en avant">
@@ -564,10 +564,16 @@
               <span class="region-filter-label" data-i18n="app.settings.artwork">Images / sprites</span>
               <select id="settingsArtworkSelect" class="region-filter" aria-label="Images / sprites"></select>
             </label>
+            <div class="settings-data-actions">
+              <button type="button" class="settings-action-btn" id="replayOnboardingBtn">
+                <span class="app-icon" aria-hidden="true">▶</span>
+                <span data-i18n="app.settings.replay">Rejouer l'onboarding</span>
+              </button>
+            </div>
           </div>
           <div class="stats-kpi-card">
-            <h2 class="stats-kpi-label" data-i18n="app.settings.data">Données</h2>
-            <p class="stats-kpi-sub" data-i18n="app.settings.data_help">Exporter ou importer toute la collection (attrapés + classeurs).</p>
+            <h2 class="stats-kpi-label" data-i18n="app.settings.backup">Sauvegarde</h2>
+            <p class="stats-kpi-sub" data-i18n="app.settings.backup_help">Exporter ou importer toute la collection, les classeurs et les contacts.</p>
             <div class="settings-data-actions">
               <button type="button" class="settings-action-btn" id="exportBtn">
                 <span class="app-icon" aria-hidden="true">↓</span>
@@ -597,17 +603,23 @@
             <p id="exportImportHint" class="sync-hint" hidden></p>
           </div>
           <div class="stats-kpi-card">
-            <h2 class="stats-kpi-label" data-i18n="app.settings.profile">Profil</h2>
-            <p class="stats-kpi-sub" id="settingsProfileLabel" data-i18n="app.settings.profile_label">Profil : —</p>
+            <h2 class="stats-kpi-label" data-i18n="app.settings.maintenance">Maintenance</h2>
+            <p class="stats-kpi-sub" data-i18n="app.settings.maintenance_help">Restaure les références embarquées ou repart sur des données locales propres.</p>
+            <p class="stats-kpi-sub settings-maintenance-status" id="settingsMaintenanceStatus">Références : vérification...</p>
             <div class="settings-data-actions">
-              <button type="button" class="settings-action-btn" id="replayOnboardingBtn">
-                <span class="app-icon" aria-hidden="true">▶</span>
-                <span data-i18n="app.settings.replay">Rejouer l'onboarding</span>
+              <button type="button" class="settings-action-btn" id="settingsMaintenanceRefreshBtn">
+                <span class="app-icon" aria-hidden="true">↻</span>
+                <span data-i18n="app.settings.refresh_data">Rafraîchir références</span>
+              </button>
+              <button type="button" class="settings-action-btn settings-action-btn--danger" id="settingsDataResetBtn">
+                <span class="app-icon" aria-hidden="true">×</span>
+                <span data-i18n="app.settings.reset_local_data">Supprimer mes données locales</span>
               </button>
             </div>
+            <p id="settingsMaintenanceHint" class="sync-hint" hidden></p>
           </div>
           <div class="stats-kpi-card">
-            <h2 class="stats-kpi-label" data-i18n="app.settings.version">Version</h2>
+            <h2 class="stats-kpi-label" data-i18n="app.settings.system">Système</h2>
             <p class="stats-kpi-sub" id="settingsVersionLabel" data-i18n="app.settings.version_label">Application v-- · API --</p>
             <p class="stats-kpi-sub" id="settingsHealthLabel" data-i18n="app.settings.health">État API : vérification...</p>
           </div>

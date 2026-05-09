@@ -237,6 +237,30 @@ class ImportResponse(BaseModel):
     binder_count: int = Field(ge=0)
 
 
+class DataFileStatus(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    name: str
+    kind: Literal["reference", "local_state"]
+    present: bool
+    refresh_available: bool = False
+
+
+class DataMaintenanceStatus(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    ok: bool = True
+    files: list[DataFileStatus] = Field(default_factory=list)
+
+
+class DataMaintenanceActionResponse(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    ok: bool = True
+    changed: list[str] = Field(default_factory=list)
+    missing_sources: list[str] = Field(default_factory=list)
+
+
 class BadgeLocalizedCopy(BaseModel):
     """Localized badge display copy and locked mystery copy."""
 
