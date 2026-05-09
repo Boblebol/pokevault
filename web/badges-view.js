@@ -283,25 +283,6 @@
     return chip;
   }
 
-  function buildRequirementsPreview(badge) {
-    const requirements = badgeRequirements(badge);
-    if (!requirements.length) return null;
-
-    const preview = document.createElement("div");
-    preview.className = "badge-requirement-preview";
-    preview.setAttribute("aria-label", tr("badges.detail.requirements"));
-    for (const requirement of requirements.slice(0, 4)) {
-      preview.append(buildRequirementChip(requirement));
-    }
-    if (requirements.length > 4) {
-      const more = document.createElement("span");
-      more.className = "badge-requirement-chip badge-requirement-chip--more";
-      more.textContent = tr("badges.detail.more", { count: requirements.length - 4 });
-      preview.append(more);
-    }
-    return preview;
-  }
-
   function createBattleTypeChip(type) {
     const label = String(type || "").trim();
     const helper = window.PokevaultPokemonFiche;
@@ -928,10 +909,6 @@
     d.className = "badge-tile__desc";
     d.textContent = copy.description;
     body.append(t, d);
-    const preview = !badge?.unlocked && badge?.reveal === "mystery"
-      ? null
-      : buildRequirementsPreview(badge);
-    if (preview) body.append(preview);
     if (!badge.unlocked) {
       const meter = document.createElement("div");
       meter.className = "badge-tile__meter";

@@ -6162,14 +6162,6 @@ body.pokemon-modal-open {
   color: var(--pdx-cyan);
 }
 
-.badge-requirement-preview {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 5px;
-  align-items: center;
-  margin-top: 8px;
-}
-
 .badge-requirement-chip {
   position: relative;
   display: inline-grid;
@@ -6215,11 +6207,6 @@ body.pokemon-modal-open {
 .badge-requirement-chip.is-missing {
   opacity: 0.7;
   filter: saturate(0.55);
-}
-
-.badge-requirement-chip--more {
-  background: var(--pdx-bg);
-  color: var(--pdx-text);
 }
 
 .badge-detail-overlay {

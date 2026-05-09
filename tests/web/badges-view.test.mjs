@@ -361,7 +361,7 @@ test("nearestBadge uses the smallest remaining count as tie-breaker", async () =
   assert.equal(nearest.id, "kanto_brock");
 });
 
-test("buildBadgeTile previews required pokemon thumbnails", async () => {
+test("buildBadgeTile keeps required pokemon for the detail view only", async () => {
   const api = await loadModule();
   globalThis.PokedexCollection = {
     allPokemon: [
@@ -386,11 +386,10 @@ test("buildBadgeTile previews required pokemon thumbnails", async () => {
 
   assert.equal(tile.attrs.tabindex, "0");
   assert.equal(tile.attrs["aria-haspopup"], "dialog");
-  assert.equal(byClass(tile, "badge-requirement-chip").length, 2);
-  assert.equal(byClass(tile, "is-caught").length, 1);
-  assert.equal(byClass(tile, "is-missing").length, 1);
-  assert.match(textTree(tile), /Geodude/);
-  assert.match(textTree(tile), /Onix/);
+  assert.equal(byClass(tile, "badge-requirement-preview").length, 0);
+  assert.equal(byClass(tile, "badge-requirement-chip").length, 0);
+  assert.doesNotMatch(textTree(tile), /Geodude/);
+  assert.doesNotMatch(textTree(tile), /Onix/);
 });
 
 test("buildBadgeTile keeps locked mystery badge requirements sealed", async () => {
