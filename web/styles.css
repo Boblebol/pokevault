@@ -5971,7 +5971,7 @@ body.pokemon-modal-open {
   background: var(--pdx-bg);
   border: 1px solid var(--pdx-border);
   border-radius: var(--radius-md);
-  opacity: 0.55;
+  opacity: 0.72;
   overflow: hidden;
   cursor: pointer;
   transition: opacity 150ms ease-out, border-color 150ms ease-out;
@@ -5979,7 +5979,7 @@ body.pokemon-modal-open {
 
 .badge-tile:hover,
 .badge-tile:focus-visible {
-  opacity: 0.82;
+  opacity: 0.92;
   border-color: var(--pdx-border-hi);
   outline: none;
 }
