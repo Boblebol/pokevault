@@ -661,7 +661,7 @@
     lastHost = host;
     host.replaceChildren();
     const section = document.createElement("section");
-    section.className = "stats-badges";
+    section.className = "badge-gallery";
 
     const title = document.createElement("h2");
     title.className = "stats-section-title";
@@ -680,12 +680,12 @@
     }
 
     const grid = document.createElement("div");
-    grid.className = "stats-badges-grid";
+    grid.className = "badge-gallery-grid";
     section.append(grid);
 
     if (!state.catalog.length) {
       const empty = document.createElement("p");
-      empty.className = "stats-badges-empty";
+      empty.className = "badge-gallery-empty";
       empty.textContent = tr("badges.gallery.empty");
       section.append(empty);
     } else {
@@ -695,7 +695,7 @@
       }
       if (!visibleCatalog.length) {
         const empty = document.createElement("p");
-        empty.className = "stats-badges-empty";
+        empty.className = "badge-gallery-empty";
         empty.textContent = tr("badges.gallery.empty");
         section.append(empty);
       }

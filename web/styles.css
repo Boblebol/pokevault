@@ -75,9 +75,9 @@
   --surface-low: #0D1424;
   --surface-high: #1A2438;
   --surface-highest: #22314A;
-  --accent: #CC1133;
-  --accent-strong: #E01B3D;
-  --accent-ink: #FFFFFF;
+  --accent: #F04455;
+  --accent-strong: #FF5E66;
+  --accent-ink: #090E1A;
   --electric: #00CCEE;
   --text: #DDE6F0;
   --muted: #8EA3C2;
@@ -87,8 +87,12 @@
   --control-border: #1E2C42;
   --control-hover: #2A3E5C;
   --success: #00CC77;
-  --danger: #CC1133;
+  --danger: #F04455;
   --warning: #F5A623;
+  --z-app-bar: 100;
+  --z-mobile-nav: 140;
+  --z-mobile-menu: 150;
+  --z-modal: 220;
 }
 
 *,
@@ -1964,25 +1968,25 @@ html.site-onboarding-pending .app-view {
 /* Core app theme tokens */
 :root {
   color-scheme: dark;
-  --bg: #111418;
-  --card: #1d232a;
-  --surface-low: #171c22;
-  --surface-high: #27313a;
-  --surface-highest: #34404b;
-  --accent: #ff6b5f;
-  --accent-strong: #ff9b54;
-  --accent-ink: #210806;
-  --electric: #36d5e8;
-  --text: #f4f7f9;
-  --muted: #b3c1cb;
-  --outline-soft: rgba(143, 163, 178, 0.28);
-  --outline-strong: rgba(179, 193, 203, 0.42);
-  --control-bg: #222a32;
-  --control-border: #526170;
-  --control-hover: #697987;
-  --success: #5dd39e;
-  --danger: #ff8f8f;
-  --warning: #ffd166;
+  --bg: #090E1A;
+  --card: #111827;
+  --surface-low: #0D1424;
+  --surface-high: #1A2438;
+  --surface-highest: #22314A;
+  --accent: #F04455;
+  --accent-strong: #FF5E66;
+  --accent-ink: #090E1A;
+  --electric: #00CCEE;
+  --text: #DDE6F0;
+  --muted: #8EA3C2;
+  --outline-soft: #1E2C42;
+  --outline-strong: #2A3E5C;
+  --control-bg: #090E1A;
+  --control-border: #1E2C42;
+  --control-hover: #2A3E5C;
+  --success: #00CC77;
+  --danger: #F04455;
+  --warning: #F5A623;
 }
 
 .app-nav-stack,
@@ -2929,7 +2933,7 @@ html.site-onboarding-pending .app-view {
   top: 0;
   right: 0;
   left: 0;
-  z-index: 100;
+  z-index: var(--z-app-bar);
   height: 48px;
   background: var(--pdx-panel);
   border-bottom: 1px solid var(--pdx-border);
@@ -4867,7 +4871,7 @@ html.site-onboarding-pending .app-view {
     right: 0;
     bottom: 0;
     left: 0;
-    z-index: 140;
+    z-index: var(--z-mobile-nav);
     display: grid;
     grid-template-columns: repeat(5, minmax(0, 1fr));
     height: 58px;
@@ -4902,7 +4906,7 @@ html.site-onboarding-pending .app-view {
     position: fixed;
     right: 10px;
     bottom: 68px;
-    z-index: 150;
+    z-index: var(--z-mobile-menu);
     display: grid;
     gap: 3px;
     min-width: 180px;
@@ -5072,7 +5076,7 @@ html.site-onboarding-pending .app-view {
 .pokemon-modal {
   position: fixed;
   inset: 0;
-  z-index: 90;
+  z-index: var(--z-modal);
   display: grid;
   place-items: center;
   padding: clamp(12px, 3vw, 28px);
@@ -5870,7 +5874,7 @@ body.pokemon-modal-open {
   min-width: 0;
 }
 
-.stats-badges {
+.badge-gallery {
   margin: 0;
   padding: 16px;
   background: var(--pdx-panel);
@@ -5878,11 +5882,11 @@ body.pokemon-modal-open {
   border-radius: var(--radius-lg);
 }
 
-#viewStats .stats-main--badges .stats-badges {
+#viewBadges .badge-gallery {
   margin-top: 0;
 }
 
-#viewStats .stats-main--badges .stats-badges-grid {
+#viewBadges .badge-gallery-grid {
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
 }
 
@@ -5954,7 +5958,7 @@ body.pokemon-modal-open {
   cursor: pointer;
 }
 
-.stats-badges-grid {
+.badge-gallery-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
   gap: 8px;
@@ -6684,7 +6688,7 @@ body.pokemon-modal-open {
   font-weight: 750;
 }
 
-.stats-badges-empty {
+.badge-gallery-empty {
   color: var(--pdx-text-dim);
   font-size: 0.85rem;
 }

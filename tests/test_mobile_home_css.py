@@ -34,6 +34,21 @@ def _blocks_in(css: str, selector: str) -> list[str]:
     return re.findall(rf"{re.escape(selector)}\s*\{{([^}}]+)\}}", css, flags=re.MULTILINE)
 
 
+def _script_index(src: str) -> int:
+    marker = f'<script src="{src}"'
+    index = HTML.find(marker)
+    assert index >= 0, f"missing script {src}"
+    return index
+
+
+def test_late_page_modules_load_before_app_router_for_direct_hashes() -> None:
+    """Initial #/stats and #/print loads need page modules before app.js routes."""
+
+    app_index = _script_index("/app.js")
+    assert _script_index("/stats-view.js") < app_index
+    assert _script_index("/print-view.js") < app_index
+
+
 def test_page_headers_scroll_with_content_under_fixed_app_bar() -> None:
     """The global nav stays fixed; per-page headers must not cover content."""
 
@@ -355,6 +370,17 @@ def test_mobile_nav_is_hidden_on_desktop_and_positioned_on_mobile() -> None:
     hidden_mobile = re.search(r"\.mobile-more-menu\[hidden\]\s*\{([^}]+)\}", mobile)
     assert hidden_mobile
     assert "display: none;" in hidden_mobile.group(1)
+
+
+def test_pokemon_modal_stacks_above_fixed_navigation() -> None:
+    topbar = "\n".join(_blocks(".stitch-topbar"))
+    bottom_nav = "\n".join(_blocks_in(_media_block(720), ".mobile-bottom-nav"))
+    modal = "\n".join(_blocks(".pokemon-modal"))
+
+    assert "--z-modal: 220;" in CSS
+    assert "z-index: var(--z-app-bar);" in topbar
+    assert "z-index: var(--z-mobile-nav);" in bottom_nav
+    assert "z-index: var(--z-modal);" in modal
 
 
 def test_vault_lab_shell_uses_maquette_density_and_mobile_surfaces() -> None:

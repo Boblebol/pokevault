@@ -135,6 +135,20 @@ def test_vault_lab_surfaces_are_visually_distinct() -> None:
     assert _channel_distance(tokens["--card"], tokens["--surface-high"]) >= 0.14
 
 
+def test_vault_lab_generic_tokens_are_not_overridden_by_legacy_palette() -> None:
+    css = STYLES.read_text(encoding="utf-8").lower()
+    for legacy_value in [
+        "--bg: #111418",
+        "--card: #1d232a",
+        "--accent: #ff6b5f",
+        "--accent-strong: #ff9b54",
+        "--electric: #36d5e8",
+        "--danger: #ff8f8f",
+        "--warning: #ffd166",
+    ]:
+        assert legacy_value not in css
+
+
 def test_single_theme_runtime_is_removed_from_web_app() -> None:
     index = (ROOT / "web" / "index.html").read_text(encoding="utf-8")
     css = STYLES.read_text(encoding="utf-8")

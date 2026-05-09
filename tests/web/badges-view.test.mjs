@@ -180,9 +180,9 @@ test("renderInto builds a complete standalone badge gallery surface", async () =
   });
   globalThis.window.PokevaultBadges.renderInto(host);
 
-  assert.ok(byClass(host, "stats-badges").length);
+  assert.ok(byClass(host, "badge-gallery").length);
   assert.ok(byClass(host, "badge-gallery-controls").length);
-  assert.ok(byClass(host, "stats-badges-grid").length);
+  assert.ok(byClass(host, "badge-gallery-grid").length);
   assert.equal(byClass(host, "badge-tile").length, 2);
   assert.match(textTree(host), /First/);
   assert.match(textTree(host), /Locked/);
