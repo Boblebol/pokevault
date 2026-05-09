@@ -1,6 +1,8 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 
+let moduleCase = 0;
+
 function installBrowserStubs() {
   globalThis.__POKEVAULT_BADGES_TESTS__ = true;
   globalThis.window = globalThis;
@@ -75,7 +77,8 @@ function installBrowserStubs() {
 
 async function loadModule() {
   installBrowserStubs();
-  await import(`../../web/badges-view.js?case=${Date.now()}`);
+  moduleCase += 1;
+  await import(`../../web/badges-view.js?case=${moduleCase}`);
   return globalThis.window.PokevaultBadges._test;
 }
 
@@ -186,6 +189,138 @@ test("renderInto builds a complete standalone badge gallery surface", async () =
   assert.equal(byClass(host, "badge-tile").length, 2);
   assert.match(textTree(host), /First/);
   assert.match(textTree(host), /Locked/);
+});
+
+test("renderInto shows the gallery empty state when the catalog has no badges", async () => {
+  installBrowserStubs();
+  moduleCase += 1;
+  await import(`../../web/badges-view.js?case=empty-${moduleCase}`);
+  const host = globalThis.document.createElement("section");
+  globalThis.window.PokevaultBadges._test.setCachedState({ catalog: [], unlocked: [] });
+
+  globalThis.window.PokevaultBadges.renderInto(host);
+
+  assert.equal(byClass(host, "badge-gallery-empty").length, 1);
+  assert.equal(byClass(host, "badge-tile").length, 0);
+  assert.match(textTree(host), /badges.gallery.empty/);
+});
+
+test("gallery filters re-render the badges page when no visible badge matches", async () => {
+  const api = await loadModule();
+  const host = globalThis.document.createElement("section");
+  api.setCachedState({
+    catalog: [
+      {
+        id: "locked",
+        title: "Locked",
+        description: "Still sealed",
+        unlocked: false,
+        current: 0,
+        target: 1,
+        percent: 0,
+        category: "gym",
+        region: "kanto",
+      },
+    ],
+    unlocked: [],
+  });
+
+  globalThis.window.PokevaultBadges.renderInto(host);
+  const unlockedButton = flatten(host).find((node) => node?.textContent === "badges.filter.unlocked");
+  assert.ok(unlockedButton);
+  unlockedButton.listeners.click();
+
+  assert.equal(byClass(host, "badge-tile").length, 0);
+  assert.equal(byClass(host, "badge-gallery-empty").length, 1);
+});
+
+test("poll keeps cached badge state when the API fetch fails", async () => {
+  const api = await loadModule();
+  const cached = {
+    catalog: [{ id: "first", title: "First", unlocked: true }],
+    unlocked: ["first"],
+  };
+  api.setCachedState(cached);
+  const originalFetch = globalThis.fetch;
+  const originalConsoleError = console.error;
+  const errors = [];
+  globalThis.fetch = async () => {
+    throw new Error("offline");
+  };
+  console.error = (...args) => {
+    errors.push(args.join(" "));
+  };
+  let immediateState = null;
+  const unsubscribe = globalThis.window.PokevaultBadges.subscribe((state) => {
+    immediateState = state;
+  });
+
+  try {
+    const result = await globalThis.window.PokevaultBadges.poll();
+
+    assert.equal(immediateState, cached);
+    assert.equal(result.state, cached);
+    assert.deepEqual(result.newlyUnlocked, []);
+    assert.match(errors.join("\n"), /badges: poll failed/);
+  } finally {
+    unsubscribe();
+    globalThis.fetch = originalFetch;
+    console.error = originalConsoleError;
+  }
+});
+
+test("poll announces newly unlocked badges and notifies subscribers", async () => {
+  const api = await loadModule();
+  api.setCachedState({
+    catalog: [{ id: "first", title: "First", unlocked: true }],
+    unlocked: ["first"],
+  });
+  const nextState = {
+    catalog: [
+      { id: "first", title: "First", unlocked: true },
+      { id: "new", title: "New badge", unlocked: true, effect: "holo" },
+    ],
+    unlocked: ["first", "new"],
+  };
+  const originalFetch = globalThis.fetch;
+  const originalToast = globalThis.PokevaultToast;
+  const toasts = [];
+  const notifications = [];
+  globalThis.fetch = async () => ({
+    ok: true,
+    json: async () => nextState,
+  });
+  globalThis.PokevaultToast = {
+    show(title, message, options) {
+      const toast = { title, message, options, classes: [] };
+      toasts.push(toast);
+      return {
+        classList: {
+          add(...classes) {
+            toast.classes.push(...classes);
+          },
+        },
+      };
+    },
+  };
+  const unsubscribe = globalThis.window.PokevaultBadges.subscribe((state) => {
+    notifications.push(state);
+  });
+
+  try {
+    const result = await globalThis.window.PokevaultBadges.poll();
+
+    assert.deepEqual(result.newlyUnlocked, ["new"]);
+    assert.equal(result.state, nextState);
+    assert.equal(toasts[0].title, "Badge unlocked");
+    assert.equal(toasts[0].message, "New badge");
+    assert.deepEqual(toasts[0].classes, ["toast--badge-unlock", "toast--badge-holo"]);
+    assert.equal(notifications.at(-1), nextState);
+  } finally {
+    unsubscribe();
+    globalThis.fetch = originalFetch;
+    globalThis.PokevaultToast = originalToast;
+  }
 });
 
 test("badgeTileClassNames includes metadata effect classes", async () => {

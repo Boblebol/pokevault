@@ -1,6 +1,8 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 
+let moduleCase = 0;
+
 class FakeClassList {
   constructor() {
     this.values = new Set();
@@ -58,6 +60,11 @@ function findByClass(node, className) {
 
 async function loadModule(elements) {
   globalThis.window = globalThis;
+  delete globalThis.PokedexCollection;
+  delete globalThis.PokevaultBadges;
+  delete globalThis.PokevaultEmptyStates;
+  delete globalThis.PokevaultI18n;
+  delete globalThis.PokevaultPokemonFiche;
   globalThis.document = {
     createElement(tagName) {
       return new FakeElement(tagName);
@@ -66,7 +73,8 @@ async function loadModule(elements) {
       return elements[id] || null;
     },
   };
-  await import(`../../web/stats-view.js?case=${Date.now()}`);
+  moduleCase += 1;
+  await import(`../../web/stats-view.js?case=${moduleCase}`);
   return globalThis.window.PokedexStats;
 }
 
@@ -86,6 +94,7 @@ test("renderStats follows English i18n labels when available", async () => {
         "stats.next_badge": "Next badge",
         "stats.rail_caught": "{caught} / {total} caught",
         "stats.rail_missing": "{count} missing",
+        "stats.other": "Other",
         "stats.hero_title": "Global completion state",
         "stats.hero_pct": "{pct}% complete",
         "stats.hero_sub": "{missing} missing · {caught} / {total}",
@@ -102,11 +111,18 @@ test("renderStats follows English i18n labels when available", async () => {
       return (messages[key] || key).replace(/\{([a-zA-Z0-9_]+)\}/g, (_, name) => String(params[name]));
     },
   };
+  let caughtSubscriber = null;
   globalThis.PokedexCollection = {
+    ensureLoaded() {
+      return Promise.reject(new Error("dex unavailable"));
+    },
+    subscribeCaught(fn) {
+      caughtSubscriber = fn;
+    },
     poolForCollectionScope() {
       return [
-        { slug: "001-a", number: "#001", region: "kanto", types: ["Grass"] },
-        { slug: "002-b", number: "#002", region: "kanto", types: ["Grass"] },
+        { slug: "001-a", number: "#001", types: ["Grass"] },
+        { slug: "002-b", number: "#999", types: ["Ghost"] },
       ];
     },
     caughtMap: { "001-a": true },
@@ -116,6 +132,14 @@ test("renderStats follows English i18n labels when available", async () => {
   globalThis.PokevaultRecommendations = {
     rankTargets() {
       throw new Error("stats must not render recommendation objectives");
+    },
+  };
+  globalThis.PokevaultPokemonFiche = {
+    createTypeChip(type, className) {
+      const chip = new FakeElement("span");
+      chip.className = `helper-chip ${className}`;
+      chip.textContent = `Type ${type}`;
+      return chip;
     },
   };
   globalThis.PokevaultHunts = {
@@ -145,6 +169,7 @@ test("renderStats follows English i18n labels when available", async () => {
   api.render();
 
   const bodyText = textTree(elements.statsBody);
+  assert.equal(typeof caughtSubscriber, "function");
   assert.equal(elements.statsRailCount.textContent, "1 / 2 caught");
   assert.equal(elements.statsRailMissing.textContent, "1 missing");
   assert.equal(elements.statsRailBadge.hidden, true);
@@ -152,6 +177,10 @@ test("renderStats follows English i18n labels when available", async () => {
   assert.match(bodyText, /Total specimens/);
   assert.match(bodyText, /Regional archive/);
   assert.match(bodyText, /Completion by type/);
+  assert.match(bodyText, /Kanto/);
+  assert.match(bodyText, /Other/);
+  assert.match(bodyText, /Type Grass/);
+  assert.match(bodyText, /Type Ghost/);
   assert.doesNotMatch(bodyText, /Collection gaps/);
   assert.doesNotMatch(textTree(elements.statsRailBadge), /Next badge/);
   assert.doesNotMatch(textTree(elements.statsRailBadge), /Sabrina - Marsh/);
@@ -164,4 +193,27 @@ test("renderStats follows English i18n labels when available", async () => {
     bento.children.filter((child) => String(child.className).includes("stats-region-wrap")).length,
     2,
   );
+
+  delete globalThis.PokevaultPokemonFiche;
+  globalThis.PokedexCollection.poolForCollectionScope = () => [
+    { slug: "007-a", number: "#007", region: "kanto", types: ["Water"] },
+  ];
+  globalThis.PokedexCollection.caughtMap = { "007-a": true };
+  api.render();
+  assert.match(textTree(elements.statsBody), /Water/);
+
+  globalThis.PokedexCollection.poolForCollectionScope = () => [];
+  globalThis.PokedexCollection.caughtMap = {};
+  globalThis.PokevaultEmptyStates = {
+    render(host, key) {
+      assert.equal(host, elements.statsBody);
+      assert.equal(key, "statsEmpty");
+      const node = new FakeElement("p");
+      node.textContent = "Stats empty state";
+      return node;
+    },
+  };
+  api.render();
+  assert.match(textTree(elements.statsBody), /Stats empty state/);
+  assert.equal(elements.statsRailCount.textContent, "0 / 0 caught");
 });

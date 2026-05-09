@@ -122,9 +122,13 @@ def test_vault_lab_tokens_cover_readable_single_theme() -> None:
 
     for signal in ["--accent", "--accent-strong", "--electric"]:
         assert _contrast(tokens[signal], tokens["--bg"]) >= 4.5, f"{EXPECTED_THEME}: {signal} on bg"
-        assert _contrast(tokens[signal], tokens["--card"]) >= 4.5, f"{EXPECTED_THEME}: {signal} on card"
+        assert (
+            _contrast(tokens[signal], tokens["--card"]) >= 4.5
+        ), f"{EXPECTED_THEME}: {signal} on card"
 
-    assert _contrast(tokens["--accent-ink"], tokens["--accent"]) >= 4.5, f"{EXPECTED_THEME}: accent ink"
+    assert (
+        _contrast(tokens["--accent-ink"], tokens["--accent"]) >= 4.5
+    ), f"{EXPECTED_THEME}: accent ink"
 
 
 def test_vault_lab_surfaces_are_visually_distinct() -> None:
