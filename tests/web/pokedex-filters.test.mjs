@@ -158,3 +158,17 @@ test("matchesPokemonFilters ignores removed hunt predicate", async () => {
     },
   }), true);
 });
+
+test("capture scope helpers are reused by filters", async () => {
+  globalThis.__POKEVAULT_CAPTURE_SCOPE_TESTS__ = true;
+  globalThis.window = globalThis;
+  await import(`../../web/pokemon-capture-scope.js?case=filters-${Date.now()}`);
+  const api = await loadModule();
+
+  assert.equal(api.isCapturablePokemonEntry({ slug: "0052-meowth-alola", form: "Forme d'Alola" }), true);
+  assert.equal(api.isCapturablePokemonEntry({ slug: "0006-charizard-mega-x", form: "Méga X" }), false);
+  assert.equal(api.matchesPokemonFilters(
+    { slug: "0006-charizard-mega-x", form: "Méga X", types: ["fire"] },
+    { filters: { status: "all", region: "all", forms: "base_regional", type: "all", tags: [] } },
+  ), false);
+});

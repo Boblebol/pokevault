@@ -248,6 +248,51 @@ test("artwork changes rerender the active Pokemon modal", async () => {
   assert.deepEqual(rendered, ["0001-bulbasaur"]);
 });
 
+test("collection keeps all pokemon but scopes progress to capturable entries", async () => {
+  await loadModule();
+  await import(`../../web/pokemon-capture-scope.js?case=app-${Date.now()}`);
+  const collection = globalThis.window.PokedexCollection;
+  const pokedexRows = [
+    { slug: "0001-bulbasaur", number: "0001", form: null, names: { fr: "Bulbizarre" } },
+    { slug: "0003-venusaur-mega", number: "0003", form: "Méga", names: { fr: "Florizarre Méga" } },
+    { slug: "0052-meowth-alola", number: "0052", form: "Forme d'Alola", names: { fr: "Miaouss d'Alola" } },
+  ];
+  globalThis.fetch = async (url) => {
+    if (String(url) === "/api/progress") {
+      return { ok: true, json: async () => ({ caught: {}, statuses: {} }) };
+    }
+    if (String(url) === "/data/pokedex.json") {
+      return {
+        ok: true,
+        json: async () => ({
+          meta: { total: pokedexRows.length, regions: [] },
+          pokemon: pokedexRows,
+        }),
+      };
+    }
+    if (String(url) === "/data/narrative-tags.json") {
+      return { ok: false, json: async () => ({}) };
+    }
+    return { ok: false, json: async () => ({}) };
+  };
+
+  await collection.ensureLoaded();
+
+  assert.deepEqual(collection.allPokemon.map((p) => p.slug), [
+    "0001-bulbasaur",
+    "0003-venusaur-mega",
+    "0052-meowth-alola",
+  ]);
+  assert.deepEqual(collection.capturablePokemon.map((p) => p.slug), [
+    "0001-bulbasaur",
+    "0052-meowth-alola",
+  ]);
+  assert.deepEqual(collection.poolForCollectionScope().map((p) => p.slug), [
+    "0001-bulbasaur",
+    "0052-meowth-alola",
+  ]);
+});
+
 test("pokemon cards show Vu chez only for missing local Pokemon", async () => {
   await loadModule();
   globalThis.document.createElement = (tagName) => new FakeElement(tagName);

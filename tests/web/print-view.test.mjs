@@ -129,6 +129,27 @@ test("print view formats English summary labels through i18n", async () => {
   assert.equal(api.formatPrintFooter("2026-05-02", false), "pokevault · 2026-05-02 · checked = caught · empty = missing");
 });
 
+test("print target pokemon prefers capturable collection entries", async () => {
+  const api = await loadModule();
+  const allPokemon = [
+    { slug: "0001-bulbasaur" },
+    { slug: "0003-venusaur-mega", form: "Méga" },
+    { slug: "0052-meowth-alola", form: "Forme d'Alola" },
+  ];
+  const capturablePokemon = [allPokemon[0], allPokemon[2]];
+
+  assert.deepEqual(api.collectionPrintPokemon({
+    allPokemon,
+    capturablePokemon,
+    poolForCollectionScope() {
+      throw new Error("capturablePokemon should be preferred");
+    },
+  }).map((p) => p.slug), [
+    "0001-bulbasaur",
+    "0052-meowth-alola",
+  ]);
+});
+
 test("placeholder section keeps pokemon and family reserved slots", async () => {
   const api = await loadModule();
   const pokemon = bulbasaur();

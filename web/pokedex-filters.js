@@ -18,6 +18,10 @@
     return String(pokemon?.slug || "");
   }
 
+  function captureScope() {
+    return window.PokevaultCaptureScope || null;
+  }
+
   function statusForPokemon(slug, caughtMap = {}, statusMap = {}) {
     const raw = statusMap?.[slug];
     if (raw?.state === "caught" || caughtMap?.[slug]) {
@@ -28,18 +32,24 @@
   }
 
   function isMegaFormPokemon(pokemon) {
+    const shared = captureScope();
+    if (typeof shared?.isMegaFormPokemon === "function") return shared.isMegaFormPokemon(pokemon);
     const form = normText(pokemon?.form);
     const slug = normText(pokemon?.slug);
     return /\bmega\b/.test(form) || slug.includes("-mega-") || /-mega(-x|-y)?$/.test(slug);
   }
 
   function isGigamaxPokemon(pokemon) {
+    const shared = captureScope();
+    if (typeof shared?.isGigamaxPokemon === "function") return shared.isGigamaxPokemon(pokemon);
     const form = normText(pokemon?.form);
     const slug = normText(pokemon?.slug);
     return form.includes("gigamax") || form.includes("g-max") || slug.includes("gmax") || slug.includes("gigantamax");
   }
 
   function isRegionalFormPokemon(pokemon) {
+    const shared = captureScope();
+    if (typeof shared?.isRegionalFormPokemon === "function") return shared.isRegionalFormPokemon(pokemon);
     if (isMegaFormPokemon(pokemon) || isGigamaxPokemon(pokemon)) return false;
     const form = normText(pokemon?.form);
     const slug = normText(pokemon?.slug);
@@ -58,6 +68,23 @@
       slug.includes("galarian") ||
       slug.includes("hisuian")
     );
+  }
+
+  function isCapturablePokemonEntry(pokemon) {
+    const shared = captureScope();
+    if (typeof shared?.isCapturablePokemonEntry === "function") {
+      return shared.isCapturablePokemonEntry(pokemon);
+    }
+    if (!pokemon || typeof pokemon !== "object") return false;
+    return !String(pokemon?.form || "").trim() || isRegionalFormPokemon(pokemon);
+  }
+
+  function capturablePokemonEntries(pokemon = []) {
+    const shared = captureScope();
+    if (typeof shared?.capturablePokemonEntries === "function") {
+      return shared.capturablePokemonEntries(pokemon);
+    }
+    return Array.isArray(pokemon) ? pokemon.filter(isCapturablePokemonEntry) : [];
   }
 
   function isNamedSpecialForm(pokemon) {
@@ -214,6 +241,8 @@
     normalizeFilterState,
     parseFilterHash,
     buildFilterHash,
+    capturablePokemonEntries,
+    isCapturablePokemonEntry,
     matchesPokemonFilters,
     isRegionalFormPokemon,
     statusForPokemon,
