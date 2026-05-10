@@ -130,6 +130,15 @@ function realOrderedEntries(ordered) {
   return Array.isArray(ordered) ? ordered.filter(Boolean) : [];
 }
 
+function collectionTargetPokemon(PC = window.PokedexCollection) {
+  if (Array.isArray(PC?.capturablePokemon)) return PC.capturablePokemon;
+  if (typeof PC?.poolForCollectionScope === "function") {
+    const scoped = PC.poolForCollectionScope();
+    if (Array.isArray(scoped)) return scoped;
+  }
+  return Array.isArray(PC?.allPokemon) ? PC.allPokemon : [];
+}
+
 function createReservedSlotCard(slot = {}) {
   const card = document.createElement("div");
   card.className = "card card--reserved-slot binder-card";
@@ -265,9 +274,10 @@ function renderVaultsNav(cfg, activeBinderId, ordered) {
     item.type = "button";
     item.className = "binder-vault-item";
     if (String(b.id) === String(activeBinderId)) item.classList.add("is-active");
+    const targetPokemon = collectionTargetPokemon(PC);
     const pool = window.PokedexBinder?.selectBinderPokemonPool
-      ? window.PokedexBinder.selectBinderPokemonPool(PC?.allPokemon || [], window.PokedexBinder.getFormRuleForBinder?.(cfg, b))
-      : PC?.allPokemon || [];
+      ? window.PokedexBinder.selectBinderPokemonPool(targetPokemon, window.PokedexBinder.getFormRuleForBinder?.(cfg, b))
+      : targetPokemon;
     const ord = ordered && String(b.id) === String(activeBinderId)
       ? ordered
       : window.PokedexBinder?.orderPokemonForBinder
@@ -329,7 +339,7 @@ function renderBinderPageGrid() {
     return;
   }
 
-  const raw = PC?.allPokemon && PC.allPokemon.length ? PC.allPokemon : [];
+  const raw = collectionTargetPokemon(PC);
   const defs = PC?.regionDefinitions || [];
   const poolSelector = window.PokedexBinder?.selectBinderPokemonPool;
   const matchesBinderRule = window.PokedexBinder?.pokemonMatchesBinderRule;

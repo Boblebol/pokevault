@@ -94,6 +94,15 @@ function findInTree(root, selector) {
   return null;
 }
 
+function byClass(root, className) {
+  const out = [];
+  for (const child of root.children || []) {
+    if (String(child.className || "").split(/\s+/).includes(className)) out.push(child);
+    out.push(...byClass(child, className));
+  }
+  return out;
+}
+
 function installRoot() {
   const root = new FakeElement("div");
   root.id = "pokemonModal";
@@ -198,6 +207,7 @@ async function loadModule() {
   const dom = installBrowserStubs();
   importCase += 1;
   const stamp = `${Date.now()}-${importCase}`;
+  await import(`../../web/pokemon-capture-scope.js?case=${stamp}-capture`);
   await import(`../../web/pokemon-fiche.js?case=${stamp}-fiche`);
   await import(`../../web/pokemon-modal.js?case=${stamp}-modal`);
   globalThis.window.PokevaultPokemonModal._test.resetForTests();
@@ -236,6 +246,26 @@ test("modal shows game Pokedex appearances and no card section", async () => {
   assert.match(text, /Pokédex de Kalos Centre - X\/Y/);
   assert.doesNotMatch(text, /Mes cartes/);
   assert.doesNotMatch(text, /TCG/);
+});
+
+test("modal keeps non-capturable alternate forms informational", async () => {
+  const { dom } = await loadModule();
+
+  globalThis.window.PokevaultPokemonModal.open("0001-bulbasaur-mega", null);
+
+  assert.match(textContent(dom.content), /Méga-Bulbizarre/);
+  assert.match(textContent(dom.content), /Forme informative/);
+  assert.equal(byClass(dom.content, "pokemon-ownership-actions").length, 0);
+});
+
+test("modal annotates alternate form buttons with capturable state", async () => {
+  const { dom } = await loadModule();
+
+  globalThis.window.PokevaultPokemonModal.open("0001-bulbasaur", null);
+
+  const forms = byClass(dom.content, "pokemon-modal-form");
+  assert.equal(forms.some((node) => node.textContent === "Méga" && node.dataset.capturable === "false"), true);
+  assert.equal(forms.some((node) => node.textContent === "Bulbizarre" && node.dataset.capturable === "true"), true);
 });
 
 test("legacy Pokemon hash opens the same modal instead of a full-page view", async () => {

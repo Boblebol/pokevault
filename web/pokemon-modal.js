@@ -19,6 +19,7 @@
     "pokemon_modal.immunities": "Immunités",
     "pokemon_modal.game_pokedexes": "Pokédex des jeux",
     "pokemon_modal.game_pokedexes_empty": "Aucune apparition de jeu référencée pour l'instant.",
+    "pokemon_modal.informational_form": "Forme informative",
     "pokemon_modal.unknown": "Pokémon inconnu dans le Pokédex local.",
   };
 
@@ -182,6 +183,12 @@
     return { caught: status.state === "caught", duplicate: false };
   }
 
+  function isCapturable(pokemon) {
+    return window.PokevaultCaptureScope?.isCapturablePokemonEntry
+      ? window.PokevaultCaptureScope.isCapturablePokemonEntry(pokemon)
+      : true;
+  }
+
   function buildIdentity(root, pokemon) {
     const section = createSection("identity", "");
     section.className += " pokemon-modal-hero";
@@ -221,6 +228,15 @@
 
   function buildStatus(root, pokemon) {
     const section = createSection("pokedex_status");
+    if (!isCapturable(pokemon)) {
+      const label = document.createElement("span");
+      label.className = "pokemon-modal-status-label";
+      label.dataset.state = "informational";
+      label.textContent = t("pokemon_modal.informational_form");
+      section.append(label);
+      root.append(section);
+      return;
+    }
     const ownership = ownershipState(pokemon.slug);
     const label = document.createElement("span");
     label.className = "pokemon-modal-status-label";
@@ -258,6 +274,7 @@
       button.type = "button";
       button.className = "pokemon-modal-form";
       button.dataset.current = entry.current ? "true" : "false";
+      button.dataset.capturable = entry.capturable === false ? "false" : "true";
       button.textContent = entry.label || displayName(entry.pokemon);
       button.addEventListener("click", () => open(entry.slug, button));
       list.append(button);

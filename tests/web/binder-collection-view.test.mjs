@@ -280,3 +280,69 @@ test("binder shell keeps the empty-data hint when physical capacity slots exist"
   assert.equal(hint.textContent.includes("Charge le Pokédex"), true);
   assert.equal(hint.textContent.includes("Emplacements 1-3"), false);
 });
+
+test("binder shell uses capturable pokemon as binder targets", async () => {
+  await loadModule({
+    document: createFakeDocument({
+      binderPagesHost: createFakeElement("div"),
+      binderShellHint: createFakeElement("p"),
+      binderMetrics: createFakeElement("div"),
+      binderVaultsNav: createFakeElement("nav"),
+    }),
+  });
+
+  const allPokemon = [
+    { slug: "0001-bulbasaur", number: "0001" },
+    { slug: "0003-venusaur-mega", number: "0003", form: "Méga" },
+    { slug: "0052-meowth-alola", number: "0052", form: "Forme d'Alola" },
+  ];
+  const capturablePokemon = [allPokemon[0], allPokemon[2]];
+  let slotInput = [];
+  let orderInput = [];
+  globalThis.PokedexCollection = {
+    allPokemon,
+    capturablePokemon,
+    caughtMap: {},
+    regionDefinitions: [],
+    createPokemonCard(pokemon, opts = {}) {
+      const card = createFakeElement("article");
+      card.className = "card";
+      card.textContent = opts.empty ? "empty" : pokemon.slug;
+      return card;
+    },
+  };
+  globalThis.PokevaultBinderLayout = {
+    computeBinderSlots({ pokemon }) {
+      slotInput = pokemon;
+      return pokemon.map((entry, index) => ({
+        slot: index + 1,
+        pokemon: entry,
+        emptyKind: null,
+        familyId: entry.slug,
+      }));
+    },
+  };
+  globalThis.PokedexBinder = {
+    orderPokemonForBinder(_binder, pokemon) {
+      orderInput = pokemon;
+      return pokemon;
+    },
+    selectBinderPokemonPool(pokemon) {
+      return pokemon;
+    },
+    getFormRuleForBinder() {
+      return { include_base: true, include_regional: true, include_other_named_forms: true };
+    },
+    pokemonMatchesFormRule() {
+      return true;
+    },
+  };
+
+  globalThis.PokedexBinderShell.syncFromConfig({
+    binders: [{ id: "main", name: "Main", rows: 1, cols: 3, sheet_count: 1 }],
+  });
+
+  assert.deepEqual(slotInput.map((p) => p.slug), ["0001-bulbasaur", "0052-meowth-alola"]);
+  assert.deepEqual(orderInput.map((p) => p.slug), ["0001-bulbasaur", "0052-meowth-alola"]);
+  assert.equal(globalThis.document.getElementById("binderPagesHost").textContent.includes("0003-venusaur-mega"), false);
+});

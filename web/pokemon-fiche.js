@@ -442,11 +442,15 @@
       const status = normalizeStatus(
         typeof getStatus === "function" ? getStatus(slug) : null,
       );
+      const capturable = window.PokevaultCaptureScope?.isCapturablePokemonEntry
+        ? window.PokevaultCaptureScope.isCapturablePokemonEntry(form)
+        : true;
       return {
         pokemon: form,
         slug,
         label: form.form || displayName(form),
         current: slug === pokemon.slug,
+        capturable,
         status,
         statusLabel: statusLabel(status),
       };

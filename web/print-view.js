@@ -443,6 +443,15 @@ function buildPlaceholderSection(binder = {}, slots = [], caughtMap = {}, filter
   return { binderId, title, rows, cols, pages };
 }
 
+function collectionPrintPokemon(PC = window.PokedexCollection) {
+  if (Array.isArray(PC?.capturablePokemon)) return PC.capturablePokemon;
+  if (typeof PC?.poolForCollectionScope === "function") {
+    const scoped = PC.poolForCollectionScope();
+    if (Array.isArray(scoped)) return scoped;
+  }
+  return Array.isArray(PC?.allPokemon) ? PC.allPokemon : [];
+}
+
 function renderPrintView() {
   const output = document.getElementById("printOutput");
   const summary = document.getElementById("printSummary");
@@ -452,7 +461,7 @@ function renderPrintView() {
   const PC = window.PokedexCollection;
   const allPokemon = PC?.allPokemon || [];
   // Aligne Print sur la meme base que la liste (pas de formes specifiques non souhaitees).
-  const listScopedPokemon = PC?.poolForCollectionScope ? PC.poolForCollectionScope() : allPokemon;
+  const listScopedPokemon = collectionPrintPokemon(PC);
   const caughtMap = PC?.caughtMap || {};
   const defs = PC?.regionDefinitions || [];
   const cfg = getBinderConfig();
@@ -964,6 +973,7 @@ if (window.__POKEVAULT_PRINT_TESTS__) {
     formatPrintFooter,
     buildPlaceholderSection,
     buildPlaceholderCardElement,
+    collectionPrintPokemon,
     configUsesEvolutionFamilies,
     resolvePrintArtwork,
     setPrintArtworkMode(mode) {

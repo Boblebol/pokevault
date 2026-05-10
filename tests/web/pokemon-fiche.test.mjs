@@ -238,6 +238,8 @@ test("statusPatchForAction ignores legacy shiny inputs", async () => {
 
 test("buildFormEntries keeps each regional and special form status independent", async () => {
   const api = await loadModule();
+  globalThis.__POKEVAULT_CAPTURE_SCOPE_TESTS__ = true;
+  await import(`../../web/pokemon-capture-scope.js?case=fiche-${Date.now()}`);
   const forms = [
     { slug: "0003-venusaur", number: "0003", names: { fr: "Florizarre" } },
     { slug: "0003-venusaur-mega", number: "0003", names: { fr: "Méga-Florizarre" }, form: "Méga" },
@@ -260,9 +262,12 @@ test("buildFormEntries keeps each regional and special form status independent",
   assert.deepEqual(entries.map((entry) => entry.slug), forms.map((form) => form.slug));
   assert.equal(entries[0].current, true);
   assert.equal(entries[1].statusLabel, "Aperçu");
+  assert.equal(entries[1].capturable, false);
   assert.equal(entries[2].statusLabel, "Attrapé");
+  assert.equal(entries[2].capturable, true);
   assert.equal("shiny" in entries[4].status, false);
   assert.equal(entries[5].label, "Forme de Paldea");
+  assert.equal(entries[5].capturable, true);
 });
 
 test("pokemon form route helpers preserve a sanitized list return hash", async () => {

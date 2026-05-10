@@ -72,6 +72,7 @@ function t(key, params = {}) {
 }
 
 let allPokemon = [];
+let capturablePokemon = [];
 /**
  * Source of truth for the enriched Pokédex status (F03).
  * Keys are Pokémon slugs. Absence means `not_met`.
@@ -194,7 +195,10 @@ async function getCollectionBootstrap() {
     }
     const dex = await dexRes.json();
     allPokemon = Array.isArray(dex) ? dex : dex.pokemon || [];
-    totalCount = dex.meta?.total ?? allPokemon.length;
+    capturablePokemon = window.PokevaultCaptureScope?.capturablePokemonEntries
+      ? window.PokevaultCaptureScope.capturablePokemonEntries(allPokemon)
+      : allPokemon;
+    totalCount = dex.meta?.total ?? capturablePokemon.length;
     regionDefinitions = Array.isArray(dex.meta?.regions) ? dex.meta.regions : [];
     await loadNarrativeTags();
     fillRegionSelect();
@@ -597,6 +601,9 @@ window.PokedexCollection = {
   get allPokemon() {
     return allPokemon;
   },
+  get capturablePokemon() {
+    return capturablePokemon;
+  },
   get regionDefinitions() {
     return regionDefinitions;
   },
@@ -850,12 +857,9 @@ function matchesTypeFilter(p) {
   return types.some((t) => String(t) === typeFilter);
 }
 
-/** Pool de référence aligné sur la règle de formes effective des classeurs. */
+/** Pool de référence suivi par la collection: base + formes régionales. */
 function poolForCollectionScope() {
-  const B = window.PokedexBinder;
-  if (!B?.getEffectiveFormRuleForCollection || !B?.selectBinderPokemonPool) return allPokemon;
-  const rule = B.getEffectiveFormRuleForCollection();
-  return B.selectBinderPokemonPool(allPokemon, rule);
+  return capturablePokemon;
 }
 
 /** Pokémon comptés pour la barre de progression (dex complet, filtre région uniquement). */
