@@ -1820,7 +1820,6 @@ function currentViewFromHash() {
   if (raw === "classeur") return "classeur";
   if (raw === "dresseurs") return "dresseurs";
   if (raw === "settings") return "settings";
-  if (raw === "print") return "print";
   if (raw === "docs") return "docs";
   if (raw === "liste" || raw === "") return "liste";
   return "liste";
@@ -1855,21 +1854,18 @@ function applyAppRoute() {
   const elDresseurs = document.getElementById("viewDresseurs");
   const elStats = document.getElementById("viewStats");
   const elSettings = document.getElementById("viewSettings");
-  const elPrint = document.getElementById("viewPrint");
   const elDocs = document.getElementById("viewDocs");
   if (elListe) elListe.hidden = view !== "liste";
   if (elClasseur) elClasseur.hidden = view !== "classeur";
   if (elDresseurs) elDresseurs.hidden = view !== "dresseurs";
   if (elStats) elStats.hidden = view !== "stats";
   if (elSettings) elSettings.hidden = view !== "settings";
-  if (elPrint) elPrint.hidden = view !== "print";
   if (elDocs) elDocs.hidden = view !== "docs";
   updateAppSwitchNav(view);
   const titles = {
     liste: `pokevault — ${t("app.nav.collection")}`,
     stats: `pokevault — ${t("app.nav.stats")}`,
     settings: `pokevault — ${t("app.nav.settings")}`,
-    print: `pokevault — ${t("app.nav.print")}`,
     docs: `pokevault — ${t("app.nav.docs")}`,
     classeur: `pokevault — ${t("app.nav.binders")}`,
     dresseurs: `pokevault — ${t("app.nav.trainers")}`,
@@ -1892,9 +1888,6 @@ function applyAppRoute() {
   }
   if (view === "stats" && typeof window.PokedexStats?.start === "function") {
     window.PokedexStats.start();
-  }
-  if (view === "print" && typeof window.PokedexPrint?.start === "function") {
-    window.PokedexPrint.start();
   }
   if (routePokemonSlug && typeof window.PokevaultPokemonModal?.open === "function") {
     window.PokevaultPokemonModal.open(routePokemonSlug, null);

@@ -185,7 +185,7 @@ def test_trainer_contacts_are_optional_and_isolated() -> None:
     assert "trainer-note-form" in CSS
     assert "trainer-danger-btn" in CSS
     assert "trainer-list-groups" in CSS
-    dresseurs_view = HTML.split('id="viewDresseurs"', 1)[1].split('id="viewPrint"', 1)[0]
+    dresseurs_view = HTML.split('id="viewDresseurs"', 1)[1].split('id="viewDocs"', 1)[0]
     assert "onboarding" not in dresseurs_view.lower()
 
 
@@ -248,3 +248,9 @@ def test_settings_no_longer_exposes_multi_profile_controls() -> None:
     assert "Pokédex multi-profils" not in HTML
     assert "settingsProfileCreateBtn" not in HTML
     assert "settingsProfileDeleteBtn" not in HTML
+
+
+def test_print_view_is_removed() -> None:
+    html = HTML
+    for forbidden in ["print-view.js", "viewPrint", "app.nav.print", "#/print"]:
+        assert forbidden not in html, f"Expected {forbidden!r} to be absent from index.html"
