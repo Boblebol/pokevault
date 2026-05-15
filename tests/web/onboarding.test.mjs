@@ -62,7 +62,9 @@ test("writeProfile persists Pokedex-first onboarding choices", async () => {
   const saved = api.writeProfile({
     goal: "complete_pokedex",
     favorite_region: "johto",
-    binder_org: "regional_family_album",
+    binder_type: "finite_10",
+    binder_region_sep: "yes",
+    binder_family_group: "aligned",
     skipped: false,
   });
 
@@ -71,7 +73,9 @@ test("writeProfile persists Pokedex-first onboarding choices", async () => {
   assert.equal(saved.version, 2);
   assert.equal(saved.goal, "complete_pokedex");
   assert.equal(saved.favorite_region, "johto");
-  assert.equal(saved.binder_org, "regional_family_album");
+  assert.equal(saved.binder_type, "finite_10");
+  assert.equal(saved.binder_region_sep, "yes");
+  assert.equal(saved.binder_family_group, "aligned");
   assert.equal(Object.hasOwn(saved, "tracking" + "_mode"), false);
   assert.match(saved.completed_at, /^\d{4}-\d{2}-\d{2}T/);
   assert.equal(raw.profile, undefined);
@@ -96,13 +100,17 @@ test("readProfile migrates legacy collector profiles to the Pokedex-first shape"
     version: profile.version,
     goal: profile.goal,
     favorite_region: profile.favorite_region,
-    binder_org: profile.binder_org,
+    binder_type: profile.binder_type,
+    binder_region_sep: profile.binder_region_sep,
+    binder_family_group: profile.binder_family_group,
     skipped: profile.skipped,
   }, {
     version: 2,
     goal: "complete_pokedex",
     favorite_region: "all",
-    binder_org: "national",
+    binder_type: "infinite",
+    binder_region_sep: "no",
+    binder_family_group: "compact",
     skipped: false,
   });
 });
@@ -129,7 +137,9 @@ test("applyPreferences guides the first collection view from region and mode", a
   api.applyPreferences({
     goal: "complete_pokedex",
     favorite_region: "kanto",
-    binder_org: "national",
+    binder_type: "infinite",
+    binder_region_sep: "no",
+    binder_family_group: "compact",
   });
 
   assert.equal(storage.get("pokedexFormFilter"), "base_regional");
@@ -152,10 +162,13 @@ test("settings profile summary follows English i18n labels", async () => {
     t(key, params = {}) {
       const messages = {
         "onboarding.profile.undefined": "Profile: undefined — replay onboarding to customize.",
-        "onboarding.profile.summary": "Profile: Complete my Pokedex · {region} · {org} · local binders.",
-        "onboarding.org.national": "national binder",
-        "onboarding.org.regional": "large by region",
-        "onboarding.org.by_region": "separate by region",
+        "onboarding.profile.summary": "Profile: Complete my Pokedex · {region} · {t} / {s} / {g} · local binders.",
+        "onboarding.org.infinite": "Large",
+        "onboarding.org.finite": "Small",
+        "onboarding.org.sep_yes": "Sep.",
+        "onboarding.org.sep_no": "No sep.",
+        "onboarding.org.group_aligned": "Aligned",
+        "onboarding.org.group_compact": "Compact",
       };
       return (messages[key] || key).replace(/\{([a-zA-Z0-9_]+)\}/g, (_, name) => String(params[name]));
     },
@@ -163,7 +176,13 @@ test("settings profile summary follows English i18n labels", async () => {
 
   assert.equal(api.formatSettingsProfileLabel(null), "Profile: undefined — replay onboarding to customize.");
   assert.equal(
-    api.formatSettingsProfileLabel({ favorite_region: "kanto", binder_org: "regional_family_album", skipped: false }),
-    "Profile: Complete my Pokedex · Kanto · large by region · local binders.",
+    api.formatSettingsProfileLabel({
+      favorite_region: "kanto",
+      binder_type: "infinite",
+      binder_region_sep: "yes",
+      binder_family_group: "aligned",
+      skipped: false
+    }),
+    "Profile: Complete my Pokedex · Kanto · Large / Sep. / Aligned · local binders.",
   );
 });

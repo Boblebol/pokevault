@@ -686,26 +686,48 @@
         <section class="onboarding__step" data-step="4" hidden>
           <p class="onboarding__kicker" data-i18n="app.onboarding.step4.kicker">Étape 4 · Organisation</p>
           <h3 class="onboarding__step-title" data-i18n="app.onboarding.step4.binder.title">Comment ranger tes classeurs ?</h3>
-          <p class="onboarding__lede" data-i18n="app.onboarding.step4.binder.lede">
-            Choisis ton format physique préféré. Tu pourras toujours le changer plus tard.
-          </p>
-          <div class="onboarding__choices" role="radiogroup" aria-label="Organisation classeur" data-i18n-aria-label="app.onboarding.binder_org">
-            <label class="onboarding__choice">
-              <input type="radio" name="onboardingBinderOrg" value="national" checked />
-              <span class="onboarding__choice-title" data-i18n="app.onboarding.binder.national">Grand classeur National</span>
-              <span class="onboarding__choice-sub" data-i18n="app.onboarding.binder.national_sub">Toutes les régions à la suite dans un seul grand classeur.</span>
-            </label>
-            <label class="onboarding__choice">
-              <input type="radio" name="onboardingBinderOrg" value="regional_family_album" />
-              <span class="onboarding__choice-title" data-i18n="app.onboarding.binder.regional">Grand classeur par Région</span>
-              <span class="onboarding__choice-sub" data-i18n="app.onboarding.binder.regional_sub">Un grand classeur, chaque région commence sur une nouvelle page.</span>
-            </label>
-            <label class="onboarding__choice">
-              <input type="radio" name="onboardingBinderOrg" value="by_region" />
-              <span class="onboarding__choice-title" data-i18n="app.onboarding.binder.by_region">Classeurs séparés</span>
-              <span class="onboarding__choice-sub" data-i18n="app.onboarding.binder.by_region_sub">Un classeur de 10 pages par région.</span>
-            </label>
-          </div>
+          
+          <fieldset class="onboarding__fieldset">
+            <legend data-i18n="app.onboarding.q1.title">1. Type de classeur</legend>
+            <div class="onboarding__choices">
+              <label class="onboarding__choice">
+                <input type="radio" name="binder_type" value="infinite" checked />
+                <span class="onboarding__choice-title" data-i18n="app.onboarding.q1.infinite">Grand classeur évolutif</span>
+              </label>
+              <label class="onboarding__choice">
+                <input type="radio" name="binder_type" value="finite_10" />
+                <span class="onboarding__choice-title" data-i18n="app.onboarding.q1.finite">Petits classeurs (10 feuillets)</span>
+              </label>
+            </div>
+          </fieldset>
+
+          <fieldset class="onboarding__fieldset">
+            <legend data-i18n="app.onboarding.q2.title">2. Séparation par région</legend>
+            <div class="onboarding__choices">
+              <label class="onboarding__choice">
+                <input type="radio" name="binder_region_sep" value="yes" checked />
+                <span class="onboarding__choice-title" data-i18n="app.onboarding.q2.yes">Oui (Nouvelle page/classeur par région)</span>
+              </label>
+              <label class="onboarding__choice">
+                <input type="radio" name="binder_region_sep" value="no" />
+                <span class="onboarding__choice-title" data-i18n="app.onboarding.q2.no">Non (Toutes les régions à la suite)</span>
+              </label>
+            </div>
+          </fieldset>
+
+          <fieldset class="onboarding__fieldset">
+            <legend data-i18n="app.onboarding.q3.title">3. Regroupement des familles</legend>
+            <div class="onboarding__choices">
+              <label class="onboarding__choice">
+                <input type="radio" name="binder_family_group" value="aligned" checked />
+                <span class="onboarding__choice-title" data-i18n="app.onboarding.q3.aligned">Isolées (Saut de ligne pour séparer)</span>
+              </label>
+              <label class="onboarding__choice">
+                <input type="radio" name="binder_family_group" value="compact" />
+                <span class="onboarding__choice-title" data-i18n="app.onboarding.q3.compact">Compactes (À la suite sans espace)</span>
+              </label>
+            </div>
+          </fieldset>
         </section>
 
         <section class="onboarding__step" data-step="5" hidden>

@@ -45,10 +45,13 @@
   };
   const FALLBACK_I18N = {
     "onboarding.profile.undefined": "Profil : non défini — rejoue l'onboarding pour personnaliser.",
-    "onboarding.profile.summary": "Profil : Compléter mon Pokédex · {region} · {org} · classeurs locaux.",
-    "onboarding.org.national": "classeur national",
-    "onboarding.org.regional": "grand par région",
-    "onboarding.org.by_region": "séparés par région",
+    "onboarding.profile.summary": "Profil : Compléter mon Pokédex · {region} · {t} / {s} / {g} · classeurs locaux.",
+    "onboarding.org.infinite": "Grand",
+    "onboarding.org.finite": "Petits (10f)",
+    "onboarding.org.sep_yes": "Sép.",
+    "onboarding.org.sep_no": "Continu",
+    "onboarding.org.group_aligned": "Isolé",
+    "onboarding.org.group_compact": "Compact",
     "onboarding.done": "Terminer",
     "onboarding.continue": "Continuer",
   };
@@ -72,9 +75,16 @@
     return REGION_LABELS[id] ? id : "all";
   }
 
-  function normalizeBinderOrg(value) {
-    if (value === "by_region" || value === "regional_family_album") return value;
-    return "national";
+  function normalizeBinderType(value) {
+    return value === "finite_10" ? "finite_10" : "infinite";
+  }
+
+  function normalizeBinderRegionSep(value) {
+    return value === "yes" ? "yes" : "no";
+  }
+
+  function normalizeBinderFamilyGroup(value) {
+    return value === "aligned" ? "aligned" : "compact";
   }
 
   function migrateLegacyProfile(data) {
@@ -82,13 +92,15 @@
       version: 2,
       goal: "complete_pokedex",
       favorite_region: "all",
-      binder_org: "national",
+      binder_type: "infinite",
+      binder_region_sep: "no",
+      binder_family_group: "compact",
       completed_at: typeof data.completed_at === "string" ? data.completed_at : null,
       skipped: Boolean(data.skipped),
     };
   }
 
-  /** @returns {null | {version: number; goal: string; favorite_region: string; binder_org: string; completed_at: string | null; skipped: boolean}} */
+  /** @returns {null | {version: number; goal: string; favorite_region: string; binder_type: string; binder_region_sep: string; binder_family_group: string; completed_at: string | null; skipped: boolean}} */
   function readProfile() {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
@@ -100,7 +112,9 @@
         version: 2,
         goal: normalizeGoal(data.goal),
         favorite_region: normalizeRegion(data.favorite_region),
-        binder_org: normalizeBinderOrg(data.binder_org),
+        binder_type: normalizeBinderType(data.binder_type),
+        binder_region_sep: normalizeBinderRegionSep(data.binder_region_sep),
+        binder_family_group: normalizeBinderFamilyGroup(data.binder_family_group),
         completed_at: typeof data.completed_at === "string" ? data.completed_at : null,
         skipped: Boolean(data.skipped),
       };
@@ -114,7 +128,9 @@
       version: 2,
       goal: normalizeGoal(payload.goal),
       favorite_region: normalizeRegion(payload.favorite_region),
-      binder_org: normalizeBinderOrg(payload.binder_org),
+      binder_type: normalizeBinderType(payload.binder_type),
+      binder_region_sep: normalizeBinderRegionSep(payload.binder_region_sep),
+      binder_family_group: normalizeBinderFamilyGroup(payload.binder_family_group),
       completed_at: payload.skipped ? null : new Date().toISOString(),
       skipped: Boolean(payload.skipped),
     };
@@ -174,7 +190,9 @@
     const clean = {
       goal: normalizeGoal(profile.goal),
       favorite_region: normalizeRegion(profile.favorite_region),
-      binder_org: normalizeBinderOrg(profile.binder_org),
+      binder_type: normalizeBinderType(profile.binder_type),
+      binder_region_sep: normalizeBinderRegionSep(profile.binder_region_sep),
+      binder_family_group: normalizeBinderFamilyGroup(profile.binder_family_group),
     };
 
     const formScope = "base_regional";
@@ -217,11 +235,11 @@
       return t("onboarding.profile.undefined");
     }
     const region = REGION_LABELS[p.favorite_region] || "National";
-    let org = t("onboarding.org.national");
-    if (p.binder_org === "by_region") org = t("onboarding.org.by_region");
-    else if (p.binder_org === "regional_family_album") org = t("onboarding.org.regional");
+    const t_label = p.binder_type === "finite_10" ? t("onboarding.org.finite") : t("onboarding.org.infinite");
+    const s_label = p.binder_region_sep === "yes" ? t("onboarding.org.sep_yes") : t("onboarding.org.sep_no");
+    const g_label = p.binder_family_group === "aligned" ? t("onboarding.org.group_aligned") : t("onboarding.org.group_compact");
 
-    return t("onboarding.profile.summary", { region, org });
+    return t("onboarding.profile.summary", { region, t: t_label, s: s_label, g: g_label });
   }
 
   function updateSettingsProfileLabel() {
@@ -309,13 +327,21 @@
       const region = /** @type {HTMLSelectElement | null} */ (
         this.form.querySelector("#onboardingFavoriteRegion")
       );
-      const org = /** @type {HTMLInputElement | null} */ (
-        this.form.querySelector('input[name="onboardingBinderOrg"]:checked')
+      const bType = /** @type {HTMLInputElement | null} */ (
+        this.form.querySelector('input[name="binder_type"]:checked')
+      );
+      const bSep = /** @type {HTMLInputElement | null} */ (
+        this.form.querySelector('input[name="binder_region_sep"]:checked')
+      );
+      const bGroup = /** @type {HTMLInputElement | null} */ (
+        this.form.querySelector('input[name="binder_family_group"]:checked')
       );
       return {
         goal: goal?.value || "complete_pokedex",
         favorite_region: region?.value || "all",
-        binder_org: org?.value || "national",
+        binder_type: bType?.value || "infinite",
+        binder_region_sep: bSep?.value || "no",
+        binder_family_group: bGroup?.value || "compact",
       };
     }
 
