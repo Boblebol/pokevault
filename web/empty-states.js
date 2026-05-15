@@ -33,12 +33,6 @@ const COPY = {
         "Retire le filtre \u00ab manquants \u00bb pour admirer ta collection, " +
         "ou pars chasser une autre région.",
     },
-    printEmpty: {
-      title: "Rien à imprimer dans ce périmètre.",
-      body:
-        "Ajuste le filtre attrapés / manquants ou sélectionne un autre " +
-        "classeur — le carnet de chasse a besoin d'au moins une entrée.",
-    },
     statsEmpty: {
       title: "Tes statistiques attendent leur premier capteur.",
       body:
@@ -75,12 +69,6 @@ const COPY = {
       body:
         "Remove the missing filter to admire your collection, " +
         "or try another region.",
-    },
-    printEmpty: {
-      title: "Nothing to print in this scope.",
-      body:
-        "Adjust the caught / missing filter or select another binder — " +
-        "the field notebook needs at least one entry.",
     },
     statsEmpty: {
       title: "Your stats are waiting for a first capture.",
