@@ -12,19 +12,17 @@ const LS_WIZARD_DISMISSED = "pokedexBinderWizardDismissed";
 let binderV2Started = false;
 let binderV2LocaleSubbed = false;
 let wizardStep = 0;
-const wizardLastStep = 3;
+const wizardLastStep = 2;
 
 const WIZARD_STEP_LABELS = [
   "binder_wizard.step.organization",
   "binder_wizard.step.forms",
-  "binder_wizard.step.format",
   "binder_wizard.step.summary",
 ];
 
 const BINDER_WIZARD_FALLBACK_I18N = {
   "binder_wizard.step.organization": "Organisation",
   "binder_wizard.step.forms": "Formes à suivre",
-  "binder_wizard.step.format": "Format du classeur",
   "binder_wizard.step.summary": "Récapitulatif",
   "binder_wizard.save": "Enregistrer",
   "binder_wizard.continue": "Continuer",
@@ -39,15 +37,13 @@ const BINDER_WIZARD_FALLBACK_I18N = {
   "binder_wizard.preview.hint": "Tri : régions (ordre national), natives puis formes importées en fin de bloc. Filtre : {filter} — {shown} / {filtered} entrées affichées ({total} au total).",
   "binder_wizard.preview.filter_all": "toutes",
   "binder_wizard.preview.regional_form": "forme régionale",
-  "binder_wizard.org.lead": "Choisis comment les entrées seront ordonnées dans le classeur. Tu pourras ajuster la grille juste après.",
-  "binder_wizard.org.national.title": "Tous à la suite",
+  "binder_wizard.org.lead": "Choisis comment les entrées seront ordonnées dans le classeur.",
+  "binder_wizard.org.national.title": "National (un seul classeur)",
   "binder_wizard.org.national.desc": "Ordre national du Pokédex, du premier au dernier numéro.",
-  "binder_wizard.org.by_region.title": "Par région",
-  "binder_wizard.org.by_region.desc": "Blocs par région : espèces natives d’abord, puis formes « importées » en fin de section.",
-  "binder_wizard.org.family.title": "Familles",
-  "binder_wizard.org.family.desc": "Familles compactes : les petites familles partagent une ligne quand elles tiennent, les branches gardent des vides discrets.",
-  "binder_wizard.org.large_ring.title": "Grand classeur 3x3",
-  "binder_wizard.org.large_ring.desc": "Un seul classeur à anneaux : régions au recto d’un nouveau feuillet, familles compactes, capacité calculée.",
+  "binder_wizard.org.by_region.title": "Par région (plusieurs classeurs)",
+  "binder_wizard.org.by_region.desc": "Un classeur physique par région (Kanto, Johto...), au format 3x3.",
+  "binder_wizard.org.large_ring.title": "Grand classeur 3x3 (album complet)",
+  "binder_wizard.org.large_ring.desc": "Un seul grand classeur à anneaux : régions au recto d’un nouveau feuillet, familles compactes, capacité calculée.",
   "binder_wizard.form.lead": "Les séries de cartes ne couvrent pas tout (Méga, Gigamax, Pikachu déguisé…). Choisis un périmètre réaliste pour ton suivi ; tu pourras l’éditer dans le JSON plus tard.",
   "binder_wizard.form.lead.large_ring": "Pour le grand classeur, garde les espèces de base avec les formes régionales, ou passe en complet si tu veux aussi suivre Méga, Gigamax et formes nommées.",
   "binder_wizard.form.base_only.choice_title": "Base seule",
@@ -56,12 +52,10 @@ const BINDER_WIZARD_FALLBACK_I18N = {
   "binder_wizard.form.base_regional.desc": "Inclut Alola, Galar, Hisui, etc. — sans Méga, sans Gigamax, sans formes annexes type costumes.",
   "binder_wizard.form.full.choice_title": "Complet",
   "binder_wizard.form.full.desc": "Méga, Gigamax et autres formes nommées : plus de lignes, beaucoup de cartes n’existent pas pour tout le monde.",
-  "binder_wizard.format.lead": "Même nombre de pochettes sur chaque face (recto / verso). Presets 3×3 ou 2×2 avec 10 feuillets, ou grille personnalisée.",
+  "binder_wizard.format.lead": "Le format par défaut est une grille 3x3 recto-verso.",
   "binder_wizard.format.lead.large_ring": "Le grand classeur verrouille la grille en 3×3 recto-verso. Le nombre de feuillets est calculé automatiquement selon les régions et familles.",
   "binder_wizard.format.3x3.title": "3 × 3",
   "binder_wizard.format.3x3.desc": "9 cases par page · 10 feuillets (recto + verso).",
-  "binder_wizard.format.2x2.title": "2 × 2",
-  "binder_wizard.format.2x2.desc": "4 cases par page · 10 feuillets.",
   "binder_wizard.format.large_ring.title": "Auto 3 x 3",
   "binder_wizard.format.large_ring.desc": "3 × 3 recto-verso, feuillets calculés pour tout faire rentrer + 10 feuillets libres.",
   "binder_wizard.format.custom.title": "Personnalisé",
@@ -76,12 +70,10 @@ const BINDER_WIZARD_FALLBACK_I18N = {
   "binder_wizard.summary.grid": "Grille",
   "binder_wizard.summary.capacity": "Capacité",
   "binder_wizard.summary.name": "Nom du classeur",
-  "binder_wizard.summary.org_family": "Familles d'évolution compactes",
-  "binder_wizard.summary.org_region": "Par région (natives puis formes importées en fin de bloc)",
+  "binder_wizard.summary.org_region": "Un classeur par région (3x3 · 10 feuillets)",
   "binder_wizard.summary.org_large_ring": "Grand classeur 3x3 : régions au recto, familles compactes",
   "binder_wizard.summary.org_national": "National (ordre du Pokédex)",
   "binder_wizard.summary.preset_3x3": "Preset 3 × 3 · 10 feuillets",
-  "binder_wizard.summary.preset_2x2": "Preset 2 × 2 · 10 feuillets",
   "binder_wizard.summary.preset_large_ring": "3 × 3 auto + 10 feuillets libres",
   "binder_wizard.summary.preset_custom": "Grille et feuillets personnalisés",
   "binder_wizard.summary.scope_base": "Base seule",
@@ -90,8 +82,7 @@ const BINDER_WIZARD_FALLBACK_I18N = {
   "binder_wizard.summary.grid_value": "{rows} × {cols} — {slots} cases par page",
   "binder_wizard.summary.capacity_value": "{sheets} feuillets → {pages} pages, {slots} emplacements au total",
   "binder_wizard.summary.capacity_large_ring": "Capacité calculée automatiquement (+ 10 feuillets libres)",
-  "binder_wizard.summary.family_name": "Un ou plusieurs classeurs Familles : les familles courtes économisent des lignes, les branches restent lisibles.",
-  "binder_wizard.summary.region_name": "Un ou plusieurs classeurs par région : si le format est trop petit, les sections sont nommées Kanto 1, Kanto 2, etc.",
+  "binder_wizard.summary.region_name": "Plusieurs classeurs par région : si le format est trop petit, les sections sont nommées Kanto 1, Kanto 2, etc.",
   "binder_wizard.summary.large_ring_name": "Un seul grand classeur physique, organisé par régions internes.",
   "binder_wizard.summary.default_name": "{name} (modifiable plus tard dans le fichier JSON)",
   "binder_wizard.summary.edit_note": "Enregistrement : le classeur existant et la règle de formes associée sont mis à jour dans binder-config.json.",
@@ -101,7 +92,7 @@ const BINDER_WIZARD_FALLBACK_I18N = {
   "binder_wizard.error.choose_org": "Choisis une organisation de classeur.",
   "binder_wizard.error.choose_format": "Choisis un format de grille (preset ou personnalisé).",
   "binder_wizard.error.choose_forms": "Choisis un périmètre de formes (base, base + région, ou complet).",
-  "binder_wizard.error.family_data": "Impossible de charger les familles d'évolution pour calculer le grand classeur.",
+  "binder_wizard.error.family_data": "Impossible de charger les familles d’évolution pour calculer le grand classeur.",
   "binder_wizard.error.pokedex_data": "Impossible de charger le Pokédex pour calculer le grand classeur.",
   "binder_wizard.error.api": "Impossible de joindre l’API classeurs (réseau ou CORS).",
 };
@@ -788,25 +779,22 @@ function formScopesForOrganization(org) {
 }
 
 function formatPresetsForOrganization(org) {
-  return org === ORG_REGIONAL_FAMILY_ALBUM
-    ? ["large-ring-3x3"]
-    : ["3x3-10", "2x2-10", "custom"];
+  if (org === ORG_REGIONAL_FAMILY_ALBUM) return ["large-ring-3x3"];
+  return ["3x3-10"];
 }
 
 function normalizeWizardDraftForOrganization() {
-  if (wizardDraft.organization === ORG_REGIONAL_FAMILY_ALBUM) {
-    if (!formScopesForOrganization(wizardDraft.organization).includes(wizardDraft.formScope)) {
-      wizardDraft.formScope = "base_regional";
-    }
-    wizardDraft.formatPreset = "large-ring-3x3";
-    wizardDraft.rows = 3;
-    wizardDraft.cols = 3;
-    return;
+  const org = wizardDraft.organization;
+  if (!formScopesForOrganization(org).includes(wizardDraft.formScope)) {
+    wizardDraft.formScope = org === ORG_REGIONAL_FAMILY_ALBUM ? "base_regional" : "base_only";
   }
-  if (!formatPresetsForOrganization(wizardDraft.organization).includes(wizardDraft.formatPreset)) {
-    wizardDraft.formatPreset = "3x3-10";
-    wizardDraft.rows = 3;
-    wizardDraft.cols = 3;
+  const allowedPresets = formatPresetsForOrganization(org);
+  wizardDraft.formatPreset = allowedPresets[0];
+
+  wizardDraft.rows = 3;
+  wizardDraft.cols = 3;
+
+  if (org === "by_region" || org === "national") {
     wizardDraft.sheetCount = 10;
   }
 }
@@ -830,28 +818,8 @@ function readFormatSelectionFromDom() {
     wizardDraft.sheetCount = 10;
     return true;
   }
-  if (key === "2x2-10") {
-    leaveLargeRingOrganizationForStandardFormat();
-    wizardDraft.rows = 2;
-    wizardDraft.cols = 2;
-    wizardDraft.sheetCount = 10;
-    return true;
-  }
   if (key === "large-ring-3x3") {
     applyLargeRingWizardDefaults({ resetFormScope: false });
-    return true;
-  }
-  if (key === "custom") {
-    leaveLargeRingOrganizationForStandardFormat();
-    const r = document.getElementById("wizardRows");
-    const c = document.getElementById("wizardCols");
-    const s = document.getElementById("wizardSheets");
-    const rows = Math.min(12, Math.max(1, Number.parseInt(r?.value || "1", 10) || 1));
-    const cols = Math.min(12, Math.max(1, Number.parseInt(c?.value || "1", 10) || 1));
-    const sheets = Math.min(200, Math.max(1, Number.parseInt(s?.value || "1", 10) || 1));
-    wizardDraft.rows = rows;
-    wizardDraft.cols = cols;
-    wizardDraft.sheetCount = sheets;
     return true;
   }
   return false;
@@ -1217,8 +1185,9 @@ function renderWizardStep() {
         btn.classList.add("is-selected");
         wizardDraft.organization = org;
         if (org === ORG_REGIONAL_FAMILY_ALBUM) {
-          applyLargeRingWizardDefaults();
+          wizardDraft.formScope = "base_regional";
         }
+        normalizeWizardDraftForOrganization();
       });
       return btn;
     };
@@ -1233,11 +1202,6 @@ function renderWizardStep() {
         "by_region",
         tBinderWizard("binder_wizard.org.by_region.title"),
         tBinderWizard("binder_wizard.org.by_region.desc"),
-      ),
-      mkOrg(
-        "family",
-        tBinderWizard("binder_wizard.org.family.title"),
-        tBinderWizard("binder_wizard.org.family.desc"),
       ),
       mkOrg(
         ORG_REGIONAL_FAMILY_ALBUM,
@@ -1304,133 +1268,13 @@ function renderWizardStep() {
   }
 
   if (wizardStep === 2) {
-    const lead = document.createElement("p");
-    lead.className = "wizard-lead";
-    lead.textContent = tBinderWizard(
-      wizardDraft.organization === ORG_REGIONAL_FAMILY_ALBUM
-        ? "binder_wizard.format.lead.large_ring"
-        : "binder_wizard.format.lead",
-    );
-    body.append(lead);
-
-    const fmtGrid = document.createElement("div");
-    fmtGrid.className = "wizard-choice-grid wizard-choice-grid--3";
-
-    const mkFmt = (key, title, desc) => {
-      const btn = document.createElement("button");
-      btn.type = "button";
-      btn.className = "wizard-choice wizard-format-card";
-      btn.dataset.formatKey = key;
-      if (wizardDraft.formatPreset === key) btn.classList.add("is-selected");
-      const h = document.createElement("h3");
-      h.className = "wizard-choice-title";
-      h.textContent = title;
-      const p = document.createElement("p");
-      p.className = "wizard-choice-desc";
-      p.textContent = desc;
-      btn.append(h, p);
-      btn.addEventListener("click", () => {
-        fmtGrid.querySelectorAll(".wizard-format-card").forEach((b) => b.classList.remove("is-selected"));
-        btn.classList.add("is-selected");
-        wizardDraft.formatPreset = key;
-        if (key === "3x3-10") {
-          leaveLargeRingOrganizationForStandardFormat();
-          wizardDraft.rows = 3;
-          wizardDraft.cols = 3;
-          wizardDraft.sheetCount = 10;
-        } else if (key === "2x2-10") {
-          leaveLargeRingOrganizationForStandardFormat();
-          wizardDraft.rows = 2;
-          wizardDraft.cols = 2;
-          wizardDraft.sheetCount = 10;
-        } else if (key === "large-ring-3x3") {
-          applyLargeRingWizardDefaults({ resetFormScope: false });
-        } else if (key === "custom") {
-          leaveLargeRingOrganizationForStandardFormat();
-        }
-        syncCustomPanelVisibility(body);
-      });
-      return btn;
-    };
-
-    const formatCopy = {
-      "3x3-10": [
-        tBinderWizard("binder_wizard.format.3x3.title"),
-        tBinderWizard("binder_wizard.format.3x3.desc"),
-      ],
-      "2x2-10": [
-        tBinderWizard("binder_wizard.format.2x2.title"),
-        tBinderWizard("binder_wizard.format.2x2.desc"),
-      ],
-      "large-ring-3x3": [
-        tBinderWizard("binder_wizard.format.large_ring.title"),
-        tBinderWizard("binder_wizard.format.large_ring.desc"),
-      ],
-      custom: [
-        tBinderWizard("binder_wizard.format.custom.title"),
-        tBinderWizard("binder_wizard.format.custom.desc"),
-      ],
-    };
-
-    fmtGrid.append(
-      ...formatPresetsForOrganization(wizardDraft.organization).map((key) =>
-        mkFmt(key, formatCopy[key][0], formatCopy[key][1])),
-    );
-    body.append(fmtGrid);
-
-    if (!formatPresetsForOrganization(wizardDraft.organization).includes("custom")) {
-      syncCustomPanelVisibility(body);
-      syncWizardChrome();
-      syncWizardBinderBar();
-      return;
-    }
-
-    const panel = document.createElement("div");
-    panel.className = "wizard-custom-panel";
-    panel.hidden = wizardDraft.formatPreset !== "custom";
-
-    const rowcols = document.createElement("div");
-    rowcols.className = "wizard-custom-fields";
-
-    const mkNumField = (id, label, min, max, val) => {
-      const wrap = document.createElement("div");
-      wrap.className = "binder-wizard-field";
-      const lab = document.createElement("label");
-      lab.htmlFor = id;
-      lab.textContent = label;
-      const inp = document.createElement("input");
-      inp.type = "number";
-      inp.id = id;
-      inp.min = String(min);
-      inp.max = String(max);
-      inp.value = String(val);
-      wrap.append(lab, inp);
-      return wrap;
-    };
-
-    rowcols.append(
-      mkNumField("wizardRows", tBinderWizard("binder_wizard.format.rows"), 1, 12, wizardDraft.rows),
-      mkNumField("wizardCols", tBinderWizard("binder_wizard.format.cols"), 1, 12, wizardDraft.cols),
-      mkNumField("wizardSheets", tBinderWizard("binder_wizard.format.sheets"), 1, 200, wizardDraft.sheetCount),
-    );
-    const hint = document.createElement("p");
-    hint.className = "wizard-custom-hint";
-    hint.textContent = tBinderWizard("binder_wizard.format.hint");
-    panel.append(rowcols, hint);
-    body.append(panel);
-    syncCustomPanelVisibility(body);
-  }
-
-  if (wizardStep === 3) {
     const slots = wizardDraft.rows * wizardDraft.cols;
     const pages = 2 * wizardDraft.sheetCount;
     const totalSlots = slots * pages;
     const isLargeRingAuto =
       wizardDraft.organization === ORG_REGIONAL_FAMILY_ALBUM && wizardDraft.formatPreset === "large-ring-3x3";
     const orgLabel =
-      wizardDraft.organization === "family"
-        ? tBinderWizard("binder_wizard.summary.org_family")
-        : wizardDraft.organization === "by_region"
+      wizardDraft.organization === "by_region"
         ? tBinderWizard("binder_wizard.summary.org_region")
         : wizardDraft.organization === ORG_REGIONAL_FAMILY_ALBUM
         ? tBinderWizard("binder_wizard.summary.org_large_ring")
@@ -1438,11 +1282,7 @@ function renderWizardStep() {
     const presetLabel =
       wizardDraft.formatPreset === "3x3-10"
         ? tBinderWizard("binder_wizard.summary.preset_3x3")
-        : wizardDraft.formatPreset === "2x2-10"
-          ? tBinderWizard("binder_wizard.summary.preset_2x2")
-          : wizardDraft.formatPreset === "large-ring-3x3"
-            ? tBinderWizard("binder_wizard.summary.preset_large_ring")
-          : tBinderWizard("binder_wizard.summary.preset_custom");
+        : tBinderWizard("binder_wizard.summary.preset_large_ring");
     const scopeLabel =
       wizardDraft.formScope === "base_only"
         ? tBinderWizard("binder_wizard.summary.scope_base")
@@ -1476,9 +1316,7 @@ function renderWizardStep() {
           }),
     );
     const nameRecap =
-      wizardDraft.organization === "family" && !wizardDraft.editBinderId
-        ? tBinderWizard("binder_wizard.summary.family_name")
-        : wizardDraft.organization === "by_region" && !wizardDraft.editBinderId
+      wizardDraft.organization === "by_region" && !wizardDraft.editBinderId
         ? tBinderWizard("binder_wizard.summary.region_name")
         : wizardDraft.organization === ORG_REGIONAL_FAMILY_ALBUM && !wizardDraft.editBinderId
         ? tBinderWizard("binder_wizard.summary.large_ring_name")
@@ -1520,10 +1358,7 @@ function buildPersistNewPayloads(draft) {
   const scope = normalizeFormScope(draft.formScope);
   const layout = normalizedBinderLayout(draft);
   const formRule = formRuleFromScope(scope);
-  const org =
-    draft.organization === "by_region" || draft.organization === "family"
-      ? draft.organization
-      : "national";
+  const org = draft.organization === "by_region" ? "by_region" : "national";
   const configBody = {
     version: 1,
     convention: "sheet_recto_verso",
@@ -1589,32 +1424,29 @@ function buildLargeRingBinderWorkspace(draft, defs, pokemon, familyData, seed = 
   const scope = normalizeFormScope(draft.formScope || "base_regional");
   const formRule = formRuleFromScope(scope);
   const selectedPokemon = selectBinderPokemonPool(Array.isArray(pokemon) ? pokemon : [], formRule);
+  const org = draft.organization === "national" ? "national" : ORG_REGIONAL_FAMILY_ALBUM;
   const sheetCount = autoSheetCountForLargeRing(selectedPokemon, defs, familyData);
   const id = `classeur-${seed}-grand-3x3`;
+  const binderEntry = {
+    id,
+    name: draft.name || "Grand classeur",
+    cols: 3,
+    rows: 3,
+    sheet_count: sheetCount,
+    form_rule_id: formRule.id,
+    organization: org,
+  };
+  if (org === ORG_REGIONAL_FAMILY_ALBUM) {
+    binderEntry.layout_options = largeRingLayoutOptions();
+  }
   return {
     configBody: {
       version: 1,
       convention: "sheet_recto_verso",
-      binders: [
-        {
-          id,
-          name: draft.name || "Grand classeur",
-          cols: 3,
-          rows: 3,
-          sheet_count: sheetCount,
-          form_rule_id: formRule.id,
-          organization: ORG_REGIONAL_FAMILY_ALBUM,
-          layout_options: largeRingLayoutOptions(),
-        },
-      ],
+      binders: [binderEntry],
       form_rules: [formRule],
     },
-    placementsBody: {
-      version: 1,
-      by_binder: {
-        [id]: {},
-      },
-    },
+    placementsBody: { version: 1, by_binder: { [id]: {} } },
   };
 }
 
@@ -1678,180 +1510,6 @@ function buildRegionalBinderWorkspace(draft, defs, pokemon, seed = Date.now().to
   };
 }
 
-function familyWorkspaceRangesFromBlocks(blocks, capacity) {
-  const ranges = [];
-  let currentStart = 0;
-  let currentLength = 0;
-
-  const closeChunk = () => {
-    if (currentLength <= 0) return;
-    ranges.push({ start: currentStart, length: currentLength });
-    currentStart += currentLength;
-    currentLength = 0;
-  };
-
-  for (const block of blocks) {
-    const blockLength = Array.isArray(block) ? block.length : 0;
-    if (!blockLength) continue;
-    if (blockLength > capacity) {
-      if (currentLength > 0) closeChunk();
-      let remaining = blockLength;
-      while (remaining > 0) {
-        const chunkLength = Math.min(capacity, remaining);
-        currentLength = chunkLength;
-        closeChunk();
-        remaining -= chunkLength;
-      }
-      continue;
-    }
-    if (currentLength > 0 && currentLength + blockLength > capacity) {
-      closeChunk();
-    }
-    currentLength += blockLength;
-  }
-  closeChunk();
-
-  return ranges;
-}
-
-function familyWorkspaceRangesFromEngine(selectedPokemon, familyData, layout, capacity) {
-  const engine = window.PokevaultBinderLayout;
-  if (!engine?.computeBinderSlots) return null;
-
-  const slots = engine.computeBinderSlots({
-    binder: {
-      organization: "family",
-      cols: layout.cols,
-      rows: layout.rows,
-      sheet_count: layout.sheetCount,
-    },
-    pokemon: selectedPokemon,
-    defs: [],
-    familyData,
-    includeCapacity: false,
-  });
-  if (!Array.isArray(slots)) return null;
-
-  const units = [];
-  let index = 0;
-  let gapLength = 0;
-
-  const groupingIdForSlot = (slot, fallbackId) => {
-    if (slot?.emptyKind === "capacity_empty") return null;
-    if (slot?.emptyKind === "alignment_empty") return fallbackId;
-    return String(slot?.familyId || slot?.pokemon?.slug || fallbackId);
-  };
-
-  while (index < slots.length) {
-    const slot = slots[index];
-    if (slot?.emptyKind === "capacity_empty") {
-      gapLength += 1;
-      index += 1;
-      continue;
-    }
-
-    const familyId = groupingIdForSlot(slot, `family-${index}`);
-    const familyStart = index;
-    let familyLength = 0;
-    while (index < slots.length) {
-      const current = slots[index];
-      const currentFamilyId = groupingIdForSlot(current, familyId);
-      if (current?.emptyKind === "capacity_empty" || currentFamilyId !== familyId) break;
-      familyLength += 1;
-      index += 1;
-    }
-    units.push({ gapLength, familyStart, familyLength });
-    gapLength = 0;
-  }
-
-  const ranges = [];
-  let currentStart = null;
-  let currentLength = 0;
-
-  const closeChunk = () => {
-    if (currentStart === null || currentLength <= 0) return;
-    ranges.push({ start: currentStart, length: currentLength });
-    currentStart = null;
-    currentLength = 0;
-  };
-
-  for (const unit of units) {
-    if (unit.familyLength > capacity) {
-      closeChunk();
-      let remaining = unit.familyLength;
-      let start = unit.familyStart;
-      while (remaining > 0) {
-        const chunkLength = Math.min(capacity, remaining);
-        ranges.push({ start, length: chunkLength });
-        start += chunkLength;
-        remaining -= chunkLength;
-      }
-      continue;
-    }
-
-    const gapLength = currentLength > 0 ? unit.gapLength : 0;
-    const nextLength = gapLength + unit.familyLength;
-    if (currentLength > 0 && currentLength + nextLength > capacity) {
-      closeChunk();
-    }
-
-    if (currentLength <= 0) {
-      currentStart = unit.familyStart;
-      currentLength = unit.familyLength;
-    } else {
-      currentLength += nextLength;
-    }
-  }
-  closeChunk();
-
-  return ranges;
-}
-
-function buildFamilyBinderWorkspace(draft, pokemon, familyData, seed = Date.now().toString(36)) {
-  const scope = normalizeFormScope(draft.formScope);
-  const formRule = formRuleFromScope(scope);
-  const layout = normalizedBinderLayout(draft);
-  const capacity = binderCapacity(layout);
-  const selectedPokemon = selectBinderPokemonPool(Array.isArray(pokemon) ? pokemon : [], formRule);
-  const ranges =
-    familyWorkspaceRangesFromEngine(selectedPokemon, familyData, layout, capacity) ||
-    familyWorkspaceRangesFromBlocks(familyLayoutBlocks(selectedPokemon, familyData, layout.cols), capacity);
-  const binders = [];
-  const byBinder = {};
-
-  for (const range of ranges) {
-    const idx = binders.length + 1;
-    const id = `classeur-${seed}-familles-${idx}`;
-    binders.push({
-      id,
-      name: `Familles ${idx}`,
-      cols: layout.cols,
-      rows: layout.rows,
-      sheet_count: layout.sheetCount,
-      form_rule_id: formRule.id,
-      organization: "family",
-      range_start: range.start,
-      range_limit: range.length,
-    });
-    byBinder[id] = {};
-  }
-
-  if (binders.length === 1) binders[0].name = "Familles";
-
-  return {
-    configBody: {
-      version: 1,
-      convention: "sheet_recto_verso",
-      binders,
-      form_rules: [formRule],
-    },
-    placementsBody: {
-      version: 1,
-      by_binder: byBinder,
-    },
-  };
-}
-
 /**
  * Un classeur par entrée de meta.regions (même grille / feuillets), chacun filtré sur sa région.
  * @param {{ name: string; organization: string; formScope: string; rows: number; cols: number; sheetCount: number }} draft
@@ -1873,7 +1531,7 @@ async function buildPersistNewPayloadsMultiRegion(draft) {
  * @param {{ name: string; organization: string; formScope: string; rows: number; cols: number; sheetCount: number }} draft
  */
 async function buildPersistNewPayloadsFromDraft(draft) {
-  if (draft.organization === ORG_REGIONAL_FAMILY_ALBUM) {
+  if (draft.organization === ORG_REGIONAL_FAMILY_ALBUM || draft.organization === "national") {
     const { defs, pokemon } = await fetchPokedexBinderData();
     if (!hasPokedexBinderData(defs, pokemon)) {
       throw new Error("large-ring-pokedex-data-unavailable");
@@ -1886,12 +1544,6 @@ async function buildPersistNewPayloadsFromDraft(draft) {
   }
   if (draft.organization === "by_region") {
     return buildPersistNewPayloadsMultiRegion(draft);
-  }
-  if (draft.organization === "family") {
-    const { pokemon } = await fetchPokedexBinderData();
-    const familyData = await ensureEvolutionFamiliesLoaded();
-    const workspace = buildFamilyBinderWorkspace(draft, pokemon, familyData);
-    if (workspace.configBody.binders.length) return workspace;
   }
   return buildPersistNewPayloads(draft);
 }
@@ -2036,16 +1688,6 @@ function validateWizardOrgStep() {
   return true;
 }
 
-function validateWizardFormatStep() {
-  const hint = document.getElementById("binderV2Hint");
-  if (!readFormatSelectionFromDom()) {
-    setBinderHint(hint, tBinderWizard("binder_wizard.error.choose_format"), false);
-    return false;
-  }
-  setBinderHint(hint, "", true);
-  return true;
-}
-
 function validateWizardFormStep() {
   const v = readFormScopeFromDom();
   const hint = document.getElementById("binderV2Hint");
@@ -2061,7 +1703,6 @@ function validateWizardFormStep() {
 async function onWizardNext() {
   if (wizardStep === 0 && !validateWizardOrgStep()) return;
   if (wizardStep === 1 && !validateWizardFormStep()) return;
-  if (wizardStep === 2 && !validateWizardFormatStep()) return;
 
   if (wizardStep < wizardLastStep) {
     wizardStep += 1;
@@ -2081,8 +1722,9 @@ async function onWizardNext() {
 
 function onWizardBack() {
   if (wizardStep === 0) return;
-  if (wizardStep === 3) readFormatSelectionFromDom();
-  if (wizardStep === 2) readFormatSelectionFromDom();
+  if (wizardStep === 2) {
+    // Going back from summary
+  }
   if (wizardStep === 1) {
     const v = readFormScopeFromDom();
     if (v) wizardDraft.formScope = v;
@@ -2280,7 +1922,6 @@ window.PokedexBinder = {
     autoSheetCountForLargeRing,
     binderCapacity,
     binderUsesEvolutionFamilies,
-    buildFamilyBinderWorkspace,
     buildLargeRingBinderWorkspace,
     buildRegionalBinderWorkspace,
     buildPersistEditPayloads,
