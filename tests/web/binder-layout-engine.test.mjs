@@ -385,4 +385,51 @@ test("regional family album packs small families tightly when possible", async (
   ]);
 });
 
+test("strict regional families: solo members are sorted by national number among other blocks", async () => {
+  const api = await loadEngine();
+  const defs = [{ id: "johto", low: 152, high: 251 }];
+  
+  // Pichu (172) and Chikorita (152).
+  // Pichu belongs to a family that has other members (Pikachu, Raichu) NOT in Johto.
+  // So Pichu is solo in Johto.
+  
+  const pokemon = [
+    { slug: "0172-pichu", number: "0172", region: "johto" },
+    { slug: "0152-chikorita", number: "0152", region: "johto" },
+    { slug: "0153-bayleef", number: "0153", region: "johto" },
+  ];
+  
+  const familyData = {
+    families: [
+      { 
+        id: "0025-pikachu", 
+        members: ["0172-pichu", "0025-pikachu", "0026-raichu"] 
+      },
+      { 
+        id: "0152-chikorita", 
+        members: ["0152-chikorita", "0153-bayleef", "0154-meganium"] 
+      }
+    ]
+  };
+
+  const slots = api.computeBinderSlots({
+    binder: { id: "test", organization: "regional_family_album", rows: 3, cols: 3, sheet_count: 1 },
+    pokemon,
+    defs,
+    familyData,
+    includeCapacity: false,
+  });
+
+  const slugs = slots.map(s => s.pokemon?.slug).filter(Boolean);
+  
+  // Pichu is solo (only 1 member in pool).
+  // Chikorita/Bayleef are multi (2 members in pool).
+  // Blocks: 
+  //   Block 1: { Chikorita, Bayleef } (min national: 152)
+  //   Block 2: { Pichu } (min national: 172)
+  // Sorted by min national: [Chikorita, Bayleef, Pichu]
+  
+  assert.deepEqual(slugs, ["0152-chikorita", "0153-bayleef", "0172-pichu"]);
+});
+
 

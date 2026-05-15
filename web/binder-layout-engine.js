@@ -126,12 +126,28 @@
       if (slug) bySlug.set(slug, p);
     }
 
-    const emitted = new Set();
     const families = Array.isArray(familyData?.families) ? familyData.families : [];
+    const familyCounts = new Map();
+
+    for (const family of families) {
+      let members = Array.isArray(family?.members) ? family.members : [];
+      if (members.length === 0 && Array.isArray(family?.layout_rows)) {
+        members = family.layout_rows.flat().filter((s) => !!s);
+      }
+      let count = 0;
+      for (const slug of members) {
+        if (bySlug.has(slug)) count++;
+      }
+      if (family.id) familyCounts.set(String(family.id), count);
+    }
+
+    const emitted = new Set();
     const blocks = [];
 
     for (const family of families) {
       const familyId = String(family?.id || "");
+      if ((familyCounts.get(familyId) || 0) < 2) continue;
+
       let blockRows = [];
       let hasRepresentedPokemon = false;
 
@@ -178,7 +194,14 @@
         }
       }
 
-      if (hasRepresentedPokemon) blocks.push({ familyId, rows: blockRows });
+      if (hasRepresentedPokemon) {
+        const firstPoke = blockRows.flat().find((item) => item?.pokemon)?.pokemon;
+        blocks.push({
+          familyId,
+          rows: blockRows,
+          sortKey: firstPoke ? nationalIntFromPokemon(firstPoke) : 999999,
+        });
+      }
     }
     const leftovers = sortNational(
       pokemon.filter((p) => p?.slug && !emitted.has(String(p.slug))),
@@ -188,8 +211,12 @@
       blocks.push({
         familyId,
         rows: [[pokemonItem(p, familyId)]],
+        sortKey: nationalIntFromPokemon(p),
       });
     }
+
+    blocks.sort((a, b) => a.sortKey - b.sortKey);
+
     return blocks;
   }
 
