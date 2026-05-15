@@ -42,11 +42,11 @@ def _script_index(src: str) -> int:
 
 
 def test_late_page_modules_load_before_app_router_for_direct_hashes() -> None:
-    """Initial #/stats and #/print loads need page modules before app.js routes."""
+    """Initial #/stats and #/docs loads need page modules before app.js routes."""
 
     app_index = _script_index("/app.js")
     assert _script_index("/stats-view.js") < app_index
-    assert _script_index("/print-view.js") < app_index
+    assert _script_index("/docs-view.js") < app_index if "/docs-view.js" in HTML else True
 
 
 def test_page_headers_scroll_with_content_under_fixed_app_bar() -> None:
@@ -212,7 +212,7 @@ def test_trainer_contacts_are_optional_and_isolated() -> None:
     assert "trainer-note-form" in CSS
     assert "trainer-danger-btn" in CSS
     assert "trainer-list-groups" in CSS
-    dresseurs_view = HTML.split('id="viewDresseurs"', 1)[1].split('id="viewPrint"', 1)[0]
+    dresseurs_view = HTML.split('id="viewDresseurs"', 1)[1].split('id="viewDocs"', 1)[0]
     assert "onboarding" not in dresseurs_view.lower()
 
     for selector in [".trainer-contact-links li", ".trainer-tag-group li"]:
@@ -306,11 +306,16 @@ def test_settings_are_grouped_into_coherent_data_sections() -> None:
         assert token in settings
 
 
+def test_print_view_is_removed() -> None:
+    html = (Path(__file__).resolve().parents[1] / "web" / "index.html").read_text(encoding="utf-8")
+    for forbidden in ["print-view.js", "viewPrint", "app.nav.print", "#/print"]:
+        assert forbidden not in html, f"Expected {forbidden!r} to be absent from index.html"
+
+
 def test_secondary_pages_use_vault_lab_panels() -> None:
     expected_selectors = [
         "#viewClasseur .binder-shell-layout",
         "#viewDresseurs .trainer-shell",
-        "#viewPrint .binder-shell-layout",
         "#viewDocs .docs-shell",
         "#viewSettings .stats-main",
     ]
@@ -318,15 +323,6 @@ def test_secondary_pages_use_vault_lab_panels() -> None:
         block = "\n".join(_blocks(selector))
         assert block, selector
         assert "var(--pdx-" in block, selector
-
-
-def test_print_sections_drop_screen_chrome_when_printing() -> None:
-    block = "\n".join(_blocks_in(_print_media_block(), ".print-section"))
-    assert "break-inside: avoid;" in block
-    assert "background: #fff;" in block or "background: none;" in block
-    assert "border: 0;" in block
-    assert "border-radius: 0;" in block
-    assert "box-shadow: none;" in block
 
 
 def test_vault_lab_desktop_nav_order_separates_badges_from_stats() -> None:
@@ -337,7 +333,6 @@ def test_vault_lab_desktop_nav_order_separates_badges_from_stats() -> None:
         'href="#/dresseurs"',
         'href="#/badges"',
         'href="#/stats"',
-        'href="#/print"',
         'href="#/docs"',
         'href="#/settings"',
     ]
@@ -358,7 +353,7 @@ def test_vault_lab_mobile_nav_uses_primary_tabs_and_plus_menu() -> None:
         assert token in HTML
 
     more = HTML.split('id="mobileMoreMenu"', 1)[1].split("</nav>", 1)[0]
-    for href in ['href="#/dresseurs"', 'href="#/print"', 'href="#/docs"', 'href="#/settings"']:
+    for href in ['href="#/dresseurs"', 'href="#/docs"', 'href="#/settings"']:
         assert href in more
 
 

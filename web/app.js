@@ -1951,7 +1951,6 @@ function currentViewFromHash() {
   if (raw === "dresseurs") return "dresseurs";
   if (raw === "badges") return "badges";
   if (raw === "settings") return "settings";
-  if (raw === "print") return "print";
   if (raw === "docs") return "docs";
   if (raw === "liste" || raw === "") return "liste";
   return "liste";
@@ -2023,7 +2022,6 @@ function applyAppRoute() {
   const elBadges = document.getElementById("viewBadges");
   const elStats = document.getElementById("viewStats");
   const elSettings = document.getElementById("viewSettings");
-  const elPrint = document.getElementById("viewPrint");
   const elDocs = document.getElementById("viewDocs");
   if (elListe) elListe.hidden = view !== "liste";
   if (elClasseur) elClasseur.hidden = view !== "classeur";
@@ -2031,7 +2029,6 @@ function applyAppRoute() {
   if (elBadges) elBadges.hidden = view !== "badges";
   if (elStats) elStats.hidden = view !== "stats";
   if (elSettings) elSettings.hidden = view !== "settings";
-  if (elPrint) elPrint.hidden = view !== "print";
   if (elDocs) elDocs.hidden = view !== "docs";
   updateAppSwitchNav(view);
   closeMobileMoreMenu();
@@ -2040,7 +2037,6 @@ function applyAppRoute() {
     badges: `pokevault — ${t("app.badges.title")}`,
     stats: `pokevault — ${t("app.nav.stats")}`,
     settings: `pokevault — ${t("app.nav.settings")}`,
-    print: `pokevault — ${t("app.nav.print")}`,
     docs: `pokevault — ${t("app.nav.docs")}`,
     classeur: `pokevault — ${t("app.nav.binders")}`,
     dresseurs: `pokevault — ${t("app.nav.trainers")}`,
@@ -2069,9 +2065,6 @@ function applyAppRoute() {
   }
   if (view === "settings") {
     setupSettingsView();
-  }
-  if (view === "print" && typeof window.PokedexPrint?.start === "function") {
-    window.PokedexPrint.start();
   }
   if (routePokemonSlug && typeof window.PokevaultPokemonModal?.open === "function") {
     window.PokevaultPokemonModal.open(routePokemonSlug, null);
