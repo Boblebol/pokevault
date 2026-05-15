@@ -359,6 +359,9 @@ function renderBinderPageGrid() {
   shellState.ordered = window.PokedexBinder.orderPokemonForBinder(binder, pokemon, defs);
   renderVaultsNav(cfg, binder.id, shellState.ordered);
 
+  const query = document.getElementById("binderSearch")?.value?.trim() || "";
+  const matchesSearch = window.PokedexCollection?.matchesSearch;
+
   const rows = Math.max(1, Number(binder.rows) || 3);
   const cols = Math.max(1, Number(binder.cols) || 3);
   const perFace = slotsPerFace(binder);
@@ -405,6 +408,11 @@ function renderBinderPageGrid() {
             : makeCard(null, { empty: true });
         if (card) {
           card.classList.add("binder-card");
+          if (query && p && typeof matchesSearch === "function") {
+            if (!matchesSearch(p, query)) {
+              card.classList.add("is-search-hidden");
+            }
+          }
           grid.append(card);
         }
       } else {
@@ -556,6 +564,10 @@ function initBinderShell() {
   }
   wirePager();
   wireBinderSelect();
+  const searchInput = document.getElementById("binderSearch");
+  if (searchInput) {
+    searchInput.addEventListener("input", () => renderBinderPageGrid());
+  }
   unsubCaught = window.PokedexCollection?.subscribeCaught?.(() => {
     const cfg = shellState.cfg;
     const empty = !cfg || !Array.isArray(cfg.binders) || !cfg.binders.length;

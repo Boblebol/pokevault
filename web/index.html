@@ -216,6 +216,7 @@
           <h1 class="title title-binder" data-i18n="app.binders.title">Classeurs</h1>
           <p class="collection-subtitle" data-i18n="app.binders.subtitle">Gère tes classeurs, tes pages et les placements de tes cartes.</p>
           <div class="binder-header-actions">
+            <input type="search" id="binderSearch" class="app-search-input" placeholder="Rechercher..." aria-label="Rechercher dans le classeur" data-i18n-placeholder="app.search.placeholder" data-i18n-aria-label="app.search.aria" autocomplete="off">
             <button type="button" class="binder-refresh" id="binderV2Refresh" data-i18n="app.binders.refresh">Rafraîchir</button>
             <button type="button" class="binder-refresh binder-refresh--ghost" id="binderWizardSettings" hidden data-i18n="app.binders.settings">Modifier format</button>
           </div>
@@ -239,6 +240,54 @@
               <p id="binderWizardStepMeta" class="wizard-step-meta binder-wizard-meta"></p>
               <div id="binderWizardBinderBar" class="binder-wizard-binder-bar" hidden></div>
               <div id="binderWizardBody" class="binder-wizard-body"></div>
+
+              <!-- Templates pour Step 0 (Organisation) -->
+              <div id="binderWizardOrgTemplates" hidden>
+                <div class="wizard-org-questions">
+                  <fieldset class="onboarding__fieldset">
+                    <legend data-i18n="app.onboarding.q1.title">1. Type de classeur</legend>
+                    <div class="onboarding__choices">
+                      <label class="onboarding__choice">
+                        <input type="radio" name="wizard_binder_type" value="infinite" checked />
+                        <span class="onboarding__choice-title" data-i18n="app.onboarding.q1.infinite">Grand classeur évolutif</span>
+                      </label>
+                      <label class="onboarding__choice">
+                        <input type="radio" name="wizard_binder_type" value="finite_10" />
+                        <span class="onboarding__choice-title" data-i18n="app.onboarding.q1.finite">Petits classeurs (10 feuillets)</span>
+                      </label>
+                    </div>
+                  </fieldset>
+
+                  <fieldset class="onboarding__fieldset">
+                    <legend data-i18n="app.onboarding.q2.title">2. Séparation par région</legend>
+                    <div class="onboarding__choices">
+                      <label class="onboarding__choice">
+                        <input type="radio" name="wizard_binder_region_sep" value="yes" checked />
+                        <span class="onboarding__choice-title" data-i18n="app.onboarding.q2.yes">Oui (Nouvelle page/classeur par région)</span>
+                      </label>
+                      <label class="onboarding__choice">
+                        <input type="radio" name="wizard_binder_region_sep" value="no" />
+                        <span class="onboarding__choice-title" data-i18n="app.onboarding.q2.no">Non (Toutes les régions à la suite)</span>
+                      </label>
+                    </div>
+                  </fieldset>
+
+                  <fieldset class="onboarding__fieldset">
+                    <legend data-i18n="app.onboarding.q3.title">3. Regroupement des familles</legend>
+                    <div class="onboarding__choices">
+                      <label class="onboarding__choice">
+                        <input type="radio" name="wizard_binder_family_group" value="aligned" checked />
+                        <span class="onboarding__choice-title" data-i18n="app.onboarding.q3.aligned">Isolées (Saut de ligne pour séparer)</span>
+                      </label>
+                      <label class="onboarding__choice">
+                        <input type="radio" name="wizard_binder_family_group" value="compact" />
+                        <span class="onboarding__choice-title" data-i18n="app.onboarding.q3.compact">Compactes (À la suite sans espace)</span>
+                      </label>
+                    </div>
+                  </fieldset>
+                </div>
+              </div>
+
               <footer class="binder-wizard-footer">
                 <button id="binderWizardSkip" class="binder-wizard-secondary" type="button" data-i18n="app.actions.cancel">Annuler</button>
                 <div class="binder-wizard-nav">

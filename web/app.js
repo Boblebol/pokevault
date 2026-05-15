@@ -609,6 +609,7 @@ window.PokedexCollection = {
   setStatus,
   getNote,
   setNote,
+  matchesSearch,
   cycleStatusBySlug,
   cycleOwnershipBySlug,
   ownershipStateForSlug,
@@ -1702,6 +1703,7 @@ if (window.__POKEVAULT_APP_TESTS__) {
   window.PokedexCollection._test = {
     currentViewFromHash,
     isSupportedBackupSchemaVersion,
+    matchesSearch,
     renderSettingsMaintenanceStatus,
     rerenderArtworkSurface,
     setupSettingsMaintenanceActions,
