@@ -1179,26 +1179,6 @@ function appendVisibleItems(fullList) {
   window.PokevaultKeyboard?.repaint?.();
 }
 
-function setupArtworkSelect() {
-  const sel = document.getElementById("settingsArtworkSelect");
-  const A = window.PokevaultArtwork;
-  if (!sel || !A || sel.dataset.wired) return;
-  sel.dataset.wired = "1";
-  sel.replaceChildren();
-  for (const m of A.modes) {
-    const opt = document.createElement("option");
-    opt.value = m.id;
-    opt.textContent = m.label;
-    sel.append(opt);
-  }
-  sel.value = A.mode;
-  sel.addEventListener("change", () => A.setMode(sel.value));
-  A.subscribe((id) => {
-    if (sel.value !== id) sel.value = id;
-    rerenderArtworkSurface();
-  });
-}
-
 function rerenderArtworkSurface() {
   const routeSlug = currentPokemonSlugFromHash();
   if (routeSlug && typeof window.PokevaultPokemonModal?.render === "function") {
@@ -1333,7 +1313,6 @@ function setupSettingsView() {
   subscribeDimMode((mode) => {
     sel.value = mode;
   });
-  setupArtworkSelect();
   paintVersionLabels();
   const versionEl = document.getElementById("settingsVersionLabel");
   const healthEl = document.getElementById("settingsHealthLabel");
