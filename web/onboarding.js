@@ -45,9 +45,10 @@
   };
   const FALLBACK_I18N = {
     "onboarding.profile.undefined": "Profil : non défini — rejoue l'onboarding pour personnaliser.",
-    "onboarding.profile.summary": "Profil : Compléter mon Pokédex · {region} · {mode} · classeurs locaux.",
-    "onboarding.mode.simple": "mode simple",
-    "onboarding.mode.advanced": "mode avancé",
+    "onboarding.profile.summary": "Profil : Compléter mon Pokédex · {region} · {org} · classeurs locaux.",
+    "onboarding.org.national": "classeur national",
+    "onboarding.org.regional": "grand par région",
+    "onboarding.org.by_region": "séparés par région",
     "onboarding.done": "Terminer",
     "onboarding.continue": "Continuer",
   };
@@ -71,31 +72,23 @@
     return REGION_LABELS[id] ? id : "all";
   }
 
-  function normalizeTrackingMode(value) {
-    return value === "advanced" ? "advanced" : "simple";
-  }
-
-  function trackingPreferences(mode) {
-    if (mode === "advanced") {
-      return { form_scope: "all", dim_mode: "caught" };
-    }
-    return { form_scope: "base_regional", dim_mode: "caught" };
+  function normalizeBinderOrg(value) {
+    if (value === "by_region" || value === "regional_family_album") return value;
+    return "national";
   }
 
   function migrateLegacyProfile(data) {
-    const legacyProfile = typeof data.profile === "string" ? data.profile : "dex";
-    const trackingMode = legacyProfile === "dex" ? "simple" : "advanced";
     return {
       version: 2,
       goal: "complete_pokedex",
       favorite_region: "all",
-      tracking_mode: trackingMode,
+      binder_org: "national",
       completed_at: typeof data.completed_at === "string" ? data.completed_at : null,
       skipped: Boolean(data.skipped),
     };
   }
 
-  /** @returns {null | {version: number; goal: string; favorite_region: string; tracking_mode: string; completed_at: string | null; skipped: boolean}} */
+  /** @returns {null | {version: number; goal: string; favorite_region: string; binder_org: string; completed_at: string | null; skipped: boolean}} */
   function readProfile() {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
@@ -107,7 +100,7 @@
         version: 2,
         goal: normalizeGoal(data.goal),
         favorite_region: normalizeRegion(data.favorite_region),
-        tracking_mode: normalizeTrackingMode(data.tracking_mode),
+        binder_org: normalizeBinderOrg(data.binder_org),
         completed_at: typeof data.completed_at === "string" ? data.completed_at : null,
         skipped: Boolean(data.skipped),
       };
@@ -121,7 +114,7 @@
       version: 2,
       goal: normalizeGoal(payload.goal),
       favorite_region: normalizeRegion(payload.favorite_region),
-      tracking_mode: normalizeTrackingMode(payload.tracking_mode),
+      binder_org: normalizeBinderOrg(payload.binder_org),
       completed_at: payload.skipped ? null : new Date().toISOString(),
       skipped: Boolean(payload.skipped),
     };
@@ -181,22 +174,18 @@
     const clean = {
       goal: normalizeGoal(profile.goal),
       favorite_region: normalizeRegion(profile.favorite_region),
-      tracking_mode: normalizeTrackingMode(profile.tracking_mode),
+      binder_org: normalizeBinderOrg(profile.binder_org),
     };
-    const preferences = trackingPreferences(clean.tracking_mode);
-    if (preferences.form_scope && preferences.form_scope !== "all") {
-      try {
-        localStorage.setItem(FORM_FILTER_STORAGE_KEY, preferences.form_scope);
-      } catch {
-        /* ignore */
-      }
-    } else {
-      try {
-        localStorage.removeItem(FORM_FILTER_STORAGE_KEY);
-      } catch {
-        /* ignore */
-      }
+
+    const formScope = "base_regional";
+    const dimMode = "caught";
+
+    try {
+      localStorage.setItem(FORM_FILTER_STORAGE_KEY, formScope);
+    } catch {
+      /* ignore */
     }
+
     if (clean.favorite_region !== "all") {
       try {
         localStorage.setItem(PREFERRED_REGION_STORAGE_KEY, clean.favorite_region);
@@ -212,15 +201,15 @@
     }
     const PC = window.PokedexCollection;
     if (PC && typeof PC.setDimMode === "function") {
-      PC.setDimMode(preferences.dim_mode);
+      PC.setDimMode(dimMode);
     } else {
       try {
-        localStorage.setItem(DIM_STORAGE_KEY, preferences.dim_mode);
+        localStorage.setItem(DIM_STORAGE_KEY, dimMode);
       } catch {
         /* ignore */
       }
     }
-    writeListFiltersToHash(clean, preferences.form_scope);
+    writeListFiltersToHash(clean, formScope);
   }
 
   function formatSettingsProfileLabel(p) {
@@ -228,8 +217,11 @@
       return t("onboarding.profile.undefined");
     }
     const region = REGION_LABELS[p.favorite_region] || "National";
-    const mode = p.tracking_mode === "advanced" ? t("onboarding.mode.advanced") : t("onboarding.mode.simple");
-    return t("onboarding.profile.summary", { region, mode });
+    let org = t("onboarding.org.national");
+    if (p.binder_org === "by_region") org = t("onboarding.org.by_region");
+    else if (p.binder_org === "regional_family_album") org = t("onboarding.org.regional");
+
+    return t("onboarding.profile.summary", { region, org });
   }
 
   function updateSettingsProfileLabel() {
@@ -317,13 +309,13 @@
       const region = /** @type {HTMLSelectElement | null} */ (
         this.form.querySelector("#onboardingFavoriteRegion")
       );
-      const mode = /** @type {HTMLInputElement | null} */ (
-        this.form.querySelector('input[name="onboardingTrackingMode"]:checked')
+      const org = /** @type {HTMLInputElement | null} */ (
+        this.form.querySelector('input[name="onboardingBinderOrg"]:checked')
       );
       return {
         goal: goal?.value || "complete_pokedex",
         favorite_region: region?.value || "all",
-        tracking_mode: mode?.value || "simple",
+        binder_org: org?.value || "national",
       };
     }
 

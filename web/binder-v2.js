@@ -112,9 +112,10 @@ const ORG_REGIONAL_FAMILY_ALBUM = "regional_family_album";
 const LARGE_RING_MARGIN_SHEETS = 10;
 
 /** @type {{ name: string; organization: string; formScope: string; formatPreset: string; rows: number; cols: number; sheetCount: number; editBinderId: string | null }} */
+const profile = window.PokevaultOnboarding?.readProfile?.();
 let wizardDraft = {
   name: tBinderWizard("binder_wizard.default_name"),
-  organization: "national",
+  organization: profile?.binder_org || "national",
   formScope: DEFAULT_FORM_SCOPE,
   formatPreset: "3x3-10",
   rows: 3,
