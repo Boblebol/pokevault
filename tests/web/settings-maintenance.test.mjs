@@ -139,7 +139,7 @@ test("settings route wires maintenance without visiting the collection first", a
   globalThis.fetch = async (url, options = {}) => {
     calls.push([url, options.method || "GET"]);
     if (url === "/api/health") {
-      return { ok: true, json: async () => ({ api_version: "1.6.3" }) };
+      return { ok: true, json: async () => ({ api_version: "1.7.0" }) };
     }
     return {
       ok: true,

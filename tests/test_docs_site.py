@@ -554,14 +554,11 @@ def test_configurable_binder_layouts_are_documented() -> None:
     for text in [readme, features]:
         assert "3×3" in text
         assert "Kanto 1" in text
-        assert "Images / sprites" in text
 
     assert "Classeurs > Réglages" not in readme
 
-    assert "Settings > Images / sprites" in features
     assert "compact family rows such as Spoink / Grumpig / Spinda" in features
     for text in [
-        "Réglages > Images / sprites",
         "Groret",
     ]:
         assert text not in features

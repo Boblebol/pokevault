@@ -1,12 +1,13 @@
-import urllib.request
 import json
-import re
 import os
+import re
+import urllib.request
+
 
 def get_local_version():
     try:
         version_file = os.path.join(os.path.dirname(__file__), "version.py")
-        with open(version_file, "r") as f:
+        with open(version_file) as f:
             content = f.read()
             match = re.search(r'APP_VERSION = "([^"]+)"', content)
             if match:
@@ -32,13 +33,19 @@ def main():
     latest = get_latest_version()
     if not local or not latest:
         return
-    
+
     norm_local = local.strip().lstrip('v')
     norm_latest = latest.strip().lstrip('v')
-    
+
     if norm_local != norm_latest:
-        print(f"\033[33mUne nouvelle version est disponible : {latest} (actuelle : v{local})\033[0m")
-        print("\033[33mConsultez https://github.com/Boblebol/pokevault/releases pour mettre à jour.\033[0m")
+        print(
+            f"\033[33mUne nouvelle version est disponible : {latest} "
+            f"(actuelle : v{local})\033[0m"
+        )
+        print(
+            "\033[33mConsultez https://github.com/Boblebol/pokevault/releases "
+            "pour mettre à jour.\033[0m"
+        )
         print("")
 
 if __name__ == "__main__":

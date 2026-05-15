@@ -250,7 +250,9 @@ def _apply_family_overrides(
                 for row in family["layout_rows"]
             ]
             # Clean up rows that only contain None after removal
-            family["layout_rows"] = [row for row in family["layout_rows"] if any(m is not None for m in row)]
+            family["layout_rows"] = [
+                row for row in family["layout_rows"] if any(m is not None for m in row)
+            ]
 
         families[:] = [f for f in families if f["members"]]
 

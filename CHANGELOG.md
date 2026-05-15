@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [1.7.0] — 2026-05-15
+
+### Added
+
+- Smart Compact binder family layouts where families pack tightly side-by-side
+  and only wrap when they overflow the row capacity.
+- Binder search bar to highlight or filter Pokémon in the current binder view.
+
+### Changed
+
+- Binder form choices are restricted to Base species and Regional variants only;
+  out-of-scope Mega and Gigantamax forms were removed for a more focused
+  collection experience.
+- Simplified binder organization configuration by removing redundant alignment
+  padding logic.
+
 ## [1.6.3] — 2026-05-09
 
 ### Added

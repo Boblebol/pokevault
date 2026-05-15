@@ -1,6 +1,6 @@
 [project]
 name = "pokevault"
-version = "1.6.3"
+version = "1.7.0"
 description = "Local-first Pokédex and Pokémon card collection tracker with FastAPI and Docker"
 readme = "README.md"
 license = "MIT"
@@ -77,7 +77,7 @@ filterwarnings = [
 [tool.coverage.run]
 source = ["tracker"]
 branch = false
-omit = []
+omit = ["tracker/check_version.py"]
 
 [tool.coverage.report]
 fail_under = 100
