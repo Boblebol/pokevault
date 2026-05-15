@@ -77,6 +77,25 @@ function makeInteractiveElement(tagName) {
     setAttribute(name, value) {
       this[name] = value;
     },
+    cloneNode(deep) {
+      const clone = makeInteractiveElement(this.tagName);
+      clone.className = this.className;
+      clone.value = this.value;
+      clone.type = this.type;
+      clone.name = this.name;
+      clone.checked = this.checked;
+      clone.dataset = { ...this.dataset };
+      if (deep) {
+        for (const child of this.children) {
+          if (child && typeof child.cloneNode === "function") {
+            clone.append(child.cloneNode(true));
+          } else {
+            clone.append(child);
+          }
+        }
+      }
+      return clone;
+    },
     click() {
       this.listeners.click?.();
     },
@@ -84,15 +103,42 @@ function makeInteractiveElement(tagName) {
       return this.querySelectorAll(selector)[0] || null;
     },
     querySelectorAll(selector) {
-      const classes = selector
-        .split(".")
-        .map((part) => part.trim())
-        .filter(Boolean);
       const out = [];
       const visit = (node) => {
         if (!node || typeof node !== "object") return;
-        const nodeClasses = String(node.className || "").split(/\s+/).filter(Boolean);
-        if (classes.length && classes.every((cls) => nodeClasses.includes(cls))) out.push(node);
+        
+        let match = true;
+        
+        // Simple class selector support
+        if (selector.startsWith(".")) {
+          const classes = selector.split(".").filter(Boolean);
+          const nodeClasses = String(node.className || "").split(/\s+/).filter(Boolean);
+          if (!classes.every(cls => nodeClasses.includes(cls))) match = false;
+        } else if (selector.includes("[")) {
+          // Attribute selector support: input[name="..."][value="..."]
+          const tagMatch = selector.match(/^([a-z0-9]+)/i);
+          if (tagMatch && node.tagName.toLowerCase() !== tagMatch[1].toLowerCase()) {
+            match = false;
+          } else {
+            const attrMatches = selector.matchAll(/\[([a-z0-9_-]+)=["']?([^"']+)["']?\]/gi);
+            for (const am of attrMatches) {
+              const attr = am[1];
+              const val = am[2];
+              if (node[attr] !== val && node.dataset?.[attr] !== val) {
+                match = false;
+                break;
+              }
+            }
+            if (match && selector.includes(":checked") && !node.checked) {
+              match = false;
+            }
+          }
+        } else {
+          // Tag name only
+          if (node.tagName.toLowerCase() !== selector.toLowerCase()) match = false;
+        }
+
+        if (match) out.push(node);
         for (const child of node.children || []) visit(child);
       };
       visit(this);
@@ -116,13 +162,38 @@ function makeInteractiveElement(tagName) {
 function installInteractiveWizardDom() {
   const body = makeInteractiveElement("div");
   body.id = "binderWizardBody";
+  const template = makeInteractiveElement("div");
+  template.id = "binderWizardOrgTemplates";
+  const questions = makeInteractiveElement("div");
+  questions.className = "wizard-org-questions";
+  
+  const mkRadio = (name, value) => {
+    const el = makeInteractiveElement("input");
+    el.type = "radio";
+    el.name = name;
+    el.value = value;
+    return el;
+  };
+
+  questions.append(
+    mkRadio("wizard_binder_type", "infinite"),
+    mkRadio("wizard_binder_type", "finite_10"),
+    mkRadio("wizard_binder_region_sep", "yes"),
+    mkRadio("wizard_binder_region_sep", "no"),
+    mkRadio("wizard_binder_family_group", "aligned"),
+    mkRadio("wizard_binder_family_group", "compact")
+  );
+  template.append(questions);
+
   globalThis.document = {
     createElement: makeInteractiveElement,
     getElementById(id) {
-      return id === "binderWizardBody" ? body : null;
+      if (id === "binderWizardBody") return body;
+      if (id === "binderWizardOrgTemplates") return template;
+      return null;
     },
     querySelector(selector) {
-      return body.querySelector(selector);
+      return body.querySelector(selector) || template.querySelector(selector);
     },
   };
   return body;
@@ -168,6 +239,9 @@ test("wizard draft prefill preserves regional family album organization", async 
         {
           id: "grand",
           name: "Grand",
+          binder_type: "infinite",
+          binder_region_sep: "yes",
+          binder_family_group: "aligned",
           organization: "regional_family_album",
           rows: 3,
           cols: 3,
@@ -180,7 +254,9 @@ test("wizard draft prefill preserves regional family album organization", async 
     "grand",
   );
 
-  assert.equal(draft.organization, "regional_family_album");
+  assert.equal(draft.binder_type, "infinite");
+  assert.equal(draft.binder_region_sep, "yes");
+  assert.equal(draft.binder_family_group, "aligned");
   assert.equal(draft.formatPreset, "large-ring-3x3");
   assert.equal(draft.formScope, "base_regional");
   assert.equal(draft.rows, 3);
@@ -192,6 +268,9 @@ test("wizard draft prefill preserves regional family album organization", async 
         {
           id: "ordinary",
           name: "Ordinary",
+          binder_type: "finite_10",
+          binder_region_sep: "no",
+          binder_family_group: "compact",
           organization: "national",
           rows: 3,
           cols: 3,
@@ -204,8 +283,34 @@ test("wizard draft prefill preserves regional family album organization", async 
     "ordinary",
   );
 
-  assert.equal(ordinaryThreeByThree.organization, "national");
+  assert.equal(ordinaryThreeByThree.binder_region_sep, "no");
   assert.notEqual(ordinaryThreeByThree.formatPreset, "large-ring-3x3");
+});
+
+test("wizard draft prefill handles the new 3-option flags", async () => {
+  const api = await loadModule();
+  const draft = api.draftFromConfigForTest(
+    {
+      binders: [
+        {
+          id: "b1",
+          binder_type: "infinite",
+          binder_region_sep: "yes",
+          binder_family_group: "aligned",
+          organization: "regional_family_album",
+          rows: 3,
+          cols: 3,
+          sheet_count: 10,
+        },
+      ],
+      form_rules: [],
+    },
+    "b1",
+  );
+
+  assert.equal(draft.binder_type, "infinite");
+  assert.equal(draft.binder_region_sep, "yes");
+  assert.equal(draft.binder_family_group, "aligned");
 });
 
 test("wizard exposes large ring option and summary copy", async () => {
@@ -213,47 +318,45 @@ test("wizard exposes large ring option and summary copy", async () => {
 
   let body = installInteractiveWizardDom();
   api.renderWizardStepForTest(0, {
-    organization: "national",
-    formScope: "full",
+    binder_type: "finite_10",
+    binder_region_sep: "no",
+    binder_family_group: "compact",
+    formScope: "base_regional",
     formatPreset: "custom",
     rows: 4,
     cols: 4,
     sheetCount: 12,
   });
-  const largeRingOrg = body
-    .querySelectorAll(".wizard-org-card")
-    .find((el) => el.dataset.org === "regional_family_album");
+  
+  const typeInf = body.querySelector('input[name="wizard_binder_type"][value="infinite"]');
+  const sepYes = body.querySelector('input[name="wizard_binder_region_sep"][value="yes"]');
+  const groupAligned = body.querySelector('input[name="wizard_binder_family_group"][value="aligned"]');
 
-  assert.ok(largeRingOrg);
-  largeRingOrg.click();
-  assert.deepEqual(api.getWizardDraftForTest(), {
-    name: "Principal",
-    organization: "regional_family_album",
-    formScope: "base_regional",
-    formatPreset: "large-ring-3x3",
-    rows: 3,
-    cols: 3,
-    sheetCount: 10,
-    editBinderId: null,
-  });
+  assert.ok(typeInf);
+  assert.ok(sepYes);
+  assert.ok(groupAligned);
 
-  body = installInteractiveWizardDom();
+  typeInf.checked = true;
+  sepYes.checked = true;
+  groupAligned.checked = true;
+
+  // The draft isn't updated until validation (on Next)
+  // But for the test we can just set the draft directly or mock the validation call
   api.renderWizardStepForTest(1, {
-    organization: "regional_family_album",
-    formScope: "base_regional",
-    formatPreset: "large-ring-3x3",
-    rows: 3,
-    cols: 3,
-    sheetCount: 12,
+    binder_type: "infinite",
+    binder_region_sep: "yes",
+    binder_family_group: "aligned",
   });
 
   const largeRingForms = body.querySelectorAll(".wizard-form-card");
-  assert.deepEqual(largeRingForms.map((el) => el.dataset.formScope), ["base_regional", "full"]);
+  assert.deepEqual(largeRingForms.map((el) => el.dataset.formScope), ["base_regional"]);
   assert.doesNotMatch(body.textContent, /Base seule/);
 
   body = installInteractiveWizardDom();
   api.renderWizardStepForTest(2, {
-    organization: "regional_family_album",
+    binder_type: "infinite",
+    binder_region_sep: "yes",
+    binder_family_group: "aligned",
     formScope: "base_regional",
     formatPreset: "large-ring-3x3",
     rows: 3,
@@ -275,7 +378,9 @@ test("wizard edit payload preserves regional family album organization", async (
     {
       editBinderId: "grand",
       name: "Grand",
-      organization: "regional_family_album",
+      binder_type: "infinite",
+      binder_region_sep: "yes",
+      binder_family_group: "aligned",
       formScope: "base_regional",
       rows: 3,
       cols: 3,
@@ -288,6 +393,9 @@ test("wizard edit payload preserves regional family album organization", async (
         {
           id: "grand",
           name: "Old",
+          binder_type: "infinite",
+          binder_region_sep: "yes",
+          binder_family_group: "aligned",
           organization: "regional_family_album",
           rows: 3,
           cols: 3,
@@ -346,7 +454,9 @@ test("large ring binder edit recomputes sheet count from family layout", async (
     {
       editBinderId: "grand",
       name: "Grand",
-      organization: "regional_family_album",
+      binder_type: "infinite",
+      binder_region_sep: "yes",
+      binder_family_group: "aligned",
       formScope: "base_regional",
       rows: 3,
       cols: 3,
@@ -359,6 +469,9 @@ test("large ring binder edit recomputes sheet count from family layout", async (
         {
           id: "grand",
           name: "Old",
+          binder_type: "finite_10",
+          binder_region_sep: "no",
+          binder_family_group: "compact",
           organization: "national",
           region_scope: "kanto",
           region_id: "kanto",
@@ -403,7 +516,9 @@ test("large ring binder edit rejects missing pokedex data before recomputing cap
         {
           editBinderId: "grand",
           name: "Grand",
-          organization: "regional_family_album",
+          binder_type: "infinite",
+          binder_region_sep: "yes",
+          binder_family_group: "aligned",
           formScope: "base_regional",
           rows: 3,
           cols: 3,
@@ -412,7 +527,7 @@ test("large ring binder edit rejects missing pokedex data before recomputing cap
         {
           version: 1,
           convention: "sheet_recto_verso",
-          binders: [{ id: "grand", organization: "regional_family_album", sheet_count: 1 }],
+          binders: [{ id: "grand", organization: "regional_family_album", binder_type: "infinite", binder_region_sep: "yes", binder_family_group: "aligned", sheet_count: 1 }],
           form_rules: [api.formRuleFromScope("base_regional")],
         },
         { version: 1, by_binder: { grand: {} } },
@@ -423,14 +538,18 @@ test("large ring binder edit rejects missing pokedex data before recomputing cap
 
 test("wizard org selection preserves hidden regional family album edit drafts", async () => {
   const api = await loadModule();
+  installInteractiveWizardDom();
+  const draft = {
+    editBinderId: "grand",
+    binder_type: "infinite",
+    binder_region_sep: "yes",
+    binder_family_group: "aligned",
+  };
 
-  assert.equal(
-    api.readOrgSelectionForDraftForTest({
-      editBinderId: "grand",
-      organization: "regional_family_album",
-    }),
-    "regional_family_album",
-  );
+  const selected = api.readOrgSelectionForDraftForTest(draft);
+  assert.equal(selected.type, "infinite");
+  assert.equal(selected.sep, "yes");
+  assert.equal(selected.group, "aligned");
 });
 
 test("large ring binder workspace creates one 3x3 regional family album with margin", async () => {
@@ -453,7 +572,9 @@ test("large ring binder workspace creates one 3x3 regional family album with mar
   const result = api.buildLargeRingBinderWorkspace(
     {
       name: "Grand classeur",
-      organization: "regional_family_album",
+      binder_type: "infinite",
+      binder_region_sep: "yes",
+      binder_family_group: "aligned",
       formScope: "base_regional",
       rows: 3,
       cols: 3,
@@ -482,11 +603,13 @@ test("large ring binder workspace creates one 3x3 regional family album with mar
   });
 });
 
-test("buildLargeRingBinderWorkspace creates national-org binder when draft.organization is national", async () => {
+test("buildLargeRingBinderWorkspace creates national-org binder when draft.binder_region_sep is no", async () => {
   const api = await loadModule();
   const draft = {
     name: "Mon classeur",
-    organization: "national",
+    binder_type: "infinite",
+    binder_region_sep: "no",
+    binder_family_group: "compact",
     formScope: "base_regional",
     rows: 3,
     cols: 3,
@@ -570,7 +693,9 @@ test("buildPersistNewPayloadsFromDraft dispatches the large ring binder mode", a
 
   const result = await api.buildPersistNewPayloadsFromDraft({
     name: "Grand classeur",
-    organization: "regional_family_album",
+    binder_type: "infinite",
+    binder_region_sep: "yes",
+    binder_family_group: "aligned",
     formScope: "base_regional",
     rows: 3,
     cols: 3,
@@ -593,7 +718,9 @@ test("buildPersistNewPayloadsFromDraft rejects large ring binder without pokedex
     () =>
       api.buildPersistNewPayloadsFromDraft({
         name: "Grand",
-        organization: "regional_family_album",
+        binder_type: "infinite",
+        binder_region_sep: "yes",
+        binder_family_group: "aligned",
         formScope: "base_regional",
         rows: 3,
         cols: 3,
@@ -626,7 +753,9 @@ test("buildPersistNewPayloadsFromDraft rejects large ring binder without family 
     () =>
       api.buildPersistNewPayloadsFromDraft({
         name: "Grand",
-        organization: "regional_family_album",
+        binder_type: "infinite",
+        binder_region_sep: "yes",
+        binder_family_group: "aligned",
         formScope: "base_regional",
         rows: 3,
         cols: 3,
@@ -663,7 +792,9 @@ test("persistWizardDraft reports family data errors before persisting large ring
   try {
     const ok = await globalThis.window.PokedexBinder.persistWizardDraft({
       name: "Grand",
-      organization: "regional_family_album",
+      binder_type: "infinite",
+      binder_region_sep: "yes",
+      binder_family_group: "aligned",
       formScope: "base_regional",
       rows: 3,
       cols: 3,
@@ -698,7 +829,9 @@ test("persistWizardDraft reports pokedex data errors before persisting large rin
   try {
     const ok = await globalThis.window.PokedexBinder.persistWizardDraft({
       name: "Grand",
-      organization: "regional_family_album",
+      binder_type: "infinite",
+      binder_region_sep: "yes",
+      binder_family_group: "aligned",
       formScope: "base_regional",
       rows: 3,
       cols: 3,
@@ -722,7 +855,9 @@ test("regional binder builder keeps the default 3x3 ten-sheet Kanto binder toget
   const result = api.buildRegionalBinderWorkspace(
     {
       name: "Principal",
-      organization: "by_region",
+      binder_type: "finite_10",
+      binder_region_sep: "yes",
+      binder_family_group: "compact",
       formScope: "base_only",
       rows: 3,
       cols: 3,
@@ -750,7 +885,9 @@ test("regional binder builder splits regions that exceed the selected sheet capa
   const result = api.buildRegionalBinderWorkspace(
     {
       name: "Principal",
-      organization: "by_region",
+      binder_type: "finite_10",
+      binder_region_sep: "yes",
+      binder_family_group: "compact",
       formScope: "base_only",
       rows: 2,
       cols: 2,
@@ -855,6 +992,9 @@ test("regional family album pool keeps base and regional forms for layout", asyn
   const ordered = api.orderPokemonForBinder(
     {
       id: "grand",
+      binder_type: "infinite",
+      binder_region_sep: "yes",
+      binder_family_group: "aligned",
       organization: "regional_family_album",
       rows: 2,
       cols: 2,
@@ -926,5 +1066,4 @@ test("binder wizard form rule labels follow English i18n when available", async 
 
   assert.equal(api.formRuleFromScope("base_only").label, "Main base only");
   assert.equal(api.formRuleFromScope("base_regional").label, "Base + regional forms");
-  assert.equal(api.formRuleFromScope("full").label, "Complete named forms");
 });
