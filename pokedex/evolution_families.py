@@ -221,10 +221,14 @@ def _apply_family_overrides(
     if not isinstance(raw_families, Mapping):
         return
     by_id = {str(family["id"]): family for family in families}
+    moved_members = set()
+    overridden_ids = set()
+
     for family_id, override in raw_families.items():
         family = by_id.get(str(family_id))
         if not family or not isinstance(override, Mapping):
             continue
+        overridden_ids.add(family["id"])
         label = str(override.get("label_fr") or "").strip()
         if label:
             family["label_fr"] = label
@@ -232,6 +236,23 @@ def _apply_family_overrides(
         if isinstance(rows, list):
             family["layout_rows"] = _validated_override_rows(rows, valid_slugs)
             family["members"] = _members_from_rows(family["layout_rows"])
+            for m in family["members"]:
+                if m != family["id"]:
+                    moved_members.add(m)
+
+    if moved_members:
+        for family in families:
+            if family["id"] in overridden_ids:
+                continue
+            family["members"] = [m for m in family["members"] if m not in moved_members]
+            family["layout_rows"] = [
+                [m for m in row if m is None or m not in moved_members]
+                for row in family["layout_rows"]
+            ]
+            # Clean up rows that only contain None after removal
+            family["layout_rows"] = [row for row in family["layout_rows"] if any(m is not None for m in row)]
+
+        families[:] = [f for f in families if f["members"]]
 
 
 def _validated_override_rows(rows: list[Any], valid_slugs: set[str]) -> list[list[str | None]]:

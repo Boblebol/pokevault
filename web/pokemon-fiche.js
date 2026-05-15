@@ -413,13 +413,30 @@
     return row;
   }
 
+  function isMegaFormPokemon(pokemon) {
+    const slug = pokemon?.slug || "";
+    if (slug.includes("-mega-")) return true;
+    if (/-mega-x$/.test(slug) || /-mega-y$/.test(slug) || /-mega$/.test(slug)) return true;
+    if (slug.includes("-primal")) return true;
+    return false;
+  }
+
+  function isGigamaxPokemon(pokemon) {
+    const slug = pokemon?.slug || "";
+    return slug.includes("-gmax") || slug.includes("gigantamax");
+  }
+
   function findForms(pokemon, allPokemon) {
     if (!pokemon) return [];
     const number = String(pokemon.number || "");
     if (!number) return [];
     const all = Array.isArray(allPokemon) ? allPokemon : [];
     return all.filter(
-      (row) => String(row?.number || "") === number && (row?.slug || "") !== pokemon.slug,
+      (row) =>
+        String(row?.number || "") === number &&
+        (row?.slug || "") !== pokemon.slug &&
+        !isMegaFormPokemon(row) &&
+        !isGigamaxPokemon(row),
     );
   }
 
@@ -434,6 +451,14 @@
       const slug = String(candidate?.slug || "");
       if (!slug || seen.has(slug)) continue;
       if (String(candidate?.number || "") !== number) continue;
+
+      if (
+        candidate.slug !== pokemon.slug &&
+        (isMegaFormPokemon(candidate) || isGigamaxPokemon(candidate))
+      ) {
+        continue;
+      }
+
       seen.add(slug);
       related.push(candidate);
     }

@@ -236,11 +236,26 @@ test("statusPatchForAction ignores legacy shiny inputs", async () => {
   assert.equal(api.statusPatchForAction({ state: "seen" }, "shiny"), null);
 });
 
+test("buildFormEntries filters out Mega and Gigantamax forms", async () => {
+  const api = await loadModule();
+  const forms = [
+    { slug: "0006-charizard", number: "0006", names: { fr: "Dracaufeu" } },
+    { slug: "0006-mega-charizard-x", number: "0006", names: { fr: "Méga-Dracaufeu X" }, form: "Méga X" },
+    { slug: "0006-mega-charizard-y", number: "0006", names: { fr: "Méga-Dracaufeu Y" }, form: "Méga Y" },
+    { slug: "0006-charizard-gmax", number: "0006", names: { fr: "Dracaufeu Gigamax" }, form: "Gigamax" },
+  ];
+
+  const entries = api.buildFormEntries(forms[0], forms, () => null);
+
+  assert.equal(entries.length, 1);
+  assert.equal(entries[0].slug, "0006-charizard");
+});
+
 test("buildFormEntries keeps each regional and special form status independent", async () => {
   const api = await loadModule();
   const forms = [
     { slug: "0003-venusaur", number: "0003", names: { fr: "Florizarre" } },
-    { slug: "0003-venusaur-mega", number: "0003", names: { fr: "Méga-Florizarre" }, form: "Méga" },
+    { slug: "0003-mega-venusaur", number: "0003", names: { fr: "Méga-Florizarre" }, form: "Méga" },
     { slug: "0003-venusaur-alola", number: "0003", names: { fr: "Florizarre d'Alola" }, form: "Forme d'Alola" },
     { slug: "0003-venusaur-galar", number: "0003", names: { fr: "Florizarre de Galar" }, form: "Forme de Galar" },
     { slug: "0003-venusaur-hisui", number: "0003", names: { fr: "Florizarre de Hisui" }, form: "Forme de Hisui" },
@@ -248,7 +263,7 @@ test("buildFormEntries keeps each regional and special form status independent",
   ];
   const statusBySlug = {
     "0003-venusaur": { state: "caught" },
-    "0003-venusaur-mega": { state: "seen" },
+    "0003-mega-venusaur": { state: "seen" },
     "0003-venusaur-alola": { state: "caught", shiny: true },
     "0003-venusaur-galar": { state: "not_met" },
     "0003-venusaur-hisui": { state: "seen", shiny: true },
@@ -257,12 +272,18 @@ test("buildFormEntries keeps each regional and special form status independent",
 
   const entries = api.buildFormEntries(forms[0], forms, (slug) => statusBySlug[slug]);
 
-  assert.deepEqual(entries.map((entry) => entry.slug), forms.map((form) => form.slug));
+  const expectedSlugs = [
+    "0003-venusaur",
+    "0003-venusaur-alola",
+    "0003-venusaur-galar",
+    "0003-venusaur-hisui",
+    "0003-venusaur-paldea",
+  ];
+  assert.deepEqual(entries.map((entry) => entry.slug), expectedSlugs);
   assert.equal(entries[0].current, true);
-  assert.equal(entries[1].statusLabel, "Aperçu");
-  assert.equal(entries[2].statusLabel, "Attrapé");
-  assert.equal("shiny" in entries[4].status, false);
-  assert.equal(entries[5].label, "Forme de Paldea");
+  assert.equal(entries[1].statusLabel, "Attrapé");
+  assert.equal("shiny" in entries[3].status, false);
+  assert.equal(entries[4].label, "Forme de Paldea");
 });
 
 test("pokemon form route helpers preserve a sanitized list return hash", async () => {
