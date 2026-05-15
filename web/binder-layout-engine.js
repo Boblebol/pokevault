@@ -7,10 +7,10 @@
   }
 
   function normalizedLayout(binder = {}) {
-    const rows = positiveInt(binder.rows, 3);
-    const cols = positiveInt(binder.cols, 3);
+    const rows = 3;
+    const cols = 3;
     const sheets = positiveInt(binder.sheet_count ?? binder.sheetCount, 10);
-    const perPage = rows * cols;
+    const perPage = 9;
     const pageCount = sheets * 2;
     const capacity = perPage * pageCount;
     return { rows, cols, sheets, perPage, pageCount, capacity };
@@ -36,24 +36,6 @@
 
   function sortNational(pokemon = []) {
     return [...pokemon].sort((a, b) => {
-      const na = nationalIntFromPokemon(a);
-      const nb = nationalIntFromPokemon(b);
-      if (na !== nb) return na - nb;
-      return String(a?.slug || "").localeCompare(String(b?.slug || ""));
-    });
-  }
-
-  function sortRegional(pokemon = [], defs = []) {
-    const orderIdx = Object.fromEntries(defs.map((r, i) => [r.id, i]));
-    return [...pokemon].sort((a, b) => {
-      const ra = effectiveRegionId(a, defs);
-      const rb = effectiveRegionId(b, defs);
-      const ia = orderIdx[ra] ?? 999;
-      const ib = orderIdx[rb] ?? 999;
-      if (ia !== ib) return ia - ib;
-      const fa = a?.region_native === false ? 1 : 0;
-      const fb = b?.region_native === false ? 1 : 0;
-      if (fa !== fb) return fa - fb;
       const na = nationalIntFromPokemon(a);
       const nb = nationalIntFromPokemon(b);
       if (na !== nb) return na - nb;
@@ -191,7 +173,8 @@
     return blocks;
   }
 
-  function flattenFamilyBlocksPageAware(blocks = [], layout) {
+  function flattenFamilyBlocksPageAware(blocks = [], layout, options = {}) {
+    const strictRowAlign = options.strictRowAlign === true;
     const out = [];
     let rowInPage = 0;
     let currentRow = null;
@@ -231,6 +214,11 @@
 
     for (const block of blocks) {
       const blockRows = block.rows || [];
+
+      if (strictRowAlign && currentRow && blockRows.length > 1) {
+        flushCurrent("alignment_empty", null);
+      }
+
       if (
         currentRow &&
         blockRows.length <= layout.rows &&
@@ -271,6 +259,7 @@
         return flattenFamilyBlocksPageAware(
           familyLayoutBlocks(pokemon, familyData, layout.cols),
           layout,
+          { strictRowAlign: true },
         );
       }
       return sortNational(pokemon).map((p) => pokemonItem(p));
@@ -288,6 +277,7 @@
           ...flattenFamilyBlocksPageAware(
             familyLayoutBlocks(regionPokemon, familyData, layout.cols, { reserveMissingSlugs: false }),
             layout,
+            { strictRowAlign: true },
           ),
         );
       } else {
@@ -299,25 +289,13 @@
 
   function basicItemsForBinder(binder = {}, pokemon = [], defs = [], familyData = null) {
     const layout = normalizedLayout(binder);
-    const regionalAlbum = isRegionalFamilyAlbum(binder);
-    const scoped = regionalAlbum ? pokemon : applyBinderScope(pokemon, binder, defs);
-    const org =
-      binder.organization === "by_region" || binder.organization === "family"
-        ? binder.organization
-        : "national";
 
-    if (regionalAlbum) {
-      return regionalFamilyAlbumItems(scoped, defs, familyData, layout);
+    if (isRegionalFamilyAlbum(binder)) {
+      return regionalFamilyAlbumItems(pokemon, defs, familyData, layout);
     }
 
-    if (org === "family" && familyData && Array.isArray(familyData.families)) {
-      return flattenFamilyBlocksPageAware(
-        familyLayoutBlocks(scoped, familyData, layout.cols),
-        layout,
-      );
-    }
-
-    const sorted = org === "by_region" && defs.length ? sortRegional(scoped, defs) : sortNational(scoped);
+    const scoped = applyBinderScope(pokemon, binder, defs);
+    const sorted = sortNational(scoped);
     return sorted.map((p) => pokemonItem(p));
   }
 
@@ -341,12 +319,7 @@
 
   function orderPokemonForBinder({ binder = {}, pokemon = [], defs = [], familyData = null } = {}) {
     const slots = computeBinderSlots({ binder, pokemon, defs, familyData, includeCapacity: false });
-    if (binder.organization === "family" || isRegionalFamilyAlbum(binder)) {
-      return slots.map((slot) => slot.pokemon || null);
-    }
-    return slots
-      .filter((slot) => slot.emptyKind !== "capacity_empty")
-      .map((slot) => slot.pokemon || null);
+    return slots.map((slot) => slot.pokemon || null);
   }
 
   window.PokevaultBinderLayout = {
@@ -365,7 +338,6 @@
       regionalFamilyAlbumItems,
       slotMeta,
       sortNational,
-      sortRegional,
     },
   };
 })();
