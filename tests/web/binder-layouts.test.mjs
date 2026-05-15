@@ -162,6 +162,16 @@ function makeInteractiveElement(tagName) {
 function installInteractiveWizardDom() {
   const body = makeInteractiveElement("div");
   body.id = "binderWizardBody";
+  const wrap = makeInteractiveElement("div");
+  wrap.id = "binderWizardWrap";
+  const settingsView = makeInteractiveElement("div");
+  settingsView.id = "viewSettings";
+  const statsMain = makeInteractiveElement("section");
+  statsMain.className = "stats-main";
+  settingsView.append(statsMain);
+  settingsView.append(wrap);
+  wrap.append(body);
+
   const template = makeInteractiveElement("div");
   template.id = "binderWizardOrgTemplates";
   const questions = makeInteractiveElement("div");
@@ -189,11 +199,14 @@ function installInteractiveWizardDom() {
     createElement: makeInteractiveElement,
     getElementById(id) {
       if (id === "binderWizardBody") return body;
+      if (id === "binderWizardWrap") return wrap;
       if (id === "binderWizardOrgTemplates") return template;
+      if (id === "viewSettings") return settingsView;
       return null;
     },
     querySelector(selector) {
-      return body.querySelector(selector) || template.querySelector(selector);
+      if (selector === "#viewSettings .stats-main") return statsMain;
+      return body.querySelector(selector) || template.querySelector(selector) || settingsView.querySelector(selector);
     },
   };
   return body;

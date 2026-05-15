@@ -218,7 +218,6 @@
           <div class="binder-header-actions">
             <input type="search" id="binderSearch" class="app-search-input" placeholder="Rechercher..." aria-label="Rechercher dans le classeur" data-i18n-placeholder="app.search.placeholder" data-i18n-aria-label="app.search.aria" autocomplete="off">
             <button type="button" class="binder-refresh" id="binderV2Refresh" data-i18n="app.binders.refresh">Rafraîchir</button>
-            <button type="button" class="binder-refresh binder-refresh--ghost" id="binderWizardSettings" hidden data-i18n="app.binders.settings">Modifier format</button>
           </div>
           <p class="sync-hint" id="binderV2Hint" hidden></p>
           <div id="binderAdvancedPanel" class="stitch-hidden" hidden>
@@ -232,72 +231,6 @@
         </header>
 
         <section class="binder-main binder-main--v2">
-          <div id="binderWizardWrap" class="wizard-wrap binder-wizard-wrap" hidden>
-            <section class="wizard-card binder-wizard binder-wizard--scrollable" aria-labelledby="binderWizardTitle">
-              <p class="wizard-kicker" data-i18n="app.binders.wizard.kicker">Réglages classeur</p>
-              <h2 id="binderWizardTitle" class="wizard-title" data-i18n="app.binders.wizard.title">Adapter le format physique.</h2>
-              <div id="binderWizardDots" class="wizard-dots" aria-hidden="true"></div>
-              <p id="binderWizardStepMeta" class="wizard-step-meta binder-wizard-meta"></p>
-              <div id="binderWizardBinderBar" class="binder-wizard-binder-bar" hidden></div>
-              <div id="binderWizardBody" class="binder-wizard-body"></div>
-
-              <!-- Templates pour Step 0 (Organisation) -->
-              <div id="binderWizardOrgTemplates" hidden>
-                <div class="wizard-org-questions">
-                  <fieldset class="onboarding__fieldset">
-                    <legend data-i18n="app.onboarding.q1.title">1. Type de classeur</legend>
-                    <div class="onboarding__choices">
-                      <label class="onboarding__choice">
-                        <input type="radio" name="wizard_binder_type" value="infinite" checked />
-                        <span class="onboarding__choice-title" data-i18n="app.onboarding.q1.infinite">Grand classeur évolutif</span>
-                      </label>
-                      <label class="onboarding__choice">
-                        <input type="radio" name="wizard_binder_type" value="finite_10" />
-                        <span class="onboarding__choice-title" data-i18n="app.onboarding.q1.finite">Petits classeurs (10 feuillets)</span>
-                      </label>
-                    </div>
-                  </fieldset>
-
-                  <fieldset class="onboarding__fieldset">
-                    <legend data-i18n="app.onboarding.q2.title">2. Séparation par région</legend>
-                    <div class="onboarding__choices">
-                      <label class="onboarding__choice">
-                        <input type="radio" name="wizard_binder_region_sep" value="yes" checked />
-                        <span class="onboarding__choice-title" data-i18n="app.onboarding.q2.yes">Oui (Nouvelle page/classeur par région)</span>
-                      </label>
-                      <label class="onboarding__choice">
-                        <input type="radio" name="wizard_binder_region_sep" value="no" />
-                        <span class="onboarding__choice-title" data-i18n="app.onboarding.q2.no">Non (Toutes les régions à la suite)</span>
-                      </label>
-                    </div>
-                  </fieldset>
-
-                  <fieldset class="onboarding__fieldset">
-                    <legend data-i18n="app.onboarding.q3.title">3. Regroupement des familles</legend>
-                    <div class="onboarding__choices">
-                      <label class="onboarding__choice">
-                        <input type="radio" name="wizard_binder_family_group" value="aligned" checked />
-                        <span class="onboarding__choice-title" data-i18n="app.onboarding.q3.aligned">Isolées (Saut de ligne pour séparer)</span>
-                      </label>
-                      <label class="onboarding__choice">
-                        <input type="radio" name="wizard_binder_family_group" value="compact" />
-                        <span class="onboarding__choice-title" data-i18n="app.onboarding.q3.compact">Compactes (À la suite sans espace)</span>
-                      </label>
-                    </div>
-                  </fieldset>
-                </div>
-              </div>
-
-              <footer class="binder-wizard-footer">
-                <button id="binderWizardSkip" class="binder-wizard-secondary" type="button" data-i18n="app.actions.cancel">Annuler</button>
-                <div class="binder-wizard-nav">
-                  <button id="binderWizardBack" class="binder-wizard-back" type="button" data-i18n="app.actions.back">Retour</button>
-                  <button id="binderWizardNext" class="binder-wizard-next" type="button" data-i18n="app.actions.continue">Continuer</button>
-                </div>
-              </footer>
-            </section>
-          </div>
-
           <div id="binderContentWrap">
             <div id="binderCollectionShell" class="binder-collection-shell" hidden>
               <div class="binder-shell-layout">
@@ -550,6 +483,16 @@
             </div>
           </div>
           <div class="stats-kpi-card">
+            <h2 class="stats-kpi-label" data-i18n="app.settings.binders">Classeurs</h2>
+            <p class="stats-kpi-sub" data-i18n="app.settings.binders_help">Gère le format physique et l'organisation de tes classeurs.</p>
+            <div class="settings-data-actions">
+              <button type="button" class="settings-action-btn" id="binderWizardSettings">
+                <span class="app-icon" aria-hidden="true">▦</span>
+                <span data-i18n="app.binders.settings">Modifier format</span>
+              </button>
+            </div>
+          </div>
+          <div class="stats-kpi-card">
             <h2 class="stats-kpi-label" data-i18n="app.settings.backup">Sauvegarde</h2>
             <p class="stats-kpi-sub" data-i18n="app.settings.backup_help">Exporter ou importer toute la collection, les classeurs et les contacts.</p>
             <div class="settings-data-actions">
@@ -598,6 +541,72 @@
             <p class="stats-kpi-sub" id="settingsHealthLabel" data-i18n="app.settings.health">État API : vérification...</p>
           </div>
         </section>
+
+        <div id="binderWizardWrap" class="wizard-wrap binder-wizard-wrap" hidden>
+          <section class="wizard-card binder-wizard binder-wizard--scrollable" aria-labelledby="binderWizardTitle">
+            <p class="wizard-kicker" data-i18n="app.binders.wizard.kicker">Réglages classeur</p>
+            <h2 id="binderWizardTitle" class="wizard-title" data-i18n="app.binders.wizard.title">Adapter le format physique.</h2>
+            <div id="binderWizardDots" class="wizard-dots" aria-hidden="true"></div>
+            <p id="binderWizardStepMeta" class="wizard-step-meta binder-wizard-meta"></p>
+            <div id="binderWizardBinderBar" class="binder-wizard-binder-bar" hidden></div>
+            <div id="binderWizardBody" class="binder-wizard-body"></div>
+
+            <!-- Templates pour Step 0 (Organisation) -->
+            <div id="binderWizardOrgTemplates" hidden>
+              <div class="wizard-org-questions">
+                <fieldset class="onboarding__fieldset">
+                  <legend data-i18n="app.onboarding.q1.title">1. Type de classeur</legend>
+                  <div class="onboarding__choices">
+                    <label class="onboarding__choice">
+                      <input type="radio" name="wizard_binder_type" value="infinite" checked />
+                      <span class="onboarding__choice-title" data-i18n="app.onboarding.q1.infinite">Grand classeur évolutif</span>
+                    </label>
+                    <label class="onboarding__choice">
+                      <input type="radio" name="wizard_binder_type" value="finite_10" />
+                      <span class="onboarding__choice-title" data-i18n="app.onboarding.q1.finite">Petits classeurs (10 feuillets)</span>
+                    </label>
+                  </div>
+                </fieldset>
+
+                <fieldset class="onboarding__fieldset">
+                  <legend data-i18n="app.onboarding.q2.title">2. Séparation par région</legend>
+                  <div class="onboarding__choices">
+                    <label class="onboarding__choice">
+                      <input type="radio" name="wizard_binder_region_sep" value="yes" checked />
+                      <span class="onboarding__choice-title" data-i18n="app.onboarding.q2.yes">Oui (Nouvelle page/classeur par région)</span>
+                    </label>
+                    <label class="onboarding__choice">
+                      <input type="radio" name="wizard_binder_region_sep" value="no" />
+                      <span class="onboarding__choice-title" data-i18n="app.onboarding.q2.no">Non (Toutes les régions à la suite)</span>
+                    </label>
+                  </div>
+                </fieldset>
+
+                <fieldset class="onboarding__fieldset">
+                  <legend data-i18n="app.onboarding.q3.title">3. Regroupement des familles</legend>
+                  <div class="onboarding__choices">
+                    <label class="onboarding__choice">
+                      <input type="radio" name="wizard_binder_family_group" value="aligned" checked />
+                      <span class="onboarding__choice-title" data-i18n="app.onboarding.q3.aligned">Isolées (Saut de ligne pour séparer)</span>
+                    </label>
+                    <label class="onboarding__choice">
+                      <input type="radio" name="wizard_binder_family_group" value="compact" />
+                      <span class="onboarding__choice-title" data-i18n="app.onboarding.q3.compact">Compactes (À la suite sans espace)</span>
+                    </label>
+                  </div>
+                </fieldset>
+              </div>
+            </div>
+
+            <footer class="binder-wizard-footer">
+              <button id="binderWizardSkip" class="binder-wizard-secondary" type="button" data-i18n="app.actions.cancel">Annuler</button>
+              <div class="binder-wizard-nav">
+                <button id="binderWizardBack" class="binder-wizard-back" type="button" data-i18n="app.actions.back">Retour</button>
+                <button id="binderWizardNext" class="binder-wizard-next" type="button" data-i18n="app.actions.continue">Continuer</button>
+              </div>
+            </footer>
+          </section>
+        </div>
       </div>
     </div>
 

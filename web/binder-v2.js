@@ -338,11 +338,11 @@ function onboardingCoversBinderWizard() {
 
 function toggleBinderViews(showWizard) {
   const wrap = document.getElementById("binderWizardWrap");
-  const content = document.getElementById("binderContentWrap");
+  const settingsMain = document.querySelector("#viewSettings .stats-main");
   const reopen = document.getElementById("binderWizardReopen");
   const settingsBtn = document.getElementById("binderWizardSettings");
   if (wrap) wrap.hidden = !showWizard;
-  if (content) content.hidden = showWizard;
+  if (settingsMain) settingsMain.hidden = showWizard;
   const empty = lastConfigJson && isBinderConfigEmpty(lastConfigJson);
   if (reopen) {
     reopen.hidden = !(
@@ -1820,6 +1820,7 @@ function wireWizardOnce() {
   if (settings && !settings.dataset.wired) {
     settings.dataset.wired = "1";
     settings.addEventListener("click", () => {
+      location.hash = "#/settings";
       const id = document.getElementById("binderIdSelect")?.value || null;
       if (lastConfigJson && !isBinderConfigEmpty(lastConfigJson)) {
         wizardStep = 0;
