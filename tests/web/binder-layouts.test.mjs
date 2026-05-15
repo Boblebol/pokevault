@@ -155,7 +155,6 @@ function makePokemon(count, region = "kanto") {
 test("binder family data preload predicates include regional family albums", async () => {
   const api = await loadModule();
 
-  assert.equal(api.binderUsesEvolutionFamilies({ organization: "family" }), true);
   assert.equal(api.binderUsesEvolutionFamilies({ organization: "regional_family_album" }), true);
   assert.equal(api.binderUsesEvolutionFamilies({ organization: "national" }), false);
   assert.equal(api.configUsesEvolutionFamilies({ binders: [{ organization: "regional_family_album" }] }), true);
@@ -234,7 +233,7 @@ test("wizard exposes large ring option and summary copy", async () => {
     formatPreset: "large-ring-3x3",
     rows: 3,
     cols: 3,
-    sheetCount: 12,
+    sheetCount: 10,
     editBinderId: null,
   });
 
@@ -253,7 +252,7 @@ test("wizard exposes large ring option and summary copy", async () => {
   assert.doesNotMatch(body.textContent, /Base seule/);
 
   body = installInteractiveWizardDom();
-  api.renderWizardStepForTest(3, {
+  api.renderWizardStepForTest(2, {
     organization: "regional_family_album",
     formScope: "base_regional",
     formatPreset: "large-ring-3x3",
@@ -268,46 +267,6 @@ test("wizard exposes large ring option and summary copy", async () => {
   assert.match(recapText, /Capacité calculée automatiquement \(\+ 10 feuillets libres\)/);
   assert.doesNotMatch(recapText, /42 feuillets/);
   assert.match(recapText, /Un seul grand classeur physique, organisé par régions internes\./);
-});
-
-test("wizard format choices depend on the previous organization", async () => {
-  const api = await loadModule();
-
-  let body = installInteractiveWizardDom();
-  api.renderWizardStepForTest(2, {
-    organization: "national",
-    formScope: "full",
-    formatPreset: "custom",
-    rows: 5,
-    cols: 5,
-    sheetCount: 20,
-  });
-  assert.deepEqual(
-    body.querySelectorAll(".wizard-format-card").map((el) => el.dataset.formatKey),
-    ["3x3-10", "2x2-10", "custom"],
-  );
-
-  body = installInteractiveWizardDom();
-  api.renderWizardStepForTest(2, {
-    organization: "regional_family_album",
-    formScope: "base_regional",
-    formatPreset: "large-ring-3x3",
-    rows: 3,
-    cols: 3,
-    sheetCount: 42,
-  });
-  assert.deepEqual(
-    body.querySelectorAll(".wizard-format-card").map((el) => el.dataset.formatKey),
-    ["large-ring-3x3"],
-  );
-  assert.equal(body.querySelector(".wizard-custom-panel"), null);
-
-  assert.equal(api.readFormatSelectionForTest(), true);
-  const draft = api.getWizardDraftForTest();
-  assert.equal(draft.organization, "regional_family_album");
-  assert.equal(draft.formatPreset, "large-ring-3x3");
-  assert.equal(draft.rows, 3);
-  assert.equal(draft.cols, 3);
 });
 
 test("wizard edit payload preserves regional family album organization", async () => {
@@ -523,6 +482,29 @@ test("large ring binder workspace creates one 3x3 regional family album with mar
   });
 });
 
+test("buildLargeRingBinderWorkspace creates national-org binder when draft.organization is national", async () => {
+  const api = await loadModule();
+  const draft = {
+    name: "Mon classeur",
+    organization: "national",
+    formScope: "base_regional",
+    rows: 3,
+    cols: 3,
+    sheetCount: 10,
+  };
+  const defs = [{ id: "kanto", low: 1, high: 151 }];
+  const pokemon = [{ slug: "0001-bulbasaur", number: "#0001" }];
+  const familyData = { families: [] };
+
+  const result = api.buildLargeRingBinderWorkspace(draft, defs, pokemon, familyData, "test");
+  const binder = result.configBody.binders[0];
+
+  assert.equal(binder.organization, "national");
+  assert.equal(binder.cols, 3);
+  assert.equal(binder.rows, 3);
+  assert.equal("layout_options" in binder, false, "national org must not carry layout_options");
+});
+
 test("autoSheetCountForLargeRing falls back from pokemon count when layout engine is unavailable", async () => {
   const api = await loadModule();
   const engine = globalThis.PokevaultBinderLayout;
@@ -690,7 +672,7 @@ test("persistWizardDraft reports family data errors before persisting large ring
 
     assert.equal(ok, false);
     assert.equal(hint.hidden, false);
-    assert.match(hint.textContent, /familles d'évolution/);
+    assert.match(hint.textContent, /familles d[’']évolution/);
     assert.deepEqual(calls, [
       ["/data/pokedex.json", "GET"],
       ["/data/evolution-families.json", "GET"],
@@ -891,7 +873,29 @@ test("regional family album pool keeps base and regional forms for layout", asyn
   );
   assert.deepEqual(
     ordered.map((p) => p?.slug || null),
-    ["0019-rattata", null, null, null, null, null, null, null, "0019-rattata-alola", null],
+    [
+      "0019-rattata",
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      "0019-rattata-alola",
+      null,
+      null,
+    ],
   );
 });
 
@@ -905,210 +909,6 @@ test("default workspace is only created for empty configs", async () => {
       binders: [{ id: "custom", rows: 2, cols: 2, sheet_count: 1 }],
     }),
     false,
-  );
-});
-
-test("family binder ordering pads evolution rows with intentional holes", async () => {
-  const api = await loadModule();
-  api.setEvolutionFamilyData({
-    families: [
-      {
-        id: "0133-eevee",
-        layout_rows: [
-          ["0133-eevee", "0134-vaporeon"],
-          [null, "0135-jolteon"],
-        ],
-      },
-    ],
-  });
-  const pokemon = [
-    { slug: "0133-eevee", number: "0133", names: { fr: "Evoli" } },
-    { slug: "0134-vaporeon", number: "0134", names: { fr: "Aquali" } },
-    { slug: "0135-jolteon", number: "0135", names: { fr: "Voltali" } },
-  ];
-
-  const ordered = api.orderPokemonForBinder(
-    {
-      organization: "family",
-      cols: 3,
-      rows: 1,
-      sheet_count: 10,
-    },
-    pokemon,
-    [],
-  );
-
-  assert.equal(Boolean(globalThis.window.PokevaultBinderLayout), true);
-  assert.deepEqual(
-    ordered.map((p) => p?.slug || null),
-    ["0133-eevee", "0134-vaporeon", null, null, "0135-jolteon", null],
-  );
-});
-
-test("family binder workspace splits on family blocks without dropping holes", async () => {
-  const api = await loadModule();
-  const families = {
-    families: [
-      { id: "f1", layout_rows: [["0001-a", "0002-b", "0003-c"]] },
-      { id: "f2", layout_rows: [["0004-d", "0005-e", "0006-f"]] },
-      { id: "f3", layout_rows: [["0007-g", "0008-h", "0009-i"]] },
-    ],
-  };
-  const pokemon = [
-    "0001-a",
-    "0002-b",
-    "0003-c",
-    "0004-d",
-    "0005-e",
-    "0006-f",
-    "0007-g",
-    "0008-h",
-    "0009-i",
-  ].map((slug, idx) => ({
-    slug,
-    number: String(idx + 1).padStart(4, "0"),
-  }));
-
-  const result = api.buildFamilyBinderWorkspace(
-    {
-      name: "Familles",
-      organization: "family",
-      formScope: "base_only",
-      rows: 1,
-      cols: 3,
-      sheetCount: 1,
-    },
-    pokemon,
-    families,
-    "test",
-  );
-
-  assert.deepEqual(
-    result.configBody.binders.map((binder) => [binder.name, binder.range_start, binder.range_limit]),
-    [
-      ["Familles 1", 0, 6],
-      ["Familles 2", 6, 3],
-    ],
-  );
-});
-
-test("family binder workspace counts page-aware gaps in binder ranges", async () => {
-  const api = await loadModule();
-  const families = {
-    families: [
-      { id: "f1", layout_rows: [["0001-a", "0002-b", "0003-c"]] },
-      {
-        id: "f2",
-        layout_rows: [
-          ["0004-d", "0005-e", "0006-f"],
-          ["0007-g", "0008-h", "0009-i"],
-        ],
-      },
-    ],
-  };
-  const pokemon = [
-    "0001-a",
-    "0002-b",
-    "0003-c",
-    "0004-d",
-    "0005-e",
-    "0006-f",
-    "0007-g",
-    "0008-h",
-    "0009-i",
-  ].map((slug, idx) => ({
-    slug,
-    number: String(idx + 1).padStart(4, "0"),
-  }));
-
-  const result = api.buildFamilyBinderWorkspace(
-    {
-      name: "Familles",
-      organization: "family",
-      formScope: "base_only",
-      rows: 2,
-      cols: 3,
-      sheetCount: 1,
-    },
-    pokemon,
-    families,
-    "test",
-  );
-
-  assert.deepEqual(
-    result.configBody.binders.map((binder) => [binder.range_start, binder.range_limit]),
-    [[0, 12]],
-  );
-
-  api.setEvolutionFamilyData(families);
-  const ordered = api.orderPokemonForBinder(result.configBody.binders[0], pokemon, []);
-
-  assert.deepEqual(
-    ordered.map((p) => p?.slug || null),
-    [
-      "0001-a",
-      "0002-b",
-      "0003-c",
-      null,
-      null,
-      null,
-      "0004-d",
-      "0005-e",
-      "0006-f",
-      "0007-g",
-      "0008-h",
-      "0009-i",
-    ],
-  );
-});
-
-test("family binder workspace keeps alignment empties inside compact family blocks", async () => {
-  const api = await loadModule();
-  const families = {
-    families: [
-      { id: "f1", layout_rows: [["0001-a", "0002-b", "0003-c"]] },
-      {
-        id: "f2",
-        layout_rows: [
-          ["0004-d"],
-          ["0005-e", "0006-f", "0007-g"],
-        ],
-      },
-    ],
-  };
-  const pokemon = [
-    "0001-a",
-    "0002-b",
-    "0003-c",
-    "0004-d",
-    "0005-e",
-    "0006-f",
-    "0007-g",
-  ].map((slug, idx) => ({
-    slug,
-    number: String(idx + 1).padStart(4, "0"),
-  }));
-
-  const result = api.buildFamilyBinderWorkspace(
-    {
-      name: "Familles",
-      organization: "family",
-      formScope: "base_only",
-      rows: 1,
-      cols: 3,
-      sheetCount: 1,
-    },
-    pokemon,
-    families,
-    "test",
-  );
-
-  assert.deepEqual(
-    result.configBody.binders.map((binder) => [binder.name, binder.range_start, binder.range_limit]),
-    [
-      ["Familles 1", 0, 3],
-      ["Familles 2", 3, 6],
-    ],
   );
 });
 

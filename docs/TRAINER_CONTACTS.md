@@ -11,7 +11,6 @@ only the states that matter during play:
 - a missing Pokemon has no local status and is implicitly still needed;
 - `Capturé` means the Pokemon is in your collection;
 - `Double` means the Pokemon is captured and can be offered for trade;
-- `Relâcher 1` removes the tradeable duplicate while keeping `Capturé`;
 - `Relâcher` removes the last local copy from progress.
 
 The `Dresseurs` tab adds a searchable local contact book on top of that model.

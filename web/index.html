@@ -21,7 +21,6 @@
           <a href="#/dresseurs" class="app-switch-link" data-view="dresseurs" data-i18n="app.nav.trainers">Dresseurs</a>
           <a href="#/badges" class="app-switch-link" data-view="badges" data-i18n="app.nav.badges">Badges</a>
           <a href="#/stats" class="app-switch-link" data-view="stats" data-i18n="app.nav.stats">Statistiques</a>
-          <a href="#/print" class="app-switch-link" data-view="print" data-i18n="app.nav.print">Impression</a>
           <a href="#/docs" class="app-switch-link" data-view="docs" data-i18n="app.nav.docs">Docs</a>
           <a href="#/settings" class="app-switch-link" data-view="settings" data-i18n="app.nav.settings">Réglages</a>
         </nav>
@@ -321,71 +320,6 @@
         <input type="file" id="trainerImportFileInput" accept=".json,.pokevault.json,.pokevault-trainer.json" hidden />
       </div>
 
-      <div id="viewPrint" class="app-view" hidden>
-        <header class="header binder-header app-collection-header">
-          <h1 class="title title-binder" data-i18n="app.print.title">Impression</h1>
-          <p class="collection-subtitle" data-i18n="app.print.subtitle">Checklist imprimable, alignée sur la liste et les classeurs.</p>
-        </header>
-
-        <section class="binder-main binder-main--v2">
-          <div class="binder-collection-shell print-shell">
-            <div class="binder-shell-layout">
-              <aside class="binder-vaults-nav">
-                <h2 class="binder-vaults-title" data-i18n="app.binders.mine">Tes classeurs</h2>
-                <div id="printVaultsNav" class="binder-vaults-list" aria-label="Choisir un classeur à imprimer" data-i18n-aria-label="app.print.choose_binder"></div>
-              </aside>
-              <section class="binder-shell-main">
-                <div class="print-toolbar">
-                  <label class="search-wrap print-search-wrap">
-                    <span class="search-icon" aria-hidden="true">⌕</span>
-                    <input
-                      type="search"
-                      id="printSearch"
-                      class="search-input"
-                      placeholder="Rechercher par nom ou numéro..."
-                      aria-label="Rechercher dans la checklist"
-                      data-i18n-placeholder="app.search.placeholder"
-                      data-i18n-aria-label="app.print.search_aria"
-                      autocomplete="off"
-                      spellcheck="false"
-                    />
-                  </label>
-                  <div class="print-controls">
-                    <div class="print-control-group">
-                      <label for="printFilterSelect" data-i18n="app.print.filter">Filtre</label>
-                      <select id="printFilterSelect" class="region-filter">
-                        <option value="all" data-i18n="app.filters.all">Tous</option>
-                        <option value="caught" data-i18n="app.print.caught">Attrapés</option>
-                        <option value="missing" data-i18n="app.filters.missing">Manquants</option>
-                      </select>
-                    </div>
-                    <div class="print-control-group">
-                      <label for="printGroupSelect" data-i18n="app.print.group">Regrouper par</label>
-                      <select id="printGroupSelect" class="region-filter">
-                        <option value="binder" data-i18n="app.print.binder_pages">Pages de classeur</option>
-                        <option value="region" data-i18n="app.print.region">Région</option>
-                        <option value="pocket" data-i18n="app.print.pocket">Pocket A5 (par région)</option>
-                        <option value="placeholders" data-i18n="app.print.placeholders">Petites fiches classeur</option>
-                      </select>
-                    </div>
-                    <div class="print-control-group" id="printArtworkGroup">
-                      <label for="printArtworkSelect" data-i18n="app.print.artwork">Image impression</label>
-                      <select id="printArtworkSelect" class="region-filter"></select>
-                    </div>
-                    <span class="print-summary" id="printSummary"></span>
-                    <button type="button" class="print-action-btn" id="printBtn">
-                      <span class="app-icon" aria-hidden="true">⎙</span>
-                      <span data-i18n="app.print.action">Imprimer</span>
-                    </button>
-                  </div>
-                </div>
-                <div id="printOutput" class="print-output"></div>
-              </section>
-            </div>
-          </div>
-        </section>
-      </div>
-
       <div id="viewDocs" class="app-view" hidden>
         <header class="header app-collection-header binder-header docs-header">
           <h1 class="title" data-i18n="app.docs.title">Docs</h1>
@@ -583,10 +517,6 @@
                 <span class="app-icon" aria-hidden="true">↑</span>
                 <span data-i18n="app.settings.import">Importer JSON</span>
               </button>
-              <a href="#/print" class="settings-action-btn" id="printFromSettingsBtn">
-                <span class="app-icon" aria-hidden="true">⎙</span>
-                <span data-i18n="app.settings.print">Checklist impression</span>
-              </a>
               <input type="file" id="importFileInput" accept=".json" hidden />
             </div>
             <div id="importPreview" class="import-preview" hidden>
@@ -872,11 +802,9 @@
     </nav>
     <nav class="mobile-more-menu" id="mobileMoreMenu" aria-label="Navigation secondaire" data-i18n-aria-label="app.nav.more_menu" hidden>
       <a href="#/dresseurs" class="mobile-more-menu__link" data-view="dresseurs" data-i18n="app.nav.trainers">Dresseurs</a>
-      <a href="#/print" class="mobile-more-menu__link" data-view="print" data-i18n="app.nav.print">Impression</a>
       <a href="#/docs" class="mobile-more-menu__link" data-view="docs" data-i18n="app.nav.docs">Docs</a>
       <a href="#/settings" class="mobile-more-menu__link" data-view="settings" data-i18n="app.nav.settings">Réglages</a>
     </nav>
-
     <script src="/i18n.js" defer></script>
     <script src="/empty-states.js" defer></script>
     <script src="/keyboard.js" defer></script>
@@ -895,7 +823,6 @@
     <script src="/trainer-contacts.js" defer></script>
     <script src="/binder-collection-view.js" defer></script>
     <script src="/stats-view.js" defer></script>
-    <script src="/print-view.js" defer></script>
     <script src="/app.js" defer></script>
   </body>
 </html>
