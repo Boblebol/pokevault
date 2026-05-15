@@ -18,11 +18,11 @@ AWK ?= awk
 .DEFAULT_GOAL := help
 
 .PHONY: help vars install dev open fetch fetch-test fetch-evolutions test test-cov web-test web-test-cov lightpanda-e2e lint fmt check clean \
-	build docker-build docker-up docker-up-local docker-down docker-logs
+	build docker-build docker-up docker-up-local docker-down docker-logs check-version
 
 ##@ General
 
-help: ## Afficher l'aide (sections + descriptions)
+help: check-version ## Afficher l'aide (sections + descriptions)
 	@printf "\n\033[1mPokevault Make Helper\033[0m\n\n"
 	@printf "\033[36mUsage:\033[0m make \033[33m<target>\033[0m [VAR=valeur]\n\n"
 	@$(AWK) '\
@@ -41,6 +41,9 @@ help: ## Afficher l'aide (sections + descriptions)
 	@printf "  make open TRACKER_PORT=9000\n"
 	@printf "  make docker-up DOCKER_TAG=latest\n"
 	@printf "  make docker-up-local\n\n"
+
+check-version: ## Verifier si une mise a jour est disponible sur GitHub
+	@$(PYTHON) tracker/check_version.py
 
 vars: ## Afficher les variables utiles (et leurs valeurs)
 	@printf "\033[1mVariables actives\033[0m\n"
