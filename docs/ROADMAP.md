@@ -13,13 +13,12 @@ to hosted accounts. The core loop is deliberately small:
 
 - `Capturé` records local progress.
 - `Double` records what can be offered to another Dresseur.
-- `Relâcher 1` removes a duplicate while keeping the Pokémon captured.
 - `Relâcher` removes the last local copy.
 - Everything not captured is implicitly still missing.
 - Imported Trainer Cards share only duplicate lists and can add `Vu chez`
   context without changing local progress.
 
-Trainer Cards, binders, print views, stats and badges support that loop; they do
+Trainer Cards, binders, stats and badges support that loop; they do
 not add missions, focus lists or automatic sharing.
 
 ## Shipped Tracks
@@ -46,12 +45,11 @@ not add missions, focus lists or automatic sharing.
   matchups in one place.
 - Game Pokédex appearance metadata sourced from `data/game-pokedexes.json`.
 
-### Wave 4 - Binders, Badges And Print
+### Wave 4 - Binders and Badges
 
-- Physical binder planning with 3×3 · 10-sheet defaults and custom formats.
-- Compact evolution-family ordering with printable reserved placeholders and
-  non-printing alignment gaps.
-- Generation sprite modes for app and print.
+- Physical binder planning with 3×3 · 10-sheet defaults.
+- Compact evolution-family ordering with strict row alignment for multi-row families.
+- Generation sprite modes for app.
 - Badge gallery with sealed badges until unlock.
 
 ## Active Next Track

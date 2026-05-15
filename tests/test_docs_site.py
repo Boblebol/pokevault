@@ -136,7 +136,6 @@ def test_web_app_supports_fr_en_switch_on_main_surfaces() -> None:
         "app.stats.title",
         "app.binders.title",
         "app.trainers.title",
-        "app.print.title",
         "app.docs.title",
         "app.settings.title",
         "app.onboarding.title",
@@ -235,13 +234,11 @@ def test_simplified_trade_state_model_is_documented_publicly() -> None:
     for text in [readme, features, landing, roadmap, i18n]:
         assert "Capturé" in text or "Caught" in text
         assert "Double" in text
-        assert "Relâcher 1" in text or "Release 1" in text
         assert "Relâcher" in text or "Release" in text
         assert "Vu chez" in text
         assert "Match" not in text
     assert "Capturé" in guide_text
     assert "Double" in guide_text
-    assert "Relâcher 1" in guide_text
     assert "Relâcher" in guide_text
     assert "Vu chez" in guide_text
     assert "There is no `Match` state" in guide_text
@@ -548,7 +545,6 @@ def test_configurable_binder_layouts_are_documented() -> None:
     readme = (ROOT / "README.md").read_text(encoding="utf-8")
     features = (DOCS / "features.html").read_text(encoding="utf-8")
     docs_i18n = (DOCS / "assets" / "i18n.js").read_text(encoding="utf-8")
-    web_i18n = (WEB / "i18n.js").read_text(encoding="utf-8")
 
     assert "10 feuillets" in readme
     assert "10 feuillets" in docs_i18n
@@ -560,48 +556,24 @@ def test_configurable_binder_layouts_are_documented() -> None:
         assert "Kanto 1" in text
         assert "Images / sprites" in text
 
-    assert "Familles" in readme
-    assert "Petites fiches classeur" in readme
-    assert "Classeurs > Modifier format" in readme
     assert "Classeurs > Réglages" not in readme
 
-    assert "Binders > Edit format" in features
     assert "Settings > Images / sprites" in features
     assert "compact family rows such as Spoink / Grumpig / Spinda" in features
-    assert "Small binder cards" in features
-    assert "Print > Group by > Small binder cards" in features
     for text in [
-        "Classeurs > Modifier format",
         "Réglages > Images / sprites",
-        "Familles",
         "Groret",
-        "Petites fiches classeur",
     ]:
         assert text not in features
 
     assert "Spoink" in readme
     assert "Spinda" in readme
-    assert "vides discrets" in readme
     assert "alignment_empty" in readme
-    assert "family_reserved" in readme
-    assert "generated trailing alignment gaps are not printed" in readme
-    assert "intentional family reservations still print as temporary placeholders" in readme
 
     assert "Planificateur de classeurs physiques" in docs_i18n
-    assert "Classeurs > Modifier format" in docs_i18n
     assert "Réglages > Images / sprites" in docs_i18n
-    assert "Impression > Regrouper par > Petites fiches classeur" in docs_i18n
-    assert "Binders > Edit format" in docs_i18n
     assert "Settings > Images / sprites" in docs_i18n
-    assert "Print > Group by > Small binder cards" in docs_i18n
-    assert "`Classeurs >" not in docs_i18n
     assert "`Réglages > Images / sprites`" not in docs_i18n
-    assert "`Petites fiches classeur`" not in docs_i18n
-
-    assert "Classeurs > Modifier format" in web_i18n
-    assert "Impression > Regrouper par > Petites fiches classeur" in web_i18n
-    assert "Binders > Edit format" in web_i18n
-    assert "Print > Group by > Small binder cards" in web_i18n
 
 
 def test_large_ring_binder_mode_is_documented() -> None:
@@ -623,7 +595,6 @@ def test_large_ring_binder_mode_is_documented() -> None:
             or "internal region sections" in normalized
             or "régions" in normalized
         )
-        assert "3×3 recto-verso" in normalized or "3×3 front/back sheets" in normalized
         assert "recto" in normalized or "sheet front" in normalized
         assert "compact" in normalized
         assert "regional forms" in normalized or "formes régionales" in normalized

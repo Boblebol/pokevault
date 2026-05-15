@@ -111,7 +111,6 @@ The exchange model stays close to the Pokedex:
   looking for it;
 - `Capturé` marks Pokemon already in your collection;
 - `Double` marks Pokemon you own twice and can offer for trade;
-- `Relâcher 1` removes the duplicate copy and keeps the Pokemon captured;
 - `Relâcher` removes the last captured copy from local progress.
 - Contact lines can share Instagram, Facebook, phone, email, Discord or site
   details inside the exported card file.
@@ -125,45 +124,15 @@ The full guide lives in [Trainer Cards](docs/TRAINER_CONTACTS.md).
 
 ## Physical Binder Layouts
 
-The binder tab keeps the base workflow automatic: without any settings, it
-creates regional binders in the classic 3×3 · 10 sheets (`10 feuillets`) format.
-A feuillet is treated like a real plastic sheet with recto and verso, so
-capacity is:
+The binder tab keeps the base workflow automatic: it creates regional binders in the classic 3×3 · 10 sheets (`10 feuillets`) format. A feuillet is treated like a real plastic sheet with recto and verso, so capacity is `rows × columns × feuillets × 2`.
 
-`rows × columns × feuillets × 2`
+If a region is too large for the 10-sheet format, Pokevault keeps every Pokemon visible by splitting that region into numbered binders such as Kanto 1 and Kanto 2 instead of hiding entries.
 
-Collectors who use smaller or larger binders can open
-`Classeurs > Modifier format`, choose a preset or custom grid, and regenerate
-the local binder view. The same settings control rows, columns and the number of
-physical sheets. If a region is too large for the selected format, Pokevault
-keeps every Pokemon visible by splitting that region into numbered binders such
-as Kanto 1 and Kanto 2 instead of hiding entries.
+`Grand classeur 3x3` is the large ring binder mode for collectors who want one physical binder instead of one binder per region. It groups entries into internal region sections, starts each region on a new sheet front (recto), compacts evolution families within that region with strict row alignment for multi-row families, keeps regional forms in their form region, and auto-calculates the needed sheet count with 10 spare sheets.
 
-`Grand classeur 3x3` is the large ring binder mode for collectors who want one
-physical binder instead of one binder per region. It keeps the 3×3 front/back
-sheets model, groups entries into internal region sections, starts each region
-on a new sheet front (recto), compacts evolution families within that region,
-keeps regional forms in their form region, and auto-calculates the needed sheet
-count with 10 spare sheets.
+Generation sprites are available from `Réglages > Images / sprites`.
 
-Generation sprites are available from `Réglages > Images / sprites`. Print can
-also choose its own image mode, so a collector can print retro sprites without
-changing the main collection view.
-
-The optional `Familles` organization uses `data/evolution-families.json` to keep
-evolution stages readable while saving space. Short complete families can share
-a 3×3 row, for example Spoink / Groret / Spinda. Branches keep their readable
-shape: Ptitard / Têtarte / Tartard stay together, Tarpaud starts the next row,
-and generated trailing alignment gaps are not printed. The layout engine marks
-those generated fillers as `alignment_empty`; intentional family reservations use
-`family_reserved` and remain printable. Manual corrections stay in
-`data/evolution-family-overrides.json`, so the app UI does not expose
-expert-only layout controls.
-
-Printable small binder cards live under
-`Impression > Regrouper par > Petites fiches classeur` (`Print > Group by > Small binder cards`
-in English). They print Pokemon slots, and intentional family reservations still print as temporary placeholders.
-Ordinary capacity slots and alignment empties (`vides discrets`) are skipped.
+Pokevault uses `data/evolution-families.json` to keep evolution stages readable while saving space. Short complete families can share a 3×3 row, for example Spoink / Groret / Spinda. Multi-row families (4+ members or branches) always start on a new row for better visual structure. The layout engine marks generated fillers as `alignment_empty`. Manual corrections stay in `data/evolution-family-overrides.json`, so the app UI does not expose expert-only layout controls.
 
 ## Screenshots
 
