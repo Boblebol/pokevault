@@ -299,13 +299,13 @@ test("regional family album drops reserved holes when a branch row has no region
   });
 
   assert.deepEqual(
-    ordered.map((p) => p?.slug || null).slice(0, 4),
-    ["0043-oddish", "0044-gloom", "0045-vileplume", null],
+    ordered.map((p) => p?.slug || null).slice(0, 3),
+    ["0043-oddish", "0044-gloom", "0045-vileplume"],
   );
-  assert.equal(ordered[18 + 2].slug, "0182-bellossom"); // Sheet 1 (18 slots) then Sheet 2 Page 1 starts with Bellossom's row
+  assert.equal(ordered[18].slug, "0182-bellossom"); // Sheet 2 Page 1 starts with Bellossom
 });
 
-test("regional family album strictly aligns multi-row blocks to start on new rows", async () => {
+test("regional family album strictly aligns families to start on new rows", async () => {
   const api = await loadEngine();
   const defs = [{ id: "kanto", low: 1, high: 151 }];
   const pokemon = [
@@ -338,14 +338,15 @@ test("regional family album strictly aligns multi-row blocks to start on new row
 
   const slugsAndEmpties = slots.map(s => s.pokemon?.slug || s.emptyKind);
   
-  assert.deepEqual(slugsAndEmpties.slice(0, 8), [
+  assert.deepEqual(slugsAndEmpties, [
     "0001-single",
     "alignment_empty",
     "alignment_empty",
     "0002-multi-1",
     "0003-multi-2",
-    "alignment_empty",
     "0004-multi-3",
     "0005-multi-4",
+    "alignment_empty",
+    "alignment_empty"
   ]);
 });
