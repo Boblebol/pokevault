@@ -350,3 +350,39 @@ test("regional family album strictly aligns families to start on new rows", asyn
     "alignment_empty"
   ]);
 });
+
+test("regional family album packs small families tightly when possible", async () => {
+  const api = await loadEngine();
+  const defs = [{ id: "kanto", low: 1, high: 151 }];
+  const pokemon = [
+    { slug: "0001-f1-p1", number: "0001", region: "kanto" },
+    { slug: "0002-f2-p1", number: "0002", region: "kanto" },
+    { slug: "0003-f3-p1", number: "0003", region: "kanto" },
+  ];
+  const familyData = {
+    families: [
+      { id: "f1", members: ["0001-f1-p1"] },
+      { id: "f2", members: ["0002-f2-p1"] },
+      { id: "f3", members: ["0003-f3-p1"] },
+    ],
+  };
+
+  const slots = api.computeBinderSlots({
+    binder: { id: "test", organization: "regional_family_album", rows: 3, cols: 3, sheet_count: 1 },
+    pokemon,
+    defs,
+    familyData,
+    includeCapacity: false,
+  });
+
+  const slugsAndEmpties = slots.map(s => s.pokemon?.slug || s.emptyKind);
+  
+  // Row 1: f1-p1, f2-p1, f3-p1 -> Total 3.
+  assert.deepEqual(slugsAndEmpties, [
+    "0001-f1-p1",
+    "0002-f2-p1",
+    "0003-f3-p1"
+  ]);
+});
+
+

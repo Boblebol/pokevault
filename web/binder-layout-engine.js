@@ -151,10 +151,6 @@
         }
         if (hasRepresentedPokemon) {
           blockRows = chunkRowToColumns(familyItems, cols);
-          const lastRow = blockRows[blockRows.length - 1];
-          while (lastRow.length < cols) {
-            lastRow.push(alignmentEmptyItem());
-          }
         }
       } else {
         const rows = Array.isArray(family?.layout_rows) ? family.layout_rows : [];
