@@ -104,7 +104,8 @@
 
   function normalizeFilterState(filters = {}, options = {}) {
     return {
-      status: normalizeStatus(filters.status),
+      hideCaught: filters.hideCaught === true || filters.hideCaught === "1" || filters.hideCaught === 1,
+      hideMissing: filters.hideMissing === true || filters.hideMissing === "1" || filters.hideMissing === 1,
       region: normalizeRegion(filters.region, options.regionIds || []),
       forms: normalizeForms(filters.forms),
       type: normalizeType(filters.type, options.typeIds || []),
@@ -127,7 +128,8 @@
     return {
       view,
       filters: normalizeFilterState({
-        status: params.get("status") || "all",
+        hideCaught: params.get("hc") === "1",
+        hideMissing: params.get("hm") === "1",
         region: params.get("region") || "all",
         forms: params.get("forms") || "all",
         type: params.get("type") || "all",
@@ -144,7 +146,9 @@
   function buildFilterHash(hash, filters = {}, options = {}) {
     const { view, params } = parseRoute(hash);
     const normalized = normalizeFilterState(filters, options);
-    writeParam(params, "status", normalized.status, "all");
+    writeParam(params, "hc", normalized.hideCaught ? "1" : "", "");
+    writeParam(params, "hm", normalized.hideMissing ? "1" : "", "");
+    params.delete("status"); // Remove legacy status if present
     writeParam(params, "region", normalized.region, "all");
     writeParam(
       params,
@@ -163,8 +167,9 @@
   function matchesStatus(pokemon, filters, caughtMap, statusMap) {
     const slug = slugOf(pokemon);
     const status = statusForPokemon(slug, caughtMap, statusMap);
-    if (filters.status === "caught") return status.state === "caught";
-    if (filters.status === "missing") return status.state !== "caught";
+    const caught = status.state === "caught";
+    if (filters.hideCaught && caught) return false;
+    if (filters.hideMissing && !caught) return false;
     return true;
   }
 
