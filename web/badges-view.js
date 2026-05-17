@@ -213,26 +213,17 @@
   }
 
   function pokemonBySlug(slug) {
-    const key = String(slug || "").trim();
-    if (!key) return null;
     const all = window.PokedexCollection?.allPokemon || [];
-    const p = all.find((p) => String(p?.slug || "") === key);
-    if (!p) {
-      // Fallback if allPokemon is not yet populated or slug mismatch
-      // This is helpful during initial boot if some polls happen very fast
-    }
-    return p || null;
+    return all.find((p) => String(p?.slug || "") === slug) || null;
   }
 
   function displayPokemonName(p, slug) {
     const names = p?.names || {};
-    return names.fr || names.en || names.ja || String(slug || "").split("-").slice(1).join(" ") || "?";
+    return names.fr || names.en || names.ja || slug || "?";
   }
 
   function displayPokemonNumber(p) {
-    const num = p?.number || "";
-    if (!num) return "";
-    const raw = String(num).replace(/^#/, "");
+    const raw = String(p?.number || "").replace(/^#/, "");
     const clean = raw.replace(/^0+/, "") || raw || "";
     return clean ? `#${clean}` : "";
   }
@@ -250,16 +241,12 @@
     if (typeof artwork?.resolve === "function") {
       const resolved = artwork.resolve(pokemon);
       if (resolved?.src) {
-        if (typeof artwork.attach === "function") {
-          artwork.attach(img, resolved);
-        } else {
-          img.src = resolved.src;
-        }
+        if (typeof artwork.attach === "function") artwork.attach(img, resolved);
+        else img.src = resolved.src;
         return true;
       }
     }
-    // Final fallback to the raw image path in the pokemon object
-    const src = normalizePokemonImagePath(pokemon.image || pokemon.image_url);
+    const src = normalizePokemonImagePath(pokemon.image);
     if (!src) return false;
     img.src = src;
     return true;
@@ -330,21 +317,18 @@
     };
   }
 
-  function buildBattleContext(battle, encounter, badgeDef = null) {
+  function buildBattleContext(battle, encounter) {
     const trainer = battle?.trainer || {};
     const location = battle?.location || {};
     const context = document.createElement("div");
     context.className = "badge-battle-context";
 
-    // 1. Badge & Trainer Line
-    const badgeTitle = badgeDef ? displayBadgeCopy(badgeDef, { forceReveal: true }).title : "";
     const trainerName = localizedText(trainer.name);
     const trainerRole = localizedText(trainer.role);
-    const trainerLine = [badgeTitle, trainerName, trainerRole].filter(Boolean).join(" · ");
-    
+    const trainerLine = [trainerName, trainerRole].filter(Boolean).join(" · ");
     if (trainerLine) {
       const block = document.createElement("p");
-      block.className = "badge-battle-context__line badge-battle-context__line--trainer";
+      block.className = "badge-battle-context__line";
       const label = document.createElement("span");
       label.className = "badge-battle-context__label";
       label.textContent = tr("badges.battle.trainer");
@@ -355,18 +339,14 @@
       context.append(block);
     }
 
-    // 2. Location Line
-    const regionLabel = tr(`badges.region.${location.region || "global"}`);
     const locationLine = [
-      regionLabel,
       localizedText(location.city),
       localizedText(location.place),
       localizedText(encounter?.label),
     ].filter(Boolean).join(" · ");
-    
     if (locationLine) {
       const block = document.createElement("p");
-      block.className = "badge-battle-context__line badge-battle-context__line--location";
+      block.className = "badge-battle-context__line";
       const label = document.createElement("span");
       label.className = "badge-battle-context__label";
       label.textContent = tr("badges.battle.location");
@@ -377,7 +357,6 @@
       context.append(block);
     }
 
-    // 3. History / Flavor Text
     const history = localizedText(trainer.history);
     if (history) {
       const note = document.createElement("p");
@@ -546,7 +525,7 @@
         empty.textContent = tr("badges.battle.unavailable");
         teamSection.append(empty);
       }
-      body.replaceChildren(buildBattleContext(battle, encounter, badge), teamSection);
+      body.replaceChildren(buildBattleContext(battle, encounter), teamSection);
     }
 
     if (encounters.length > 1) {
@@ -963,12 +942,9 @@
     return tile;
   }
 
-  async function start() {
+  function start() {
     if (start._called) return;
     start._called = true;
-    if (typeof window.PokedexCollection?.ensureLoaded === "function") {
-      await window.PokedexCollection.ensureLoaded();
-    }
     void poll({ silent: true });
     window.PokedexCollection?.subscribeCaught?.(() => {
       void poll();
@@ -985,7 +961,6 @@
     poll,
     subscribe,
     renderInto,
-    setData,
     displayCopy: displayBadgeCopy,
     labelForId(id, state = cachedState) {
       const catalog = Array.isArray(state?.catalog) ? state.catalog : [];

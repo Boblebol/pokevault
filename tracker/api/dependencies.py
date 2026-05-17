@@ -29,10 +29,10 @@ from tracker.services.progress_service import ProgressService
 from tracker.services.trainer_contact_service import TrainerContactService
 
 
-def get_pokedex_repo(
+def get_progress_repository(
     settings: Annotated[TrackerSettings, Depends(get_settings)],
-) -> JsonPokedexRepository:
-    return JsonPokedexRepository(settings.pokedex_path)
+) -> ProgressRepository:
+    return JsonProgressRepository(settings.progress_path)
 
 
 def get_bundle_service(

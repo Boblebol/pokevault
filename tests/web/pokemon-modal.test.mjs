@@ -238,6 +238,23 @@ test("modal shows game Pokedex appearances and no card section", async () => {
   assert.doesNotMatch(text, /TCG/);
 });
 
+test("modal merges descriptions into Pokedex appearances", async () => {
+  const { dom } = await loadModule();
+  const pokemon = globalThis.PokedexCollection.allPokemon[0];
+  pokemon.descriptions = [
+    { version: "red", text: "A strange seed was planted on its back at birth." },
+    { version: "x", text: "For some time after its birth, it grows by gaining nourishment from the seed on its back." },
+  ];
+
+  globalThis.window.PokevaultPokemonModal.open("0001-bulbasaur", null);
+
+  const text = textContent(dom.content);
+  // rb-kanto maps to red/blue -> should find "A strange seed..."
+  assert.match(text, /A strange seed was planted on its back at birth/);
+  // xy-kalos-central maps to x/y -> should find "For some time after its birth..."
+  assert.match(text, /For some time after its birth/);
+});
+
 test("legacy Pokemon hash opens the same modal instead of a full-page view", async () => {
   const { dom, api } = await loadModule();
   globalThis.location.hash = "#/pokemon/0001-bulbasaur";

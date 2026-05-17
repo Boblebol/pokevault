@@ -1,6 +1,6 @@
 import json
+from datetime import UTC, datetime
 from pathlib import Path
-from datetime import datetime, UTC
 
 DATA_DIR = Path("data")
 BUNDLE_PATH = DATA_DIR / "pokevault_bundle.json"
@@ -27,7 +27,7 @@ def main():
         path = DATA_DIR / filename
         if path.exists():
             print(f"Adding {filename}...")
-            with open(path, "r", encoding="utf-8") as f:
+            with open(path, encoding="utf-8") as f:
                 bundle[key] = json.load(f)
         else:
             print(f"Warning: {filename} not found.")

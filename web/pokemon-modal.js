@@ -242,9 +242,9 @@
     const entries = typeof helper.buildFormEntries === "function"
       ? helper.buildFormEntries(pokemon, all, (slug) => window.PokedexCollection?.getStatus?.(slug))
       : [pokemon];
-    
-    if (entries.length <= 1) return;
-
+    if (entries.length <= 1) {
+      return;
+    }
     const section = createSection("forms");
     const list = document.createElement("div");
     list.className = "pokemon-modal-forms";
@@ -371,70 +371,40 @@
   }
 
   function buildGamePokedexes(root, pokemon) {
-    const section = createSection("pokedex_entries", t("pokemon_fiche.section.pokedex_entries"));
-    const appearances = gamePokedexAppearances(pokemon.slug);
-    const descriptions = Array.isArray(pokemon.descriptions) ? pokemon.descriptions : [];
-
-    if (!appearances.length && !descriptions.length) {
+    const section = createSection("pokedex_entries", t("pokemon_modal.game_pokedexes"));
+    const entries = gamePokedexAppearances(pokemon.slug);
+    if (!entries.length) {
       const empty = document.createElement("p");
       empty.className = "pokemon-modal-empty";
-      empty.textContent = t("pokemon_modal.descriptions_empty");
+      empty.textContent = t("pokemon_modal.game_pokedexes_empty");
       section.append(empty);
       root.append(section);
       return;
     }
 
+    const descriptions = Array.isArray(pokemon.descriptions) ? pokemon.descriptions : [];
+    const fallback = descriptions[0]?.text || "";
+
     const list = document.createElement("div");
-    list.className = "pokemon-modal-descriptions";
+    list.className = "pokemon-modal-pokedexes-v2";
 
-    const emittedVersions = new Set();
-    for (const app of appearances) {
-      const versions = getVersionMapping(app.id);
-      let entry = descriptions.find((d) => versions.includes(d.version));
-      
-      // Fallback: if no exact version match, try any description from the same generation?
-      // Or just the very first one available if we really want a text.
-      if (!entry && descriptions.length > 0) {
-        entry = descriptions[0]; // Take first available as fallback
-      }
+    for (const entry of entries) {
+      const versions = getVersionMapping(entry.id);
+      const desc = descriptions.find((d) => versions.includes(d.version))?.text || fallback;
 
       const block = document.createElement("div");
-      block.className = "pokemon-modal-description";
-      
-      const title = document.createElement("span");
-      title.className = "pokemon-modal-description__version";
-      title.textContent = app.label_fr || app.label_en || app.id;
-      
-      const text = document.createElement("p");
-      text.className = "pokemon-modal-description__text";
-      if (entry) {
-        text.textContent = entry.text;
-        if (versions.includes(entry.version)) {
-            versions.forEach((v) => emittedVersions.add(v));
-        }
-      } else {
-        text.textContent = "—";
-        text.classList.add("is-empty");
-      }
-      
-      block.append(title, text);
-      list.append(block);
-    }
+      block.className = "pokemon-modal-pokedex-version";
 
-    for (const d of descriptions) {
-      if (emittedVersions.has(d.version)) continue;
-      const block = document.createElement("div");
-      block.className = "pokemon-modal-description";
-      const version = document.createElement("span");
-      version.className = "pokemon-modal-description__version";
-      version.textContent = String(d.version)
-        .split("-")
-        .map((s) => s.charAt(0).toUpperCase() + s.slice(1))
-        .join(" ");
+      const title = document.createElement("h4");
+      title.className = "pokemon-modal-pokedex-version__title";
+      title.textContent = entry.label_fr || entry.label_en || entry.id;
+
       const text = document.createElement("p");
-      text.className = "pokemon-modal-description__text";
-      text.textContent = d.text;
-      block.append(version, text);
+      text.className = "pokemon-modal-pokedex-version__text";
+      text.textContent = desc;
+
+      block.append(title);
+      if (desc) block.append(text);
       list.append(block);
     }
 
@@ -547,10 +517,6 @@
     open,
     openFromCurrentHash,
     render,
-    setData(data) {
-      gamePokedexes = data;
-      window.PokevaultGamePokedexes = data;
-    },
   };
   if (window.__POKEVAULT_MODAL_TESTS__) {
     modalApi._test = {
