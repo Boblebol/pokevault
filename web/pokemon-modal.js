@@ -242,15 +242,10 @@
     const entries = typeof helper.buildFormEntries === "function"
       ? helper.buildFormEntries(pokemon, all, (slug) => window.PokedexCollection?.getStatus?.(slug))
       : [pokemon];
+    
+    if (entries.length <= 1) return;
+
     const section = createSection("forms");
-    if (entries.length <= 1) {
-      const empty = document.createElement("p");
-      empty.className = "pokemon-modal-empty";
-      empty.textContent = t("pokemon_modal.forms_empty");
-      section.append(empty);
-      root.append(section);
-      return;
-    }
     const list = document.createElement("div");
     list.className = "pokemon-modal-forms";
     for (const entry of entries) {
@@ -346,41 +341,104 @@
     return ids.map((id) => map.get(String(id))).filter(Boolean);
   }
 
+  function getVersionMapping(pokedexId) {
+    const table = {
+      "rb-kanto": ["red", "blue"],
+      "yellow-kanto": ["yellow"],
+      "gsc-johto": ["gold", "silver", "crystal"],
+      "rs-hoenn": ["ruby", "sapphire", "emerald"],
+      "frlg-kanto": ["firered", "leafgreen"],
+      "dp-sinnoh": ["diamond", "pearl"],
+      "pt-sinnoh": ["platinum"],
+      "hgss-johto": ["heartgold", "soulsilver"],
+      "bw-unova": ["black", "white"],
+      "b2w2-unova": ["black-2", "white-2"],
+      "xy-kalos-central": ["x", "y"],
+      "xy-kalos-coastal": ["x", "y"],
+      "xy-kalos-mountain": ["x", "y"],
+      "oras-hoenn": ["omega-ruby", "alpha-sapphire"],
+      "sm-alola": ["sun", "moon"],
+      "usum-alola": ["ultra-sun", "ultra-moon"],
+      "lgpe-kanto": ["lets-go-pikachu", "lets-go-eevee"],
+      "swsh-galar": ["sword", "shield"],
+      "bdsp-sinnoh": ["brilliant-diamond", "shining-pearl"],
+      "pla-hisui": ["legends-arceus"],
+      "sv-paldea": ["scarlet", "violet"],
+      "sv-kitakami": ["scarlet", "violet"],
+      "sv-blueberry": ["scarlet", "violet"],
+    };
+    return table[pokedexId] || [];
+  }
+
   function buildGamePokedexes(root, pokemon) {
-    const section = createSection("game_pokedexes", t("pokemon_modal.game_pokedexes"));
-    const entries = gamePokedexAppearances(pokemon.slug);
-    if (!entries.length) {
+    const section = createSection("pokedex_entries", t("pokemon_fiche.section.pokedex_entries"));
+    const appearances = gamePokedexAppearances(pokemon.slug);
+    const descriptions = Array.isArray(pokemon.descriptions) ? pokemon.descriptions : [];
+
+    if (!appearances.length && !descriptions.length) {
       const empty = document.createElement("p");
       empty.className = "pokemon-modal-empty";
-      empty.textContent = t("pokemon_modal.game_pokedexes_empty");
+      empty.textContent = t("pokemon_modal.descriptions_empty");
       section.append(empty);
       root.append(section);
       return;
     }
-    const list = document.createElement("ul");
-    list.className = "pokemon-modal-pokedexes";
-    for (const entry of entries) {
-      const item = document.createElement("li");
-      item.textContent = entry.label_fr || entry.label_en || entry.id;
-      list.append(item);
-    }
-    section.append(list);
-    root.append(section);
-  }
 
-  function buildNotes(root, pokemon) {
-    const section = createSection("notes");
-    const note = window.PokedexCollection?.getNote?.(pokemon.slug) || "";
-    const editor = ficheHelpers().createNoteEditor?.(note, async (text) => {
-      await window.PokedexCollection?.setNote?.(pokemon.slug, text);
-    });
-    if (editor) section.append(editor);
-    else {
-      const empty = document.createElement("p");
-      empty.className = "pokemon-modal-empty";
-      empty.textContent = note || t("pokemon_modal.note.empty");
-      section.append(empty);
+    const list = document.createElement("div");
+    list.className = "pokemon-modal-descriptions";
+
+    const emittedVersions = new Set();
+    for (const app of appearances) {
+      const versions = getVersionMapping(app.id);
+      let entry = descriptions.find((d) => versions.includes(d.version));
+      
+      // Fallback: if no exact version match, try any description from the same generation?
+      // Or just the very first one available if we really want a text.
+      if (!entry && descriptions.length > 0) {
+        entry = descriptions[0]; // Take first available as fallback
+      }
+
+      const block = document.createElement("div");
+      block.className = "pokemon-modal-description";
+      
+      const title = document.createElement("span");
+      title.className = "pokemon-modal-description__version";
+      title.textContent = app.label_fr || app.label_en || app.id;
+      
+      const text = document.createElement("p");
+      text.className = "pokemon-modal-description__text";
+      if (entry) {
+        text.textContent = entry.text;
+        if (versions.includes(entry.version)) {
+            versions.forEach((v) => emittedVersions.add(v));
+        }
+      } else {
+        text.textContent = "—";
+        text.classList.add("is-empty");
+      }
+      
+      block.append(title, text);
+      list.append(block);
     }
+
+    for (const d of descriptions) {
+      if (emittedVersions.has(d.version)) continue;
+      const block = document.createElement("div");
+      block.className = "pokemon-modal-description";
+      const version = document.createElement("span");
+      version.className = "pokemon-modal-description__version";
+      version.textContent = String(d.version)
+        .split("-")
+        .map((s) => s.charAt(0).toUpperCase() + s.slice(1))
+        .join(" ");
+      const text = document.createElement("p");
+      text.className = "pokemon-modal-description__text";
+      text.textContent = d.text;
+      block.append(version, text);
+      list.append(block);
+    }
+
+    section.append(list);
     root.append(section);
   }
 
@@ -404,10 +462,9 @@
     root.replaceChildren();
     buildIdentity(root, pokemon);
     buildStatus(root, pokemon);
+    buildGamePokedexes(root, pokemon);
     buildForms(root, pokemon);
     buildTypeMatchups(root, pokemon);
-    buildGamePokedexes(root, pokemon);
-    buildNotes(root, pokemon);
   }
 
   async function ensureGamePokedexes() {
@@ -490,6 +547,10 @@
     open,
     openFromCurrentHash,
     render,
+    setData(data) {
+      gamePokedexes = data;
+      window.PokevaultGamePokedexes = data;
+    },
   };
   if (window.__POKEVAULT_MODAL_TESTS__) {
     modalApi._test = {
