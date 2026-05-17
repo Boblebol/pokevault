@@ -566,7 +566,26 @@ function initBinderShell() {
   wireBinderSelect();
   const searchInput = document.getElementById("binderSearch");
   if (searchInput) {
-    searchInput.addEventListener("input", () => renderBinderPageGrid());
+    searchInput.addEventListener("input", () => {
+      const query = searchInput.value.trim();
+      const binder = getActiveBinder(shellState.cfg);
+      const matchesSearch = window.PokedexCollection?.matchesSearch;
+
+      if (query && binder && typeof matchesSearch === "function") {
+        const perFace = slotsPerFace(binder);
+        const physicalSlots = shellState.slots.length ? shellState.slots : shellState.ordered;
+        const matchIdx = physicalSlots.findIndex((item) => {
+          const p = item?.pokemon || item; // item might be a slot object or a pokemon object
+          return p && matchesSearch(p, query);
+        });
+
+        if (matchIdx >= 0) {
+          const pageIdx = Math.floor(matchIdx / perFace);
+          setGlobalFaceIndex(binder, pageIdx);
+        }
+      }
+      renderBinderPageGrid();
+    });
   }
   unsubCaught = window.PokedexCollection?.subscribeCaught?.(() => {
     const cfg = shellState.cfg;

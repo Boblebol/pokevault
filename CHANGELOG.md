@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- Pokedex descriptions: each Pokemon detail view now displays historical flavor
+  text from different game versions (in French, sourced from PokéAPI).
 - Smart Compact binder family layouts where families pack tightly side-by-side
   and only wrap when they overflow the row capacity.
 - Binder search bar to highlight or filter Pokémon in the current binder view.
