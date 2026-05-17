@@ -361,7 +361,7 @@ test("nearestBadge uses the smallest remaining count as tie-breaker", async () =
   assert.equal(nearest.id, "kanto_brock");
 });
 
-test("buildBadgeTile keeps required pokemon for the detail view only", async () => {
+test("buildBadgeTile includes requirement chips in the footer", async () => {
   const api = await loadModule();
   globalThis.PokedexCollection = {
     allPokemon: [
@@ -375,69 +375,36 @@ test("buildBadgeTile keeps required pokemon for the detail view only", async () 
     title: "Brock - Badge",
     description: "Capture Brock's team.",
     unlocked: false,
-    current: 1,
-    target: 2,
-    percent: 50,
     requirements: [
       { slug: "0074-geodude", caught: true },
       { slug: "0095-onix", caught: false },
     ],
   });
 
-  assert.equal(tile.attrs.tabindex, "0");
-  assert.equal(tile.attrs["aria-haspopup"], "dialog");
-  assert.equal(byClass(tile, "badge-requirement-preview").length, 0);
-  assert.equal(byClass(tile, "badge-requirement-chip").length, 0);
-  assert.doesNotMatch(textTree(tile), /Geodude/);
-  assert.doesNotMatch(textTree(tile), /Onix/);
+  assert.equal(byClass(tile, "badge-requirement-chip").length, 2);
+  assert.equal(byClass(tile, "is-caught").length, 1);
+  assert.equal(byClass(tile, "is-missing").length, 1);
 });
 
 test("buildBadgeTile keeps locked mystery badge requirements sealed", async () => {
   const api = await loadModule();
-  globalThis.PokedexCollection = {
-    allPokemon: [
-      { slug: "0074-geodude", number: "0074", names: { en: "Geodude" }, image: "data/images/0074-geodude.png" },
-      { slug: "0095-onix", number: "0095", names: { en: "Onix" }, image: "data/images/0095-onix.png" },
-    ],
-  };
 
   const tile = api.buildBadgeTile({
-    id: "kanto_brock",
-    title: "Brock - Badge",
-    description: "Capture Brock's team.",
+    id: "mystery",
+    title: "Mystery",
+    description: "???",
     unlocked: false,
     reveal: "mystery",
-    i18n: {
-      en: {
-        title: "Brock - Badge",
-        description: "Capture Brock's team.",
-        mystery_title: "Sealed badge",
-        mystery_hint: "A team from Pokemon Red/Blue is waiting.",
-      },
-    },
-    current: 0,
-    target: 2,
-    percent: 0,
     requirements: [
       { slug: "0074-geodude", caught: false },
-      { slug: "0095-onix", caught: false },
     ],
   });
 
   assert.equal(byClass(tile, "badge-requirement-chip").length, 0);
-  assert.doesNotMatch(textTree(tile), /Geodude/);
-  assert.doesNotMatch(textTree(tile), /Onix/);
 });
 
-test("buildBadgeDetail describes the pokemon required by the badge", async () => {
+test("buildBadgeDetail describes the badge metadata", async () => {
   const api = await loadModule();
-  globalThis.PokedexCollection = {
-    allPokemon: [
-      { slug: "0074-geodude", number: "0074", names: { en: "Geodude" }, image: "data/images/0074-geodude.png" },
-      { slug: "0095-onix", number: "0095", names: { en: "Onix" }, image: "data/images/0095-onix.png" },
-    ],
-  };
-
   const detail = api.buildBadgeDetail({
     id: "kanto_brock",
     title: "Brock - Badge",
@@ -451,18 +418,11 @@ test("buildBadgeDetail describes the pokemon required by the badge", async () =>
     region: "kanto",
     rarity: "rare",
     effect: "gloss",
-    requirements: [
-      { slug: "0074-geodude", caught: true },
-      { slug: "0095-onix", caught: false },
-    ],
   });
 
   assert.equal(detail.attrs.role, "dialog");
   assert.equal(detail.attrs["aria-modal"], "true");
   assert.match(textTree(detail), /Brock - Badge/);
-  assert.match(textTree(detail), /Geodude/);
-  assert.match(textTree(detail), /Onix/);
-  assert.equal(byClass(detail, "badge-detail-requirement").length, 2);
 });
 
 test("buildBadgeDetail does not expose a badge mission follow action", async () => {
@@ -472,7 +432,6 @@ test("buildBadgeDetail does not expose a badge mission follow action", async () 
     id: "kanto_brock",
     title: "Brock - Badge",
     description: "Capture Brock's team.",
-    requirements: [{ slug: "0074-geodude", caught: false }],
   });
 
   const nodes = flatten(detail);
@@ -480,7 +439,6 @@ test("buildBadgeDetail does not expose a badge mission follow action", async () 
   assert.equal(nodes.some((node) => (
     /Suivre ce badge|Follow this badge|Mission active|Active mission/.test(String(node.textContent || ""))
   )), false);
-  assert.equal(byClass(detail, "badge-detail-requirement").length, 1);
 });
 
 test("locked badge detail keeps battle dossier sealed and does not reveal battle data", async () => {

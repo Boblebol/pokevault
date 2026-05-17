@@ -222,7 +222,7 @@ test("open renders one modal surface and keeps PokevaultDrawer compatibility", a
   assert.ok(String(dom.root.className).includes("is-open"));
   assert.deepEqual(
     dom.content.children.filter((child) => child.dataset?.section).map((child) => child.dataset.section),
-    ["identity", "pokedex_status", "forms", "type_matchups", "game_pokedexes", "notes"],
+    ["identity", "pokedex_status", "pokedex_entries", "type_matchups"],
   );
 });
 

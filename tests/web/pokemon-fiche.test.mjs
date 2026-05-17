@@ -61,11 +61,10 @@ test("buildFicheSectionPlan keeps B1 sections in Pokedex-first order", async () 
   assert.deepEqual(sections.map((section) => section.id), [
     "identity",
     "pokedex_status",
+    "pokedex_entries",
     "forms",
-    "personal_progress",
-    "notes",
   ]);
-  assert.equal(sections.at(-1).id, "notes");
+  assert.equal(sections.at(-1).id, "forms");
 });
 
 test("createFicheSection renders a labelled DOM section", async () => {

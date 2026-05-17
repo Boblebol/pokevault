@@ -443,7 +443,7 @@ test("validateTrainerCard accepts a complete local card", async () => {
   assert.equal(api.validateTrainerCard(card), "");
 });
 
-test("updateCardListMembership toggles duplicate trades and ignores legacy wants", async () => {
+test("adjustCardListCount and clearCardListMembership manage duplicate trades and ignore legacy wants", async () => {
   const api = await loadModule();
   const card = api.normalizeCard({
     trainer_id: "trainer-123",
@@ -453,14 +453,17 @@ test("updateCardListMembership toggles duplicate trades and ignores legacy wants
     updated_at: "2026-04-30T10:00:00+00:00",
   });
 
-  const wanted = api.updateCardListMembership(card, "wants", "0001-bulbasaur", true);
+  const wanted = api.adjustCardListCount(card, "wants", "0001-bulbasaur", 1);
   assert.equal(Object.hasOwn(wanted, "wants"), false);
 
-  const removed = api.updateCardListMembership(wanted, "wants", "0001-bulbasaur", false);
-  assert.equal(removed, wanted);
+  const cleared = api.clearCardListMembership(card, "for_trade", "0004-charmander");
+  assert.deepEqual(cleared.for_trade, []);
 
-  const traded = api.updateCardListMembership(removed, "for_trade", "0007-squirtle", true);
-  assert.deepEqual(traded.for_trade, ["0004-charmander", "0007-squirtle"]);
+  const added = api.adjustCardListCount(card, "for_trade", "0004-charmander", 1);
+  assert.deepEqual(added.for_trade, ["0004-charmander", "0004-charmander"]);
+
+  const removed = api.adjustCardListCount(added, "for_trade", "0004-charmander", -1);
+  assert.deepEqual(removed.for_trade, ["0004-charmander"]);
 });
 
 test("defaultOwnCard creates a valid local card for low-friction chips", async () => {

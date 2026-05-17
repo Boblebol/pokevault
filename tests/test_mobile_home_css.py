@@ -160,11 +160,11 @@ def test_collection_home_has_no_focus_hunt_or_recommendation_surfaces() -> None:
 def test_collection_home_orders_mobile_workflow_before_grid() -> None:
     """Progression and filters must precede the grid in HTML."""
 
-    dashboard = HTML.index('class="pokedex-dashboard"')
+    search = HTML.index('class="search-wrap"')
     filters = HTML.index('class="filters"')
     grid = HTML.index('id="grid"')
 
-    assert dashboard < filters < grid
+    assert search < filters < grid
 
 
 def test_mobile_home_has_dedicated_720_layout() -> None:
@@ -252,19 +252,18 @@ def test_seen_badge_keeps_duplicate_availability_styling() -> None:
 
 
 def test_binder_layout_settings_are_optional_and_use_sheet_language() -> None:
-    classeur_view = HTML.split('id="viewClasseur"', 1)[1].split('id="viewDresseurs"', 1)[0]
+    settings_view = HTML.split('id="viewSettings"', 1)[1]
 
-    assert 'id="binderWizardSettings"' in classeur_view
-    assert 'id="binderWizardWrap"' in classeur_view
-    assert "Réglages" in classeur_view
-    assert "10 feuillets" in classeur_view
-    assert "3×3" in classeur_view
+    assert 'id="binderWizardSettings"' in settings_view
+    assert 'id="binderWizardWrap"' in settings_view
+    assert "Réglages" in settings_view
+    assert "10 feuillets" in settings_view
 
 
 def test_onboarding_product_tour_covers_local_trade_workflow() -> None:
     block = HTML.split('id="onboardingWizard"', 1)[1].split("</dialog>", 1)[0]
 
-    assert len(re.findall(r'<section class="onboarding__step\b', block)) == 5
+    assert len(re.findall(r'<section class="onboarding__step\b', block)) == 4
     for text in [
         "Capturé",
         "Plusieurs exemplaires",

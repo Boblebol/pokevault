@@ -83,7 +83,7 @@ async function loadModule() {
 }
 
 function installRenderStubs() {
-  const grid = { replaceChildren() {}, append() {} };
+  const grid = { replaceChildren() {}, append() {}, style: {}, offsetHeight: 0 };
   const progressFill = { style: {}, parentElement: { setAttribute() {} } };
   const counter = { textContent: "" };
   globalThis.document.createElement = () => ({ className: "", textContent: "" });
