@@ -28,6 +28,11 @@ class PokemonNames(BaseModel):
         return {k: v for k, v in self.model_dump().items() if v}
 
 
+class PokedexEntry(BaseModel):
+    version: str
+    text: str
+
+
 class Pokemon(BaseModel):
     number: str = Field(..., description="Numéro national, ex: '0001'")
     slug: str = Field(..., description="Identifiant kebab-case unique, ex: '0001-bulbasaur'")
@@ -50,6 +55,10 @@ class Pokemon(BaseModel):
     region_native: bool = Field(
         default=True,
         description="True si le n° tombe dans la tranche de `region` (sinon forme importée)",
+    )
+    descriptions: list[PokedexEntry] = Field(
+        default_factory=list,
+        description="Textes de description par version de jeu",
     )
 
     @model_validator(mode="after")
