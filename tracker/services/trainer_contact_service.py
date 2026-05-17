@@ -103,12 +103,10 @@ class TrainerContactService:
 
 def _clean_list(values: list[str]) -> list[str]:
     out: list[str] = []
-    seen: set[str] = set()
     for value in values:
         item = str(value or "").strip()
-        if not item or item in seen:
+        if not item:
             continue
-        seen.add(item)
         out.append(item)
     return out
 

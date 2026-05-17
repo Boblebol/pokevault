@@ -72,7 +72,7 @@
 
   function normalizeList(raw) {
     if (!Array.isArray(raw)) return [];
-    return raw.map((x) => String(x || "").trim()).filter(Boolean).slice(0, 40);
+    return raw.map((x) => String(x || "").trim()).filter(Boolean).slice(0, 9999);
   }
 
   function normalizeCard(raw) {
@@ -132,7 +132,7 @@
       .split(/\r?\n/)
       .map((line) => line.trim())
       .filter(Boolean)
-      .slice(0, 40);
+      .slice(0, 9999);
   }
 
   function cardFromForm(values) {
@@ -289,24 +289,48 @@
     return cachedBook.own_card;
   }
 
-  function updateCardListMembership(card, listName, slug, enabled) {
+  function adjustCardListCount(card, listName, slug, delta) {
     const key = String(slug || "").trim();
     if (!key || listName !== "for_trade") return card;
-    const current = normalizeList(card?.[listName]);
-    const next = enabled
-      ? [...current.filter((item) => item !== key), key]
-      : current.filter((item) => item !== key);
+    const current = (card?.[listName] || []).filter((item) => typeof item === "string");
+    const next = [...current];
+    if (delta > 0) {
+      for (let i = 0; i < delta; i++) next.push(key);
+    } else if (delta < 0) {
+      for (let i = 0; i < -delta; i++) {
+        const idx = next.indexOf(key);
+        if (idx >= 0) next.splice(idx, 1);
+      }
+    }
     return {
       ...(card || defaultOwnCard()),
-      [listName]: next.slice(0, 40),
+      [listName]: next.slice(0, 9999),
       updated_at: new Date().toISOString(),
     };
   }
 
-  async function setOwnListMembership(slug, listName, enabled) {
+  function clearCardListMembership(card, listName, slug) {
+    const key = String(slug || "").trim();
+    if (!key || listName !== "for_trade") return card;
+    const current = (card?.[listName] || []).filter((item) => typeof item === "string");
+    return {
+      ...(card || defaultOwnCard()),
+      [listName]: current.filter((item) => item !== key),
+      updated_at: new Date().toISOString(),
+    };
+  }
+
+  async function adjustOwnListCount(slug, listName, delta) {
     await ensureLoaded();
     const base = cachedBook.own_card || defaultOwnCard();
-    const card = updateCardListMembership(base, listName, slug, enabled);
+    const card = adjustCardListCount(base, listName, slug, delta);
+    return saveOwnCard(card);
+  }
+
+  async function clearOwnListMembership(slug, listName) {
+    await ensureLoaded();
+    const base = cachedBook.own_card || defaultOwnCard();
+    const card = clearCardListMembership(base, listName, slug);
     return saveOwnCard(card);
   }
 
@@ -750,7 +774,8 @@
     ensureLoaded,
     subscribe,
     getOwnCard,
-    setOwnListMembership,
+    adjustOwnListCount,
+    clearOwnListMembership,
     contactsTrading,
     contactsWanting,
     tradeSummary,
@@ -762,7 +787,8 @@
       cardFromForm,
       validateTrainerCard,
       defaultOwnCard,
-      updateCardListMembership,
+      adjustCardListCount,
+      clearCardListMembership,
       contactsTrading,
       contactsWanting,
       tradeSummary,

@@ -10,9 +10,8 @@
   const SECTION_DEFINITIONS = [
     { id: "identity", titleKey: "pokemon_fiche.section.identity" },
     { id: "pokedex_status", titleKey: "pokemon_fiche.section.pokedex_status" },
+    { id: "pokedex_entries", titleKey: "pokemon_fiche.section.pokedex_entries" },
     { id: "forms", titleKey: "pokemon_fiche.section.forms" },
-    { id: "personal_progress", titleKey: "pokemon_fiche.section.personal_progress" },
-    { id: "notes", titleKey: "pokemon_fiche.section.notes" },
   ];
   const STATUS_ACTIONS = [
     { id: "not_met", labelKey: "pokemon_fiche.action.not_met", state: "not_met" },
@@ -73,7 +72,7 @@
     "pokemon_fiche.status.caught": "Attrapé",
     "pokemon_fiche.ownership.capture": "Capturer",
     "pokemon_fiche.ownership.owned": "Capturé",
-    "pokemon_fiche.ownership.duplicate": "Plusieurs exemplaires",
+    "pokemon_fiche.ownership.count": "{count} exemplaires",
     "pokemon_fiche.ownership.release": "Relâcher",
     "pokemon_fiche.ownership.none": "À attraper",
     "pokemon_fiche.unknown": "Inconnu",
@@ -278,16 +277,15 @@
   }
 
   function normalizeOwnershipState(state) {
-    const duplicate = Boolean(state?.duplicate);
-    return {
-      caught: duplicate || Boolean(state?.caught),
-      duplicate,
-    };
+    const count = typeof state?.count === "number" ? state.count : 0;
+    const caught = count > 0 || Boolean(state?.caught);
+    const duplicate = count > 1 || Boolean(state?.duplicate);
+    return { caught, duplicate, count: Math.max(count, caught ? (duplicate ? 2 : 1) : 0) };
   }
 
   function ownershipLabel(state) {
     const clean = normalizeOwnershipState(state);
-    if (clean.duplicate) return t("pokemon_fiche.ownership.duplicate");
+    if (clean.count > 1) return t("pokemon_fiche.ownership.count", { count: clean.count });
     if (clean.caught) return t("pokemon_fiche.ownership.owned");
     return t("pokemon_fiche.ownership.none");
   }
@@ -302,7 +300,7 @@
         label: t(capture.labelKey),
         active: false,
         disabled: false,
-        patch: clean.caught ? "duplicate" : "owned",
+        patch: "add",
       },
     ];
     if (clean.caught) {
@@ -311,7 +309,7 @@
         label: t(release.labelKey),
         active: false,
         disabled: false,
-        patch: clean.duplicate ? "release_one" : "none",
+        patch: clean.count > 1 ? "remove" : "release_all",
       });
     }
     return actions;
@@ -355,14 +353,22 @@
     return list.some((item) => String(item || "").trim() === key);
   }
 
+  function listCountSlug(list, slug) {
+    const key = String(slug || "").trim();
+    if (!key || !Array.isArray(list)) return 0;
+    return list.filter((item) => String(item || "").trim() === key).length;
+  }
+
   function ownershipStateFromSources(slug, options = {}) {
     const key = String(slug || "").trim();
     const status = normalizeStatus(options.status);
     const ownCard = options.ownCard && typeof options.ownCard === "object" ? options.ownCard : {};
-    const duplicate = listIncludesSlug(ownCard.for_trade, key);
+    const dupCount = listCountSlug(ownCard.for_trade, key);
+    const caught = dupCount > 0 || status.state === "caught";
     return {
-      caught: duplicate || status.state === "caught",
-      duplicate,
+      caught,
+      count: caught ? 1 + dupCount : 0,
+      duplicate: dupCount > 0, // Keep for backward compatibility
     };
   }
 
