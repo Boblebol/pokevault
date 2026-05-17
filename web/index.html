@@ -48,45 +48,6 @@
 
           <section class="collection-shell" aria-label="Collection Pokédex" data-i18n-aria-label="app.collection.shell">
             <aside class="collection-rail" aria-label="Filtres de collection" data-i18n-aria-label="app.collection.filters">
-              <div class="list-hero">
-                <div class="list-hero-left">
-                  <p class="list-kicker" data-i18n="app.collection.center">Centre Pokédex</p>
-                </div>
-                <div class="list-hero-right">
-                  <span id="listHeroPct" class="list-hero-pct">0%</span>
-                  <p id="listHeroCount" class="list-hero-count">0 / 0 découverts</p>
-                </div>
-              </div>
-
-              <section class="pokedex-dashboard" aria-label="Tableau de bord Pokédex" data-i18n-aria-label="app.collection.dashboard">
-                <div
-                  id="pokedexDashboardCards"
-                  class="pokedex-dashboard-cards"
-                  aria-live="polite"
-                ></div>
-                <div class="pokedex-dashboard-regions-wrap">
-                  <p class="pokedex-dashboard-title" data-i18n="app.collection.region_progress">Progression par région</p>
-                  <div
-                    id="pokedexDashboardRegions"
-                    class="pokedex-dashboard-regions"
-                  ></div>
-                </div>
-              </section>
-
-              <div class="progress-row">
-                <div class="progress-bar" role="progressbar" aria-label="Progression de la collection" data-i18n-aria-label="app.collection.progress" aria-valuemin="0" aria-valuemax="100">
-                  <div class="progress-bar-fill" id="progressFill"></div>
-                </div>
-                <span class="counter" id="counter">0 / 0</span>
-                <button
-                  type="button"
-                  class="kb-hint-btn"
-                  id="kbHelpTrigger"
-                  aria-label="Afficher les raccourcis clavier"
-                  title="Raccourcis clavier (touche ?)"
-                >?</button>
-              </div>
-
               <label class="search-wrap">
                 <span class="search-icon" aria-hidden="true">⌕</span>
                 <input
@@ -103,14 +64,11 @@
               </label>
 
               <div class="filters" role="group" aria-label="Filtrer par statut" data-i18n-aria-label="app.filters.status">
-                <button type="button" class="filter-btn is-active" data-filter="all" aria-pressed="true">
-                  <span data-i18n="app.filters.all">Tous</span>
+                <button type="button" class="filter-btn" data-filter="hide_caught" aria-pressed="false">
+                  <span data-i18n="app.filters.hide_caught">Cacher capturés</span>
                 </button>
-                <button type="button" class="filter-btn" data-filter="missing" aria-pressed="false">
-                  <span data-i18n="app.filters.missing">Manquants</span>
-                </button>
-                <button type="button" class="filter-btn" data-filter="caught" aria-pressed="false">
-                  <span data-i18n="app.filters.caught">Capturés</span>
+                <button type="button" class="filter-btn" data-filter="hide_missing" aria-pressed="false">
+                  <span data-i18n="app.filters.hide_missing">Cacher manquants</span>
                 </button>
                 <button type="button" class="filter-btn" data-form-filter="regional_only" aria-pressed="false">
                   <span data-i18n="app.filters.regional">Formes régionales</span>
@@ -216,8 +174,8 @@
           <h1 class="title title-binder" data-i18n="app.binders.title">Classeurs</h1>
           <p class="collection-subtitle" data-i18n="app.binders.subtitle">Gère tes classeurs, tes pages et les placements de tes cartes.</p>
           <div class="binder-header-actions">
+            <input type="search" id="binderSearch" class="app-search-input" placeholder="Rechercher..." aria-label="Rechercher dans le classeur" data-i18n-placeholder="app.search.placeholder" data-i18n-aria-label="app.search.aria" autocomplete="off">
             <button type="button" class="binder-refresh" id="binderV2Refresh" data-i18n="app.binders.refresh">Rafraîchir</button>
-            <button type="button" class="binder-refresh binder-refresh--ghost" id="binderWizardSettings" hidden data-i18n="app.binders.settings">Modifier format</button>
           </div>
           <p class="sync-hint" id="binderV2Hint" hidden></p>
           <div id="binderAdvancedPanel" class="stitch-hidden" hidden>
@@ -231,24 +189,6 @@
         </header>
 
         <section class="binder-main binder-main--v2">
-          <div id="binderWizardWrap" class="wizard-wrap binder-wizard-wrap" hidden>
-            <section class="wizard-card binder-wizard binder-wizard--scrollable" aria-labelledby="binderWizardTitle">
-              <p class="wizard-kicker" data-i18n="app.binders.wizard.kicker">Réglages classeur</p>
-              <h2 id="binderWizardTitle" class="wizard-title" data-i18n="app.binders.wizard.title">Adapter le format physique.</h2>
-              <div id="binderWizardDots" class="wizard-dots" aria-hidden="true"></div>
-              <p id="binderWizardStepMeta" class="wizard-step-meta binder-wizard-meta"></p>
-              <div id="binderWizardBinderBar" class="binder-wizard-binder-bar" hidden></div>
-              <div id="binderWizardBody" class="binder-wizard-body"></div>
-              <footer class="binder-wizard-footer">
-                <button id="binderWizardSkip" class="binder-wizard-secondary" type="button" data-i18n="app.actions.cancel">Annuler</button>
-                <div class="binder-wizard-nav">
-                  <button id="binderWizardBack" class="binder-wizard-back" type="button" data-i18n="app.actions.back">Retour</button>
-                  <button id="binderWizardNext" class="binder-wizard-next" type="button" data-i18n="app.actions.continue">Continuer</button>
-                </div>
-              </footer>
-            </section>
-          </div>
-
           <div id="binderContentWrap">
             <div id="binderCollectionShell" class="binder-collection-shell" hidden>
               <div class="binder-shell-layout">
@@ -334,7 +274,7 @@
             <p data-i18n="app.docs.hero.text">
               Pokevault suit ton Pokédex, tes classeurs et tes échanges Dresseur
               avec des fichiers JSON lisibles sur ta machine. Cette page résume
-              les workflows actifs de la version 1.6.3.
+              les workflows actifs de la version 1.7.0.
             </p>
           </section>
 
@@ -386,7 +326,6 @@
                 <li data-i18n="app.docs.binders.custom">Classeurs > Modifier format permet de modifier lignes, colonnes, feuillets, périmètre de formes et organisation.</li>
                 <li data-i18n="app.docs.binders.split">Si une région dépasse la capacité, Pokevault crée des sections comme Kanto 1 / Kanto 2.</li>
                 <li data-i18n="app.docs.binders.family">Le mode Familles compacte les familles courtes quand elles tiennent sur la même ligne, tout en gardant les branches lisibles avec des vides discrets non imprimés.</li>
-                <li data-i18n="app.docs.print.placeholders">Impression > Regrouper par > Petites fiches classeur imprime des cartes temporaires et saute les vides d'alignement.</li>
               </ul>
             </article>
 
@@ -494,14 +433,20 @@
                 <option value="missing" data-i18n="app.dim.missing">Atténuer manquants</option>
               </select>
             </label>
-            <label class="region-filter-wrap settings-dim-label theme-choice-row">
-              <span class="region-filter-label" data-i18n="app.settings.artwork">Images / sprites</span>
-              <select id="settingsArtworkSelect" class="region-filter" aria-label="Images / sprites"></select>
-            </label>
             <div class="settings-data-actions">
               <button type="button" class="settings-action-btn" id="replayOnboardingBtn">
                 <span class="app-icon" aria-hidden="true">▶</span>
                 <span data-i18n="app.settings.replay">Rejouer l'onboarding</span>
+              </button>
+            </div>
+          </div>
+          <div class="stats-kpi-card">
+            <h2 class="stats-kpi-label" data-i18n="app.settings.binders">Classeurs</h2>
+            <p class="stats-kpi-sub" data-i18n="app.settings.binders_help">Gère le format physique et l'organisation de tes classeurs.</p>
+            <div class="settings-data-actions">
+              <button type="button" class="settings-action-btn" id="binderWizardSettings">
+                <span class="app-icon" aria-hidden="true">▦</span>
+                <span data-i18n="app.binders.settings">Modifier format</span>
               </button>
             </div>
           </div>
@@ -554,6 +499,72 @@
             <p class="stats-kpi-sub" id="settingsHealthLabel" data-i18n="app.settings.health">État API : vérification...</p>
           </div>
         </section>
+
+        <div id="binderWizardWrap" class="wizard-wrap binder-wizard-wrap" hidden>
+          <section class="wizard-card binder-wizard binder-wizard--scrollable" aria-labelledby="binderWizardTitle">
+            <p class="wizard-kicker" data-i18n="app.binders.wizard.kicker">Réglages classeur</p>
+            <h2 id="binderWizardTitle" class="wizard-title" data-i18n="app.binders.wizard.title">Adapter le format physique.</h2>
+            <div id="binderWizardDots" class="wizard-dots" aria-hidden="true"></div>
+            <p id="binderWizardStepMeta" class="wizard-step-meta binder-wizard-meta"></p>
+            <div id="binderWizardBinderBar" class="binder-wizard-binder-bar" hidden></div>
+            <div id="binderWizardBody" class="binder-wizard-body"></div>
+
+            <!-- Templates pour Step 0 (Organisation) -->
+            <div id="binderWizardOrgTemplates" hidden>
+              <div class="wizard-org-questions">
+                <fieldset class="onboarding__fieldset">
+                  <legend data-i18n="app.onboarding.q1.title">1. Type de classeur</legend>
+                  <div class="onboarding__choices">
+                    <label class="onboarding__choice">
+                      <input type="radio" name="wizard_binder_type" value="infinite" checked />
+                      <span class="onboarding__choice-title" data-i18n="app.onboarding.q1.infinite">Grand classeur évolutif</span>
+                    </label>
+                    <label class="onboarding__choice">
+                      <input type="radio" name="wizard_binder_type" value="finite_10" />
+                      <span class="onboarding__choice-title" data-i18n="app.onboarding.q1.finite">Petits classeurs (10 feuillets)</span>
+                    </label>
+                  </div>
+                </fieldset>
+
+                <fieldset class="onboarding__fieldset">
+                  <legend data-i18n="app.onboarding.q2.title">2. Séparation par région</legend>
+                  <div class="onboarding__choices">
+                    <label class="onboarding__choice">
+                      <input type="radio" name="wizard_binder_region_sep" value="yes" checked />
+                      <span class="onboarding__choice-title" data-i18n="app.onboarding.q2.yes">Oui (Nouvelle page/classeur par région)</span>
+                    </label>
+                    <label class="onboarding__choice">
+                      <input type="radio" name="wizard_binder_region_sep" value="no" />
+                      <span class="onboarding__choice-title" data-i18n="app.onboarding.q2.no">Non (Toutes les régions à la suite)</span>
+                    </label>
+                  </div>
+                </fieldset>
+
+                <fieldset class="onboarding__fieldset">
+                  <legend data-i18n="app.onboarding.q3.title">3. Regroupement des familles</legend>
+                  <div class="onboarding__choices">
+                    <label class="onboarding__choice">
+                      <input type="radio" name="wizard_binder_family_group" value="aligned" checked />
+                      <span class="onboarding__choice-title" data-i18n="app.onboarding.q3.aligned">Isolées (Saut de ligne pour séparer)</span>
+                    </label>
+                    <label class="onboarding__choice">
+                      <input type="radio" name="wizard_binder_family_group" value="compact" />
+                      <span class="onboarding__choice-title" data-i18n="app.onboarding.q3.compact">Compactes (À la suite sans espace)</span>
+                    </label>
+                  </div>
+                </fieldset>
+              </div>
+            </div>
+
+            <footer class="binder-wizard-footer">
+              <button id="binderWizardSkip" class="binder-wizard-secondary" type="button" data-i18n="app.actions.cancel">Annuler</button>
+              <div class="binder-wizard-nav">
+                <button id="binderWizardBack" class="binder-wizard-back" type="button" data-i18n="app.actions.back">Retour</button>
+                <button id="binderWizardNext" class="binder-wizard-next" type="button" data-i18n="app.actions.continue">Continuer</button>
+              </div>
+            </footer>
+          </section>
+        </div>
       </div>
     </div>
 
@@ -630,7 +641,6 @@
           <li class="onboarding__dot" data-step-dot="2"></li>
           <li class="onboarding__dot" data-step-dot="3"></li>
           <li class="onboarding__dot" data-step-dot="4"></li>
-          <li class="onboarding__dot" data-step-dot="5"></li>
         </ol>
 
         <section class="onboarding__step is-active" data-step="1">
@@ -689,32 +699,7 @@
         </section>
 
         <section class="onboarding__step" data-step="4" hidden>
-          <p class="onboarding__kicker" data-i18n="app.onboarding.step4.kicker">Étape 4 · Mode de suivi</p>
-          <h3 class="onboarding__step-title" data-i18n="app.onboarding.step4.title">Simple ou avancé ?</h3>
-          <p class="onboarding__lede" data-i18n="app.onboarding.step4.lede">
-            Simple garde la liste concentrée sur À attraper, Capturé, Plusieurs exemplaires et les actions Capturer / Relâcher.
-            Avancé rend les formes, notes et Dresseurs plus visibles.
-          </p>
-          <div class="onboarding__choices" role="radiogroup" aria-label="Mode de suivi Pokédex" data-i18n-aria-label="app.onboarding.mode">
-            <label class="onboarding__choice">
-              <input type="radio" name="onboardingTrackingMode" value="simple" checked />
-              <span class="onboarding__choice-title" data-i18n="app.onboarding.simple">Simple</span>
-              <span class="onboarding__choice-sub" data-i18n="app.onboarding.simple_sub">Capturer, Relâcher et états clairs. Les formes régionales restent disponibles.</span>
-            </label>
-            <label class="onboarding__choice">
-              <input type="radio" name="onboardingTrackingMode" value="advanced" />
-              <span class="onboarding__choice-title" data-i18n="app.onboarding.advanced">Avancé</span>
-              <span class="onboarding__choice-sub" data-i18n="app.onboarding.advanced_sub">Formes spéciales, notes et Dresseurs plus accessibles.</span>
-            </label>
-          </div>
-          <p class="onboarding__hint" data-i18n="app.onboarding.hint">
-            La fiche garde statut, formes, notes et apparitions dans les
-            Pokédex des jeux au même endroit.
-          </p>
-        </section>
-
-        <section class="onboarding__step" data-step="5" hidden>
-          <p class="onboarding__kicker" data-i18n="app.onboarding.step5.kicker">Étape 5 · Données locales</p>
+          <p class="onboarding__kicker" data-i18n="app.onboarding.step5.kicker">Étape 4 · Données locales</p>
           <h3 class="onboarding__step-title" data-i18n="app.onboarding.step5.title">Garder chacun son fichier.</h3>
           <p class="onboarding__lede" data-i18n="app.onboarding.step5.lede">
             Pokevault reste utilisable sans compte, sans cloud et sans serveur
@@ -819,7 +804,7 @@
     <script src="/binder-layout-engine.js" defer></script>
     <script src="/binder-v2.js" defer></script>
     <script src="/pokedex-filters.js" defer></script>
-    <script src="/pokedex-dashboard.js" defer></script>
+
     <script src="/trainer-contacts.js" defer></script>
     <script src="/binder-collection-view.js" defer></script>
     <script src="/stats-view.js" defer></script>

@@ -6,7 +6,7 @@
 const API_PROGRESS = "/api/progress";
 const API_HEALTH = "/api/health";
 const API_DATA = "/api/data";
-const APP_VERSION = "1.6.3";
+const APP_VERSION = "1.7.0";
 const PROGRESS_QUEUE_KEY = "pokedex_progress_queue";
 const FORM_FILTER_STORAGE_KEY = "pokedexFormFilter";
 const TYPE_FILTER_STORAGE_KEY = "pokedexTypeFilter";
@@ -82,7 +82,8 @@ let statusMap = Object.create(null);
 let caughtMap = Object.create(null);
 /** @type {Record<string, { text: string; updated_at?: string | null }>} */
 let noteMap = Object.create(null);
-let filterMode = "all";
+let hideCaught = false;
+let hideMissing = false;
 let regionFilter = "all";
 let searchQuery = "";
 let totalCount = 0;
@@ -465,11 +466,6 @@ function shouldDimCardForHighlight(mode, ownership) {
   return mode === "missing" ? !caught : caught;
 }
 
-async function setTrainerListMembership(slug, listName, enabled) {
-  if (!window.PokevaultTrainerContacts?.setOwnListMembership) return;
-  await window.PokevaultTrainerContacts.setOwnListMembership(slug, listName, enabled);
-}
-
 function showOwnershipSyncError(err) {
   const hint = document.getElementById("syncHint");
   if (hint) {
@@ -481,21 +477,20 @@ function showOwnershipSyncError(err) {
 async function setPokemonOwnershipState(slug, nextState) {
   const key = String(slug || "").trim();
   if (!key) return;
-  const next = nextState === "owned" || nextState === "duplicate" || nextState === "release_one"
-    ? nextState
-    : "none";
-  const current = getStatus(key);
   const tasks = [];
 
-  if (next === "owned" || next === "release_one") {
+  if (nextState === "add") {
+    const isFirst = !ownershipStateForSlug(key).caught;
     setStatus(key, "caught");
-    tasks.push(setTrainerListMembership(key, "for_trade", false));
-  } else if (next === "duplicate") {
+    if (!isFirst) {
+      tasks.push(window.PokevaultTrainerContacts?.adjustOwnListCount?.(key, "for_trade", 1));
+    }
+  } else if (nextState === "remove") {
     setStatus(key, "caught");
-    tasks.push(setTrainerListMembership(key, "for_trade", true));
-  } else {
+    tasks.push(window.PokevaultTrainerContacts?.adjustOwnListCount?.(key, "for_trade", -1));
+  } else if (nextState === "release_all") {
     setStatus(key, "not_met");
-    tasks.push(setTrainerListMembership(key, "for_trade", false));
+    tasks.push(window.PokevaultTrainerContacts?.clearOwnListMembership?.(key, "for_trade"));
   }
 
   try {
@@ -513,9 +508,14 @@ function cycleOwnershipBySlug(slug, opts) {
   if (!slug) return;
   const current = ownershipStateForSlug(slug);
   const shift = Boolean(opts?.shift);
-  const next = shift
-    ? current.duplicate ? "owned" : "duplicate"
-    : current.caught ? "none" : "owned";
+  // Plain click: Capture -> Release (all)
+  // Shift+click: Add -> Remove
+  let next = "add";
+  if (shift) {
+    next = current.count > 1 ? "remove" : "add";
+  } else {
+    next = current.caught ? "release_all" : "add";
+  }
   void setPokemonOwnershipState(slug, next);
 }
 
@@ -531,7 +531,8 @@ function availableTypeIds() {
 
 function currentFilterState() {
   return {
-    status: filterMode,
+    hideCaught,
+    hideMissing,
     region: regionFilter,
     forms: formFilterMode,
     type: typeFilter,
@@ -570,7 +571,8 @@ function applyFilterState(filters) {
     filters || {},
     filterHashOptions(),
   ) || filters || {};
-  filterMode = clean.status || "all";
+  hideCaught = clean.hideCaught === true;
+  hideMissing = clean.hideMissing === true;
   regionFilter = clean.region || "all";
   formFilterMode = clean.forms || "all";
   typeFilter = clean.type || "all";
@@ -609,6 +611,7 @@ window.PokedexCollection = {
   setStatus,
   getNote,
   setNote,
+  matchesSearch,
   cycleStatusBySlug,
   cycleOwnershipBySlug,
   ownershipStateForSlug,
@@ -772,8 +775,8 @@ function matchesFilter(p) {
     state: caughtMap[k] ? "caught" : "not_met",
   };
   const got = status.state === "caught";
-  if (filterMode === "caught") return got;
-  if (filterMode === "missing") return !got;
+  if (hideCaught && got) return false;
+  if (hideMissing && !got) return false;
   return true;
 }
 
@@ -859,18 +862,6 @@ function poolForCollectionScope() {
 }
 
 /** Pokémon comptés pour la barre de progression (dex complet, filtre région uniquement). */
-function poolForRegionProgress() {
-  const scoped = poolForCollectionScope();
-  if (regionFilter === "all") return scoped;
-  return scoped.filter((p) => effectiveRegion(p) === regionFilter);
-}
-
-function progressForRegionBar() {
-  const pool = poolForRegionProgress();
-  const caught = pool.filter((p) => caughtMap[pokemonKey(p)]).length;
-  return { caught, total: pool.length };
-}
-
 function visibleList() {
   const scoped = poolForCollectionScope();
   return scoped.filter(
@@ -1179,26 +1170,6 @@ function appendVisibleItems(fullList) {
   window.PokevaultKeyboard?.repaint?.();
 }
 
-function setupArtworkSelect() {
-  const sel = document.getElementById("settingsArtworkSelect");
-  const A = window.PokevaultArtwork;
-  if (!sel || !A || sel.dataset.wired) return;
-  sel.dataset.wired = "1";
-  sel.replaceChildren();
-  for (const m of A.modes) {
-    const opt = document.createElement("option");
-    opt.value = m.id;
-    opt.textContent = m.label;
-    sel.append(opt);
-  }
-  sel.value = A.mode;
-  sel.addEventListener("change", () => A.setMode(sel.value));
-  A.subscribe((id) => {
-    if (sel.value !== id) sel.value = id;
-    rerenderArtworkSurface();
-  });
-}
-
 function rerenderArtworkSurface() {
   const routeSlug = currentPokemonSlugFromHash();
   if (routeSlug && typeof window.PokevaultPokemonModal?.render === "function") {
@@ -1333,7 +1304,6 @@ function setupSettingsView() {
   subscribeDimMode((mode) => {
     sel.value = mode;
   });
-  setupArtworkSelect();
   paintVersionLabels();
   const versionEl = document.getElementById("settingsVersionLabel");
   const healthEl = document.getElementById("settingsHealthLabel");
@@ -1598,10 +1568,10 @@ function createPokemonCard(p, opts) {
       : "○";
   statusIcon.setAttribute("aria-hidden", "true");
   markers.append(statusIcon);
-  if (ownership.duplicate) {
+  if (ownership.count > 1) {
     const ownedCount = document.createElement("span");
     ownedCount.className = "pokemon-owned-count";
-    ownedCount.textContent = "2+";
+    ownedCount.textContent = String(ownership.count);
     ownedCount.title = card.dataset.ownership || t("pokemon_fiche.ownership.duplicate");
     ownedCount.setAttribute("aria-label", ownedCount.title);
     markers.append(ownedCount);
@@ -1723,6 +1693,7 @@ if (window.__POKEVAULT_APP_TESTS__) {
   window.PokedexCollection._test = {
     currentViewFromHash,
     isSupportedBackupSchemaVersion,
+    matchesSearch,
     renderSettingsMaintenanceStatus,
     rerenderArtworkSurface,
     setupSettingsMaintenanceActions,
@@ -1730,7 +1701,7 @@ if (window.__POKEVAULT_APP_TESTS__) {
   };
 }
 
-function hasActiveFilterExceptMissing() {
+function hasActiveFilterExceptStatus() {
   return (
     searchQuery.trim() !== "" ||
     regionFilter !== "all" ||
@@ -1742,41 +1713,31 @@ function hasActiveFilterExceptMissing() {
 
 function render() {
   const grid = document.getElementById("grid");
+  if (!grid) return;
   const sliced = slicedVisibleList();
   const list = sliced.pageItems;
-  const { caught: caughtCount, total: barTotal } = progressForRegionBar();
 
-  document.getElementById("counter").textContent = `${caughtCount} / ${barTotal}`;
-  const pct = barTotal ? Math.round((caughtCount / barTotal) * 100) : 0;
-  const heroPct = document.getElementById("listHeroPct");
-  const heroCount = document.getElementById("listHeroCount");
-  if (heroPct) heroPct.textContent = `${pct}%`;
-  if (heroCount) heroCount.textContent = t("app.collection.discovered", { caught: caughtCount, total: barTotal });
-  window.PokevaultDashboard?.renderFromState?.({
-    cardsHost: document.getElementById("pokedexDashboardCards"),
-    regionsHost: document.getElementById("pokedexDashboardRegions"),
-    pool: sliced.full,
-    statusMap,
-    caughtMap,
-    regionDefinitions,
-  });
-  const fill = document.getElementById("progressFill");
-  fill.style.width = `${pct}%`;
-  fill.parentElement.setAttribute("aria-valuenow", String(pct));
+  const scrollY = window.scrollY;
+
+  // Fix scroll jump/glitch: lock height during clearing
+  const currentHeight = grid.offsetHeight;
+  grid.style.minHeight = `${currentHeight}px`;
 
   grid.replaceChildren();
   if (!sliced.total) {
+    grid.style.minHeight = ""; // Reset if empty
     const ES = window.PokevaultEmptyStates;
     const collectionEmpty = Object.keys(caughtMap).length === 0;
     const hasActiveFilter =
       searchQuery.trim() !== "" ||
-      filterMode !== "all" ||
+      hideCaught ||
+      hideMissing ||
       regionFilter !== "all" ||
       typeFilter !== "all" ||
       formFilterMode !== "all" ||
       narrativeTagFilter.size > 0;
     let variant = "listNoMatch";
-    if (filterMode === "missing" && !hasActiveFilterExceptMissing()) {
+    if (hideMissing && !hideCaught && !hasActiveFilterExceptStatus()) {
       variant = "listAllCaught";
     } else if (collectionEmpty && !hasActiveFilter) {
       variant = "listCollectionEmpty";
@@ -1798,6 +1759,13 @@ function render() {
   for (const p of list) frag.append(createPokemonCard(p));
   grid.append(frag);
 
+  // Release height lock
+  grid.style.minHeight = "";
+
+  if (window.scrollY !== scrollY) {
+    window.scrollTo(0, scrollY);
+  }
+
   updateListDisplayInfo({ full: sliced.full, end: sliced.end, total: sliced.total });
   window.PokevaultKeyboard?.repaint?.();
 }
@@ -1806,9 +1774,10 @@ function syncQuickFilterButtons() {
   const buttons = document.querySelectorAll("#viewListe .filter-btn[data-filter], #viewListe .filter-btn[data-form-filter]");
   buttons.forEach((btn) => {
     let on = false;
-    if (btn.dataset.filter) {
-      on = btn.dataset.filter === filterMode;
-      if (btn.dataset.filter === "all") on = filterMode === "all" && formFilterMode === "all";
+    if (btn.dataset.filter === "hide_caught") {
+      on = hideCaught;
+    } else if (btn.dataset.filter === "hide_missing") {
+      on = hideMissing;
     } else if (btn.dataset.formFilter) {
       on = btn.dataset.formFilter === formFilterMode;
     }
@@ -1823,9 +1792,10 @@ function setupFilters() {
     if (btn.dataset.filterWired) return;
     btn.dataset.filterWired = "1";
     btn.addEventListener("click", () => {
-      if (btn.dataset.filter) {
-        filterMode = btn.dataset.filter || "all";
-        if (filterMode === "all") formFilterMode = "all";
+      if (btn.dataset.filter === "hide_caught") {
+        hideCaught = !hideCaught;
+      } else if (btn.dataset.filter === "hide_missing") {
+        hideMissing = !hideMissing;
       } else if (btn.dataset.formFilter) {
         const next = btn.dataset.formFilter || "all";
         formFilterMode = formFilterMode === next ? "all" : next;

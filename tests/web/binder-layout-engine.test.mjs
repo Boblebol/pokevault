@@ -299,13 +299,13 @@ test("regional family album drops reserved holes when a branch row has no region
   });
 
   assert.deepEqual(
-    ordered.map((p) => p?.slug || null).slice(0, 4),
-    ["0043-oddish", "0044-gloom", "0045-vileplume", null],
+    ordered.map((p) => p?.slug || null).slice(0, 3),
+    ["0043-oddish", "0044-gloom", "0045-vileplume"],
   );
-  assert.equal(ordered[18 + 2].slug, "0182-bellossom"); // Sheet 1 (18 slots) then Sheet 2 Page 1 starts with Bellossom's row
+  assert.equal(ordered[18].slug, "0182-bellossom"); // Sheet 2 Page 1 starts with Bellossom
 });
 
-test("regional family album strictly aligns multi-row blocks to start on new rows", async () => {
+test("regional family album strictly aligns families to start on new rows", async () => {
   const api = await loadEngine();
   const defs = [{ id: "kanto", low: 1, high: 151 }];
   const pokemon = [
@@ -338,14 +338,98 @@ test("regional family album strictly aligns multi-row blocks to start on new row
 
   const slugsAndEmpties = slots.map(s => s.pokemon?.slug || s.emptyKind);
   
-  assert.deepEqual(slugsAndEmpties.slice(0, 8), [
+  assert.deepEqual(slugsAndEmpties, [
     "0001-single",
     "alignment_empty",
     "alignment_empty",
     "0002-multi-1",
     "0003-multi-2",
-    "alignment_empty",
     "0004-multi-3",
     "0005-multi-4",
+    "alignment_empty",
+    "alignment_empty"
   ]);
 });
+
+test("regional family album packs small families tightly when possible", async () => {
+  const api = await loadEngine();
+  const defs = [{ id: "kanto", low: 1, high: 151 }];
+  const pokemon = [
+    { slug: "0001-f1-p1", number: "0001", region: "kanto" },
+    { slug: "0002-f2-p1", number: "0002", region: "kanto" },
+    { slug: "0003-f3-p1", number: "0003", region: "kanto" },
+  ];
+  const familyData = {
+    families: [
+      { id: "f1", members: ["0001-f1-p1"] },
+      { id: "f2", members: ["0002-f2-p1"] },
+      { id: "f3", members: ["0003-f3-p1"] },
+    ],
+  };
+
+  const slots = api.computeBinderSlots({
+    binder: { id: "test", organization: "regional_family_album", rows: 3, cols: 3, sheet_count: 1 },
+    pokemon,
+    defs,
+    familyData,
+    includeCapacity: false,
+  });
+
+  const slugsAndEmpties = slots.map(s => s.pokemon?.slug || s.emptyKind);
+  
+  // Row 1: f1-p1, f2-p1, f3-p1 -> Total 3.
+  assert.deepEqual(slugsAndEmpties, [
+    "0001-f1-p1",
+    "0002-f2-p1",
+    "0003-f3-p1"
+  ]);
+});
+
+test("strict regional families: solo members are sorted by national number among other blocks", async () => {
+  const api = await loadEngine();
+  const defs = [{ id: "johto", low: 152, high: 251 }];
+  
+  // Pichu (172) and Chikorita (152).
+  // Pichu belongs to a family that has other members (Pikachu, Raichu) NOT in Johto.
+  // So Pichu is solo in Johto.
+  
+  const pokemon = [
+    { slug: "0172-pichu", number: "0172", region: "johto" },
+    { slug: "0152-chikorita", number: "0152", region: "johto" },
+    { slug: "0153-bayleef", number: "0153", region: "johto" },
+  ];
+  
+  const familyData = {
+    families: [
+      { 
+        id: "0025-pikachu", 
+        members: ["0172-pichu", "0025-pikachu", "0026-raichu"] 
+      },
+      { 
+        id: "0152-chikorita", 
+        members: ["0152-chikorita", "0153-bayleef", "0154-meganium"] 
+      }
+    ]
+  };
+
+  const slots = api.computeBinderSlots({
+    binder: { id: "test", organization: "regional_family_album", rows: 3, cols: 3, sheet_count: 1 },
+    pokemon,
+    defs,
+    familyData,
+    includeCapacity: false,
+  });
+
+  const slugs = slots.map(s => s.pokemon?.slug).filter(Boolean);
+  
+  // Pichu is solo (only 1 member in pool).
+  // Chikorita/Bayleef are multi (2 members in pool).
+  // Blocks: 
+  //   Block 1: { Chikorita, Bayleef } (min national: 152)
+  //   Block 2: { Pichu } (min national: 172)
+  // Sorted by min national: [Chikorita, Bayleef, Pichu]
+  
+  assert.deepEqual(slugs, ["0152-chikorita", "0153-bayleef", "0172-pichu"]);
+});
+
+

@@ -222,7 +222,7 @@ test("open renders one modal surface and keeps PokevaultDrawer compatibility", a
   assert.ok(String(dom.root.className).includes("is-open"));
   assert.deepEqual(
     dom.content.children.filter((child) => child.dataset?.section).map((child) => child.dataset.section),
-    ["identity", "pokedex_status", "forms", "type_matchups", "game_pokedexes", "notes"],
+    ["identity", "pokedex_status", "pokedex_entries", "type_matchups"],
   );
 });
 
@@ -236,6 +236,23 @@ test("modal shows game Pokedex appearances and no card section", async () => {
   assert.match(text, /Pokédex de Kalos Centre - X\/Y/);
   assert.doesNotMatch(text, /Mes cartes/);
   assert.doesNotMatch(text, /TCG/);
+});
+
+test("modal merges descriptions into Pokedex appearances", async () => {
+  const { dom } = await loadModule();
+  const pokemon = globalThis.PokedexCollection.allPokemon[0];
+  pokemon.descriptions = [
+    { version: "red", text: "A strange seed was planted on its back at birth." },
+    { version: "x", text: "For some time after its birth, it grows by gaining nourishment from the seed on its back." },
+  ];
+
+  globalThis.window.PokevaultPokemonModal.open("0001-bulbasaur", null);
+
+  const text = textContent(dom.content);
+  // rb-kanto maps to red/blue -> should find "A strange seed..."
+  assert.match(text, /A strange seed was planted on its back at birth/);
+  // xy-kalos-central maps to x/y -> should find "For some time after its birth..."
+  assert.match(text, /For some time after its birth/);
 });
 
 test("legacy Pokemon hash opens the same modal instead of a full-page view", async () => {

@@ -3,7 +3,7 @@
 [![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![Tests](https://img.shields.io/badge/tracker_coverage-100%25-brightgreen.svg)](#quality)
-[![Version: 1.6.3](https://img.shields.io/badge/version-1.6.3-00daf3.svg)](CHANGELOG.md)
+[![Version: 1.7.0](https://img.shields.io/badge/version-1.7.0-00daf3.svg)](CHANGELOG.md)
 
 <p align="center">
   <img src="docs/assets/logo.svg" alt="pokevault logo" width="140">
@@ -129,8 +129,6 @@ The binder tab keeps the base workflow automatic: it creates regional binders in
 If a region is too large for the 10-sheet format, Pokevault keeps every Pokemon visible by splitting that region into numbered binders such as Kanto 1 and Kanto 2 instead of hiding entries.
 
 `Grand classeur 3x3` is the large ring binder mode for collectors who want one physical binder instead of one binder per region. It groups entries into internal region sections, starts each region on a new sheet front (recto), compacts evolution families within that region with strict row alignment for multi-row families, keeps regional forms in their form region, and auto-calculates the needed sheet count with 10 spare sheets.
-
-Generation sprites are available from `Réglages > Images / sprites`.
 
 Pokevault uses `data/evolution-families.json` to keep evolution stages readable while saving space. Short complete families can share a 3×3 row, for example Spoink / Groret / Spinda. Multi-row families (4+ members or branches) always start on a new row for better visual structure. The layout engine marks generated fillers as `alignment_empty`. Manual corrections stay in `data/evolution-family-overrides.json`, so the app UI does not expose expert-only layout controls.
 

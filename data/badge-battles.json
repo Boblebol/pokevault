@@ -8,22 +8,22 @@
           "en": "Brock"
         },
         "role": {
-          "fr": "Gym Leader",
+          "fr": "Champion d'Arène",
           "en": "Gym Leader"
         },
         "history": {
-          "fr": "Battle data for Brock with exact levels and moves from source trainer data.",
-          "en": "Battle data for Brock with exact levels and moves from source trainer data."
+          "fr": "Pierre est le Champion de l'Arène d'Argenta. Il est connu pour sa volonté de fer et ses Pokémon de type Roche.",
+          "en": "Brock is the Pewter City Gym Leader. He is known for his rock-solid determination and Rock-type Pokémon."
         }
       },
       "location": {
         "region": "kanto",
         "city": {
-          "fr": "Kanto",
-          "en": "Kanto"
+          "fr": "Argenta",
+          "en": "Pewter City"
         },
         "place": {
-          "fr": "Pewter City Gym",
+          "fr": "Arène d'Argenta",
           "en": "Pewter City Gym"
         }
       },
@@ -86,22 +86,22 @@
           "en": "Misty"
         },
         "role": {
-          "fr": "Gym Leader",
+          "fr": "Championne d'Arène",
           "en": "Gym Leader"
         },
         "history": {
-          "fr": "Battle data for Misty with exact levels and moves from source trainer data.",
-          "en": "Battle data for Misty with exact levels and moves from source trainer data."
+          "fr": "Ondine est la Championne de l'Arène d'Azuria. Elle est spécialisée dans les Pokémon de type Eau.",
+          "en": "Misty is the Cerulean City Gym Leader. She specializes in Water-type Pokémon."
         }
       },
       "location": {
         "region": "kanto",
         "city": {
-          "fr": "Kanto",
-          "en": "Kanto"
+          "fr": "Azuria",
+          "en": "Cerulean City"
         },
         "place": {
-          "fr": "Cerulean City Gym",
+          "fr": "Arène d'Azuria",
           "en": "Cerulean City Gym"
         }
       },
@@ -168,7 +168,7 @@
           "en": "Gym Leader"
         },
         "history": {
-          "fr": "Battle data for Lt. Surge with exact levels and moves from source trainer data.",
+          "fr": "Données de combat pour Major Bob avec les niveaux et capacités exacts.",
           "en": "Battle data for Lt. Surge with exact levels and moves from source trainer data."
         }
       },
@@ -272,7 +272,7 @@
           "en": "Gym Leader"
         },
         "history": {
-          "fr": "Battle data for Erika with exact levels and moves from source trainer data.",
+          "fr": "Données de combat pour Erika avec les niveaux et capacités exacts.",
           "en": "Battle data for Erika with exact levels and moves from source trainer data."
         }
       },
@@ -376,7 +376,7 @@
           "en": "Gym Leader"
         },
         "history": {
-          "fr": "Battle data for Koga with exact levels and moves from source trainer data.",
+          "fr": "Données de combat pour Koga avec les niveaux et capacités exacts.",
           "en": "Battle data for Koga with exact levels and moves from source trainer data."
         }
       },
@@ -510,7 +510,7 @@
           "en": "Gym Leader"
         },
         "history": {
-          "fr": "Battle data for Sabrina with exact levels and moves from source trainer data.",
+          "fr": "Données de combat pour Morgane avec les niveaux et capacités exacts.",
           "en": "Battle data for Sabrina with exact levels and moves from source trainer data."
         }
       },
@@ -644,7 +644,7 @@
           "en": "Gym Leader"
         },
         "history": {
-          "fr": "Battle data for Blaine with exact levels and moves from source trainer data.",
+          "fr": "Données de combat pour Auguste avec les niveaux et capacités exacts.",
           "en": "Battle data for Blaine with exact levels and moves from source trainer data."
         }
       },
@@ -778,7 +778,7 @@
           "en": "Gym Leader"
         },
         "history": {
-          "fr": "Battle data for Giovanni with exact levels and moves from source trainer data.",
+          "fr": "Données de combat pour Giovanni avec les niveaux et capacités exacts.",
           "en": "Battle data for Giovanni with exact levels and moves from source trainer data."
         }
       },
@@ -930,7 +930,7 @@
           "en": "Elite Four"
         },
         "history": {
-          "fr": "Battle data for Lorelei with exact levels and moves from source trainer data.",
+          "fr": "Données de combat pour Conseil 4 avec les niveaux et capacités exacts.",
           "en": "Battle data for Lorelei with exact levels and moves from source trainer data."
         }
       },
@@ -1086,7 +1086,7 @@
           "en": "Elite Four"
         },
         "history": {
-          "fr": "Battle data for Bruno with exact levels and moves from source trainer data.",
+          "fr": "Données de combat pour Conseil 4 avec les niveaux et capacités exacts.",
           "en": "Battle data for Bruno with exact levels and moves from source trainer data."
         }
       },
@@ -1242,7 +1242,7 @@
           "en": "Elite Four"
         },
         "history": {
-          "fr": "Battle data for Agatha with exact levels and moves from source trainer data.",
+          "fr": "Données de combat pour Conseil 4 avec les niveaux et capacités exacts.",
           "en": "Battle data for Agatha with exact levels and moves from source trainer data."
         }
       },
@@ -1398,7 +1398,7 @@
           "en": "Elite Four"
         },
         "history": {
-          "fr": "Battle data for Lance with exact levels and moves from source trainer data.",
+          "fr": "Données de combat pour Conseil 4 avec les niveaux et capacités exacts.",
           "en": "Battle data for Lance with exact levels and moves from source trainer data."
         }
       },
@@ -1554,7 +1554,7 @@
           "en": "Rival"
         },
         "history": {
-          "fr": "Battle data for Blue with exact levels and moves from source trainer data.",
+          "fr": "Données de combat pour Maitre de la Ligue avec les niveaux et capacités exacts.",
           "en": "Battle data for Blue with exact levels and moves from source trainer data."
         }
       },
@@ -2018,22 +2018,22 @@
           "en": "Falkner"
         },
         "role": {
-          "fr": "Gym Leader",
+          "fr": "Champion d'Arène",
           "en": "Gym Leader"
         },
         "history": {
-          "fr": "Battle data for Falkner with exact levels and moves from source trainer data.",
-          "en": "Battle data for Falkner with exact levels and moves from source trainer data."
+          "fr": "Albert est le Champion de l'Arène de Mauville. Il a hérité de l'arène de son père et utilise des Pokémon Vol.",
+          "en": "Falkner is the Violet City Gym Leader. He inherited the gym from his father and uses Flying-type Pokémon."
         }
       },
       "location": {
-        "region": "gs",
+        "region": "johto",
         "city": {
-          "fr": "Johto",
-          "en": "Johto"
+          "fr": "Mauville",
+          "en": "Violet City"
         },
         "place": {
-          "fr": "Violet City Gym",
+          "fr": "Arène de Mauville",
           "en": "Violet City Gym"
         }
       },
@@ -2100,7 +2100,7 @@
           "en": "Gym Leader"
         },
         "history": {
-          "fr": "Battle data for Bugsy with exact levels and moves from source trainer data.",
+          "fr": "Données de combat pour Hector avec les niveaux et capacités exacts.",
           "en": "Battle data for Bugsy with exact levels and moves from source trainer data."
         }
       },
@@ -2200,7 +2200,7 @@
           "en": "Gym Leader"
         },
         "history": {
-          "fr": "Battle data for Whitney with exact levels and moves from source trainer data.",
+          "fr": "Données de combat pour Blanche avec les niveaux et capacités exacts.",
           "en": "Battle data for Whitney with exact levels and moves from source trainer data."
         }
       },
@@ -2290,7 +2290,7 @@
           "en": "Gym Leader"
         },
         "history": {
-          "fr": "Battle data for Morty with exact levels and moves from source trainer data.",
+          "fr": "Données de combat pour Mortimer avec les niveaux et capacités exacts.",
           "en": "Battle data for Morty with exact levels and moves from source trainer data."
         }
       },
@@ -2424,7 +2424,7 @@
           "en": "Gym Leader"
         },
         "history": {
-          "fr": "Battle data for Chuck with exact levels and moves from source trainer data.",
+          "fr": "Données de combat pour Chuck avec les niveaux et capacités exacts.",
           "en": "Battle data for Chuck with exact levels and moves from source trainer data."
         }
       },
@@ -2514,7 +2514,7 @@
           "en": "Gym Leader"
         },
         "history": {
-          "fr": "Battle data for Jasmine with exact levels and moves from source trainer data.",
+          "fr": "Données de combat pour Jasmine avec les niveaux et capacités exacts.",
           "en": "Battle data for Jasmine with exact levels and moves from source trainer data."
         }
       },
@@ -2626,7 +2626,7 @@
           "en": "Gym Leader"
         },
         "history": {
-          "fr": "Battle data for Pryce with exact levels and moves from source trainer data.",
+          "fr": "Données de combat pour Fredo avec les niveaux et capacités exacts.",
           "en": "Battle data for Pryce with exact levels and moves from source trainer data."
         }
       },
@@ -2738,7 +2738,7 @@
           "en": "Gym Leader"
         },
         "history": {
-          "fr": "Battle data for Clair with exact levels and moves from source trainer data.",
+          "fr": "Données de combat pour Sandra avec les niveaux et capacités exacts.",
           "en": "Battle data for Clair with exact levels and moves from source trainer data."
         }
       },
@@ -2872,7 +2872,7 @@
           "en": "Gym Leader"
         },
         "history": {
-          "fr": "Battle data for Brock with exact levels and moves from source trainer data.",
+          "fr": "Données de combat pour Pierre avec les niveaux et capacités exacts.",
           "en": "Battle data for Brock with exact levels and moves from source trainer data."
         }
       },
@@ -3028,7 +3028,7 @@
           "en": "Gym Leader"
         },
         "history": {
-          "fr": "Battle data for Misty with exact levels and moves from source trainer data.",
+          "fr": "Données de combat pour Ondine avec les niveaux et capacités exacts.",
           "en": "Battle data for Misty with exact levels and moves from source trainer data."
         }
       },
@@ -3162,7 +3162,7 @@
           "en": "Gym Leader"
         },
         "history": {
-          "fr": "Battle data for Lt. Surge with exact levels and moves from source trainer data.",
+          "fr": "Données de combat pour Major Bob avec les niveaux et capacités exacts.",
           "en": "Battle data for Lt. Surge with exact levels and moves from source trainer data."
         }
       },
@@ -3318,7 +3318,7 @@
           "en": "Gym Leader"
         },
         "history": {
-          "fr": "Battle data for Erika with exact levels and moves from source trainer data.",
+          "fr": "Données de combat pour Erika avec les niveaux et capacités exacts.",
           "en": "Battle data for Erika with exact levels and moves from source trainer data."
         }
       },
@@ -3452,7 +3452,7 @@
           "en": "Gym Leader"
         },
         "history": {
-          "fr": "Battle data for Janine with exact levels and moves from source trainer data.",
+          "fr": "Données de combat pour Jeannine avec les niveaux et capacités exacts.",
           "en": "Battle data for Janine with exact levels and moves from source trainer data."
         }
       },
@@ -3608,7 +3608,7 @@
           "en": "Gym Leader"
         },
         "history": {
-          "fr": "Battle data for Sabrina with exact levels and moves from source trainer data.",
+          "fr": "Données de combat pour Morgane avec les niveaux et capacités exacts.",
           "en": "Battle data for Sabrina with exact levels and moves from source trainer data."
         }
       },
@@ -3720,7 +3720,7 @@
           "en": "Gym Leader"
         },
         "history": {
-          "fr": "Battle data for Blaine with exact levels and moves from source trainer data.",
+          "fr": "Données de combat pour Auguste avec les niveaux et capacités exacts.",
           "en": "Battle data for Blaine with exact levels and moves from source trainer data."
         }
       },
@@ -3832,7 +3832,7 @@
           "en": "Gym Leader"
         },
         "history": {
-          "fr": "Battle data for Blue with exact levels and moves from source trainer data.",
+          "fr": "Données de combat pour Blue avec les niveaux et capacités exacts.",
           "en": "Battle data for Blue with exact levels and moves from source trainer data."
         }
       },
@@ -4010,7 +4010,7 @@
           "en": "Elite Four"
         },
         "history": {
-          "fr": "Battle data for Will with exact levels and moves from source trainer data.",
+          "fr": "Données de combat pour Conseil 4 avec les niveaux et capacités exacts.",
           "en": "Battle data for Will with exact levels and moves from source trainer data."
         }
       },
@@ -4166,7 +4166,7 @@
           "en": "Elite Four"
         },
         "history": {
-          "fr": "Battle data for Koga with exact levels and moves from source trainer data.",
+          "fr": "Données de combat pour Conseil 4 avec les niveaux et capacités exacts.",
           "en": "Battle data for Koga with exact levels and moves from source trainer data."
         }
       },
@@ -4322,7 +4322,7 @@
           "en": "Elite Four"
         },
         "history": {
-          "fr": "Battle data for Bruno with exact levels and moves from source trainer data.",
+          "fr": "Données de combat pour Conseil 4 avec les niveaux et capacités exacts.",
           "en": "Battle data for Bruno with exact levels and moves from source trainer data."
         }
       },
@@ -4478,7 +4478,7 @@
           "en": "Elite Four"
         },
         "history": {
-          "fr": "Battle data for Karen with exact levels and moves from source trainer data.",
+          "fr": "Données de combat pour Conseil 4 avec les niveaux et capacités exacts.",
           "en": "Battle data for Karen with exact levels and moves from source trainer data."
         }
       },
@@ -4634,7 +4634,7 @@
           "en": "Elite Four"
         },
         "history": {
-          "fr": "Battle data for Lance with exact levels and moves from source trainer data.",
+          "fr": "Données de combat pour Maitre de la Ligue avec les niveaux et capacités exacts.",
           "en": "Battle data for Lance with exact levels and moves from source trainer data."
         }
       },
@@ -4812,7 +4812,7 @@
           "en": "Gym Leader"
         },
         "history": {
-          "fr": "Battle data for Roxanne with exact levels and moves from source trainer data.",
+          "fr": "Données de combat pour Roxanne avec les niveaux et capacités exacts.",
           "en": "Battle data for Roxanne with exact levels and moves from source trainer data."
         }
       },
@@ -4902,7 +4902,7 @@
           "en": "Gym Leader"
         },
         "history": {
-          "fr": "Battle data for Brawly with exact levels and moves from source trainer data.",
+          "fr": "Données de combat pour Brawly avec les niveaux et capacités exacts.",
           "en": "Battle data for Brawly with exact levels and moves from source trainer data."
         }
       },
@@ -4992,7 +4992,7 @@
           "en": "Gym Leader"
         },
         "history": {
-          "fr": "Battle data for Wattson with exact levels and moves from source trainer data.",
+          "fr": "Données de combat pour Voltère avec les niveaux et capacités exacts.",
           "en": "Battle data for Wattson with exact levels and moves from source trainer data."
         }
       },
@@ -5104,7 +5104,7 @@
           "en": "Gym Leader"
         },
         "history": {
-          "fr": "Battle data for Flannery with exact levels and moves from source trainer data.",
+          "fr": "Données de combat pour Adriane avec les niveaux et capacités exacts.",
           "en": "Battle data for Flannery with exact levels and moves from source trainer data."
         }
       },
@@ -5216,7 +5216,7 @@
           "en": "Gym Leader"
         },
         "history": {
-          "fr": "Battle data for Norman with exact levels and moves from source trainer data.",
+          "fr": "Données de combat pour Norman avec les niveaux et capacités exacts.",
           "en": "Battle data for Norman with exact levels and moves from source trainer data."
         }
       },
@@ -5328,7 +5328,7 @@
           "en": "Gym Leader"
         },
         "history": {
-          "fr": "Battle data for Winona with exact levels and moves from source trainer data.",
+          "fr": "Données de combat pour Alizée avec les niveaux et capacités exacts.",
           "en": "Battle data for Winona with exact levels and moves from source trainer data."
         }
       },
@@ -5462,7 +5462,7 @@
           "en": "Gym Leader"
         },
         "history": {
-          "fr": "Battle data for Tate & Liza with exact levels and moves from source trainer data.",
+          "fr": "Données de combat pour Tate & Liza avec les niveaux et capacités exacts.",
           "en": "Battle data for Tate & Liza with exact levels and moves from source trainer data."
         }
       },
@@ -5552,7 +5552,7 @@
           "en": "Gym Leader"
         },
         "history": {
-          "fr": "Battle data for Wallace with exact levels and moves from source trainer data.",
+          "fr": "Données de combat pour Marc avec les niveaux et capacités exacts.",
           "en": "Battle data for Wallace with exact levels and moves from source trainer data."
         }
       },
@@ -5708,7 +5708,7 @@
           "en": "Elite Four"
         },
         "history": {
-          "fr": "Battle data for Sidney with exact levels and moves from source trainer data.",
+          "fr": "Données de combat pour Conseil 4 avec les niveaux et capacités exacts.",
           "en": "Battle data for Sidney with exact levels and moves from source trainer data."
         }
       },
@@ -5864,7 +5864,7 @@
           "en": "Elite Four"
         },
         "history": {
-          "fr": "Battle data for Phoebe with exact levels and moves from source trainer data.",
+          "fr": "Données de combat pour Conseil 4 avec les niveaux et capacités exacts.",
           "en": "Battle data for Phoebe with exact levels and moves from source trainer data."
         }
       },
@@ -6020,7 +6020,7 @@
           "en": "Elite Four"
         },
         "history": {
-          "fr": "Battle data for Glacia with exact levels and moves from source trainer data.",
+          "fr": "Données de combat pour Conseil 4 avec les niveaux et capacités exacts.",
           "en": "Battle data for Glacia with exact levels and moves from source trainer data."
         }
       },
@@ -6176,7 +6176,7 @@
           "en": "Elite Four"
         },
         "history": {
-          "fr": "Battle data for Drake with exact levels and moves from source trainer data.",
+          "fr": "Données de combat pour Conseil 4 avec les niveaux et capacités exacts.",
           "en": "Battle data for Drake with exact levels and moves from source trainer data."
         }
       },
@@ -6332,7 +6332,7 @@
           "en": "Elite Four"
         },
         "history": {
-          "fr": "Battle data for Steven with exact levels and moves from source trainer data.",
+          "fr": "Données de combat pour Maitre de la Ligue avec les niveaux et capacités exacts.",
           "en": "Battle data for Steven with exact levels and moves from source trainer data."
         }
       },
@@ -6510,7 +6510,7 @@
           "en": "Gym Leader"
         },
         "history": {
-          "fr": "Battle data for Wally with exact levels and moves from source trainer data.",
+          "fr": "Données de combat pour Rival Timmy avec les niveaux et capacités exacts.",
           "en": "Battle data for Wally with exact levels and moves from source trainer data."
         }
       },
@@ -6666,7 +6666,7 @@
           "en": "Gym Leader"
         },
         "history": {
-          "fr": "Battle data for Roark with exact levels and moves from source trainer data.",
+          "fr": "Données de combat pour Pierrick avec les niveaux et capacités exacts.",
           "en": "Battle data for Roark with exact levels and moves from source trainer data."
         }
       },
@@ -6762,7 +6762,7 @@
           "en": "Gym Leader"
         },
         "history": {
-          "fr": "Battle data for Gardenia with exact levels and moves from source trainer data.",
+          "fr": "Données de combat pour Flo avec les niveaux et capacités exacts.",
           "en": "Battle data for Gardenia with exact levels and moves from source trainer data."
         }
       },
@@ -6874,7 +6874,7 @@
           "en": "Gym Leader"
         },
         "history": {
-          "fr": "Battle data for Maylene with exact levels and moves from source trainer data.",
+          "fr": "Données de combat pour Mélina avec les niveaux et capacités exacts.",
           "en": "Battle data for Maylene with exact levels and moves from source trainer data."
         }
       },
@@ -6986,7 +6986,7 @@
           "en": "Gym Leader"
         },
         "history": {
-          "fr": "Battle data for Crasher Wake with exact levels and moves from source trainer data.",
+          "fr": "Données de combat pour Lovis avec les niveaux et capacités exacts.",
           "en": "Battle data for Crasher Wake with exact levels and moves from source trainer data."
         }
       },
@@ -7098,7 +7098,7 @@
           "en": "Gym Leader"
         },
         "history": {
-          "fr": "Battle data for Fantina with exact levels and moves from source trainer data.",
+          "fr": "Données de combat pour Kimera avec les niveaux et capacités exacts.",
           "en": "Battle data for Fantina with exact levels and moves from source trainer data."
         }
       },
@@ -7210,7 +7210,7 @@
           "en": "Gym Leader"
         },
         "history": {
-          "fr": "Battle data for Byron with exact levels and moves from source trainer data.",
+          "fr": "Données de combat pour Charles avec les niveaux et capacités exacts.",
           "en": "Battle data for Byron with exact levels and moves from source trainer data."
         }
       },
@@ -7322,7 +7322,7 @@
           "en": "Gym Leader"
         },
         "history": {
-          "fr": "Battle data for Candice with exact levels and moves from source trainer data.",
+          "fr": "Données de combat pour Gladys avec les niveaux et capacités exacts.",
           "en": "Battle data for Candice with exact levels and moves from source trainer data."
         }
       },
@@ -7456,7 +7456,7 @@
           "en": "Gym Leader"
         },
         "history": {
-          "fr": "Battle data for Volkner with exact levels and moves from source trainer data.",
+          "fr": "Données de combat pour Tanguy avec les niveaux et capacités exacts.",
           "en": "Battle data for Volkner with exact levels and moves from source trainer data."
         }
       },
@@ -7590,7 +7590,7 @@
           "en": "Elite Four"
         },
         "history": {
-          "fr": "Battle data for Aaron with exact levels and moves from source trainer data.",
+          "fr": "Données de combat pour Conseil 4 avec les niveaux et capacités exacts.",
           "en": "Battle data for Aaron with exact levels and moves from source trainer data."
         }
       },
@@ -7746,7 +7746,7 @@
           "en": "Elite Four"
         },
         "history": {
-          "fr": "Battle data for Bertha with exact levels and moves from source trainer data.",
+          "fr": "Données de combat pour Conseil 4 avec les niveaux et capacités exacts.",
           "en": "Battle data for Bertha with exact levels and moves from source trainer data."
         }
       },
@@ -7902,7 +7902,7 @@
           "en": "Elite Four"
         },
         "history": {
-          "fr": "Battle data for Flint with exact levels and moves from source trainer data.",
+          "fr": "Données de combat pour Conseil 4 avec les niveaux et capacités exacts.",
           "en": "Battle data for Flint with exact levels and moves from source trainer data."
         }
       },
@@ -8058,7 +8058,7 @@
           "en": "Elite Four"
         },
         "history": {
-          "fr": "Battle data for Lucian with exact levels and moves from source trainer data.",
+          "fr": "Données de combat pour Conseil 4 avec les niveaux et capacités exacts.",
           "en": "Battle data for Lucian with exact levels and moves from source trainer data."
         }
       },
@@ -8214,7 +8214,7 @@
           "en": "Elite Four"
         },
         "history": {
-          "fr": "Battle data for Cynthia with exact levels and moves from source trainer data.",
+          "fr": "Données de combat pour Maitre de la Ligue avec les niveaux et capacités exacts.",
           "en": "Battle data for Cynthia with exact levels and moves from source trainer data."
         }
       },
@@ -8392,7 +8392,7 @@
           "en": "Rival"
         },
         "history": {
-          "fr": "Battle data for Barry with exact levels and moves from source trainer data.",
+          "fr": "Données de combat pour Rival Barry avec les niveaux et capacités exacts.",
           "en": "Battle data for Barry with exact levels and moves from source trainer data."
         }
       },
@@ -8868,7 +8868,7 @@
           "en": "Gym Leader"
         },
         "history": {
-          "fr": "Battle data for Chili, Cress or Cilan with exact levels and moves from source trainer data.",
+          "fr": "Données de combat pour Dent/Noa/Rachid avec les niveaux et capacités exacts.",
           "en": "Battle data for Chili, Cress or Cilan with exact levels and moves from source trainer data."
         }
       },
@@ -9032,7 +9032,7 @@
           "en": "Gym Leader"
         },
         "history": {
-          "fr": "Battle data for Lenora with exact levels and moves from source trainer data.",
+          "fr": "Données de combat pour Aloe avec les niveaux et capacités exacts.",
           "en": "Battle data for Lenora with exact levels and moves from source trainer data."
         }
       },
@@ -9122,7 +9122,7 @@
           "en": "Gym Leader"
         },
         "history": {
-          "fr": "Battle data for Burgh with exact levels and moves from source trainer data.",
+          "fr": "Données de combat pour Artie avec les niveaux et capacités exacts.",
           "en": "Battle data for Burgh with exact levels and moves from source trainer data."
         }
       },
@@ -9234,7 +9234,7 @@
           "en": "Gym Leader"
         },
         "history": {
-          "fr": "Battle data for Elesa with exact levels and moves from source trainer data.",
+          "fr": "Données de combat pour Inezia avec les niveaux et capacités exacts.",
           "en": "Battle data for Elesa with exact levels and moves from source trainer data."
         }
       },
@@ -9346,7 +9346,7 @@
           "en": "Gym Leader"
         },
         "history": {
-          "fr": "Battle data for Clay with exact levels and moves from source trainer data.",
+          "fr": "Données de combat pour Bardane avec les niveaux et capacités exacts.",
           "en": "Battle data for Clay with exact levels and moves from source trainer data."
         }
       },
@@ -9458,7 +9458,7 @@
           "en": "Gym Leader"
         },
         "history": {
-          "fr": "Battle data for Skyla with exact levels and moves from source trainer data.",
+          "fr": "Données de combat pour Carolina avec les niveaux et capacités exacts.",
           "en": "Battle data for Skyla with exact levels and moves from source trainer data."
         }
       },
@@ -9570,7 +9570,7 @@
           "en": "Gym Leader"
         },
         "history": {
-          "fr": "Battle data for Brycen with exact levels and moves from source trainer data.",
+          "fr": "Données de combat pour Zhu avec les niveaux et capacités exacts.",
           "en": "Battle data for Brycen with exact levels and moves from source trainer data."
         }
       },
@@ -9682,7 +9682,7 @@
           "en": "Elite Four"
         },
         "history": {
-          "fr": "Battle data for Shauntal with exact levels and moves from source trainer data.",
+          "fr": "Données de combat pour Conseil 4 avec les niveaux et capacités exacts.",
           "en": "Battle data for Shauntal with exact levels and moves from source trainer data."
         }
       },
@@ -9816,7 +9816,7 @@
           "en": "Elite Four"
         },
         "history": {
-          "fr": "Battle data for Grimsley with exact levels and moves from source trainer data.",
+          "fr": "Données de combat pour Conseil 4 avec les niveaux et capacités exacts.",
           "en": "Battle data for Grimsley with exact levels and moves from source trainer data."
         }
       },
@@ -9950,7 +9950,7 @@
           "en": "Elite Four"
         },
         "history": {
-          "fr": "Battle data for Caitlin with exact levels and moves from source trainer data.",
+          "fr": "Données de combat pour Conseil 4 avec les niveaux et capacités exacts.",
           "en": "Battle data for Caitlin with exact levels and moves from source trainer data."
         }
       },
@@ -10084,7 +10084,7 @@
           "en": "Elite Four"
         },
         "history": {
-          "fr": "Battle data for Marshal with exact levels and moves from source trainer data.",
+          "fr": "Données de combat pour Conseil 4 avec les niveaux et capacités exacts.",
           "en": "Battle data for Marshal with exact levels and moves from source trainer data."
         }
       },
@@ -10218,7 +10218,7 @@
           "en": "Elite Four"
         },
         "history": {
-          "fr": "Battle data for Alder with exact levels and moves from source trainer data.",
+          "fr": "Données de combat pour Maitre de la Ligue avec les niveaux et capacités exacts.",
           "en": "Battle data for Alder with exact levels and moves from source trainer data."
         }
       },
@@ -10396,7 +10396,7 @@
           "en": "Gym Leader"
         },
         "history": {
-          "fr": "Battle data for Ghestsis with exact levels and moves from source trainer data.",
+          "fr": "Données de combat pour Ghetis avec les niveaux et capacités exacts.",
           "en": "Battle data for Ghestsis with exact levels and moves from source trainer data."
         }
       },
@@ -10574,7 +10574,7 @@
           "en": "Gym Leader"
         },
         "history": {
-          "fr": "Battle data for Drayden and Iris with exact levels and moves from source trainer data.",
+          "fr": "Données de combat pour Watson / Iris avec les niveaux et capacités exacts.",
           "en": "Battle data for Drayden and Iris with exact levels and moves from source trainer data."
         }
       },
@@ -10686,7 +10686,7 @@
           "en": "Rival"
         },
         "history": {
-          "fr": "Battle data for N with exact levels and moves from source trainer data.",
+          "fr": "Données de combat pour N avec les niveaux et capacités exacts.",
           "en": "Battle data for N with exact levels and moves from source trainer data."
         }
       },
@@ -11011,7 +11011,7 @@
           "en": "Gym Leader"
         },
         "history": {
-          "fr": "Battle data for Cheren with exact levels and moves from source trainer data.",
+          "fr": "Données de combat pour Tcheren avec les niveaux et capacités exacts.",
           "en": "Battle data for Cheren with exact levels and moves from source trainer data."
         }
       },
@@ -11093,7 +11093,7 @@
           "en": "Gym Leader"
         },
         "history": {
-          "fr": "Battle data for Roxie with exact levels and moves from source trainer data.",
+          "fr": "Données de combat pour Strykna avec les niveaux et capacités exacts.",
           "en": "Battle data for Roxie with exact levels and moves from source trainer data."
         }
       },
@@ -11179,7 +11179,7 @@
           "en": "Gym Leader"
         },
         "history": {
-          "fr": "Battle data for Burgh with exact levels and moves from source trainer data.",
+          "fr": "Données de combat pour Artie avec les niveaux et capacités exacts.",
           "en": "Battle data for Burgh with exact levels and moves from source trainer data."
         }
       },
@@ -11291,7 +11291,7 @@
           "en": "Gym Leader"
         },
         "history": {
-          "fr": "Battle data for Elesa with exact levels and moves from source trainer data.",
+          "fr": "Données de combat pour Inezia avec les niveaux et capacités exacts.",
           "en": "Battle data for Elesa with exact levels and moves from source trainer data."
         }
       },
@@ -11395,7 +11395,7 @@
           "en": "Gym Leader"
         },
         "history": {
-          "fr": "Battle data for Clay with exact levels and moves from source trainer data.",
+          "fr": "Données de combat pour Bardane avec les niveaux et capacités exacts.",
           "en": "Battle data for Clay with exact levels and moves from source trainer data."
         }
       },
@@ -11507,7 +11507,7 @@
           "en": "Gym Leader"
         },
         "history": {
-          "fr": "Battle data for Skyla with exact levels and moves from source trainer data.",
+          "fr": "Données de combat pour Carolina avec les niveaux et capacités exacts.",
           "en": "Battle data for Skyla with exact levels and moves from source trainer data."
         }
       },
@@ -11619,7 +11619,7 @@
           "en": "Gym Leader"
         },
         "history": {
-          "fr": "Battle data for Drayden with exact levels and moves from source trainer data.",
+          "fr": "Données de combat pour Watson avec les niveaux et capacités exacts.",
           "en": "Battle data for Drayden with exact levels and moves from source trainer data."
         }
       },
@@ -11731,7 +11731,7 @@
           "en": "Gym Leader"
         },
         "history": {
-          "fr": "Battle data for Marlon with exact levels and moves from source trainer data.",
+          "fr": "Données de combat pour Amana avec les niveaux et capacités exacts.",
           "en": "Battle data for Marlon with exact levels and moves from source trainer data."
         }
       },
@@ -11843,7 +11843,7 @@
           "en": "Elite Four"
         },
         "history": {
-          "fr": "Battle data for Shauntal with exact levels and moves from source trainer data.",
+          "fr": "Données de combat pour Conseil 4 avec les niveaux et capacités exacts.",
           "en": "Battle data for Shauntal with exact levels and moves from source trainer data."
         }
       },
@@ -11977,7 +11977,7 @@
           "en": "Elite Four"
         },
         "history": {
-          "fr": "Battle data for Grimsley with exact levels and moves from source trainer data.",
+          "fr": "Données de combat pour Conseil 4 avec les niveaux et capacités exacts.",
           "en": "Battle data for Grimsley with exact levels and moves from source trainer data."
         }
       },
@@ -12111,7 +12111,7 @@
           "en": "Elite Four"
         },
         "history": {
-          "fr": "Battle data for Caitlin with exact levels and moves from source trainer data.",
+          "fr": "Données de combat pour Conseil 4 avec les niveaux et capacités exacts.",
           "en": "Battle data for Caitlin with exact levels and moves from source trainer data."
         }
       },
@@ -12245,7 +12245,7 @@
           "en": "Elite Four"
         },
         "history": {
-          "fr": "Battle data for Marshal with exact levels and moves from source trainer data.",
+          "fr": "Données de combat pour Conseil 4 avec les niveaux et capacités exacts.",
           "en": "Battle data for Marshal with exact levels and moves from source trainer data."
         }
       },
@@ -12379,7 +12379,7 @@
           "en": "Elite Four"
         },
         "history": {
-          "fr": "Battle data for Iris with exact levels and moves from source trainer data.",
+          "fr": "Données de combat pour Maitre de la Ligue avec les niveaux et capacités exacts.",
           "en": "Battle data for Iris with exact levels and moves from source trainer data."
         }
       },
@@ -12557,7 +12557,7 @@
           "en": "Gym Leader"
         },
         "history": {
-          "fr": "Battle data for Viola with exact levels and moves from source trainer data.",
+          "fr": "Données de combat pour Violette avec les niveaux et capacités exacts.",
           "en": "Battle data for Viola with exact levels and moves from source trainer data."
         }
       },
@@ -12639,7 +12639,7 @@
           "en": "Gym Leader"
         },
         "history": {
-          "fr": "Battle data for Grant with exact levels and moves from source trainer data.",
+          "fr": "Données de combat pour Lino avec les niveaux et capacités exacts.",
           "en": "Battle data for Grant with exact levels and moves from source trainer data."
         }
       },
@@ -12725,7 +12725,7 @@
           "en": "Gym Leader"
         },
         "history": {
-          "fr": "Battle data for Korrina with exact levels and moves from source trainer data.",
+          "fr": "Données de combat pour Cornélia avec les niveaux et capacités exacts.",
           "en": "Battle data for Korrina with exact levels and moves from source trainer data."
         }
       },
@@ -12825,7 +12825,7 @@
           "en": "Gym Leader"
         },
         "history": {
-          "fr": "Battle data for Ramos with exact levels and moves from source trainer data.",
+          "fr": "Données de combat pour Amaro avec les niveaux et capacités exacts.",
           "en": "Battle data for Ramos with exact levels and moves from source trainer data."
         }
       },
@@ -12929,7 +12929,7 @@
           "en": "Gym Leader"
         },
         "history": {
-          "fr": "Battle data for Clemont with exact levels and moves from source trainer data.",
+          "fr": "Données de combat pour Lem avec les niveaux et capacités exacts.",
           "en": "Battle data for Clemont with exact levels and moves from source trainer data."
         }
       },
@@ -13029,7 +13029,7 @@
           "en": "Gym Leader"
         },
         "history": {
-          "fr": "Battle data for Valerie with exact levels and moves from source trainer data.",
+          "fr": "Données de combat pour Valériane avec les niveaux et capacités exacts.",
           "en": "Battle data for Valerie with exact levels and moves from source trainer data."
         }
       },
@@ -13137,7 +13137,7 @@
           "en": "Gym Leader"
         },
         "history": {
-          "fr": "Battle data for Olympia with exact levels and moves from source trainer data.",
+          "fr": "Données de combat pour Astre avec les niveaux et capacités exacts.",
           "en": "Battle data for Olympia with exact levels and moves from source trainer data."
         }
       },
@@ -13249,7 +13249,7 @@
           "en": "Gym Leader"
         },
         "history": {
-          "fr": "Battle data for Wulfric with exact levels and moves from source trainer data.",
+          "fr": "Données de combat pour Urup avec les niveaux et capacités exacts.",
           "en": "Battle data for Wulfric with exact levels and moves from source trainer data."
         }
       },
@@ -13357,7 +13357,7 @@
           "en": "Elite Four"
         },
         "history": {
-          "fr": "Battle data for Wikstrom with exact levels and moves from source trainer data.",
+          "fr": "Données de combat pour Conseil 4 avec les niveaux et capacités exacts.",
           "en": "Battle data for Wikstrom with exact levels and moves from source trainer data."
         }
       },
@@ -13491,7 +13491,7 @@
           "en": "Elite Four"
         },
         "history": {
-          "fr": "Battle data for Malva with exact levels and moves from source trainer data.",
+          "fr": "Données de combat pour Conseil 4 avec les niveaux et capacités exacts.",
           "en": "Battle data for Malva with exact levels and moves from source trainer data."
         }
       },
@@ -13625,7 +13625,7 @@
           "en": "Elite Four"
         },
         "history": {
-          "fr": "Battle data for Drasna with exact levels and moves from source trainer data.",
+          "fr": "Données de combat pour Conseil 4 avec les niveaux et capacités exacts.",
           "en": "Battle data for Drasna with exact levels and moves from source trainer data."
         }
       },
@@ -13759,7 +13759,7 @@
           "en": "Elite Four"
         },
         "history": {
-          "fr": "Battle data for Siebold with exact levels and moves from source trainer data.",
+          "fr": "Données de combat pour Conseil 4 avec les niveaux et capacités exacts.",
           "en": "Battle data for Siebold with exact levels and moves from source trainer data."
         }
       },
@@ -13893,7 +13893,7 @@
           "en": "Elite Four"
         },
         "history": {
-          "fr": "Battle data for Diantha with exact levels and moves from source trainer data.",
+          "fr": "Données de combat pour Maitre de la Ligue avec les niveaux et capacités exacts.",
           "en": "Battle data for Diantha with exact levels and moves from source trainer data."
         }
       },
@@ -14071,7 +14071,7 @@
           "en": "Island Kahuna"
         },
         "history": {
-          "fr": "Battle data for Island Kahuna Hala with exact levels and moves from source trainer data.",
+          "fr": "Données de combat pour Pectorius avec les niveaux et capacités exacts.",
           "en": "Battle data for Island Kahuna Hala with exact levels and moves from source trainer data."
         }
       },
@@ -14171,7 +14171,7 @@
           "en": "Island Kahuna"
         },
         "history": {
-          "fr": "Battle data for Island Kahuna Olivia with exact levels and moves from source trainer data.",
+          "fr": "Données de combat pour Alyxia avec les niveaux et capacités exacts.",
           "en": "Battle data for Island Kahuna Olivia with exact levels and moves from source trainer data."
         }
       },
@@ -14267,7 +14267,7 @@
           "en": "Island Kahuna"
         },
         "history": {
-          "fr": "Battle data for Island Kahuna Nanu with exact levels and moves from source trainer data.",
+          "fr": "Données de combat pour Dan avec les niveaux et capacités exacts.",
           "en": "Battle data for Island Kahuna Nanu with exact levels and moves from source trainer data."
         }
       },
@@ -14371,7 +14371,7 @@
           "en": "Island Kahuna"
         },
         "history": {
-          "fr": "Battle data for Island Kahuna Hapu with exact levels and moves from source trainer data.",
+          "fr": "Données de combat pour Paulie avec les niveaux et capacités exacts.",
           "en": "Battle data for Island Kahuna Hapu with exact levels and moves from source trainer data."
         }
       },
@@ -14493,7 +14493,7 @@
           "en": "Trial Captain"
         },
         "history": {
-          "fr": "Battle data for Ilima (Optional) with exact levels and moves from source trainer data.",
+          "fr": "Données de combat pour Althéo avec les niveaux et capacités exacts.",
           "en": "Battle data for Ilima (Optional) with exact levels and moves from source trainer data."
         }
       },
@@ -14579,7 +14579,7 @@
           "en": "Elite Four"
         },
         "history": {
-          "fr": "Battle data for Hala with exact levels and moves from source trainer data.",
+          "fr": "Données de combat pour Conseil 4 avec les niveaux et capacités exacts.",
           "en": "Battle data for Hala with exact levels and moves from source trainer data."
         }
       },
@@ -14707,7 +14707,7 @@
           "en": "Elite Four"
         },
         "history": {
-          "fr": "Battle data for Olivia with exact levels and moves from source trainer data.",
+          "fr": "Données de combat pour Conseil 4 avec les niveaux et capacités exacts.",
           "en": "Battle data for Olivia with exact levels and moves from source trainer data."
         }
       },
@@ -14851,7 +14851,7 @@
           "en": "Elite Four"
         },
         "history": {
-          "fr": "Battle data for Acerola with exact levels and moves from source trainer data.",
+          "fr": "Données de combat pour Conseil 4 avec les niveaux et capacités exacts.",
           "en": "Battle data for Acerola with exact levels and moves from source trainer data."
         }
       },
@@ -15007,7 +15007,7 @@
           "en": "Elite Four"
         },
         "history": {
-          "fr": "Battle data for Kahili with exact levels and moves from source trainer data.",
+          "fr": "Données de combat pour Conseil 4 avec les niveaux et capacités exacts.",
           "en": "Battle data for Kahili with exact levels and moves from source trainer data."
         }
       },
@@ -15163,7 +15163,7 @@
           "en": "Champion"
         },
         "history": {
-          "fr": "Battle data for Kukui with exact levels and moves from source trainer data.",
+          "fr": "Données de combat pour Maitre de la Ligue avec les niveaux et capacités exacts.",
           "en": "Battle data for Kukui with exact levels and moves from source trainer data."
         }
       },
@@ -15639,7 +15639,7 @@
           "en": "Gym Leader"
         },
         "history": {
-          "fr": "Battle data for Gladion with exact levels and moves from source trainer data.",
+          "fr": "Données de combat pour Rival Gladio avec les niveaux et capacités exacts.",
           "en": "Battle data for Gladion with exact levels and moves from source trainer data."
         }
       },
@@ -15757,7 +15757,7 @@
           "en": "Gym Leader"
         },
         "history": {
-          "fr": "Battle data for Milo with exact levels and moves from source trainer data.",
+          "fr": "Données de combat pour Milo avec les niveaux et capacités exacts.",
           "en": "Battle data for Milo with exact levels and moves from source trainer data."
         }
       },
@@ -15839,7 +15839,7 @@
           "en": "Gym Leader"
         },
         "history": {
-          "fr": "Battle data for Nessa with exact levels and moves from source trainer data.",
+          "fr": "Données de combat pour Donna avec les niveaux et capacités exacts.",
           "en": "Battle data for Nessa with exact levels and moves from source trainer data."
         }
       },
@@ -15951,7 +15951,7 @@
           "en": "Gym Leader"
         },
         "history": {
-          "fr": "Battle data for Kabu with exact levels and moves from source trainer data.",
+          "fr": "Données de combat pour Kabu avec les niveaux et capacités exacts.",
           "en": "Battle data for Kabu with exact levels and moves from source trainer data."
         }
       },
@@ -16063,7 +16063,7 @@
           "en": "Gym Leader"
         },
         "history": {
-          "fr": "Battle data for Opal with exact levels and moves from source trainer data.",
+          "fr": "Données de combat pour Sally avec les niveaux et capacités exacts.",
           "en": "Battle data for Opal with exact levels and moves from source trainer data."
         }
       },
@@ -16185,7 +16185,7 @@
           "en": "Gym Leader"
         },
         "history": {
-          "fr": "Battle data for Piers with exact levels and moves from source trainer data.",
+          "fr": "Données de combat pour Peterson avec les niveaux et capacités exacts.",
           "en": "Battle data for Piers with exact levels and moves from source trainer data."
         }
       },
@@ -16319,7 +16319,7 @@
           "en": "Gym Leader"
         },
         "history": {
-          "fr": "Battle data for Raihan with exact levels and moves from source trainer data.",
+          "fr": "Données de combat pour Roy avec les niveaux et capacités exacts.",
           "en": "Battle data for Raihan with exact levels and moves from source trainer data."
         }
       },
@@ -16453,7 +16453,7 @@
           "en": "Elite Four"
         },
         "history": {
-          "fr": "Battle data for Bede with exact levels and moves from source trainer data.",
+          "fr": "Données de combat pour Rival Travis avec les niveaux et capacités exacts.",
           "en": "Battle data for Bede with exact levels and moves from source trainer data."
         }
       },
@@ -16583,7 +16583,7 @@
           "en": "Elite Four"
         },
         "history": {
-          "fr": "Battle data for Marnie with exact levels and moves from source trainer data.",
+          "fr": "Données de combat pour Rival Rosemary avec les niveaux et capacités exacts.",
           "en": "Battle data for Marnie with exact levels and moves from source trainer data."
         }
       },
@@ -16739,7 +16739,7 @@
           "en": "Champion"
         },
         "history": {
-          "fr": "Battle data for Champion Leon with exact levels and moves from source trainer data.",
+          "fr": "Données de combat pour Maitre de la Ligue avec les niveaux et capacités exacts.",
           "en": "Battle data for Champion Leon with exact levels and moves from source trainer data."
         }
       },
@@ -17215,7 +17215,7 @@
           "en": "Gym Leader"
         },
         "history": {
-          "fr": "Battle data for Bea with exact levels and moves from source trainer data.",
+          "fr": "Données de combat pour Faïza avec les niveaux et capacités exacts.",
           "en": "Battle data for Bea with exact levels and moves from source trainer data."
         }
       },
@@ -17348,7 +17348,7 @@
           "en": "Gym Leader"
         },
         "history": {
-          "fr": "Battle data for Allister with exact levels and moves from source trainer data.",
+          "fr": "Données de combat pour Alistair avec les niveaux et capacités exacts.",
           "en": "Battle data for Allister with exact levels and moves from source trainer data."
         }
       },
@@ -17473,7 +17473,7 @@
           "en": "Gym Leader"
         },
         "history": {
-          "fr": "Battle data for Gordie with exact levels and moves from source trainer data.",
+          "fr": "Données de combat pour Chaz avec les niveaux et capacités exacts.",
           "en": "Battle data for Gordie with exact levels and moves from source trainer data."
         }
       },
@@ -17602,7 +17602,7 @@
           "en": "Gym Leader"
         },
         "history": {
-          "fr": "Battle data for Melony with exact levels and moves from source trainer data.",
+          "fr": "Données de combat pour Lona avec les niveaux et capacités exacts.",
           "en": "Battle data for Melony with exact levels and moves from source trainer data."
         }
       },
@@ -17735,7 +17735,7 @@
           "en": "Gym Leader"
         },
         "history": {
-          "fr": "Battle data for Katy with exact levels and moves from source trainer data.",
+          "fr": "Données de combat pour Katy avec les niveaux et capacités exacts.",
           "en": "Battle data for Katy with exact levels and moves from source trainer data."
         }
       },
@@ -17823,7 +17823,7 @@
           "en": "Gym Leader"
         },
         "history": {
-          "fr": "Battle data for Brassius with exact levels and moves from source trainer data.",
+          "fr": "Données de combat pour Colza avec les niveaux et capacités exacts.",
           "en": "Battle data for Brassius with exact levels and moves from source trainer data."
         }
       },
@@ -17911,7 +17911,7 @@
           "en": "Gym Leader"
         },
         "history": {
-          "fr": "Battle data for Iono with exact levels and moves from source trainer data.",
+          "fr": "Données de combat pour Mashynn avec les niveaux et capacités exacts.",
           "en": "Battle data for Iono with exact levels and moves from source trainer data."
         }
       },
@@ -18021,7 +18021,7 @@
           "en": "Gym Leader"
         },
         "history": {
-          "fr": "Battle data for Kofu with exact levels and moves from source trainer data.",
+          "fr": "Données de combat pour Kombu avec les niveaux et capacités exacts.",
           "en": "Battle data for Kofu with exact levels and moves from source trainer data."
         }
       },
@@ -18121,7 +18121,7 @@
           "en": "Gym Leader"
         },
         "history": {
-          "fr": "Battle data for Larry with exact levels and moves from source trainer data.",
+          "fr": "Données de combat pour Okuba avec les niveaux et capacités exacts.",
           "en": "Battle data for Larry with exact levels and moves from source trainer data."
         }
       },
@@ -18217,7 +18217,7 @@
           "en": "Gym Leader"
         },
         "history": {
-          "fr": "Battle data for Ryme with exact levels and moves from source trainer data.",
+          "fr": "Données de combat pour Laïm avec les niveaux et capacités exacts.",
           "en": "Battle data for Ryme with exact levels and moves from source trainer data."
         }
       },
@@ -18335,7 +18335,7 @@
           "en": "Gym Leader"
         },
         "history": {
-          "fr": "Battle data for Tulip with exact levels and moves from source trainer data.",
+          "fr": "Données de combat pour Tully avec les niveaux et capacités exacts.",
           "en": "Battle data for Tulip with exact levels and moves from source trainer data."
         }
       },
@@ -18453,7 +18453,7 @@
           "en": "Gym Leader"
         },
         "history": {
-          "fr": "Battle data for Grusha with exact levels and moves from source trainer data.",
+          "fr": "Données de combat pour Grusha avec les niveaux et capacités exacts.",
           "en": "Battle data for Grusha with exact levels and moves from source trainer data."
         }
       },
@@ -18575,7 +18575,7 @@
           "en": "Elite Four"
         },
         "history": {
-          "fr": "Battle data for Rika with exact levels and moves from source trainer data.",
+          "fr": "Données de combat pour Conseil 4 avec les niveaux et capacités exacts.",
           "en": "Battle data for Rika with exact levels and moves from source trainer data."
         }
       },
@@ -18731,7 +18731,7 @@
           "en": "Elite Four"
         },
         "history": {
-          "fr": "Battle data for Poppy with exact levels and moves from source trainer data.",
+          "fr": "Données de combat pour Conseil 4 avec les niveaux et capacités exacts.",
           "en": "Battle data for Poppy with exact levels and moves from source trainer data."
         }
       },
@@ -18887,7 +18887,7 @@
           "en": "Elite Four"
         },
         "history": {
-          "fr": "Battle data for Larry with exact levels and moves from source trainer data.",
+          "fr": "Données de combat pour Conseil 4 avec les niveaux et capacités exacts.",
           "en": "Battle data for Larry with exact levels and moves from source trainer data."
         }
       },
@@ -19043,7 +19043,7 @@
           "en": "Elite Four"
         },
         "history": {
-          "fr": "Battle data for Hassel with exact levels and moves from source trainer data.",
+          "fr": "Données de combat pour Conseil 4 avec les niveaux et capacités exacts.",
           "en": "Battle data for Hassel with exact levels and moves from source trainer data."
         }
       },
@@ -19195,7 +19195,7 @@
           "en": "Elite Four"
         },
         "history": {
-          "fr": "Battle data for Geeta with exact levels and moves from source trainer data.",
+          "fr": "Données de combat pour Maitre de la Ligue avec les niveaux et capacités exacts.",
           "en": "Battle data for Geeta with exact levels and moves from source trainer data."
         }
       },
@@ -19373,7 +19373,7 @@
           "en": "Gym Leader"
         },
         "history": {
-          "fr": "Battle data for Nemona with exact levels and moves from source trainer data.",
+          "fr": "Données de combat pour Rival Menzi avec les niveaux et capacités exacts.",
           "en": "Battle data for Nemona with exact levels and moves from source trainer data."
         }
       },
@@ -19849,7 +19849,7 @@
           "en": "Gym Leader"
         },
         "history": {
-          "fr": "Battle data for Arven with exact levels and moves from source trainer data.",
+          "fr": "Données de combat pour Rival Pepper avec les niveaux et capacités exacts.",
           "en": "Battle data for Arven with exact levels and moves from source trainer data."
         }
       },
@@ -20027,7 +20027,7 @@
           "en": "Gym Leader"
         },
         "history": {
-          "fr": "Battle data for Penny with exact levels and moves from source trainer data.",
+          "fr": "Données de combat pour Rival Pania avec les niveaux et capacités exacts.",
           "en": "Battle data for Penny with exact levels and moves from source trainer data."
         }
       },
@@ -20205,7 +20205,7 @@
           "en": "Rival"
         },
         "history": {
-          "fr": "Battle data for Silver with exact levels and moves from source trainer data.",
+          "fr": "Données de combat pour Rival Silver avec les niveaux et capacités exacts.",
           "en": "Battle data for Silver with exact levels and moves from source trainer data."
         }
       },
@@ -20681,7 +20681,7 @@
           "en": "Rival"
         },
         "history": {
-          "fr": "Battle data for Hugh with exact levels and moves from source trainer data.",
+          "fr": "Données de combat pour Rival Matis avec les niveaux et capacités exacts.",
           "en": "Battle data for Hugh with exact levels and moves from source trainer data."
         }
       },
@@ -21157,7 +21157,7 @@
           "en": "Rival"
         },
         "history": {
-          "fr": "Battle data for Calem and Serena with exact levels and moves from source trainer data.",
+          "fr": "Données de combat pour Calem / Serena avec les niveaux et capacités exacts.",
           "en": "Battle data for Calem and Serena with exact levels and moves from source trainer data."
         }
       },
@@ -22008,7 +22008,7 @@
           "en": "Trial Captain"
         },
         "history": {
-          "fr": "Battle data for Lana with exact levels and moves from source trainer data.",
+          "fr": "Données de combat pour Néphie avec les niveaux et capacités exacts.",
           "en": "Battle data for Lana with exact levels and moves from source trainer data."
         }
       },
@@ -22108,7 +22108,7 @@
           "en": "Trial Captain"
         },
         "history": {
-          "fr": "Battle data for Kiawe with exact levels and moves from source trainer data.",
+          "fr": "Données de combat pour Kiawe avec les niveaux et capacités exacts.",
           "en": "Battle data for Kiawe with exact levels and moves from source trainer data."
         }
       },
@@ -22207,7 +22207,7 @@
           "en": "Trial Captain"
         },
         "history": {
-          "fr": "Battle data for Mallow with exact levels and moves from source trainer data.",
+          "fr": "Données de combat pour Barbara avec les niveaux et capacités exacts.",
           "en": "Battle data for Mallow with exact levels and moves from source trainer data."
         }
       },
@@ -22318,7 +22318,7 @@
           "en": "Trial Captain"
         },
         "history": {
-          "fr": "Battle data for Mina with exact levels and moves from source trainer data.",
+          "fr": "Données de combat pour Oléa avec les niveaux et capacités exacts.",
           "en": "Battle data for Mina with exact levels and moves from source trainer data."
         }
       },
@@ -22474,7 +22474,7 @@
           "en": "Rival"
         },
         "history": {
-          "fr": "Battle data for Hau with exact levels and moves from source trainer data.",
+          "fr": "Données de combat pour Rival Tili avec les niveaux et capacités exacts.",
           "en": "Battle data for Hau with exact levels and moves from source trainer data."
         }
       },
@@ -22872,7 +22872,7 @@
           "en": "Rival"
         },
         "history": {
-          "fr": "Battle data for Hop with exact levels and moves from source trainer data.",
+          "fr": "Données de combat pour Rival Nabil avec les niveaux et capacités exacts.",
           "en": "Battle data for Hop with exact levels and moves from source trainer data."
         }
       },

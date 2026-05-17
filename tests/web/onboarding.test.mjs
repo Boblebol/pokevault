@@ -62,7 +62,6 @@ test("writeProfile persists Pokedex-first onboarding choices", async () => {
   const saved = api.writeProfile({
     goal: "complete_pokedex",
     favorite_region: "johto",
-    tracking_mode: "advanced",
     skipped: false,
   });
 
@@ -71,8 +70,8 @@ test("writeProfile persists Pokedex-first onboarding choices", async () => {
   assert.equal(saved.version, 2);
   assert.equal(saved.goal, "complete_pokedex");
   assert.equal(saved.favorite_region, "johto");
-  assert.equal(saved.tracking_mode, "advanced");
-  assert.equal(Object.hasOwn(saved, "card" + "_layer"), false);
+  assert.equal(Object.hasOwn(saved, "binder" + "_type"), false);
+  assert.equal(Object.hasOwn(saved, "tracking" + "_mode"), false);
   assert.match(saved.completed_at, /^\d{4}-\d{2}-\d{2}T/);
   assert.equal(raw.profile, undefined);
   assert.equal(raw.goal, "complete_pokedex");
@@ -96,13 +95,11 @@ test("readProfile migrates legacy collector profiles to the Pokedex-first shape"
     version: profile.version,
     goal: profile.goal,
     favorite_region: profile.favorite_region,
-    tracking_mode: profile.tracking_mode,
     skipped: profile.skipped,
   }, {
     version: 2,
     goal: "complete_pokedex",
     favorite_region: "all",
-    tracking_mode: "advanced",
     skipped: false,
   });
 });
@@ -129,7 +126,6 @@ test("applyPreferences guides the first collection view from region and mode", a
   api.applyPreferences({
     goal: "complete_pokedex",
     favorite_region: "kanto",
-    tracking_mode: "simple",
   });
 
   assert.equal(storage.get("pokedexFormFilter"), "base_regional");
@@ -152,9 +148,7 @@ test("settings profile summary follows English i18n labels", async () => {
     t(key, params = {}) {
       const messages = {
         "onboarding.profile.undefined": "Profile: undefined — replay onboarding to customize.",
-        "onboarding.profile.summary": "Profile: Complete my Pokedex · {region} · {mode} · local binders.",
-        "onboarding.mode.simple": "simple mode",
-        "onboarding.mode.advanced": "advanced mode",
+        "onboarding.profile.summary": "Profile: Complete my Pokedex · {region} · local binders.",
       };
       return (messages[key] || key).replace(/\{([a-zA-Z0-9_]+)\}/g, (_, name) => String(params[name]));
     },
@@ -162,7 +156,10 @@ test("settings profile summary follows English i18n labels", async () => {
 
   assert.equal(api.formatSettingsProfileLabel(null), "Profile: undefined — replay onboarding to customize.");
   assert.equal(
-    api.formatSettingsProfileLabel({ favorite_region: "kanto", tracking_mode: "advanced", skipped: false }),
-    "Profile: Complete my Pokedex · Kanto · advanced mode · local binders.",
+    api.formatSettingsProfileLabel({
+      favorite_region: "kanto",
+      skipped: false
+    }),
+    "Profile: Complete my Pokedex · Kanto · local binders.",
   );
 });

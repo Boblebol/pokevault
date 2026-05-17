@@ -1,4 +1,29 @@
 {
   "version": 1,
-  "families": {}
+  "families": {
+    "0144-articuno": {
+      "label_fr": "Oiseaux Légendaires",
+      "layout_rows": [
+        ["0144-articuno", "0145-zapdos", "0146-moltres"]
+      ]
+    },
+    "0243-raikou": {
+      "label_fr": "Fauves Légendaires",
+      "layout_rows": [
+        ["0243-raikou", "0244-entei", "0245-suicune"]
+      ]
+    },
+    "0377-regirock": {
+      "label_fr": "Golems Légendaires",
+      "layout_rows": [
+        ["0377-regirock", "0378-regice", "0379-registeel"]
+      ]
+    },
+    "0382-kyogre": {
+      "label_fr": "Trio de la Météo",
+      "layout_rows": [
+        ["0382-kyogre", "0383-groudon", "0384-rayquaza"]
+      ]
+    }
+  }
 }

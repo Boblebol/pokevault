@@ -31,32 +31,23 @@ async function loadModule() {
   return apiPromise;
 }
 
-test("artwork switcher exposes generation sprite modes", async () => {
+test("artwork switcher resolves default official artwork", async () => {
   const api = await loadModule();
+  const resolved = api.resolve({
+    slug: "0001-bulbasaur",
+    image: "/data/images/0001-bulbasaur.png",
+  });
 
-  assert.deepEqual(
-    api.modes.map((mode) => mode.id),
-    ["default", "sprite_gen1", "sprite_gen2", "sprite_gen3", "sprite_gen4", "sprite_gen5"],
-  );
-  assert.deepEqual(
-    api.modes.map((mode) => mode.id).filter((id) => id.startsWith("sprite_gen")),
-    ["sprite_gen1", "sprite_gen2", "sprite_gen3", "sprite_gen4", "sprite_gen5"],
-  );
+  assert.equal(resolved.src, "/data/images/0001-bulbasaur.png");
+  assert.deepEqual(resolved.fallbacks, []);
 });
 
-test("resolveForMode uses generation sprite before official artwork fallback", async () => {
+test("artwork switcher handles external URLs", async () => {
   const api = await loadModule();
-  const resolved = api.resolveForMode(
-    {
-      slug: "0001-bulbasaur",
-      image: "/data/images/0001-bulbasaur.png",
-    },
-    "sprite_gen2",
-  );
+  const resolved = api.resolve({
+    slug: "external",
+    image: "https://example.com/sprite.png",
+  });
 
-  assert.equal(
-    resolved.src,
-    "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-ii/crystal/1.png",
-  );
-  assert.deepEqual(resolved.fallbacks, ["/data/images/0001-bulbasaur.png"]);
+  assert.equal(resolved.src, "https://example.com/sprite.png");
 });

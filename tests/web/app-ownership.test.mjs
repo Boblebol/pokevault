@@ -83,7 +83,7 @@ async function loadModule() {
 }
 
 function installRenderStubs() {
-  const grid = { replaceChildren() {}, append() {} };
+  const grid = { replaceChildren() {}, append() {}, style: {}, offsetHeight: 0 };
   const progressFill = { style: {}, parentElement: { setAttribute() {} } };
   const counter = { textContent: "" };
   globalThis.document.createElement = () => ({ className: "", textContent: "" });
@@ -96,17 +96,25 @@ function installRenderStubs() {
 }
 
 function installTrainerContactStubs(ownCard = { for_trade: [] }) {
-  const membershipCalls = [];
+  const calls = [];
   globalThis.PokevaultTrainerContacts = {
     getOwnCard() {
       return ownCard;
     },
+    adjustOwnListCount(slug, listName, delta) {
+      calls.push({ method: "adjust", slug, listName, delta });
+      return Promise.resolve();
+    },
+    clearOwnListMembership(slug, listName) {
+      calls.push({ method: "clear", slug, listName });
+      return Promise.resolve();
+    },
     setOwnListMembership(slug, listName, enabled) {
-      membershipCalls.push({ slug, listName, enabled });
+      calls.push({ method: "set", slug, listName, enabled });
       return Promise.resolve();
     },
   };
-  return membershipCalls;
+  return calls;
 }
 
 test("shouldDimCardForHighlight dims doubles as captured cards", async () => {
@@ -148,30 +156,29 @@ test("backup import accepts schema versions emitted by the backend", async () =>
 test("direct ownership updates map capture duplicate release-one and release-all semantics", async () => {
   await loadModule();
   installRenderStubs();
-  const membershipCalls = installTrainerContactStubs();
+  const calls = installTrainerContactStubs();
   const collection = globalThis.window.PokedexCollection;
 
   collection.setStatus("0001-bulbasaur", "seen", false);
-  await collection.setPokemonOwnershipState("0001-bulbasaur", "owned");
+  await collection.setPokemonOwnershipState("0001-bulbasaur", "add");
   assert.deepEqual(collection.getStatus("0001-bulbasaur"), { state: "caught" });
 
   collection.setStatus("0002-ivysaur", "caught", true);
-  await collection.setPokemonOwnershipState("0002-ivysaur", "duplicate");
+  await collection.setPokemonOwnershipState("0002-ivysaur", "add");
   assert.deepEqual(collection.getStatus("0002-ivysaur"), { state: "caught" });
 
   collection.setStatus("0003-venusaur", "caught", true);
-  await collection.setPokemonOwnershipState("0003-venusaur", "release_one");
+  await collection.setPokemonOwnershipState("0003-venusaur", "remove");
   assert.deepEqual(collection.getStatus("0003-venusaur"), { state: "caught" });
 
   collection.setStatus("0004-charmander", "caught", true);
-  await collection.setPokemonOwnershipState("0004-charmander", "none");
+  await collection.setPokemonOwnershipState("0004-charmander", "release_all");
   assert.deepEqual(collection.getStatus("0004-charmander"), { state: "not_met" });
 
-  assert.deepEqual(membershipCalls, [
-    { slug: "0001-bulbasaur", listName: "for_trade", enabled: false },
-    { slug: "0002-ivysaur", listName: "for_trade", enabled: true },
-    { slug: "0003-venusaur", listName: "for_trade", enabled: false },
-    { slug: "0004-charmander", listName: "for_trade", enabled: false },
+  assert.deepEqual(calls, [
+    { method: "adjust", slug: "0002-ivysaur", listName: "for_trade", delta: 1 },
+    { method: "adjust", slug: "0003-venusaur", listName: "for_trade", delta: -1 },
+    { method: "clear", slug: "0004-charmander", listName: "for_trade" },
   ]);
 });
 
@@ -180,41 +187,45 @@ test("cycleOwnershipBySlug follows simplified capture duplicate release formula"
   installRenderStubs();
   const collection = globalThis.window.PokedexCollection;
   globalThis.PokevaultPokemonFiche = {
+    ownershipLabel() {
+      return "";
+    },
     ownershipStateFromSources(slug, options = {}) {
       const key = String(slug || "").trim();
       const status = options.status || { state: "not_met" };
       const forTrade = Array.isArray(options.ownCard?.for_trade) ? options.ownCard.for_trade : [];
-      const duplicate = forTrade.includes(key);
-      return { caught: duplicate || status.state === "caught", duplicate };
+      const dupCount = forTrade.filter(s => s === key).length;
+      const caught = dupCount > 0 || status.state === "caught";
+      return { caught, count: caught ? 1 + dupCount : 0, duplicate: dupCount > 0 };
     },
   };
 
-  let membershipCalls = installTrainerContactStubs({ for_trade: [] });
+  let calls = installTrainerContactStubs({ for_trade: [] });
   collection.cycleOwnershipBySlug("0007-squirtle", {});
   await Promise.resolve();
   assert.deepEqual(collection.getStatus("0007-squirtle"), { state: "caught" });
-  assert.deepEqual(membershipCalls.at(-1), { slug: "0007-squirtle", listName: "for_trade", enabled: false });
+  assert.equal(calls.length, 0); // first catch doesn't call adjust
 
-  membershipCalls = installTrainerContactStubs({ for_trade: [] });
+  calls = installTrainerContactStubs({ for_trade: [] });
   collection.setStatus("0008-wartortle", "caught", true);
   collection.cycleOwnershipBySlug("0008-wartortle", {});
   await Promise.resolve();
   assert.deepEqual(collection.getStatus("0008-wartortle"), { state: "not_met" });
-  assert.deepEqual(membershipCalls.at(-1), { slug: "0008-wartortle", listName: "for_trade", enabled: false });
+  assert.deepEqual(calls.at(-1), { method: "clear", slug: "0008-wartortle", listName: "for_trade" });
 
-  membershipCalls = installTrainerContactStubs({ for_trade: [] });
+  calls = installTrainerContactStubs({ for_trade: [] });
   collection.setStatus("0009-blastoise", "caught", false);
   collection.cycleOwnershipBySlug("0009-blastoise", { shift: true });
   await Promise.resolve();
   assert.deepEqual(collection.getStatus("0009-blastoise"), { state: "caught" });
-  assert.deepEqual(membershipCalls.at(-1), { slug: "0009-blastoise", listName: "for_trade", enabled: true });
+  assert.deepEqual(calls.at(-1), { method: "adjust", slug: "0009-blastoise", listName: "for_trade", delta: 1 });
 
-  membershipCalls = installTrainerContactStubs({ for_trade: ["0010-caterpie"] });
+  calls = installTrainerContactStubs({ for_trade: ["0010-caterpie"] });
   collection.setStatus("0010-caterpie", "caught", true);
   collection.cycleOwnershipBySlug("0010-caterpie", { shift: true });
   await Promise.resolve();
   assert.deepEqual(collection.getStatus("0010-caterpie"), { state: "caught" });
-  assert.deepEqual(membershipCalls.at(-1), { slug: "0010-caterpie", listName: "for_trade", enabled: false });
+  assert.deepEqual(calls.at(-1), { method: "adjust", slug: "0010-caterpie", listName: "for_trade", delta: -1 });
 });
 
 test("docs route is recognized as a first-class app view", async () => {
@@ -257,7 +268,8 @@ test("pokemon cards show Vu chez only for missing local Pokemon", async () => {
     },
     ownershipStateFromSources(slug, options = {}) {
       const status = options.status || { state: "not_met" };
-      return { caught: status.state === "caught", duplicate: false };
+      const caught = status.state === "caught";
+      return { caught, count: caught ? 1 : 0, duplicate: false };
     },
     createOwnershipActions() {
       return null;
@@ -310,8 +322,9 @@ test("pokemon cards suppress Vu chez for local duplicates even when raw progress
       const key = String(slug || "").trim();
       const status = options.status || { state: "not_met" };
       const forTrade = Array.isArray(options.ownCard?.for_trade) ? options.ownCard.for_trade : [];
-      const duplicate = forTrade.includes(key);
-      return { caught: duplicate || status.state === "caught", duplicate };
+      const dupCount = forTrade.filter(s => s === key).length;
+      const caught = dupCount > 0 || status.state === "caught";
+      return { caught, count: caught ? 1 + dupCount : 0, duplicate: dupCount > 0 };
     },
     createOwnershipActions() {
       return null;
@@ -358,6 +371,6 @@ test("pokemon cards suppress Vu chez for local duplicates even when raw progress
   assert.doesNotMatch(card["aria-label"], /vu chez/);
   assert.equal(card.dataset.ownership, "Plusieurs exemplaires");
   const ownedCount = findByClass(card, "pokemon-owned-count");
-  assert.equal(ownedCount?.textContent, "2+");
+  assert.equal(ownedCount?.textContent, "2");
   assert.equal(ownedCount?.title, "Plusieurs exemplaires");
 });

@@ -7,6 +7,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [1.7.0] — 2026-05-15
+
+### Added
+
+- Pokedex descriptions: each Pokemon detail view now displays historical flavor
+  text from different game versions (in French, sourced from PokéAPI).
+- Smart Compact binder family layouts where families pack tightly side-by-side
+  and only wrap when they overflow the row capacity.
+- Binder search bar to highlight or filter Pokémon in the current binder view.
+
+### Changed
+
+- Binder configuration wizard and its "Modifier format" button moved from the
+  Classeurs view to the Réglages view for better feature discovery.
+- Faster onboarding tour: reduced to 4 steps, removing the binder configuration
+  step (now handled in Réglages).
+- Binder form choices are restricted to Base species and Regional variants only;
+  out-of-scope Mega and Gigantamax forms were removed for a more focused
+  collection experience.
+- Simplified binder organization configuration by removing redundant alignment
+  padding logic.
+
 ## [1.6.3] — 2026-05-09
 
 ### Added

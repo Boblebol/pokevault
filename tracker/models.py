@@ -143,7 +143,7 @@ class TrainerCard(BaseModel):
     favorite_pokemon_slug: str = Field(default="", max_length=80)
     public_note: str = Field(default="", max_length=280)
     contact_links: list[TrainerContactLink] = Field(default_factory=list, max_length=6)
-    for_trade: list[str] = Field(default_factory=list, max_length=80)
+    for_trade: list[str] = Field(default_factory=list, max_length=9999)
     updated_at: str
 
 

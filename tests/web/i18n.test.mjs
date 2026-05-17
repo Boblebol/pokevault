@@ -97,8 +97,8 @@ test("defaults to French and falls back to French for missing English keys", asy
   assert.equal(api.t("app.nav.settings"), "Réglages");
   assert.equal(api.t("missing.key"), "missing.key");
   assert.equal(api.t("app.nav.settings", {}, "en"), "Settings");
-  assert.equal(api.t("app.settings.artwork"), "Images / sprites");
-  assert.equal(api.t("app.settings.artwork", {}, "en"), "Images / sprites");
+  assert.equal(api.t("app.nav.collection"), "Collection");
+  assert.equal(api.t("app.nav.collection", {}, "en"), "Collection");
   assert.equal(api.t("app.binders.settings"), "Modifier format");
   assert.equal(api.t("app.binders.settings", {}, "en"), "Edit format");
   assert.equal(

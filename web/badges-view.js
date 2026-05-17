@@ -579,18 +579,25 @@
 
   function announce(newIds, next) {
     const T = window.PokevaultToast;
-    if (!T || !newIds.length) return;
+    if (!newIds.length) return;
     const byId = new Map((next.catalog || []).map((b) => [b.id, b]));
     for (const id of newIds) {
       const def = byId.get(id);
       if (!def) continue;
-      const copy = displayBadgeCopy(def, { forceReveal: true });
-      const toast = T.show(tr("badges.toast.title"), copy.title, {
-        icon: "★",
-        tone: "ok",
-        duration: 6500,
-      });
-      toast?.classList?.add("toast--badge-unlock", `toast--badge-${def.effect || "metal"}`);
+
+      // New discovery modal with animation
+      openBadgeDetail(def, { isDiscovery: true });
+
+      // Keep toast as a non-intrusive fallback/history record
+      if (T) {
+        const copy = displayBadgeCopy(def, { forceReveal: true });
+        const toast = T.show(tr("badges.toast.title"), copy.title, {
+          icon: "★",
+          tone: "ok",
+          duration: 6500,
+        });
+        toast?.classList?.add("toast--badge-unlock", `toast--badge-${def.effect || "metal"}`);
+      }
     }
   }
 
@@ -829,23 +836,6 @@
       if (dossier) detail.append(dossier);
     }
 
-    const hideRequirements = !badge?.unlocked && badge?.reveal === "mystery";
-    const requirements = hideRequirements ? [] : badgeRequirements(badge);
-    if (requirements.length) {
-      const section = document.createElement("section");
-      section.className = "badge-detail__requirements-section";
-      const subtitle = document.createElement("h3");
-      subtitle.className = "badge-detail__subtitle";
-      subtitle.textContent = tr("badges.detail.requirements");
-      const grid = document.createElement("div");
-      grid.className = "badge-detail-requirements";
-      for (const requirement of requirements) {
-        grid.append(buildDetailRequirement(requirement));
-      }
-      section.append(subtitle, grid);
-      detail.append(section);
-    }
-
     return detail;
   }
 
@@ -857,10 +847,13 @@
     if (activeDetail?.overlay === overlay) activeDetail = null;
   }
 
-  function openBadgeDetail(badge) {
+  function openBadgeDetail(badge, options = {}) {
+    const isDiscovery = options.isDiscovery === true;
     if (activeDetail) closeBadgeDetail(activeDetail.overlay, activeDetail.onKeydown);
     const overlay = document.createElement("div");
     overlay.className = "badge-detail-overlay";
+    if (isDiscovery) overlay.classList.add("badge-detail-overlay--discovery");
+
     const onKeydown = (event) => {
       if (event.key === "Escape") closeBadgeDetail(overlay, onKeydown);
     };
@@ -934,6 +927,17 @@
       ? tr("badges.status.unlocked")
       : tr("badges.status.sealed", { percent: progress.percent });
     tile.append(status);
+
+    const hideRequirements = !badge.unlocked && badge.reveal === "mystery";
+    const requirements = hideRequirements ? [] : badgeRequirements(badge);
+    if (requirements.length) {
+      const footer = document.createElement("footer");
+      footer.className = "badge-tile__footer";
+      for (const requirement of requirements) {
+        footer.append(buildRequirementChip(requirement));
+      }
+      tile.append(footer);
+    }
 
     return tile;
   }

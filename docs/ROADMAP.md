@@ -49,7 +49,6 @@ not add missions, focus lists or automatic sharing.
 
 - Physical binder planning with 3×3 · 10-sheet defaults.
 - Compact evolution-family ordering with strict row alignment for multi-row families.
-- Generation sprite modes for app.
 - Badge gallery with sealed badges until unlock.
 
 ## Active Next Track

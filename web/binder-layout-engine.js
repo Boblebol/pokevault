@@ -30,7 +30,8 @@
   }
 
   function effectiveRegionId(p, defs = []) {
-    if (p?.region) return p.region;
+    const regionalFormRegions = ["alola", "galar", "hisui", "paldea"];
+    if (p?.region && regionalFormRegions.includes(p.region)) return p.region;
     return inferRegionFromDefs(nationalIntFromPokemon(p), defs);
   }
 
@@ -118,48 +119,90 @@
 
   function familyLayoutBlocks(pokemon = [], familyData = null, cols = 3, options = {}) {
     const reserveMissingSlugs = options.reserveMissingSlugs !== false;
+    const continuousAlignment = options.continuousAlignment === true;
     const bySlug = new Map();
     for (const p of pokemon) {
       const slug = String(p?.slug || "");
       if (slug) bySlug.set(slug, p);
     }
 
-    const emitted = new Set();
     const families = Array.isArray(familyData?.families) ? familyData.families : [];
+    const familyCounts = new Map();
+
+    for (const family of families) {
+      let members = Array.isArray(family?.members) ? family.members : [];
+      if (members.length === 0 && Array.isArray(family?.layout_rows)) {
+        members = family.layout_rows.flat().filter((s) => !!s);
+      }
+      let count = 0;
+      for (const slug of members) {
+        if (bySlug.has(slug)) count++;
+      }
+      if (family.id) familyCounts.set(String(family.id), count);
+    }
+
+    const emitted = new Set();
     const blocks = [];
 
     for (const family of families) {
       const familyId = String(family?.id || "");
-      const rows = Array.isArray(family?.layout_rows) ? family.layout_rows : [];
-      const blockRows = [];
+      if ((familyCounts.get(familyId) || 0) < 2) continue;
+
+      let blockRows = [];
       let hasRepresentedPokemon = false;
 
-      for (const rawRow of rows) {
-        if (!Array.isArray(rawRow)) continue;
-        const row = [];
-        let rowHasPokemon = false;
-        for (const slugRaw of rawRow) {
-          if (!slugRaw) {
-            row.push(familyReservedItem(familyId));
-            continue;
-          }
-          const slug = String(slugRaw);
-          const p = bySlug.get(slug);
-          if (!p || emitted.has(slug)) {
-            if (reserveMissingSlugs) row.push(familyReservedItem(familyId));
-            continue;
-          }
-          row.push(pokemonItem(p, familyId));
-          emitted.add(slug);
-          rowHasPokemon = true;
-          hasRepresentedPokemon = true;
+      if (continuousAlignment) {
+        let members = Array.isArray(family?.members) ? family.members : [];
+        if (members.length === 0 && Array.isArray(family?.layout_rows)) {
+          members = family.layout_rows.flat().filter((s) => !!s);
         }
-        if (rowHasPokemon || reserveMissingSlugs) blockRows.push(...chunkRowToColumns(row, cols));
+        const familyItems = [];
+        for (const slug of members) {
+          const p = bySlug.get(slug);
+          if (p && !emitted.has(slug)) {
+            familyItems.push(pokemonItem(p, familyId));
+            emitted.add(slug);
+            hasRepresentedPokemon = true;
+          }
+        }
+        if (hasRepresentedPokemon) {
+          blockRows = chunkRowToColumns(familyItems, cols);
+        }
+      } else {
+        const rows = Array.isArray(family?.layout_rows) ? family.layout_rows : [];
+        for (const rawRow of rows) {
+          if (!Array.isArray(rawRow)) continue;
+          const row = [];
+          let rowHasPokemon = false;
+          for (const slugRaw of rawRow) {
+            if (!slugRaw) {
+              row.push(familyReservedItem(familyId));
+              continue;
+            }
+            const slug = String(slugRaw);
+            const p = bySlug.get(slug);
+            if (!p || emitted.has(slug)) {
+              if (reserveMissingSlugs) row.push(familyReservedItem(familyId));
+              continue;
+            }
+            row.push(pokemonItem(p, familyId));
+            emitted.add(slug);
+            rowHasPokemon = true;
+            hasRepresentedPokemon = true;
+          }
+          if (rowHasPokemon || reserveMissingSlugs) blockRows.push(...chunkRowToColumns(row, cols));
+        }
       }
 
-      if (hasRepresentedPokemon) blocks.push({ familyId, rows: blockRows });
+      if (hasRepresentedPokemon) {
+        const firstPoke = blockRows.flat().find((item) => item?.pokemon)?.pokemon;
+        blocks.push({
+          familyId,
+          rows: blockRows,
+          sortKey: firstPoke ? nationalIntFromPokemon(firstPoke) : 999999,
+        });
+      }
     }
-
     const leftovers = sortNational(
       pokemon.filter((p) => p?.slug && !emitted.has(String(p.slug))),
     );
@@ -168,8 +211,12 @@
       blocks.push({
         familyId,
         rows: [[pokemonItem(p, familyId)]],
+        sortKey: nationalIntFromPokemon(p),
       });
     }
+
+    blocks.sort((a, b) => a.sortKey - b.sortKey);
+
     return blocks;
   }
 
@@ -253,11 +300,14 @@
     return out;
   }
 
-  function regionalFamilyAlbumItems(pokemon = [], defs = [], familyData = null, layout) {
+  function regionalFamilyAlbumItems(pokemon = [], defs = [], familyData = null, layout, familyGroup = "aligned") {
+    const useFamilyBlocks = familyGroup !== "compact";
+    const continuousAlignment = familyGroup === "aligned";
+
     if (!defs.length) {
-      if (familyData && Array.isArray(familyData.families)) {
+      if (familyData && Array.isArray(familyData.families) && useFamilyBlocks) {
         return flattenFamilyBlocksPageAware(
-          familyLayoutBlocks(pokemon, familyData, layout.cols),
+          familyLayoutBlocks(pokemon, familyData, layout.cols, { continuousAlignment }),
           layout,
           { strictRowAlign: true },
         );
@@ -272,10 +322,13 @@
       if (idx > 0) padToNextSheetRecto(out, layout);
 
       const regionPokemon = pokemon.filter((p) => effectiveRegionId(p, defs) === regionId);
-      if (familyData && Array.isArray(familyData.families)) {
+      if (familyData && Array.isArray(familyData.families) && useFamilyBlocks) {
         out.push(
           ...flattenFamilyBlocksPageAware(
-            familyLayoutBlocks(regionPokemon, familyData, layout.cols, { reserveMissingSlugs: false }),
+            familyLayoutBlocks(regionPokemon, familyData, layout.cols, {
+              reserveMissingSlugs: false,
+              continuousAlignment,
+            }),
             layout,
             { strictRowAlign: true },
           ),
@@ -289,9 +342,10 @@
 
   function basicItemsForBinder(binder = {}, pokemon = [], defs = [], familyData = null) {
     const layout = normalizedLayout(binder);
+    const familyGroup = binder.family_group || binder.binder_family_group || "aligned";
 
     if (isRegionalFamilyAlbum(binder)) {
-      return regionalFamilyAlbumItems(pokemon, defs, familyData, layout);
+      return regionalFamilyAlbumItems(pokemon, defs, familyData, layout, familyGroup);
     }
 
     const scoped = applyBinderScope(pokemon, binder, defs);

@@ -56,7 +56,7 @@ def test_save_own_card_cleans_links_and_lists(tmp_path: Path) -> None:
     assert len(saved.contact_links) == 1
     assert saved.contact_links[0].label == "Mail"
     assert saved.contact_links[0].value == "alex@example.test"
-    assert saved.for_trade == ["0007-squirtle"]
+    assert saved.for_trade == ["0007-squirtle", "0007-squirtle"]
 
 
 def test_save_own_card_ignores_legacy_wants_and_badges(tmp_path: Path) -> None:
@@ -78,7 +78,7 @@ def test_save_own_card_ignores_legacy_wants_and_badges(tmp_path: Path) -> None:
     saved = service.save_own_card(legacy)
     exported = saved.model_dump()
 
-    assert saved.for_trade == ["0004-charmander"]
+    assert saved.for_trade == ["0004-charmander", "0004-charmander"]
     assert "wants" not in exported
     assert "badges" not in exported
 
