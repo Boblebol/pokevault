@@ -1,5 +1,6 @@
 from .badge_controller import router as badge_router
 from .binder_controller import router as binder_router
+from .bundle_controller import router as bundle_router
 from .data_controller import router as data_router
 from .export_controller import router as export_router
 from .health_controller import router as health_router
@@ -9,6 +10,7 @@ from .trainer_contact_controller import router as trainer_contact_router
 __all__ = [
     "badge_router",
     "binder_router",
+    "bundle_router",
     "data_router",
     "export_router",
     "health_router",

@@ -22,16 +22,24 @@ from tracker.services.badge_service import BadgeService
 from tracker.services.binder_config_service import BinderConfigService
 from tracker.services.binder_placements_service import BinderPlacementsService
 from tracker.services.binder_workspace_service import BinderWorkspaceService
+from tracker.services.bundle_service import BundleService
 from tracker.services.data_maintenance_service import DataMaintenanceService
 from tracker.services.export_service import ExportService
 from tracker.services.progress_service import ProgressService
 from tracker.services.trainer_contact_service import TrainerContactService
 
 
-def get_progress_repository(
+def get_pokedex_repo(
     settings: Annotated[TrackerSettings, Depends(get_settings)],
-) -> ProgressRepository:
-    return JsonProgressRepository(settings.progress_path)
+) -> JsonPokedexRepository:
+    return JsonPokedexRepository(settings.pokedex_path)
+
+
+def get_bundle_service(
+    settings: Annotated[TrackerSettings, Depends(get_settings)],
+) -> BundleService:
+    return BundleService(settings.data_dir, settings.pokedex_path)
+
 
 
 def get_progress_service(
